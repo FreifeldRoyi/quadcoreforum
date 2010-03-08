@@ -4,5 +4,5 @@
  */
 public class AnotherTest {
 	// just another class
-	// update and change the line updat
+	// update and change the line update
 }
