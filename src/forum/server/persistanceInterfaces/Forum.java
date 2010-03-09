@@ -1,4 +1,4 @@
-package server;
+package forum.server.persistanceInterfaces;
 
 import java.util.Vector;
 
