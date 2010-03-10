@@ -1,18 +1,31 @@
 package forum.server.persistanceInterfaces;
 
+import java.text.SimpleDateFormat;
+
 public interface ForumThread 
 {
-	/*Methods*/
+	/* Methods */
+	
 	public void addMessage (ForumMessage father, ForumMessage newMsg);
-	public void add1NumOfViews();
-	public void add1NumOfResponses();
-	public void sub1NumOfResponses();
+
+	public void incNumOfViews();
+	
+	public void incNumOfResponses();
+	
+	public void decNumOfResponses();
 	
 	/**
 	 * Will return the subject of the root message
 	 * in the thread.
 	 */
-	public void getThreadSubject();
+	public String getThreadSubject();
+	
+	public String getAuthor();
+
+	public SimpleDateFormat getPostingTime(); // will be changed!!!
+
+	public SimpleDateFormat getPostingDate(); // will be changed!!!
+
 	
 }
 

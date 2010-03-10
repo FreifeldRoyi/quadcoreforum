@@ -4,16 +4,31 @@ import java.util.Vector;
 
 public interface Forum 
 {
-	/*Methods*/
-	public void addForumSubject (ForumSubject fs);
-	public void add1ConnectedUser (RegisteredUser ru);
-	public void sub1ConnectedUser (RegisteredUser ru);
-	public void registerUser (String username, String password, String prvName, String lastName, String email);
-	public void addNewThread (ForumSubject fs, ForumMessage fm);
-	public void addNewMessage (ForumSubject fs, ForumThread ft, ForumMessage father, ForumMessage self);
+	/* Methods */
 	
-	/*Getters*/
-	public Vector<RegisteredUser> getConnectedUsers(); //in case we'll want to display the users' names
+	public void addForumSubject (ForumSubject fs);
+
+	
+	public void registerUser (String username, String password, String prvName, String lastName, String email);
+
+	/**
+	 * TODO: change to private
+	 */
+	//public void decConnectedUsers (RegisteredUser ru);
+	// public void incConnectedUsers (RegisteredUser ru);
+
+	public void logout(String username) throws NotConnectedException;
+	public void login(String username, String password) throws AlreadyConnectedException,
+		NotRegisteredException;
+	
+//	public void addNewThread (ForumSubject fs, ForumMessage fm);
+	
+//	public void addNewMessage (ForumSubject fs, ForumThread ft, ForumMessage father, ForumMessage self);
+	
+	/* Getters */
+	
+	public Vector<RegisteredUser> getConnectedUsers(); // in case we'll want to display the users' names
+
 	public int getNumOfConnectedUsers();
 }
 

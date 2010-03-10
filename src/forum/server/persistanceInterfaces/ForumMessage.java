@@ -1,5 +1,8 @@
 package forum.server.persistanceInterfaces;
 
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+
 public interface ForumMessage 
 {
 	/*Setters*/
@@ -9,8 +12,10 @@ public interface ForumMessage
 	/*Getters*/
 	public String getMessageTitle();
 	public String getMessageContent();
-	public int getTime(); //will be changed!!!
-	public int getDate(); //will be changed!!!
+	public SimpleDateFormat getTime(); //will be changed!!!
+	public SimpleDateFormat getDate(); //will be changed!!!
+	
+	public String getAuthor();
 }
 
 /**

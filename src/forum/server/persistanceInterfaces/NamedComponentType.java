@@ -2,15 +2,22 @@ package forum.server.persistanceInterfaces;
 
 public interface NamedComponentType 
 {
-	/*Setters*/
+	/* Setters */
+	
 	public void setName(String name);
+	
 	public void setDescription (String desc);
+	
 	public void add1ToNumberOfMessages();
+	
 	public void sub1FromNumberOfMessages();
 	
-	/*Getters*/
+	/* Getters */
+	
 	public String getName();
+	
 	public String getDescription();
+	
 	public int getNumOfMessages();
 }
 
