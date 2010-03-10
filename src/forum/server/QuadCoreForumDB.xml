@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Forum xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="QuadCoreForumDB.xsd">
+  <name>name</name>
+  <description>description</description>
+  <numOfMessages>0</numOfMessages>
+  <numOfConnected>0</numOfConnected>
+</Forum>

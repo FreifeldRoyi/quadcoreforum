@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:element name="Forum">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="NamedComponent">
+				<xsd:sequence>
+					<xsd:element name="numOfConnected">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:int">
+								<xsd:minInclusive value="0"></xsd:minInclusive>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="forumSubjects" type="ForumSubject">
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="registeredUsers" type="ForumUser"></xsd:element>
+					</xsd:sequence>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>    
+    </xsd:element>
+
+
+	<xsd:simpleType name="ConnectionStatus">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Connected"></xsd:enumeration>
+			<xsd:enumeration value="Disconected"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="NamedComponent">
+		<xsd:sequence>
+			<xsd:element name="name" type="xsd:string"></xsd:element>
+			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="numOfMessages">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="0"></xsd:minInclusive>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ForumUser">
+		<xsd:sequence>
+			<xsd:element name="username" type="xsd:string"></xsd:element>
+			<xsd:element name="password" type="xsd:string"></xsd:element>
+			<xsd:element name="lastName" type="xsd:string"></xsd:element>
+			<xsd:element name="firstName" type="xsd:string"></xsd:element>
+			<xsd:element name="e-mail">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:pattern value=".+(@).+"></xsd:pattern>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="numOfPostedMessages" type="xsd:int"></xsd:element>
+			<xsd:element name="connectionStatus"
+				type="ConnectionStatus">
+			</xsd:element>
+			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="postedMessages" type="ForumMessage"></xsd:element>
+			</xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ForumSubject">
+		<xsd:complexContent>
+			<xsd:extension base="NamedComponent">
+				<xsd:sequence>
+					<xsd:element name="ansestorSubject"
+						type="ForumSubject" minOccurs="0" maxOccurs="1">
+					</xsd:element>
+
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="subSubjects"
+							type="ForumSubject">
+						</xsd:element>
+					</xsd:sequence>
+
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="subThreads"
+							type="ForumThread">
+						</xsd:element>
+					</xsd:sequence>
+
+					<xsd:element name="numOfThreads">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:int">
+								<xsd:minInclusive value="0"></xsd:minInclusive>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					
+					<xsd:element name="lastAddedMessage"
+						type="ForumMessage" minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    <xsd:complexType name="ForumMessage">
+    	<xsd:sequence>
+    		<xsd:element name="author" type="ForumUser"></xsd:element>
+    		<xsd:element name="isReplyTo" type="ForumMessage" minOccurs="0" maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="title" type="xsd:string"></xsd:element>
+    		<xsd:element name="date" type="xsd:date"></xsd:element>
+    		<xsd:element name="time" type="xsd:time"></xsd:element>
+    		<xsd:element name="content" type="xsd:string"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ForumThread">
+    	<xsd:sequence>
+    		<xsd:element name="startMessage" type="ForumMessage"></xsd:element>
+    		<xsd:element name="lastMessage" type="ForumMessage"></xsd:element>
+    		<xsd:element name="numOfViews">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    		<xsd:element name="numOfResponses">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
