@@ -1,4 +1,4 @@
-package forum.server.persistanceInterfaces;
+package forum.server.domainlayer.interfaces;
 
 import java.text.SimpleDateFormat;
 

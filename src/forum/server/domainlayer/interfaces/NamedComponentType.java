@@ -1,4 +1,4 @@
-package forum.server.persistanceInterfaces;
+package forum.server.domainlayer.interfaces;
 
 public interface NamedComponentType 
 {

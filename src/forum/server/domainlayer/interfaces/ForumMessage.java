@@ -1,4 +1,4 @@
-package forum.server.persistanceInterfaces;
+package forum.server.domainlayer.interfaces;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -15,7 +15,10 @@ public interface ForumMessage
 	public SimpleDateFormat getTime(); //will be changed!!!
 	public SimpleDateFormat getDate(); //will be changed!!!
 	
-	public String getAuthor();
+	public RegisteredUser getAuthor();
+	
+	
+	
 }
 
 /**
