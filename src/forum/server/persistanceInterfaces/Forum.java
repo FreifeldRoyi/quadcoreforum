@@ -10,7 +10,7 @@ public interface Forum
 	public void sub1ConnectedUser (RegisteredUser ru);
 	public void registerUser (String username, String password, String prvName, String lastName, String email);
 	public void addNewThread (ForumSubject fs, ForumMessage fm);
-	public void addNewMessage (ForumSubject fs, ForumThread ft, ForumMessage father, ForumMessage self);
+	public void addNewMessage (ForumSubject fs, ForumThread ft, ForumMessage father, ForumMessage self); //
 	
 	/*Getters*/
 	public Vector<RegisteredUser> getConnectedUsers(); //in case we'll want to display the users' names
