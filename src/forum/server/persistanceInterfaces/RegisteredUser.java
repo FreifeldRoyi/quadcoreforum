@@ -2,7 +2,8 @@ package forum.server.persistanceInterfaces;
 
 public interface RegisteredUser 
 {
-	/*Getters*/
+	/* Getters */
+	
 	public String getUsername();
 	public String getPassword();
 	public String getPrivateName();
@@ -10,12 +11,14 @@ public interface RegisteredUser
 	public String getEMail();
 	public int getPostedMsgNumber();
 	
-	/*Setters*/
+	/* Setters */
+	
 	//public void setUsername(String un); I don't think it is needed 
+	
 	public void setPassword(String pass);
 	public void setPrivateName(String prvName);
 	public void setLastName(String lastName);
-	public void setPostedMsgNumber(int num); //in case of serv rollback, we'll want a way to nullify the field
+	public void setPostedMsgNumber(int num); //in case of server rollback, we'll want a way to nullify the field
 }
 
 /**
