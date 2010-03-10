@@ -6,8 +6,8 @@ public interface Forum
 {
 	/*Methods*/
 	public void addForumSubject (ForumSubject fs);
-	public void add1ConnectedUser (RegisteredUser ru);
-	public void sub1ConnectedUser (RegisteredUser ru);
+	public void incConnectedUser (RegisteredUser ru);
+	public void decConnectedUser (RegisteredUser ru);
 	public void registerUser (String username, String password, String prvName, String lastName, String email);
 	public void addNewThread (ForumSubject fs, ForumMessage fm);
 	public void addNewMessage (ForumSubject fs, ForumThread ft, ForumMessage father, ForumMessage self);

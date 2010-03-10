@@ -4,9 +4,9 @@ public interface ForumThread
 {
 	/*Methods*/
 	public void addMessage (ForumMessage father, ForumMessage newMsg);
-	public void add1NumOfViews();
-	public void add1NumOfResponses();
-	public void sub1NumOfResponses();
+	public void incNumOfViews();
+	public void incNumOfResponses();
+	public void decNumOfResponses();
 	
 	/**
 	 * Will return the subject of the root message

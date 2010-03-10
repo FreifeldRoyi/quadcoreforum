@@ -6,8 +6,8 @@ public interface ForumSubject
 	public void addThread (ForumMessage frmMsg);
 	public void addMessage (ForumThread frmThrd, ForumMessage frmMsg);
 	public void addNewThread (ForumMessage frmMsg);
-	public void add1ToThreadCount();
-	public void sub1FromThreadCount();
+	public void incToThreadCount();
+	public void decFromThreadCount();
 	
 	/*Getters*/
 	public int getNumOfThreads();

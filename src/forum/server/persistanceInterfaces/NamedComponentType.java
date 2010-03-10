@@ -5,8 +5,8 @@ public interface NamedComponentType
 	/*Setters*/
 	public void setName(String name);
 	public void setDescription (String desc);
-	public void add1ToNumberOfMessages();
-	public void sub1FromNumberOfMessages();
+	public void incNumberOfMessages();
+	public void decNumberOfMessages();
 	
 	/*Getters*/
 	public String getName();
