@@ -1,26 +1,30 @@
 /**
  * 
  */
-package forum.server.domainlayer.additional;
+package forum.server.domainlayer.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.*;
 import javax.xml.validation.SchemaFactory;
 
 import forum.server.domainlayer.interfaces.persistenceDataHandler;
+import forum.server.exceptions.message.MessageNotFoundException;
+import forum.server.exceptions.subject.SubjectAlreadyExistsException;
+import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.exceptions.user.AlreadyConnectedException;
+import forum.server.exceptions.user.NotConnectedException;
+import forum.server.exceptions.user.NotRegisteredException;
+import forum.server.exceptions.user.WrongPasswordException;
 import forum.server.persistentlayer.Forum;
-import forum.server.persistentlayer.ForumSubject;
-import forum.server.persistentlayer.ForumUser;
 
 /**
  * @author sepetnit
  *
  */
-public class persistenceDataHandlerImpl implements persistenceDataHandler {
+public class JAXBpersistenceDataHandler implements persistenceDataHandler {
 
 	private static String DB_FILES_LOCATION = 
 		"src" + System.getProperty("file.separator") +
@@ -39,7 +43,7 @@ public class persistenceDataHandlerImpl implements persistenceDataHandler {
 	private Marshaller marshaller;
 
 
-	public persistenceDataHandlerImpl() {
+	public JAXBpersistenceDataHandler() {
 		try {
 			this.jaxbContent = JAXBContext.newInstance("forum.server.persistentlayer");
 			this.unmarshaller = this.jaxbContent.createUnmarshaller();
@@ -93,6 +97,47 @@ public class persistenceDataHandlerImpl implements persistenceDataHandler {
 			IOException, SubjectNotFoundException {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void addNewSubject(String father, String subjectName)
+			throws JAXBException, IOException, SubjectAlreadyExistsException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void login(String username, String password)
+			throws AlreadyConnectedException, NotRegisteredException,
+			WrongPasswordException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void logoutUser(String username) throws NotConnectedException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void replyToMessage(int fatherID, String authorUsername,
+			String replyTitle, String replyContent) throws JAXBException,
+			IOException, MessageNotFoundException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateMessageContent(int messageID, String newContent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateMessageTitle(int messageID, String newTitle) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

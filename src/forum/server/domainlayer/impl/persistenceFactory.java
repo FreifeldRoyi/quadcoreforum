@@ -1,6 +1,5 @@
-package forum.server.factories;
+package forum.server.domainlayer.impl;
 
-import forum.server.domainlayer.additional.persistenceDataHandlerImpl;
 import forum.server.domainlayer.interfaces.persistenceDataHandler;
 
 public class persistenceFactory {
@@ -8,9 +7,7 @@ public class persistenceFactory {
 	
 	public persistenceDataHandler getPipe() {
 		if (PERSISTENCE_DATA_HANDLER == null)
-			PERSISTENCE_DATA_HANDLER = new persistenceDataHandlerImpl();
+			PERSISTENCE_DATA_HANDLER = new JAXBpersistenceDataHandler();
 		return PERSISTENCE_DATA_HANDLER;
 	}
-	
-	
 }

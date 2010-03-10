@@ -1,6 +1,8 @@
-package forum.server.persistanceInterfaces;
+package forum.server.domainlayer.interfaces;
 
 import java.util.Vector;
+
+import forum.server.exceptions.user.*;
 
 public interface Forum 
 {
