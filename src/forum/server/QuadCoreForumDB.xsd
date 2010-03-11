@@ -1,36 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-    <xsd:element name="Forum" abstract="true">
-	<xsd:complexType>
-		<xsd:complexContent>
-			<xsd:extension base="NamedComponentType">
-				<xsd:sequence>
-                        <xsd:element name="numOfConnected">
-						<xsd:simpleType>
-							<xsd:restriction base="xsd:int">
-								<xsd:minInclusive value="0"></xsd:minInclusive>
-							</xsd:restriction>
-						</xsd:simpleType>
-					</xsd:element>
-					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="forumSubjects"
-							type="SubjectType">
-						</xsd:element>
-					</xsd:sequence>
-					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="registeredUsers"
-							type="UserType">
-						</xsd:element>
-					</xsd:sequence>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>    
-    </xsd:element>
 
 
-	<xsd:simpleType name="ConnectionStatusType">
+    <xsd:simpleType name="ConnectionStatusType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="Connected"></xsd:enumeration>
 			<xsd:enumeration value="Disconected"></xsd:enumeration>
@@ -148,4 +121,25 @@
     		</xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="ForumType">
+    	<xsd:sequence>
+    		<xsd:element name="numOfConnected">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:int">
+    					<xsd:minInclusive value="0"></xsd:minInclusive>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+
+    		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+    			<xsd:element name="registredUsers" type="UserType"></xsd:element>
+    		</xsd:sequence>
+    		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+    			<xsd:element name="forumSubjects" type="SubjectType"></xsd:element>
+    		</xsd:sequence>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="Forum" type="ForumType"></xsd:element>
 </xsd:schema>
