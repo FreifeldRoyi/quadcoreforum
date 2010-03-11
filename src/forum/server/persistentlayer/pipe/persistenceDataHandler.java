@@ -2,7 +2,7 @@
  * 
  */
 
-package forum.server.domainlayer.interfaces;
+package forum.server.persistentlayer.pipe;
 
 
 import java.io.IOException;

@@ -3,9 +3,7 @@
  * 
  * The interface is intended to the programmers who write the higher layers
  */
-package forum.server.domainlayer.impl;
-
-import forum.server.domainlayer.interfaces.persistenceDataHandler;
+package forum.server.persistentlayer.pipe;
 
 import java.util.*;
 import java.io.File;
@@ -123,7 +121,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		for (UserType tUserType : forum.getRegisteredUsers())
 			if (tUserType.getUsername().equals(authorUsername))
 			{
-				tMsgAuthor = tUserType;
+				tMsgAuthor = tUserType; 
 				break;
 			}		
 		if (tMsgAuthor == null) throw new NotRegisteredException(authorUsername);
