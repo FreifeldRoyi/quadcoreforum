@@ -125,22 +125,33 @@
 	<xsd:element name="Forum">
   	  <xsd:complexType>
     		<xsd:sequence>
-	    		<xsd:element name="numOfConnected">
+    			<xsd:element name="numOfConnected">
     				<xsd:simpleType>
     					<xsd:restriction base="xsd:int">
     						<xsd:minInclusive value="0"></xsd:minInclusive>
     					</xsd:restriction>
     				</xsd:simpleType>
     			</xsd:element>
-	
-	    		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-    				<xsd:element name="registredUsers" type="UserType"></xsd:element>
+
+    			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+    				<xsd:element name="registeredUsers"
+    					type="UserType">
+    				</xsd:element>
     			</xsd:sequence>
     			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-    				<xsd:element name="forumSubjects" type="SubjectType"></xsd:element>
+    				<xsd:element name="forumSubjects"
+    					type="SubjectType">
+    				</xsd:element>
     			</xsd:sequence>
+    			<xsd:element name="numOfMessages">
+    				<xsd:simpleType>
+    					<xsd:restriction base="xsd:int">
+    						<xsd:minInclusive value="0"></xsd:minInclusive>
+    					</xsd:restriction>
+    				</xsd:simpleType>
+    			</xsd:element>
     		</xsd:sequence>
-    	</xsd:complexType>
+  	  </xsd:complexType>
 	</xsd:element>
 
 </xsd:schema>
