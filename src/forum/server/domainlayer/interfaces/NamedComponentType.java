@@ -8,9 +8,9 @@ public interface NamedComponentType
 	
 	public void setDescription (String desc);
 	
-	public void add1ToNumberOfMessages();
+	public void incMessagesNumber();
 	
-	public void sub1FromNumberOfMessages();
+	public void decMessagesNumber();
 	
 	/* Getters */
 	

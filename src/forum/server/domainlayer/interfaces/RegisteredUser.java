@@ -6,7 +6,7 @@ public interface RegisteredUser
 	
 	public String getUsername();
 	public String getPassword();
-	public String getPrivateName();
+	public String getPrivateName(); // what is private????????? first?
 	public String getLastName();
 	public String getEMail();
 	public int getPostedMsgNumber();

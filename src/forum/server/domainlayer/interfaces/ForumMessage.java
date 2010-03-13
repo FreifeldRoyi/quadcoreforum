@@ -1,9 +1,8 @@
 package forum.server.domainlayer.interfaces;
 
 import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
 
-public interface ForumMessage 
+public interface ForumMessage extends NamedComponentType
 {
 	/*Setters*/
 	public void setMessageTitle (String t);

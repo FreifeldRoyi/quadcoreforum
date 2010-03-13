@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 import forum.server.exceptions.subject.*;
 
 
-public interface ForumSubject 
+public interface ForumSubject extends NamedComponentType
 {
 	/* Methods */
 	
@@ -17,12 +17,16 @@ public interface ForumSubject
 	public void incThreadCount();
 	public void decThreadCount();
 	
-	public void addSubject(String subjectName) throws JAXBException, IOException, SubjectNotFoundException;
+	public void addSubSubject(String subjectName) throws JAXBException, IOException, SubjectNotFoundException;
 	
 	/* Getters */
 	public Vector<ForumSubject> getSubSubjects();
 	
 	public int getNumOfThreads();
+	
+	// new method
+	
+	public Vector<Thread> getThreads();
 }
 
 /**

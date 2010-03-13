@@ -3,12 +3,20 @@
  */
 package forum.server.dummygui;
 
+import forum.server.domainlayer.interfaces.Forum;
+import forum.server.domainlayer.interfaces.RegisteredUser;
+import forum.server.exceptions.user.*;
+
 
 /**
  * @author sepetnit
  *
  */
 public class ForumLogin {
+	private Forum forum;
+	//	private ForumPromt prevMenu;
+
+	private static String ESCAPE_SEQUENCE = "esc";
 
 	private enum LoggedUserOperations { 
 		LOGGED_ADD_NEW, LOGGED_VIEW, LOGGED_LOGOFF, LOGGED_EXIT, LOGGED_ERROR, LOGGED_HELP; 
@@ -73,54 +81,75 @@ public class ForumLogin {
 	 * @return 
 	 *              true if a valid operation has chosen and false otherwise 
 	 */ 
-	public boolean redirectOperations(StartOperation userChose) { 
+	public boolean redirectOperations(LoggedUserOperations userChose) { 
 		switch (userChose) { 
-		case START_LOGIN:
+		case LOGGED_ADD_NEW:
 			System.out.println("A"); 
 			return true; 
-		case START_REGISTER: 
+		case LOGGED_VIEW: 
 			System.out.println("B"); 
 			return true; 
-		case START_VIEW_MESSAGES: 
+		case LOGGED_LOGOFF: 
 			System.out.println("C"); 
 			return true; 
-		case START_EXIT:  
+		case LOGGED_EXIT:  
 			System.out.println("Exiting ..."); 
 			System.exit(0); 
 			return true; // just to calm the compiler 
-		case START_HELP: 
+		case LOGGED_HELP: 
 			return true; 
 		default: 
 			return false; 
 		} 
 	}
 
-
-
-
-
-
-
-
-
-
-
 	public void manageLogin() { 
-		System.out.println("Please type your username");
+		System.out.println("Please type your username (or esc to return the main menu)");
 		String tUsername = ForumPromt.USER_CHOICE_SCANNER.next();
-		System.out.println("Please type your password");
+		if (tUsername.equals(ESCAPE_SEQUENCE))
+			return;
+
+		System.out.println("Please type your password (or esc to return the main menu)");
 		String tPassword = ForumPromt.USER_CHOICE_SCANNER.next();
+		if (tPassword.equals(ESCAPE_SEQUENCE))
+			return;
 
-		// here the login should be called
+		try {
+			RegisteredUser tUser = 	this.forum.login(tUsername, tPassword);
+
+			this.playLogged(tUser);
+
+		} catch (AlreadyConnectedException e) {
+			System.out.println(e.getMessage());
+			return;
+		} catch (NotRegisteredException e) {
+			System.out.println(e.getMessage());
+			return;
+		}
+
+	}
+
+	public void playLogged(RegisteredUser loggedIn) { 
+		while (true) {
+			System.out.println("Wellcome " + loggedIn.getPrivateName() + " "
+					+ loggedIn.getLastName() + "!"); // here the login should be handled
+
+			printStartScreenHelp(); // print welcome ... 
+
+			// get the user choice and redirect it or exit if exit is pressed 
+			while (!redirectOperations(getStartScreenOperation())) { 
+				System.out.println("This chose isn't performed, please try again! (press " + 
+						LoggedUserOperations.LOGGED_EXIT.ordinalPlus1() + 
+				" to exit and ? to help)"); 
+				System.out.println();
+				System.out.println("The system waits for your choose ..."); 
+			} 
+		} 
+	}
 
 
-		System.out.println("Wellcome"); // here the login should be handled
-
-
-
-
-
-
-		System.out.println("Please choose one of the following operations:\n"); 
+	public ForumLogin(Forum forum /* , ForumPromt prevMenu */) {
+		this.forum = forum;
+		// this.prevMenu = prevMenu;
 	}
 }
