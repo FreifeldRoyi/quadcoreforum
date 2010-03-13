@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.domainlayer.additional;
+package forum.server.exceptions.other;
 
 /**
  * @author sepetnit

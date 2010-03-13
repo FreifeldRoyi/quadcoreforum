@@ -5,19 +5,14 @@ public interface NamedComponentType
 	/* Setters */
 	
 	public void setName(String name);
-	
 	public void setDescription (String desc);
-	
 	public void incMessagesNumber();
-	
 	public void decMessagesNumber();
 	
 	/* Getters */
 	
-	public String getName();
-	
-	public String getDescription();
-	
+	public String getName();	
+	public String getDescription();	
 	public int getNumOfMessages();
 }
 

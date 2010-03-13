@@ -19,6 +19,9 @@ public interface RegisteredUser
 	public void setPrivateName(String prvName);
 	public void setLastName(String lastName);
 	public void setPostedMsgNumber(int num); //in case of server rollback, we'll want a way to nullify the field
+	
+	/*Methods*/
+	public void incPostedMsgNum();
 }
 
 /**
