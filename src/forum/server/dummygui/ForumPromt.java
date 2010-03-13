@@ -2,6 +2,9 @@ package forum.server.dummygui;
 
 import java.util.Scanner;
 
+import forum.server.domainlayer.impl.CentralForumImpl;
+import forum.server.domainlayer.interfaces.Forum;
+
 /** 
  * @author Sepetnitsky Vitali 
  * 
@@ -9,7 +12,8 @@ import java.util.Scanner;
 public class ForumPromt { 
 
 	public static Scanner USER_CHOICE_SCANNER = new Scanner(System.in); 
-
+	private Forum forum;
+	
 	private enum StartOperation { 
 		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
 
@@ -24,7 +28,11 @@ public class ForumPromt {
 		public int ordinalPlus1() { 
 			return this.ordinal() + 1; 
 		} 
-	} 
+	}
+	
+	public ForumPromt() {
+		forum = new CentralForumImpl();
+	}
 
 	/** 
 	 * Prints a guide which shows the user all the available operations he can choose to perform 
@@ -39,7 +47,7 @@ public class ForumPromt {
 	} 
 
 	/** 
-	 * Prints the welcome promt whith the available operations 
+	 * Prints the welcome promt with the available operations 
 	 */ 
 	private void printStartPromt() { 
 		System.out.println("\nWelcome to the QuadCoreForum system!"); 
@@ -91,7 +99,7 @@ public class ForumPromt {
 	public boolean redirectOperations(StartOperation userChose) { 
 		switch (userChose) { 
 		case START_LOGIN:
-			System.out.println("A"); 
+			new ForumLogin(this.forum).manageLogin();
 			return true; 
 		case START_REGISTER: 
 			System.out.println("B"); 
@@ -123,6 +131,12 @@ public class ForumPromt {
 				System.out.println("The system waits for your choose ..."); 
 			} 
 		} 
-	} 
+	}
+	
+	
+	public static void main (String[] args) {
+		new ForumPromt().playDummy(); // creates a new PromtForum instance which handles the promt
+	}
+		
 } 
 

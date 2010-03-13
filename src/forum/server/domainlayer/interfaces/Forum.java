@@ -3,6 +3,7 @@ package forum.server.domainlayer.interfaces;
 import java.util.Vector;
 
 import forum.server.exceptions.user.*;
+import forum.server.persistentlayer.SubjectType;
 
 public interface Forum 
 {
@@ -20,7 +21,7 @@ public interface Forum
 	// public void incConnectedUsers (RegisteredUser ru);
 
 	public void logout(String username) throws NotConnectedException;
-	public void login(String username, String password) throws AlreadyConnectedException,
+	public RegisteredUser login(String username, String password) throws AlreadyConnectedException,
 		NotRegisteredException;
 	
 //	public void addNewThread (ForumSubject fs, ForumMessage fm);
@@ -32,6 +33,10 @@ public interface Forum
 	public Vector<RegisteredUser> getConnectedUsers(); // in case we'll want to display the users' names
 
 	public int getNumOfConnectedUsers();
+
+	
+	// new methods 
+	public Vector<SubjectType> getForumSubjects();
 }
 
 /**
