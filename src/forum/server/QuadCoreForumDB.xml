@@ -1,4 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Forum xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../QuadCoreForumDB.xsd">
-  <numOfConnected>0</numOfConnected>
-</Forum>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ForumType>
+    <numOfConnected>0</numOfConnected>
+    <registeredUsers>
+        <username>sepetnit</username>
+        <e-mail>sdfdsd@ssdsd</e-mail>
+        <password>uyjzb3Bz</password>
+        <lastName>sepetnitsky</lastName>
+        <firstName>vitali</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+    </registeredUsers>
+    <numOfMessages>0</numOfMessages>
+</ForumType>
