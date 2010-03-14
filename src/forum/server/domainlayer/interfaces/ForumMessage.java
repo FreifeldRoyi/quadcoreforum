@@ -1,26 +1,25 @@
 package forum.server.domainlayer.interfaces;
 
-import java.text.SimpleDateFormat;
-
-public interface ForumMessage extends NamedComponentType
+public interface ForumMessage
 {
 	/*Setters*/
-	public void setMessageTitle (String t);
+	
+	public void setMessageTitle (String t);	
 	public void setMessageContent (String body);
 	
 	/*Getters*/
 	public String getMessageTitle();
 	public String getMessageContent();
-	public SimpleDateFormat getTime(); //will be changed!!!
-	public SimpleDateFormat getDate(); //will be changed!!!
-	
+	public String getTime();
+	public String getDate();
 	public RegisteredUser getAuthor();
 	
-	
-	
+	/*Methods*/
+	public void addMessage(ForumMessage fm);	
 }
 
 /**
  * TODO don't forget to change time/date return type.
  * TODO write proper JavaDoc
+ * TODO private member timeDate of type GregorianCalendar
  */

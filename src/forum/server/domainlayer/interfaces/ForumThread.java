@@ -1,7 +1,5 @@
 package forum.server.domainlayer.interfaces;
 
-import java.text.SimpleDateFormat;
-
 public interface ForumThread 
 {
 	/* Methods */
@@ -10,6 +8,7 @@ public interface ForumThread
 	public void incNumOfResponses();	
 	public void decNumOfResponses();
 	
+	/*Getters*/
 	/**
 	 * Will return the subject of the root message
 	 * in the thread.
@@ -17,9 +16,14 @@ public interface ForumThread
 	public String getThreadSubject();	
 	public String getAuthor();
 	public ForumMessage getRootMessage();
-	public SimpleDateFormat getPostingTime(); // will be changed!!!
-	public SimpleDateFormat getPostingDate(); // will be changed!!!
-
+	public String getPostingTime(); 
+	public String getPostingDate();
+	public String getLatestPostTime();
+	public String getLatestPostDate();
+	public String getLatestPostAuthor();
+	
+	/*Setters*/
+	public void setLatestPost(ForumMessage post);
 	
 }
 

@@ -1,6 +1,6 @@
 package forum.server.domainlayer.interfaces;
 
-public interface NamedComponentType 
+public interface NamedComponent 
 {
 	/* Setters */
 	
