@@ -11,6 +11,7 @@ import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumSubject;
 import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.domainlayer.interfaces.RegisteredUser;
+import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.SubjectAlreadyExistsException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
@@ -102,4 +103,54 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		return tAns;
 	}
 
+	public ForumSubject getForumSubject(long id) throws SubjectNotFoundException {
+		ForumSubject toReturn = this.subSubjects.get(id);
+		if (toReturn == null) { 		
+			for (ForumSubject tSubj : this.subSubjects.values()) {
+				try 
+				{
+					toReturn = tSubj.getForumSubject(id);
+					return toReturn;
+				}
+				catch (SubjectNotFoundException e)
+				{
+					continue;
+				}
+
+			}
+			throw new SubjectNotFoundException(id);
+		}
+		return toReturn;
+	}
+
+	@Override
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
+	{
+		ForumMessage toReturn = null;
+		for (ForumSubject tSubj : this.subSubjects.values())
+		{
+			try 
+			{
+				toReturn = tSubj.findMessage(msgID);
+				return toReturn;
+			}
+			catch (MessageNotFoundException e)
+			{
+				continue;
+			}
+		}
+		for (ForumThread tThread : this.threads)
+		{
+			try 
+			{
+				toReturn = tThread.findMessage(msgID);
+				return toReturn;
+			}
+			catch (MessageNotFoundException e)
+			{
+				continue;
+			}
+		}
+		throw new MessageNotFoundException(msgID);
+	}
 }

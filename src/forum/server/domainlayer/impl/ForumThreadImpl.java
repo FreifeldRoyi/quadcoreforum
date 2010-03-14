@@ -2,6 +2,7 @@ package forum.server.domainlayer.impl;
 
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumThread;
+import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.persistentlayer.MessageType;
 
 public class ForumThreadImpl implements ForumThread 
@@ -101,6 +102,12 @@ public class ForumThreadImpl implements ForumThread
 
 	public String threadToString() {
 		return this.rootMessage.msgToString();
+	}
+
+	@Override
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
+	{
+		return this.rootMessage.findMessage(msgID);
 	}
 	
 }

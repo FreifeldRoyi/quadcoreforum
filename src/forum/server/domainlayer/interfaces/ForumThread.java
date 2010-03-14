@@ -1,5 +1,7 @@
 package forum.server.domainlayer.interfaces;
 
+import forum.server.exceptions.message.MessageNotFoundException;
+
 public interface ForumThread 
 {
 	/* Methods */
@@ -7,6 +9,7 @@ public interface ForumThread
 	public void incNumOfViews();	
 	public void incNumOfResponses();	
 	public void decNumOfResponses();
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException; 
 	
 	/*Getters*/
 	/**
