@@ -11,10 +11,7 @@ public interface RegisteredUser
 	public String getEMail();
 	public int getPostedMsgNumber();
 	
-	/* Setters */
-	
-	//public void setUsername(String un); I don't think it is needed 
-	
+	/* Setters */	
 	public void setPassword(String pass);
 	public void setPrivateName(String prvName);
 	public void setLastName(String lastName);
@@ -26,5 +23,4 @@ public interface RegisteredUser
 
 /**
  * TODO write proper JavaDoc for RegisteredUser
- * TODO add methods
  */
