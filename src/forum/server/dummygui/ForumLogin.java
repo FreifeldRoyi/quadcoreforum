@@ -13,11 +13,12 @@ import forum.server.exceptions.user.*;
  *
  */
 public class ForumLogin {
-	private Forum forum;
+	//private Forum forum;
 	//	private ForumPromt prevMenu;
 
 	private static String ESCAPE_SEQUENCE = "esc";
-
+	private static String SUCCESS_MESSAGE = "success!";
+	
 	private enum LoggedUserOperations { 
 		LOGGED_ADD_NEW, LOGGED_VIEW, LOGGED_LOGOFF, LOGGED_EXIT, LOGGED_ERROR, LOGGED_HELP; 
 
@@ -115,23 +116,28 @@ public class ForumLogin {
 			return;
 
 		try {
-			RegisteredUser tUser = 	this.forum.login(tUsername, tPassword);
+			String tRegAns = ForumPromt.CONT.login(tUsername, tPassword);
+			if (tRegAns.equals(SUCCESS_MESSAGE))
+				this.playLogged();
 
-			this.playLogged(tUser);
-
-		} catch (AlreadyConnectedException e) {
+		} 
+		catch (AlreadyConnectedException e) {
 			System.out.println(e.getMessage());
-			return;
-		} catch (NotRegisteredException e) {
+		} 
+		catch (NotRegisteredException e) 
+		{
 			System.out.println(e.getMessage());
-			return;
+		} 
+		catch (WrongPasswordException e) 
+		{
+			System.out.println("Wrong password please try again");
 		}
 
 	}
 
 	public void playLogged(RegisteredUser loggedIn) { 
 		while (true) {
-			System.out.println("Wellcome " + loggedIn.getPrivateName() + " "
+			System.out.println("Welcome " + loggedIn.getPrivateName() + " "
 					+ loggedIn.getLastName() + "!"); // here the login should be handled
 
 			printStartScreenHelp(); // print welcome ... 
