@@ -4,11 +4,18 @@ import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXException;
 
-public class persistenceFactory {
+public class persistenceFactory 
+{
 	private static persistenceDataHandler PERSISTENCE_DATA_HANDLER = null;
 
-	public persistenceDataHandler getPipe() {
-		if (PERSISTENCE_DATA_HANDLER == null) {
+	/**
+	 * Initializes the forum database (in case it hasn't initialized yet, and returns a pipe which
+	 * handles the database operations)
+	 */
+	public persistenceDataHandler getPipe() 
+	{
+		if (PERSISTENCE_DATA_HANDLER == null) 
+		{
 			try
 			{
 				PERSISTENCE_DATA_HANDLER = new JAXBpersistenceDataHandler();
