@@ -15,7 +15,7 @@ public class ForumPromt {
 	public static Controller CONT = new Controller();
 	
 	private enum StartOperation { 
-		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
+		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_NEW_SUBJECT, START_EXIT, START_ERROR, START_HELP; 
 
 		/** 
 		 * This method is used instead the standard ordinal() method, used with enums. 
@@ -38,6 +38,8 @@ public class ForumPromt {
 		System.out.println("\t" + StartOperation.START_LOGIN.ordinalPlus1()         + ": login to the forum"); 
 		System.out.println("\t" + StartOperation.START_REGISTER.ordinalPlus1()      + ": register to the forum"); 
 		System.out.println("\t" + StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + ": view forum messages as a guest user"); 
+		System.out.println();
+		System.out.println("\t" + StartOperation.START_NEW_SUBJECT.ordinalPlus1()   + ": add new subject to the forum"); 
 		System.out.println("\t" + StartOperation.START_EXIT.ordinalPlus1()          + ": exit the program\n"); 
 		System.out.println("The system waits for your choose ..."); 
 	} 
@@ -52,8 +54,8 @@ public class ForumPromt {
 
 
 	/** 
-	 * Gets the user choise from the available operation list, parses it and returns the suitable enum 
-	 * element or an element which indicates that an error occured. 
+	 * Gets the user choice from the available operation list, parses it and returns the suitable enum
+	 * element or an element which indicates that an error occurred. 
 	 *  
 	 * @return 
 	 *              The desired operation typed by user as an enum element 
@@ -67,7 +69,9 @@ public class ForumPromt {
 			if (tReadText.equals(StartOperation.START_REGISTER.ordinalPlus1() + "")) 
 				return StartOperation.START_REGISTER; 
 			if (tReadText.equals(StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + "")) 
-				return StartOperation.START_VIEW_MESSAGES; 
+				return StartOperation.START_VIEW_MESSAGES;
+			if (tReadText.equals(StartOperation.START_NEW_SUBJECT.ordinalPlus1() + "")) 
+				return StartOperation.START_NEW_SUBJECT;
 			if (tReadText.equals(StartOperation.START_EXIT.ordinalPlus1() + "")) 
 				return StartOperation.START_EXIT; 
 			if (tReadText.equals("?")) 
@@ -98,14 +102,16 @@ public class ForumPromt {
 			new ForumLogin().manageLogin();
 			return true; 
 		case START_REGISTER: 
-			System.out.println("B"); 
+			new ForumFunctions().playRegister();
 			return true; 
-		case START_VIEW_MESSAGES: 
-			System.out.println("C"); 
+		case START_VIEW_MESSAGES:
+			new ForumFunctions().viewMessages();
 			return true; 
+		case START_NEW_SUBJECT:
+			new ForumFunctions().addNewSubject();
 		case START_EXIT:  
 			System.out.println("Exiting ..."); 
-			System.exit(0); 
+			System.exit(0);
 			return true; // just to calm the compiler 
 		case START_HELP: 
 			return true; 

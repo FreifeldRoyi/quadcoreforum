@@ -18,9 +18,9 @@ public class ForumLogin {
 
 	private static String ESCAPE_SEQUENCE = "esc";
 	private static String SUCCESS_MESSAGE = "success!";
-	
+
 	private enum LoggedUserOperations { 
-		LOGGED_ADD_NEW, LOGGED_VIEW, LOGGED_LOGOFF, LOGGED_EXIT, LOGGED_ERROR, LOGGED_HELP; 
+		LOGGED_VIEW, LOGGED_ADD_NEW, LOGGED_LOGOFF, LOGGED_EXIT, LOGGED_ERROR, LOGGED_HELP; 
 
 		/** 
 		 * This method is used instead the standard ordinal() method, used with enums. 
@@ -115,30 +115,18 @@ public class ForumLogin {
 		if (tPassword.equals(ESCAPE_SEQUENCE))
 			return;
 
-		try {
-			String tRegAns = ForumPromt.CONT.login(tUsername, tPassword);
-			if (tRegAns.equals(SUCCESS_MESSAGE))
-				this.playLogged();
-
-		} 
-		catch (AlreadyConnectedException e) {
-			System.out.println(e.getMessage());
-		} 
-		catch (NotRegisteredException e) 
-		{
-			System.out.println(e.getMessage());
-		} 
-		catch (WrongPasswordException e) 
-		{
-			System.out.println("Wrong password please try again");
-		}
+		String tRegAns = ForumPromt.CONT.login(tUsername, tPassword);
+		if (tRegAns.equals(SUCCESS_MESSAGE))
+			this.playLogged();
+		else
+			System.out.println(tRegAns);
 
 	}
 
-	public void playLogged(RegisteredUser loggedIn) { 
+	public void playLogged() { 
 		while (true) {
-			System.out.println("Welcome " + loggedIn.getPrivateName() + " "
-					+ loggedIn.getLastName() + "!"); // here the login should be handled
+			System.out.println("Welcome " + ForumPromt.CONT.getCurrentlyLoggedOnUserName() + " "
+					+ "!"); // here the login should be handled
 
 			printStartScreenHelp(); // print welcome ... 
 
@@ -151,11 +139,5 @@ public class ForumLogin {
 				System.out.println("The system waits for your choose ..."); 
 			} 
 		} 
-	}
-
-
-	public ForumLogin(Forum forum /* , ForumPromt prevMenu */) {
-		this.forum = forum;
-		// this.prevMenu = prevMenu;
 	}
 }

@@ -30,13 +30,33 @@ import forum.server.persistentlayer.pipe.persistenceDataHandler;
  * @author sepetnit
  *
  */
-public class Controller implements domainDataHandler {
-	private 
-
+public class Controller implements DomainDataHandler {
+	private static Forum forum = new ForumImpl();
+	private RegisteredUser user;
+	
 	public Controller() {
 		forum = new ForumImpl();
+		this.user = null;
 	}
 
+	public String[] getForumSubjects() {
+		String[] tAns = new String[this.forum.getForumSubjects().size()];
+		for (int i = 0; i < tAns.length; i++) {
+			tAns[i] = 
+			"subject: " +
+			this.forum.getForumSubjects().get(i).getSubjectID() + " " + 
+			this.forum.getForumSubjects().get(i).getName() + 
+			" " +
+			this.forum.getForumSubjects().get(i).getDescription();
+		}
+		return tAns;
+	}
+	
+	// TODO: add more getters like firstName() ...
+	public String getCurrentlyLoggedOnUserName() {
+		return this.user != null ? this.user.getUsername() : "";
+	}
+	
 	public void addNewMessage(long subjectID, String username,
 			String title, String content) 
 	{
@@ -95,19 +115,17 @@ public class Controller implements domainDataHandler {
 	}
 
 	@Override
-	public void addNewSubject(String name, String description) {
+	public String addNewSubject(String name, String description) {
 		ForumSubject tNewSubject = new ForumSubjectImpl(description, name);
 		try {
 			this.forum.addForumSubject(tNewSubject);
+			return "the subject " + name + " was added successfuly!";
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "JAXB error!";
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "database error!";
 		} catch (SubjectAlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		}
 	}
 
@@ -127,6 +145,7 @@ public class Controller implements domainDataHandler {
 	public String login(String username, String password){
 		try {
 			RegisteredUser tUser = forum.login(username, password);
+			this.user = tUser;
 			return "success!";
 		} catch (AlreadyConnectedException e) {
 			return e.getMessage();
@@ -143,6 +162,7 @@ public class Controller implements domainDataHandler {
 		String toReturn = "success!";
 		try {
 			this.forum.logout(username);
+			this.user = null;
 		} catch (NotConnectedException e) {
 			toReturn = e.getMessage();
 		}

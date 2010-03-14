@@ -30,7 +30,7 @@ public interface DomainDataHandler
 	 * @param name
 	 * @param description
 	 */
-	public void addNewSubject(String name, String description);
+	public String addNewSubject(String name, String description);
 	
 	/**
 	 * 
