@@ -2,6 +2,7 @@ package forum.server.domainlayer.impl;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.Vector;
 
 import forum.server.domainlayer.interfaces.ForumMessage;
@@ -89,5 +90,20 @@ public class ForumMessageImpl implements ForumMessage
 		/**
 		 * TODO figure out what to do with Vitali's interface
 		 */
+	}
+	
+	public String msgToString() {
+		String tAns = this.getAuthor() + "\n" + 
+		this.getDate() + "\n" + this.getTime() + "\n" +
+		this.getMessageTitle() + "\n" + this.getMessageContent();
+		
+		Iterator<ForumMessage> iter = this.replyMessages.iterator();
+		
+		tAns += "\nreplys\n";
+		while (iter.hasNext()) {
+			ForumMessage tReply = (ForumMessage)iter.next();
+			tAns += tReply.msgToString();
+		}
+		return tAns;	
 	}
 }

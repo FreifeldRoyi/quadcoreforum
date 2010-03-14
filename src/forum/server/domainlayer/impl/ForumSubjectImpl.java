@@ -61,4 +61,16 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		 */
 	}
 
+	public String subjToString() {
+		String tAns = this.getName() + " " + this.getDescription() + "\n\n";
+		
+		for (ForumThread tThread : this.threads)
+			tAns += "\n\n" + tThread.threadToString();
+		
+		for (ForumSubject tSubject : this.subSubjects)
+			tAns += "\n\n" + tSubject.subjToString();
+		
+		return tAns;
+	}
+	
 }

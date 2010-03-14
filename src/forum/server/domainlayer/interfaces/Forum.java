@@ -9,7 +9,7 @@ public interface Forum
 {
 	/* Methods */
 	
-	public void addForumSubject (ForumSubject fs);
+	public void addForumSubject(ForumSubject fs);
 
 	
 	public void registerUser (String username, String password, String prvName, String lastName, String email);

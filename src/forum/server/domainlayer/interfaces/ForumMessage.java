@@ -16,6 +16,8 @@ public interface ForumMessage
 	
 	/*Methods*/
 	public void addMessage(ForumMessage fm);	
+	
+	public String msgToString();
 }
 
 /**

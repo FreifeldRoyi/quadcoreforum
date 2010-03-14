@@ -24,7 +24,8 @@ public interface ForumThread
 	
 	/*Setters*/
 	public void setLatestPost(ForumMessage post);
-	
+
+	public String threadToString();
 }
 
 
