@@ -53,19 +53,19 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 	}
 
-	private Forum getForumFromDatabase() throws JAXBException
+	public ForumType getForumFromDatabase() throws JAXBException
 	{
 		return this.unmarshalDatabase();
 	}
 
-	private Forum unmarshalDatabase() throws JAXBException
+	private ForumType unmarshalDatabase() throws JAXBException
 	{
-		Forum tForum = (Forum)unmarshaller.unmarshal(new File(
+		ForumType tForum = (ForumType)this.unmarshaller.unmarshal(new File(
 				DB_FILE_FULL_LOCATION));
 		return tForum;
 	}
 
-	private void marshalDatabase(Forum forum) throws JAXBException
+	private void marshalDatabase(ForumType forum) throws JAXBException
 	{
 		marshaller.marshal(forum, new File(DB_FILE_FULL_LOCATION));
 	}
@@ -74,7 +74,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 			String lastName, String firstName, String email)
 	throws JAXBException, IOException, UserAlreadyExistsException
 	{
-		Forum tForum = this.getForumFromDatabase();
+		ForumType tForum = this.getForumFromDatabase();
 		for (UserType tUserType : tForum.getRegisteredUsers())
 		{
 			if (tUserType.getUsername().equals(username))
@@ -84,24 +84,23 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		}		
 		UserType tNewUser = ExtendedObjectFactory.createUserType(username, password, lastName, firstName, email);
 		tForum.getRegisteredUsers().add(tNewUser);
-		this.marshalDatabase(tForum);		
+		this.marshalDatabase(tForum);
 	}
 
-	// performs a BFS
-	private SubjectType findSubject(List<SubjectType> subjects, String subjName) throws SubjectNotFoundException
-	{		
-		for (SubjectType tSubject : subjects)
-		{ // first, look in the top level
-			if (tSubject.getName().equals(subjName))
-				return tSubject;
-		}
+	// performs a DFS
+	private SubjectType findSubject(List<SubjectType> subjects, long subjectID) throws SubjectNotFoundException
+	{	
+		if (subjects.size() == 0)
+			throw new SubjectNotFoundException(subjectID);
 
 		SubjectType tAnsSubject = null;
 		for (SubjectType tSubject : subjects)
-		{ // look in the deeper levels
+		{			
+			if (tSubject.getSubjectID() == subjectID)
+				return tSubject;
 			try
 			{
-				tAnsSubject = findSubject(tSubject.getSubSubjects(), subjName); 
+				tAnsSubject = findSubject(tSubject.getSubSubjects(), subjectID); 
 				return tAnsSubject;
 			}
 			catch (SubjectNotFoundException e)
@@ -109,12 +108,13 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 				continue; // do nothing - subject wasn't found in deeper levels
 			}
 		}
-		throw new SubjectNotFoundException(subjName); // the required subject wasn't found in all the levels
+
+		throw new SubjectNotFoundException(subjectID); // the required subject wasn't found in all the levels
 	}
 
 
-	private UserType getMessageAuthor(Forum forum, String authorUsername)
-	throws NotRegisteredException, NotConnectedException
+	private UserType getMessageAuthor(ForumType forum, String authorUsername)
+	throws NotRegisteredException
 	{
 		UserType tMsgAuthor = null;
 		// checks that the message author exists and is connected to the system
@@ -125,22 +125,20 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 				break;
 			}		
 		if (tMsgAuthor == null) throw new NotRegisteredException(authorUsername);
-		else if (tMsgAuthor.getConnectionStatus() == ConnectionStatusType.DISCONECTED)
-			throw new NotConnectedException(authorUsername);		
 		return tMsgAuthor;
 	}
 
-	public void addNewMessage(String subjectName, String authorUsername, String msgTitle, String msgContent)
-	throws JAXBException, IOException, NotRegisteredException, NotConnectedException, SubjectNotFoundException
+	public void addNewMessage(long messageID, long subjectID, String authorUsername, String msgTitle, String msgContent)
+	throws JAXBException, IOException, NotRegisteredException, SubjectNotFoundException
 	{
 
-		Forum tForum = this.getForumFromDatabase();
+		ForumType tForum = this.getForumFromDatabase();
 		UserType tMsgAuthor = this.getMessageAuthor(tForum, authorUsername);
 
 		// an exception will be thrown if the message won't be found
-		SubjectType tMsgSubject = this.findSubject(tForum.getForumSubjects(), subjectName);
+		SubjectType tMsgSubject = this.findSubject(tForum.getForumSubjects(), subjectID);
 
-		MessageType tMsg = ExtendedObjectFactory.createMessageType(tForum.getNumOfMessages(), tMsgAuthor, msgTitle, 
+		MessageType tMsg = ExtendedObjectFactory.createMessageType(messageID, tMsgAuthor, msgTitle, 
 				msgContent);
 
 		tForum.setNumOfMessages(tForum.getNumOfMessages() + 1);
@@ -154,42 +152,38 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		this.marshalDatabase(tForum);		
 	}
 
-	public void addNewSubject(String subjectName, String subjectDescription)
+	public void addNewSubject(long subjectID, String subjectName, String subjectDescription)
 	throws JAXBException, IOException, SubjectAlreadyExistsException
 	{
-		Forum tForum = this.getForumFromDatabase();	
-		try
-		{ 
-			this.findSubject(tForum.getForumSubjects(), subjectName);
-			throw new SubjectAlreadyExistsException(subjectName);
-		}
-		catch (SubjectNotFoundException e)
-		{
-			SubjectType tNewSubject = ExtendedObjectFactory.createSubject(null, subjectName, subjectDescription);
-			tForum.getForumSubjects().add(tNewSubject);		
-			this.marshalDatabase(tForum);
+		ForumType tForum = this.getForumFromDatabase();	
+		
+		this.checkDuplicateSubject(tForum.getForumSubjects(), subjectName);
+		
+		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(null, subjectID, subjectName, subjectDescription);
+		tForum.getForumSubjects().add(tNewSubject);		
+		this.marshalDatabase(tForum);
+	}
+
+	private void checkDuplicateSubject(Collection<SubjectType> subjectsCol, String subjectName) throws
+	SubjectAlreadyExistsException {
+		for (SubjectType tSubSubj : subjectsCol) {
+			if (tSubSubj.getName().equals(subjectName))
+				throw new SubjectAlreadyExistsException(subjectName);
 		}
 	}
 
-	public void addNewSubSubject(String father, String subjectName, String subjectDescription) 
+	public void addNewSubSubject(long fatherID, long subjectID, String subjectName, String subjectDescription) 
 	throws JAXBException, IOException, SubjectAlreadyExistsException, SubjectNotFoundException
 	{
-		Forum tForum = this.getForumFromDatabase();	
-		try
-		{ 
-			this.findSubject(tForum.getForumSubjects(), subjectName);
-			throw new SubjectAlreadyExistsException(subjectName);
-		}
-		catch (SubjectNotFoundException e)
-		{
-			SubjectType tAnsestorSubject = this.findSubject(tForum.getForumSubjects(), father);
-			SubjectType tNewSubject = ExtendedObjectFactory.createSubject(tAnsestorSubject, subjectName, subjectDescription);
-			tAnsestorSubject.getSubSubjects().add(tNewSubject);
-			this.marshalDatabase(tForum);
-		}		
+		ForumType tForum = this.getForumFromDatabase();
+		SubjectType tAnsestorSubject = this.findSubject(tForum.getForumSubjects(), fatherID);
+		checkDuplicateSubject(tAnsestorSubject.getSubSubjects(), subjectName);
+		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(tAnsestorSubject, subjectID, subjectName, subjectDescription);
+		tAnsestorSubject.getSubSubjects().add(tNewSubject);
+		this.marshalDatabase(tForum);
 	}
 
-	public void login(String username, String password)
+	/*	public void login(String username, String password)
 	throws JAXBException, IOException, AlreadyConnectedException, NotRegisteredException,
 	WrongPasswordException
 	{
@@ -208,8 +202,8 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 				else throw new WrongPasswordException();
 		throw new NotRegisteredException(username);
 	}
-
-	public void logoutUser(String username) throws JAXBException, IOException, NotConnectedException
+	 */
+	/*	public void logoutUser(String username) throws JAXBException, IOException, NotConnectedException
 	{
 		Forum tForum = this.getForumFromDatabase();	
 		for (UserType tRegUser : tForum.getRegisteredUsers())
@@ -224,8 +218,8 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 				}
 		throw new NotConnectedException(username);
 	}
-
-	private MessageType findMessage(MessageType msgTypeToLookIn, int msgIDtoFind) 
+	 */
+	private MessageType findMessage(MessageType msgTypeToLookIn, long msgIDtoFind) 
 	throws MessageNotFoundException
 	{
 		if (msgTypeToLookIn.getMessageID() == msgIDtoFind)
@@ -243,7 +237,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		throw new MessageNotFoundException(msgIDtoFind);		
 	}
 
-	private MessageType findMessage(Forum forum, int msgIDtoFind) throws MessageNotFoundException 
+	private MessageType findMessage(ForumType forum, long msgIDtoFind) throws MessageNotFoundException 
 	{
 		for (SubjectType tSubjectType : forum.getForumSubjects())
 		{
@@ -262,15 +256,15 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		throw new MessageNotFoundException(msgIDtoFind);
 	}
 
-	public void replyToMessage(int fatherID, String authorUsername, String replyTitle, String replyContent)
-	throws JAXBException, IOException, MessageNotFoundException, NotRegisteredException, NotConnectedException
+	public void replyToMessage(long fatherID, long messageID, String authorUsername, String replyTitle, String replyContent)
+	throws JAXBException, IOException, MessageNotFoundException, NotRegisteredException
 	{
-		Forum tForum = this.getForumFromDatabase();
+		ForumType tForum = this.getForumFromDatabase();
 
 		MessageType father = this.findMessage(tForum, fatherID);
 		UserType tMsgAuthor = this.getMessageAuthor(tForum, authorUsername);		
 
-		MessageType tReply = ExtendedObjectFactory.createMessageType(tForum.getNumOfMessages(),			
+		MessageType tReply = ExtendedObjectFactory.createMessageType(messageID,
 				tMsgAuthor, replyTitle, replyContent);
 
 		tReply.setIsReplyTo(father);
@@ -286,10 +280,10 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		this.marshalDatabase(tForum);		
 	}
 
-	public void updateMessage(int messageID, String newTitle, String newContent) throws JAXBException, IOException,
+	public void updateMessage(long messageID, String newTitle, String newContent) throws JAXBException, IOException,
 	MessageNotFoundException
 	{
-		Forum tForum = this.getForumFromDatabase();
+		ForumType tForum = this.getForumFromDatabase();
 
 		MessageType tMsgToEdit = this.findMessage(tForum, messageID);
 		tMsgToEdit.setTitle(newTitle);

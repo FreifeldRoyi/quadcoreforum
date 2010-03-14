@@ -1,6 +1,7 @@
 package forum.server.domainlayer.pipe;
 
-public interface domainDataHandler {
+public interface domainDataHandler 
+{
 	
 	/**
 	 * 

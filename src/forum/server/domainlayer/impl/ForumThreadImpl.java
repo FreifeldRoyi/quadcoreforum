@@ -22,9 +22,7 @@ public class ForumThreadImpl implements ForumThread
 	@Override
 	public void addMessage(ForumMessage father, ForumMessage newMsg) 
 	{
-		/**
-		 * TODO still needs implementation, figure out what to do here
-		 */
+		father.addReplyToMe(newMsg);
 	}
 
 	@Override

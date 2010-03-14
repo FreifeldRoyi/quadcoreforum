@@ -12,7 +12,7 @@ public interface Forum
 	public void addForumSubject(ForumSubject fs);
 
 	
-	public void registerUser (String username, String password, String prvName, String lastName, String email);
+	public void registerUser (RegisteredUser user) throws UserAlreadyExistsException;
 
 	/**
 	 * TODO: change to private
@@ -36,7 +36,7 @@ public interface Forum
 
 	
 	// new methods 
-	public Vector<SubjectType> getForumSubjects();
+	public Vector<ForumSubject> getForumSubjects();
 }
 
 /**

@@ -21,6 +21,12 @@ public class NamedComponentImpl implements NamedComponent
 		this.name = nm;
 	}
 	
+	public NamedComponentImpl()
+	{
+		this.messageNum = 0;
+	}
+
+	
 	@Override
 	public void decMessagesNumber() 
 	{

@@ -1,10 +1,20 @@
+/**
+ * 
+ */
 package forum.server.persistentlayer.pipe;
 
 import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXException;
 
-public class persistenceFactory 
+
+/**
+ * @author sepetnit
+ *
+ */
+
+
+public class PersistenceFactory 
 {
 	private static persistenceDataHandler PERSISTENCE_DATA_HANDLER = null;
 
@@ -12,7 +22,7 @@ public class persistenceFactory
 	 * Initializes the forum database (in case it hasn't initialized yet, and returns a pipe which
 	 * handles the database operations)
 	 */
-	public persistenceDataHandler getPipe() 
+	public static persistenceDataHandler getPipe() 
 	{
 		if (PERSISTENCE_DATA_HANDLER == null) 
 		{
@@ -23,7 +33,7 @@ public class persistenceFactory
 			catch (JAXBException e) 
 			{
 				System.out.println("An error was encountered while" +
-				"connecting to the database, the program will exit!!!");
+						"connecting to the database, the program will exit!!!");
 				System.exit(-1);
 			}
 			catch (SAXException e) 
@@ -36,3 +46,4 @@ public class persistenceFactory
 		return PERSISTENCE_DATA_HANDLER;
 	}
 }
+

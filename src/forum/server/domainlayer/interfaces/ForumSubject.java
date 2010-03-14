@@ -12,11 +12,10 @@ public interface ForumSubject extends NamedComponent
 {
 	/* Methods */
 	
-	public void openNewThread (RegisteredUser author,  
-			String msgTitle, String msgContent) throws JAXBException, IOException;
+	public void openNewThread (ForumMessage root) throws JAXBException, IOException;
 	
-	public void addSubSubject(String decc, String subjectName) 
-		throws JAXBException, IOException, SubjectNotFoundException;
+	public void addSubSubject(ForumSubject fs) 
+		throws JAXBException, IOException, SubjectAlreadyExistsException;
 	
 	/* Getters */
 	public Vector<ForumSubject> getSubSubjects();
@@ -29,6 +28,7 @@ public interface ForumSubject extends NamedComponent
 	
 	public String subjToString();
 
+	public long getSubjectID();
 }
 
 /**
