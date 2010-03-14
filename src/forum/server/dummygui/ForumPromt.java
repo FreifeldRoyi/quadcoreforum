@@ -2,8 +2,8 @@ package forum.server.dummygui;
 
 import java.util.Scanner;
 
-import forum.server.domainlayer.impl.CentralForumImpl;
 import forum.server.domainlayer.interfaces.Forum;
+import forum.server.domainlayer.pipe.Controller;
 
 /** 
  * @author Sepetnitsky Vitali 
@@ -12,7 +12,7 @@ import forum.server.domainlayer.interfaces.Forum;
 public class ForumPromt { 
 
 	public static Scanner USER_CHOICE_SCANNER = new Scanner(System.in); 
-	private Forum forum;
+	public static Controller CONT = new Controller();
 	
 	private enum StartOperation { 
 		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
@@ -29,10 +29,6 @@ public class ForumPromt {
 			return this.ordinal() + 1; 
 		} 
 	}
-	
-	public ForumPromt() {
-		forum = new CentralForumImpl();
-	}
 
 	/** 
 	 * Prints a guide which shows the user all the available operations he can choose to perform 
@@ -40,7 +36,7 @@ public class ForumPromt {
 	public void printStartScreenHelp() { 
 		System.out.println("Please choose one of the following operations:\n"); 
 		System.out.println("\t" + StartOperation.START_LOGIN.ordinalPlus1()         + ": login to the forum"); 
-		System.out.println("\t" + StartOperation.START_REGISTER.ordinalPlus1()      + ": view forum messages as a guest user"); 
+		System.out.println("\t" + StartOperation.START_REGISTER.ordinalPlus1()      + ": register to the forum"); 
 		System.out.println("\t" + StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + ": view forum messages as a guest user"); 
 		System.out.println("\t" + StartOperation.START_EXIT.ordinalPlus1()          + ": exit the program\n"); 
 		System.out.println("The system waits for your choose ..."); 
@@ -99,7 +95,7 @@ public class ForumPromt {
 	public boolean redirectOperations(StartOperation userChose) { 
 		switch (userChose) { 
 		case START_LOGIN:
-			new ForumLogin(this.forum).manageLogin();
+			new ForumLogin().manageLogin();
 			return true; 
 		case START_REGISTER: 
 			System.out.println("B"); 

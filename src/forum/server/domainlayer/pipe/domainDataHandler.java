@@ -1,6 +1,12 @@
 package forum.server.domainlayer.pipe;
 
-public interface domainDataHandler 
+import forum.server.domainlayer.interfaces.RegisteredUser;
+import forum.server.exceptions.user.AlreadyConnectedException;
+import forum.server.exceptions.user.NotConnectedException;
+import forum.server.exceptions.user.NotRegisteredException;
+import forum.server.exceptions.user.WrongPasswordException;
+
+public interface DomainDataHandler 
 {
 	
 	/**
@@ -16,7 +22,7 @@ public interface domainDataHandler
 	 * @param firstName
 	 * @param email
 	 */
-	public void registerToForum(String username, String password, String lastName, String firstName,
+	public String registerToForum(String username, String password, String lastName, String firstName,
 			String email);
 	
 	/**
@@ -56,10 +62,13 @@ public interface domainDataHandler
 	 * 
 	 * @param username
 	 * @param password
+	 * @throws WrongPasswordException 
+	 * @throws NotRegisteredException 
+	 * @throws AlreadyConnectedException 
 	 */
-	public void login(String username, String password);
+	public String login(String username, String password) throws AlreadyConnectedException, NotRegisteredException, WrongPasswordException;
 	
-	public void logout(String username);
+	public String logout(String username) throws NotConnectedException;
 	
 	public String getContent();
 }

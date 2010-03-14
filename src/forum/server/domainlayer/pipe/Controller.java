@@ -3,6 +3,7 @@
  */
 package forum.server.domainlayer.pipe;
 
+
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
@@ -30,9 +31,7 @@ import forum.server.persistentlayer.pipe.persistenceDataHandler;
  *
  */
 public class Controller implements domainDataHandler {
-
-
-	private Forum forum;
+	private 
 
 	public Controller() {
 		forum = new ForumImpl();
@@ -125,47 +124,50 @@ public class Controller implements domainDataHandler {
 	}
 
 	@Override
-	public void login(String username, String password) {
+	public String login(String username, String password){
 		try {
-			forum.login(username, password);
+			RegisteredUser tUser = forum.login(username, password);
+			return "success!";
 		} catch (AlreadyConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		} catch (NotRegisteredException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		} catch (WrongPasswordException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		}
+
 	}
 
 	@Override
-	public void logout(String username) {
+	public String logout(String username) {
+		String toReturn = "success!";
 		try {
 			this.forum.logout(username);
 		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			toReturn = e.getMessage();
 		}
+		return toReturn;
 
 	}
 
-	public void registerToForum(String username, String password,
+	// TODO: Will be changed - a controller instance will be opened per connection
+	public String registerToForum(String username, String password,
 			String lastName, String firstName, String email) {
-		RegisteredUser tUser = new RegisteredUserImpl(username, password, firstName, lastName, email);
+		String toReturn = "success!";
+		RegisteredUser tUser = new RegisteredUserImpl(username, password, firstName, lastName, email);		
 		try {
 			this.forum.registerUser(tUser);
-		} catch (UserAlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		catch (UserAlreadyExistsException e) {
+			toReturn = e.getMessage();
+		} 
+		catch (JAXBException e) {
+			toReturn = e.getMessage();
+		}
+		catch (IOException e) {
+			toReturn = e.getMessage();
+		}
+		return toReturn;
 	}
 
 	@Override
