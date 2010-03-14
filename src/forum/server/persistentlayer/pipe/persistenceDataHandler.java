@@ -7,10 +7,10 @@ package forum.server.persistentlayer.pipe;
 
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-
 import forum.server.exceptions.message.*;
 import forum.server.exceptions.user.*;
 import forum.server.exceptions.subject.*;
+import forum.server.persistentlayer.ForumType;
 
 
 /**
@@ -40,8 +40,8 @@ public interface persistenceDataHandler
 	 * @throws
 	 * 		In case the given password is wrong
 	 */
-	public void login(String username, String password) throws JAXBException, IOException, AlreadyConnectedException,
-	NotRegisteredException, WrongPasswordException;
+//	public void login(String username, String password) throws JAXBException, IOException, AlreadyConnectedException,
+//	NotRegisteredException, WrongPasswordException;
 
 	/**
 	 * Performs a logout of a user with the given username, by updating its status in the database as disconnected
@@ -56,7 +56,7 @@ public interface persistenceDataHandler
 	 * @throws NotConnectedException
 	 * 		In case the given username isn't connected
 	 */
-	public void logoutUser(String username) throws JAXBException, IOException, NotConnectedException;
+//	public void logoutUser(String username) throws JAXBException, IOException, NotConnectedException;
 
 	/**
 	 * This method updates the database with a new registered user
@@ -84,6 +84,8 @@ public interface persistenceDataHandler
 	/**
 	 * This method updates the database with a new subject which is added to the top level
      *
+     * @param subjectID
+     * 		A unique id of the new subject 
 	 * @param subjectName
 	 * 		The name of the new subject
 	 * @param subjectDescription
@@ -97,7 +99,7 @@ public interface persistenceDataHandler
 	 * @throws SubjectAlreadyExistsException
 	 * 		If there already exists a subject with the given name in the forum
 	 */
-	public void addNewSubject(String subjectName, String subjectDescription) throws JAXBException, IOException, 
+	public void addNewSubject(long subjectID, String subjectName, String subjectDescription) throws JAXBException, IOException, 
 	SubjectAlreadyExistsException;
 
 	
@@ -121,12 +123,14 @@ public interface persistenceDataHandler
 	 * @throws SubjectNotFoundException
 	 * 		In case the new subject should be a sub-subject of a non existing one
 	 */
-	public void addNewSubSubject(String father, String subjectName, String subjectDescription) throws JAXBException, IOException, 
+	public void addNewSubSubject(long fatherID, long subjectID, String subjectName, String subjectDescription) throws JAXBException, IOException, 
 	SubjectAlreadyExistsException, SubjectNotFoundException;	
 	
 	/**
 	 * Adds a new message, by openning a new messages thread within a given subject, and updates the database with the given message
 	 * 
+	 * @param messageID
+	 * 		A unique id of the new message
 	 * @param subjectName
 	 * 		The given subject
 	 * @param authorUsername
@@ -148,14 +152,16 @@ public interface persistenceDataHandler
 	 * @throws SubjectNotFoundException
 	 * 		In case the given subject name is invalid
 	 */
-	public void addNewMessage(String subjectName, String authorUsername, String msgTitle, String msgContent) 
-	throws JAXBException, IOException,  NotRegisteredException, NotConnectedException, SubjectNotFoundException;
+	public void addNewMessage(long messageID, long subjectID, String authorUsername, String msgTitle, String msgContent) 
+	throws JAXBException, IOException,  NotRegisteredException, SubjectNotFoundException;
 
 	/**
 	 * Adds a reply to an existing message which is identificated by the given id
 	 * 
 	 * @param fatherID
 	 * 		The created message will be a reply to a message with this id
+	 * @param messageID
+	 * 		A unique ID of the created message
 	 * @param authorUsername
 	 * 		The reply author
 	 * @param replyTitle
@@ -171,12 +177,9 @@ public interface persistenceDataHandler
 	 * 		In case the given message id which is supposed to be the reply father, wasn't found
 	 * @throws NotRegisteredException
 	 * 		In case the author isn't one of the registered users
-	 * @throws NotConnectedException 
-	 * 		In case the author is a registered forum user, but he isn't connected now and therefore can't
-	 * 		post messages in the forum
 	 */
-	public void replyToMessage(int fatherID, String authorUsername, String replyTitle, String replyContent) 
-	throws JAXBException, IOException, MessageNotFoundException, NotRegisteredException, NotConnectedException;
+	public void replyToMessage(long fatherID, long messageID, String authorUsername, String replyTitle, String replyContent) 
+	throws JAXBException, IOException, MessageNotFoundException, NotRegisteredException;
 
 	/**
 	 * Updates the title and the content of a specific message (the message is identified by the given id) 
@@ -197,6 +200,8 @@ public interface persistenceDataHandler
 	 * @throws MessageNotFoundException
 	 * 		In case the message which should be updated wasn't found
 	 */
-	public void updateMessage(int messageID, String newTitle, String newContent) throws JAXBException,
+	public void updateMessage(long messageID, String newTitle, String newContent) throws JAXBException,
 	IOException, MessageNotFoundException;
+	
+	public ForumType getForumFromDatabase() throws JAXBException;
 }

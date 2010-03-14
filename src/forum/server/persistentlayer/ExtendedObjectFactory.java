@@ -44,7 +44,6 @@ public class ExtendedObjectFactory {
 		tUserType.setFirstName(firstName);
 		tUserType.setEMail(email);
 		tUserType.setNumOfPostedMessages(0);
-		tUserType.setConnectionStatus(ConnectionStatusType.DISCONECTED);
 		return tUserType;
 	}
 
@@ -64,7 +63,7 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link MessageType} class which is initialized with the given parameters		
 	 */
-	public static MessageType createMessageType(int msgID, UserType author,
+	public static MessageType createMessageType(long msgID, UserType author,
 			String title, String content) {
 		GregorianCalendar tCurrDateTime = new GregorianCalendar();
 		MessageType tMsgType = factory.createMessageType();
@@ -111,9 +110,11 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of a {@link SubjectType} which is initialized with the given parameters
 	 */
-	public static SubjectType createSubject(SubjectType father, String name, String description) {
+	public static SubjectType createSubject(SubjectType father, long subjectID, String name, String description) {
 		SubjectType tSubjectType = factory.createSubjectType();
 		tSubjectType.setAnsestorSubject(father);
+		tSubjectType.setSubjectID(subjectID);
+		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
 		tSubjectType.setLastAddedMessage(null);
 		tSubjectType.setNumOfMessages(0);

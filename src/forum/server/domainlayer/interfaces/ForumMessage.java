@@ -8,6 +8,7 @@ public interface ForumMessage
 	public void setMessageContent (String body);
 	
 	/*Getters*/
+	public long getMessageID();
 	public String getMessageTitle();
 	public String getMessageContent();
 	public String getTime();
@@ -15,7 +16,7 @@ public interface ForumMessage
 	public RegisteredUser getAuthor();
 	
 	/*Methods*/
-	public void addMessage(ForumMessage fm);	
+	public void addReplyToMe(ForumMessage fm);	
 	
 	public String msgToString();
 }

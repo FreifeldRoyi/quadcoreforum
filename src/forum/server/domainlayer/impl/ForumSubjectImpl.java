@@ -1,48 +1,76 @@
 package forum.server.domainlayer.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
+import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumSubject;
 import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.domainlayer.interfaces.RegisteredUser;
+import forum.server.exceptions.subject.SubjectAlreadyExistsException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.persistentlayer.pipe.PersistenceFactory;
+import forum.server.persistentlayer.pipe.persistenceDataHandler;
 
 public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject 
 {
-	public Vector<ForumSubject> subSubjects;
-	public Vector<ForumThread> threads;
-	
-	public ForumSubjectImpl(String desc, String name) 
+
+	private static long SUBJECT_ID_COUNTER = 0;
+
+	private long subjectID;
+	private Map<String, ForumSubject> subSubjects; // we assume that there are no two subjects with the same
+	// in the same level
+	private Vector<ForumThread> threads;
+
+	public ForumSubjectImpl(String description, String name) 
 	{
-		super(desc, name);
-		this.subSubjects = new Vector<ForumSubject>();
+
+		super(description, name);
+		this.subjectID = (SUBJECT_ID_COUNTER++);
+		this.subSubjects = new HashMap<String, ForumSubject>();
 		this.threads = new Vector<ForumThread>();
 	}
 
 	@Override
-	public void addSubSubject(String desc, String subjectName) 
-			throws JAXBException, IOException, SubjectNotFoundException 
+	public void addSubSubject(ForumSubject forumSubject) 
+	throws JAXBException, IOException, SubjectAlreadyExistsException
 	{
-		this.subSubjects.add(new ForumSubjectImpl(desc, subjectName));
-		/**
-		 * TODO add to data base.. can't really figure out if i need to hold
-		 * a data base object or not.
-		 */
+		if (this.subSubjects.get(forumSubject.getName()) != null)
+			throw new SubjectAlreadyExistsException(forumSubject.getName());
+
+		this.subSubjects.put(forumSubject.getName(), forumSubject);
+
+		persistenceDataHandler pipe = PersistenceFactory.getPipe();
+
+		try {
+			pipe.addNewSubSubject(this.getSubjectID(), forumSubject.getSubjectID(), 
+					forumSubject.getName(), forumSubject.getDescription());
+		} catch (SubjectNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public long getSubjectID() {
+		return this.subjectID;
 	}
 
 	@Override
 	public int getNumOfThreads() 
 	{
-		return this.threads.size();
+		int tAns = this.threads.size();
+		for (ForumSubject tForumSubject : this.subSubjects.values())
+			tAns += tForumSubject.getNumOfThreads();
+		return tAns;
 	}
 
 	@Override
 	public Vector<ForumSubject> getSubSubjects() 
 	{
-		return this.subSubjects;
+		return new Vector<ForumSubject>(this.subSubjects.values());
 	}
 
 	@Override
@@ -52,25 +80,26 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	@Override
-	public void openNewThread(RegisteredUser author, String msgTitle,
-			String msgContent) throws JAXBException,
-			IOException 
+	public void openNewThread (ForumMessage root) throws JAXBException, IOException
 	{
-		/**
-		 * TODO implement Forum Message first
-		 */
+		this.threads.add(new ForumThreadImpl(root));
 	}
 
-	public String subjToString() {
-		String tAns = this.getName() + " " + this.getDescription() + "\n\n";
-		
+	public String subjToString() 
+	{
+		String tAns = this.getName() + " " + this.getDescription();
+
+
 		for (ForumThread tThread : this.threads)
 			tAns += "\n\n" + tThread.threadToString();
-		
-		for (ForumSubject tSubject : this.subSubjects)
+
+		tAns += "\n" + "subSubjects {";
+		for (ForumSubject tSubject : this.subSubjects.values())
 			tAns += "\n\n" + tSubject.subjToString();
-		
+
+		tAns += "}";
+
 		return tAns;
 	}
-	
+
 }
