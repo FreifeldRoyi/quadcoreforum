@@ -1,5 +1,7 @@
 package forum.server.domainlayer.interfaces;
 
+import forum.server.exceptions.message.MessageNotFoundException;
+
 public interface ForumMessage
 {
 	/*Setters*/
@@ -15,9 +17,10 @@ public interface ForumMessage
 	public String getDate();
 	public RegisteredUser getAuthor();
 	
+	
 	/*Methods*/
 	public void addReplyToMe(ForumMessage fm);	
-	
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException;
 	public String msgToString();
 }
 

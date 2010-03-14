@@ -11,7 +11,6 @@ import javax.xml.bind.JAXBException;
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.exceptions.message.MessageNotFoundException;
-import forum.server.exceptions.user.NotConnectedException;
 import forum.server.exceptions.user.NotRegisteredException;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
 import forum.server.persistentlayer.pipe.persistenceDataHandler;
@@ -137,5 +136,27 @@ public class ForumMessageImpl implements ForumMessage
 			tAns += tReply.msgToString();
 		}
 		return tAns;	
+	}
+
+	@Override
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
+	{
+		ForumMessage toReturn = null;
+		
+		for (ForumMessage tMsg : this.replyMessages)
+		{
+			if (tMsg.getMessageID() == msgID)
+				return tMsg;
+			try 
+			{
+				toReturn = tMsg.findMessage(msgID);
+				return toReturn;
+			}
+			catch (MessageNotFoundException e)
+			{
+				continue;
+			}
+		}
+		throw new MessageNotFoundException(msgID);
 	}
 }

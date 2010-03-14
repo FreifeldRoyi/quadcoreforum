@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
+import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.*;
 
 
@@ -29,6 +30,11 @@ public interface ForumSubject extends NamedComponent
 	public String subjToString();
 
 	public long getSubjectID();
+	
+	
+	public ForumSubject getForumSubject(long id) throws SubjectNotFoundException;
+
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException; 
 }
 
 /**
