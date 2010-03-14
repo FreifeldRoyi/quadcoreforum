@@ -12,7 +12,6 @@ import forum.server.persistentlayer.SubjectType;
 
 public class ForumImpl extends NamedComponentImpl implements Forum 
 {
-
 	private Vector<ForumSubject> subjects;
 	
 	public ForumImpl(String desc, String nm) {

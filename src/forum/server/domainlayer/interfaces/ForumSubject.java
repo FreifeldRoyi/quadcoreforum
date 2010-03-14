@@ -26,6 +26,9 @@ public interface ForumSubject extends NamedComponent
 	// new method
 	
 	public Vector<ForumThread> getThreads();
+	
+	public String subjToString();
+
 }
 
 /**
