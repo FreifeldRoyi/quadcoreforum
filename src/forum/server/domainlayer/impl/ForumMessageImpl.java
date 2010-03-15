@@ -94,6 +94,14 @@ public class ForumMessageImpl implements ForumMessage
 		this.title = t;
 	}
 
+	/**
+	 * Used only for the first time fill
+	 * @param forumMessage
+	 */
+	public void addMessageReplyData(ForumMessage forumMessage) {
+		this.replyMessages.add(forumMessage);
+	}
+	
 	@Override
 	public void addReplyToMe(ForumMessage forumMessage) 
 	{		

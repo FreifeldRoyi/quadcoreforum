@@ -39,7 +39,12 @@ public interface ForumSubject extends NamedComponent
 	 * Used only for the first time fill
 	 */
 	public void addSubSubjectToData(ForumSubject fs);
-	
+
+	/**
+	 * Used only for the first time fill
+	 */
+
+	public void addThreadToData(ForumThread ft);
 		
 	
 	public Vector<ForumThread> getThreads();

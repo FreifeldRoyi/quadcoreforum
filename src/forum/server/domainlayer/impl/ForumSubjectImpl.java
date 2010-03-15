@@ -102,6 +102,18 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		this.subSubjects.put(fs.getName(), fs);
 	}
 
+	/**
+	 * Used only to construct the first time
+	 * 
+	 * @param ft
+	 */
+	public void addThreadToData(ForumThread ft) {
+		this.threads.add(ft);
+	}
+
+	
+	
+
 	@Override
 	public Vector<ForumThread> getThreads() 
 	{
