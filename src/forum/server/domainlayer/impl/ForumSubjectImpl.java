@@ -14,6 +14,7 @@ import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.SubjectAlreadyExistsException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.exceptions.user.NotRegisteredException;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
 import forum.server.persistentlayer.pipe.persistenceDataHandler;
 
@@ -27,11 +28,29 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	// in the same level
 	private Vector<ForumThread> threads;
 
+
+	/**
+	 * Used only for converter class where the subjectID is already defined
+	 * @param id
+	 * @param description
+	 * @param name
+	 */
+	public ForumSubjectImpl(long id, String description, String name) 
+	{
+
+		super(description, name);
+		this.subjectID = id;
+		SUBJECT_ID_COUNTER++;
+		this.subSubjects = new HashMap<String, ForumSubject>();
+		this.threads = new Vector<ForumThread>();
+	}
+
+
 	public ForumSubjectImpl(String description, String name) 
 	{
 
 		super(description, name);
-		this.subjectID = (SUBJECT_ID_COUNTER++);
+		this.subjectID = (ForumSubjectImpl.SUBJECT_ID_COUNTER++);
 		this.subSubjects = new HashMap<String, ForumSubject>();
 		this.threads = new Vector<ForumThread>();
 	}
@@ -74,6 +93,15 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		return new Vector<ForumSubject>(this.subSubjects.values());
 	}
 
+	/**
+	 * Used only to construct the first time
+	 * 
+	 * @param fs
+	 */
+	public void addSubSubjectToData(ForumSubject fs) {
+		this.subSubjects.put(fs.getName(), fs);
+	}
+
 	@Override
 	public Vector<ForumThread> getThreads() 
 	{
@@ -81,9 +109,20 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	@Override
-	public void openNewThread (ForumMessage root) throws JAXBException, IOException
+	public void openNewThread (ForumMessage root) throws JAXBException, IOException, NotRegisteredException, SubjectNotFoundException
 	{
 		this.threads.add(new ForumThreadImpl(root));
+
+		persistenceDataHandler pipe = PersistenceFactory.getPipe();
+
+			pipe.addNewMessage(root.getMessageID(), this.getSubjectID(),
+					root.getAuthor().getUsername(), root.getMessageTitle(),
+					root.getMessageContent());
+	}
+
+
+	public String toString() {
+		return this.getName() + " " + this.getDescription();
 	}
 
 	public String subjToString() 
@@ -104,23 +143,24 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	public ForumSubject getForumSubject(long id) throws SubjectNotFoundException {
-		ForumSubject toReturn = this.subSubjects.get(id);
-		if (toReturn == null) { 		
-			for (ForumSubject tSubj : this.subSubjects.values()) {
-				try 
-				{
+		ForumSubject toReturn = null;
+		for (ForumSubject tSubj : this.subSubjects.values()) {
+			try 
+			{
+				if (tSubj.getSubjectID() == id)
+					return tSubj;
+				else { 
 					toReturn = tSubj.getForumSubject(id);
 					return toReturn;
 				}
-				catch (SubjectNotFoundException e)
-				{
-					continue;
-				}
-
 			}
-			throw new SubjectNotFoundException(id);
+			catch (SubjectNotFoundException e)
+			{
+				continue;
+			}
+
 		}
-		return toReturn;
+		throw new SubjectNotFoundException(id);
 	}
 
 	@Override
@@ -152,5 +192,15 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 			}
 		}
 		throw new MessageNotFoundException(msgID);
+	}
+
+
+	@Override
+	public Map<Long, String> getForumThreadsDesc() {
+		Map<Long, String> toReturn = new HashMap<Long, String>();
+
+		for (ForumThread tForumThread : this.getThreads())
+			toReturn.put(tForumThread.getRootMessageID(), tForumThread.toString());
+		return toReturn;
 	}
 }

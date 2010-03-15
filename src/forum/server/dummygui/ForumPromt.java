@@ -37,7 +37,7 @@ public class ForumPromt {
 		System.out.println("Please choose one of the following operations:\n"); 
 		System.out.println("\t" + StartOperation.START_LOGIN.ordinalPlus1()         + ": login to the forum"); 
 		System.out.println("\t" + StartOperation.START_REGISTER.ordinalPlus1()      + ": register to the forum"); 
-		System.out.println("\t" + StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + ": view forum messages as a guest user"); 
+		System.out.println("\t" + StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + ": browse the forum as a guest user"); 
 		System.out.println();
 		System.out.println("\t" + StartOperation.START_NEW_SUBJECT.ordinalPlus1()   + ": add new subject to the forum"); 
 		System.out.println("\t" + StartOperation.START_EXIT.ordinalPlus1()          + ": exit the program\n"); 
@@ -77,7 +77,6 @@ public class ForumPromt {
 			if (tReadText.equals("?")) 
 				return StartOperation.START_HELP; 
 			return StartOperation.START_ERROR; 
-
 		} 
 		catch (Exception tIOException) { 
 			System.out.println("An error has occured for some reason, can't read" + 
@@ -105,10 +104,11 @@ public class ForumPromt {
 			new ForumFunctions().playRegister();
 			return true; 
 		case START_VIEW_MESSAGES:
-			new ForumFunctions().viewMessages();
+			new ForumFunctions().view(-1);
 			return true; 
 		case START_NEW_SUBJECT:
-			new ForumFunctions().addNewSubject();
+			new ForumFunctions().addNewSubject(-1);
+			return true;
 		case START_EXIT:  
 			System.out.println("Exiting ..."); 
 			System.exit(0);
@@ -126,7 +126,7 @@ public class ForumPromt {
 
 			// get the user choice and redirect it or exit if exit is pressed 
 			while (!redirectOperations(getStartScreenOperation())) { 
-				System.out.println("This chose isn't performed, please try again! (press " + 
+				System.out.println("This choise isn't performed, please try again! (press " + 
 						StartOperation.START_EXIT.ordinalPlus1() + 
 				" to exit and ? to help)"); 
 				System.out.println(); 
@@ -138,7 +138,6 @@ public class ForumPromt {
 	
 	public static void main (String[] args) {
 		new ForumPromt().playDummy(); // creates a new PromtForum instance which handles the promt
-	}
-		
+	}		
 } 
 

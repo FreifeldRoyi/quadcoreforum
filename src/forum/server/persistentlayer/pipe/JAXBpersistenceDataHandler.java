@@ -144,7 +144,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		tForum.setNumOfMessages(tForum.getNumOfMessages() + 1);
 
 		ThreadType tThread = ExtendedObjectFactory.createThreadType(tMsg);
-		tMsg.setThread(tThread);
+		//tMsg.setThread(tThread);
 
 		tMsgSubject.getSubThreads().add(tThread);
 		tMsgSubject.setNumOfThreads(tMsgSubject.getNumOfThreads() + 1);
@@ -159,7 +159,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		
 		this.checkDuplicateSubject(tForum.getForumSubjects(), subjectName);
 		
-		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(null, subjectID, subjectName, subjectDescription);
+		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, subjectName, subjectDescription);
 		tForum.getForumSubjects().add(tNewSubject);		
 		this.marshalDatabase(tForum);
 	}
@@ -178,7 +178,7 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		ForumType tForum = this.getForumFromDatabase();
 		SubjectType tAnsestorSubject = this.findSubject(tForum.getForumSubjects(), fatherID);
 		checkDuplicateSubject(tAnsestorSubject.getSubSubjects(), subjectName);
-		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(tAnsestorSubject, subjectID, subjectName, subjectDescription);
+		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, subjectName, subjectDescription);
 		tAnsestorSubject.getSubSubjects().add(tNewSubject);
 		this.marshalDatabase(tForum);
 	}
@@ -267,10 +267,8 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		MessageType tReply = ExtendedObjectFactory.createMessageType(messageID,
 				tMsgAuthor, replyTitle, replyContent);
 
-		tReply.setIsReplyTo(father);
-		tReply.setThread(father.getThread());
-		tReply.getThread().setNumOfResponses(tReply.getThread().getNumOfResponses() + 1);
-		tReply.getThread().setLastMessage(tReply);
+//		tReply.getThread().setNumOfResponses(tReply.getThread().getNumOfResponses() + 1);
+//		tReply.getThread().setLastMessage(tReply);
 
 		father.getReplies().add(tReply);
 

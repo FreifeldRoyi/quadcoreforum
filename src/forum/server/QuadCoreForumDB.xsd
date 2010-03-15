@@ -49,9 +49,6 @@
 			<xsd:extension base="NamedComponentType">
 				<xsd:sequence>
                     <xsd:element name="subjectID" type="xsd:long"></xsd:element>
-                    <xsd:element name="ansestorSubject"
-						type="SubjectType" minOccurs="0" maxOccurs="1">
-					</xsd:element>
 
 					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
 						<xsd:element name="subSubjects"
@@ -89,13 +86,9 @@
     		<xsd:element name="content" type="xsd:string"></xsd:element>
     		<xsd:element name="date" type="xsd:date"></xsd:element>
     		<xsd:element name="time" type="xsd:time"></xsd:element>
-    		<xsd:element name="isReplyTo" type="MessageType"
-    			minOccurs="0" maxOccurs="1">
-    		</xsd:element>
     		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
     			<xsd:element name="replies" type="MessageType"></xsd:element>
     		</xsd:sequence>
-    		<xsd:element name="thread" type="ThreadType"></xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
 
@@ -123,13 +116,6 @@
 	<xsd:element name="ForumType">
   	  <xsd:complexType>
     		<xsd:sequence>
-    			<xsd:element name="numOfConnected">
-    				<xsd:simpleType>
-    					<xsd:restriction base="xsd:int">
-    						<xsd:minInclusive value="0"></xsd:minInclusive>
-    					</xsd:restriction>
-    				</xsd:simpleType>
-    			</xsd:element>
 
     			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
     				<xsd:element name="registeredUsers"

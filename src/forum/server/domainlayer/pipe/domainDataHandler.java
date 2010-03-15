@@ -38,7 +38,7 @@ public interface DomainDataHandler
 	 * @param name
 	 * @param description
 	 */
-	public void addNewSubSubject(long fatherID, String name, String description);
+	public String addNewSubSubject(long fatherID, String name, String description);
 	
 	/**
 	 * 
@@ -47,7 +47,7 @@ public interface DomainDataHandler
 	 * @param title
 	 * @param content
 	 */
-	public void addNewMessage(long subjectID, String userName, String title, String content);
+	public String addNewMessage(long subjectID, String userName, String title, String content);
 	
 	/**
 	 * 

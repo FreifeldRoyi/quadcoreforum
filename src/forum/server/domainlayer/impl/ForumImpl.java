@@ -12,6 +12,7 @@ import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumSubject;
 import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.domainlayer.interfaces.RegisteredUser;
+import forum.server.domainlayer.pipe.Controller;
 import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.SubjectAlreadyExistsException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
@@ -69,21 +70,10 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 	}
 
 	private ForumSubject constructSubSubject(SubjectType subjType) {
-		ForumSubject toReturn = new ForumSubjectImpl(subjType.getDescription(), subjType.getName());
+		ForumSubject toReturn = new ForumSubjectImpl(subjType.getSubjectID(), subjType.getDescription(), subjType.getName());
 
 		for (SubjectType tSubjectType : subjType.getSubSubjects())
-			try {
-				toReturn.addSubSubject(constructSubSubject(tSubjectType));
-			} catch (JAXBException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (SubjectAlreadyExistsException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			toReturn.addSubSubjectToData(constructSubSubject(tSubjectType));
 
 			for (ThreadType tThreadType : subjType.getSubThreads())
 				try {
@@ -92,6 +82,12 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NotRegisteredException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SubjectNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
@@ -160,6 +156,12 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 		throw new SubjectNotFoundException(id);
 	}
 
+	
+	public Map<Long, String> getForumThreadsBySubjectID(long rootSubjectID) throws SubjectNotFoundException {		
+		return this.getForumSubject(rootSubjectID).getForumThreadsDesc();
+	}
+	
+	
 
 	@Override
 	public int getNumOfConnectedUsers() 
