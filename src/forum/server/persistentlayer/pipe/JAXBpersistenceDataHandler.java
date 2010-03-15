@@ -113,6 +113,17 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 	}
 
 
+	/**
+	 * Looks for the a UserType object instance according to the given username and returns it
+	 * 
+	 * @param forum
+	 * 		The forum type object, where the username should be found
+	 * @param authorUsername
+	 * 		The username of the message author
+	 * @return
+	 * 		The found UserType object 
+	 * @throws NotRegisteredException
+	 */
 	private UserType getMessageAuthor(ForumType forum, String authorUsername)
 	throws NotRegisteredException
 	{

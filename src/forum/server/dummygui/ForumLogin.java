@@ -3,8 +3,6 @@
  */
 package forum.server.dummygui;
 
-import forum.server.domainlayer.interfaces.Forum;
-import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.exceptions.user.*;
 
 
@@ -48,8 +46,8 @@ public class ForumLogin {
 	}
 
 	/** 
-	 * Gets the user choise from the available operation list, parses it and returns the suitable enum 
-	 * element or an element which indicates that an error occured. 
+	 * Gets the user choice from the available operation list, parses it and returns the suitable enum 
+	 * element or an element which indicates that an error occurred. 
 	 *  
 	 * @return 
 	 *              The desired operation typed by user as an enum element 
@@ -107,12 +105,12 @@ public class ForumLogin {
 	}
 
 	public void manageLogin() { 
-		System.out.println("Please type your username (or esc to return the main menu)");
+		System.out.println("Please type your username (or type" + ESCAPE_SEQUENCE + " to return the main menu)");
 		String tUsername = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tUsername.equals(ESCAPE_SEQUENCE))
 			return;
 
-		System.out.println("Please type your password (or esc to return the main menu)");
+		System.out.println("Please type your password (or type" + ESCAPE_SEQUENCE + " to return the main menu)");
 		String tPassword = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tPassword.equals(ESCAPE_SEQUENCE))
 			return;
@@ -139,7 +137,7 @@ public class ForumLogin {
 							LoggedUserOperations.LOGGED_EXIT.ordinalPlus1() + 
 					" to exit and ? to help)"); 
 					System.out.println();
-					System.out.println("The system waits for your choose ..."); 
+					System.out.println("The system waits for your choice ..."); 
 				}
 			} catch (NotConnectedException e) {
 				break;
