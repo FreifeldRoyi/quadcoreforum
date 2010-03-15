@@ -40,8 +40,8 @@ public class ForumLogin {
 	 */ 
 	public void printStartScreenHelp() { 
 		System.out.println("Please choose one of the following operations:\n"); 
-		System.out.println("\t" + LoggedUserOperations.LOGGED_VIEW.ordinalPlus1()		+ ": view forum messages as a guest user"); 
-		System.out.println("\t" + LoggedUserOperations.LOGGED_ADD_NEW.ordinalPlus1() 	+ ": add a new message"); 
+		System.out.println("\t" + LoggedUserOperations.LOGGED_VIEW.ordinalPlus1()		+ ": view forum messages as a logged-in user"); 
+		System.out.println("\t" + LoggedUserOperations.LOGGED_ADD_NEW.ordinalPlus1() 	+ ": add a new subject"); 
 		System.out.println("\t" + LoggedUserOperations.LOGGED_LOGOFF.ordinalPlus1()    	+ ": logoff the forum\n"); 
 		System.out.println("\t" + LoggedUserOperations.LOGGED_EXIT.ordinalPlus1()       + ": exit the program\n"); 
 		System.out.println("The system waits for your choose ..."); 
@@ -81,18 +81,20 @@ public class ForumLogin {
 	 *              The operation chosen by user (represented as an enum element)  
 	 * @return 
 	 *              true if a valid operation has chosen and false otherwise 
+	 * @throws NotConnectedException 
 	 */ 
-	public boolean redirectOperations(LoggedUserOperations userChose) { 
+	public boolean redirectOperations(LoggedUserOperations userChose) throws NotConnectedException { 
 		switch (userChose) { 
 		case LOGGED_ADD_NEW:
-			System.out.println("A"); 
+			new ForumFunctions().addNewSubject(-1);
 			return true; 
 		case LOGGED_VIEW: 
-			System.out.println("B"); 
+			new ForumFunctions().view(-1);
 			return true; 
 		case LOGGED_LOGOFF: 
-			System.out.println("C"); 
-			return true; 
+			String tCurrentUserName = ForumPromt.CONT.getCurrentlyLoggedOnUserName();
+			ForumPromt.CONT.logout(tCurrentUserName);
+			throw new NotConnectedException(tCurrentUserName);
 		case LOGGED_EXIT:  
 			System.out.println("Exiting ..."); 
 			System.exit(0); 
@@ -131,12 +133,16 @@ public class ForumLogin {
 			printStartScreenHelp(); // print welcome ... 
 
 			// get the user choice and redirect it or exit if exit is pressed 
-			while (!redirectOperations(getStartScreenOperation())) { 
-				System.out.println("This chose isn't performed, please try again! (press " + 
-						LoggedUserOperations.LOGGED_EXIT.ordinalPlus1() + 
-				" to exit and ? to help)"); 
-				System.out.println();
-				System.out.println("The system waits for your choose ..."); 
+			try {
+				while (!redirectOperations(getStartScreenOperation())) { 
+					System.out.println("This chose isn't performed, please try again! (press " + 
+							LoggedUserOperations.LOGGED_EXIT.ordinalPlus1() + 
+					" to exit and ? to help)"); 
+					System.out.println();
+					System.out.println("The system waits for your choose ..."); 
+				}
+			} catch (NotConnectedException e) {
+				break;
 			} 
 		} 
 	}

@@ -5,6 +5,8 @@ package forum.server.domainlayer.pipe;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -15,6 +17,7 @@ import forum.server.domainlayer.impl.RegisteredUserImpl;
 import forum.server.domainlayer.interfaces.Forum;
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumSubject;
+import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.SubjectAlreadyExistsException;
@@ -31,33 +34,62 @@ import forum.server.persistentlayer.pipe.persistenceDataHandler;
  *
  */
 public class Controller implements DomainDataHandler {
-	private static Forum forum = new ForumImpl();
+	private static Forum forum;
 	private RegisteredUser user;
-	
+
 	public Controller() {
-		forum = new ForumImpl();
 		this.user = null;
+		if (Controller.forum == null)
+			Controller.forum = new ForumImpl();
+	}	
+
+	public String getForumSubjectByID(long id) {
+		try {
+			return Controller.forum.getForumSubject(id).toString();
+		} catch (SubjectNotFoundException e) {
+			return "error: subject not found";
+		}
 	}
 
-	public String[] getForumSubjects() {
-		String[] tAns = new String[this.forum.getForumSubjects().size()];
-		for (int i = 0; i < tAns.length; i++) {
-			tAns[i] = 
-			"subject: " +
-			this.forum.getForumSubjects().get(i).getSubjectID() + " " + 
-			this.forum.getForumSubjects().get(i).getName() + 
-			" " +
-			this.forum.getForumSubjects().get(i).getDescription();
-		}
-		return tAns;
+
+	public Map<Long, String> getForumSubjects() {
+		return this.getSubjectsByRoot(-1);
 	}
-	
+
+	public Map<Long, String> getSubjectsByRoot(long rootSubjectID) {
+		Map<Long, String> toReturn = new HashMap<Long, String>();
+		try {
+			if (rootSubjectID != -1)
+				for (ForumSubject tForumSubject : Controller.forum.getForumSubject(rootSubjectID).getSubSubjects())
+					toReturn.put(tForumSubject.getSubjectID(), tForumSubject.toString());
+			else
+				for (ForumSubject tForumSubject : Controller.forum.getForumSubjects())
+					toReturn.put(tForumSubject.getSubjectID(), tForumSubject.toString());
+		} catch (SubjectNotFoundException e) {
+			System.out.println("error: subject wasn't found");
+		}
+		return toReturn;
+	}
+
+	public Map<Long, String> getSubjectThreads(long rootSubjectID) {
+		try {
+			return  Controller.forum.getForumThreadsBySubjectID(rootSubjectID);
+		} catch (SubjectNotFoundException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+	public boolean isTheUsserLoggedIn() {
+		return this.user != null;
+	}
+
 	// TODO: add more getters like firstName() ...
 	public String getCurrentlyLoggedOnUserName() {
 		return this.user != null ? this.user.getUsername() : "";
 	}
-	
-	public void addNewMessage(long subjectID, String username,
+
+	public String addNewMessage(long subjectID, String username,
 			String title, String content) 
 	{
 		try 
@@ -67,49 +99,49 @@ public class Controller implements DomainDataHandler {
 			tMsgUser = forum.getUserByUsername(username);
 			ForumMessage tMsg = new ForumMessageImpl(tMsgUser, title, content);
 			tRoot.openNewThread(tMsg);
+			return "success!";
 		}
 		catch (NotRegisteredException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		}
 
 		catch (SubjectNotFoundException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		} 
 		catch (JAXBException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "JAXB error!";
 		}
 		catch (IOException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "database error!";
 		}
 	}
 
-	public void addNewSubSubject(long fatherID, String name,
+	public String addNewSubSubject(long fatherID, String name,
 			String description) 
 	{
 		try {
 			ForumSubject tForumSubject = forum.getForumSubject(fatherID);
 			ForumSubject tNewSubject = new ForumSubjectImpl(description, name);
 			tForumSubject.addSubSubject(tNewSubject);
+			return "A subject " + name + " has successfully added as a sub-subject of " +
+			tForumSubject.getName();
 		} catch (SubjectNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "JAXB error!";
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return "database error!";
 		} catch (SubjectAlreadyExistsException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return e.getMessage();
 		}
 
 	}

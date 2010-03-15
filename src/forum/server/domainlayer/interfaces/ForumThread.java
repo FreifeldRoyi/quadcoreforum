@@ -18,7 +18,11 @@ public interface ForumThread
 	 */
 	public String getThreadSubject();	
 	public String getAuthor();
-	public ForumMessage getRootMessage();
+	//public ForumMessage getRootMessage();
+	
+	public long getRootMessageID();
+	
+	
 	public String getPostingTime(); 
 	public String getPostingDate();
 	public String getLatestPostTime();

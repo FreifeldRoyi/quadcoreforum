@@ -40,11 +40,12 @@ public class ForumThreadImpl implements ForumThread
 		return "" + this.rootMessage.getAuthor(); //calls toString
 	}
 
-	@Override
+/*	@Override
 	public ForumMessage getRootMessage() 
 	{
 		return this.rootMessage;
 	}
+*/	
 
 	@Override
 	public String getThreadSubject() 
@@ -108,6 +109,19 @@ public class ForumThreadImpl implements ForumThread
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
 	{
 		return this.rootMessage.findMessage(msgID);
+	}
+
+	@Override
+	public long getRootMessageID() {
+		return this.rootMessage.getMessageID();
+	}
+	
+	public String toString() {
+		return this.rootMessage.getMessageTitle() + "\n" +
+				"\tposted by: " + this.rootMessage.getAuthor().getUsername() + "\n" + 
+				"\tposting date: " + this.rootMessage.getDate() + "\n" +
+				"\tposting time: " + this.rootMessage.getTime() + "\n" +
+				"\tnumber of responses: " + this.numOfResponses;
 	}
 	
 }

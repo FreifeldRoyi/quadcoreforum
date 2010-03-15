@@ -1,6 +1,7 @@
 package forum.server.domainlayer.interfaces;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
@@ -50,7 +51,10 @@ public interface Forum
 
 	public RegisteredUser getUserByUsername(String username) throws NotRegisteredException;
 
-	public ForumMessage findMessage(long msgID) throws MessageNotFoundException;	
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException;
+	
+	
+	public Map<Long, String> getForumThreadsBySubjectID(long rootSubjectID) throws SubjectNotFoundException;
 }
 
 /**

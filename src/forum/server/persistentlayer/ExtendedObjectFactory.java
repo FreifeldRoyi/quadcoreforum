@@ -73,7 +73,6 @@ public class ExtendedObjectFactory {
 		tMsgType.setContent(content);
 		tMsgType.setDate(new XMLGregorianCalendarImpl(tCurrDateTime));
 		tMsgType.setTime(new XMLGregorianCalendarImpl(tCurrDateTime));
-		tMsgType.setIsReplyTo(null);
 		author.setNumOfPostedMessages(author.getNumOfPostedMessages() + 1);
 		return tMsgType;
 	}
@@ -110,9 +109,8 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of a {@link SubjectType} which is initialized with the given parameters
 	 */
-	public static SubjectType createSubject(SubjectType father, long subjectID, String name, String description) {
+	public static SubjectType createSubject(long subjectID, String name, String description) {
 		SubjectType tSubjectType = factory.createSubjectType();
-		tSubjectType.setAnsestorSubject(father);
 		tSubjectType.setSubjectID(subjectID);
 		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
