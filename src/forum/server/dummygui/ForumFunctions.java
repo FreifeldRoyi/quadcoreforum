@@ -36,7 +36,7 @@ public class ForumFunctions
 
 	public void addNewSubject(long tRootSubject) {
 		// if the user isn't logged-in, log it in
-		if (!ForumPromt.CONT.isTheUsserLoggedIn()) {
+		if (!ForumPromt.CONT.isAUserLoggedIn()) {
 			System.out.println("You should log-in to the system in order to add a new subject!");
 			System.out.println();
 			if (!this.manageLogin())
@@ -47,29 +47,29 @@ public class ForumFunctions
 		System.out.println("You are at a new subject add form!");
 		System.out.println();		
 
-		System.out.println("please type the subject name! (press " + this.ESCAPE_SEQUENCE + " to exit)");
+		System.out.println("please type the subject name! (type " + this.ESCAPE_SEQUENCE + " to exit)");
 		String name = ForumPromt.USER_CHOICE_SCANNER.next();
 
 		if (name.equals(ESCAPE_SEQUENCE)) {
-			checkShouldStayLogin();
+//			checkShouldStayLogin();
 			return;
 		}
-		System.out.println("please type the subject description! (press " + this.ESCAPE_SEQUENCE + " to exit)");
+		System.out.println("please type the subject description! (type " + this.ESCAPE_SEQUENCE + " to exit)");
 		String description = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (description.equals(ESCAPE_SEQUENCE)) {
-			checkShouldStayLogin();
+//			checkShouldStayLogin();
 			return;
 		}
 
 		if (tRootSubject == -1) {
 			System.out.println(ForumPromt.CONT.addNewSubject(name, description));
 			System.out.println();
-			checkShouldStayLogin();
+//			checkShouldStayLogin();
 		}
 		else {
 			System.out.println(ForumPromt.CONT.addNewSubSubject(tRootSubject, name, description));
 			System.out.println();
-			checkShouldStayLogin();
+//			checkShouldStayLogin();
 		}
 	}
 
@@ -84,7 +84,7 @@ public class ForumFunctions
 			else if (tUserAns.equals("?"))
 				continue;
 			else {
-				System.out.println("This chose isn't performed, please try again! (press ? to help)"); 
+				System.out.println("This chose isn't performed, please try again! (type ? to help)"); 
 				System.out.println(); 
 				System.out.println("The system waits for your choose ...");
 			}
@@ -106,22 +106,24 @@ public class ForumFunctions
 
 			System.out.println();
 			System.out.println("Please choose one of the following operations:\n"); 
-			System.out.println("0: view the Subjects");
+			
+			if (rootSubject == -1)
+				System.out.println("1: view the forum subjects");
+			else
+				System.out.println("1: view the sub-subjects");
 
 
 			if (rootSubject > -1)
-				System.out.println("1: view the Threads");
+				System.out.println("2: view the Threads");
 
-			System.out.println();
-			System.out.println("2: to add a sub-subject");
+			if (ForumPromt.CONT.isAUserLoggedIn())
+				System.out.println("3: add a new sub-subject");
 
-			if (rootSubject > -1) {
-				System.out.println("3: to open a thread");
-			}
-			System.out.println();
-
-			System.out.println("4: return the previous menu");
-			System.out.println("5: exit the program");
+			if (rootSubject > -1)
+				System.out.println("4: open a new thread");
+			
+			System.out.println("5: return the previous menu");
+			System.out.println("6: exit the program");
 
 			System.out.println();
 			System.out.println("The system waits for your choose ..."); 
@@ -137,35 +139,36 @@ public class ForumFunctions
 				if (tUserChoise.equals("?"))
 					break;
 
-				if (tUserChoise.equals("4"))
+				if (tUserChoise.equals("5"))
 					return;
 
-				if (tUserChoise.equals("5")) {
+				if (tUserChoise.equals("6")) {
 					System.out.println("Exiting ..."); 
+					System.out.println("Done");
 					System.exit(0);			
 				}
 
 
-				if (rootSubject > -1 && tUserChoise.equals("1")) {
+				if (rootSubject > -1 && tUserChoise.equals("2")) {
 					this.viewThreads(rootSubject);
 					break;
 				}		
 
-				if (tUserChoise.equals("2")) {	
+				if (tUserChoise.equals("3")) {	
 					this.addNewSubject(rootSubject);
 					break;
 				}
 
-				if (rootSubject > -1 && tUserChoise.equals("3"))
+				if (rootSubject > -1 && tUserChoise.equals("4"))
 					this.openNewThread(rootSubject);
 
-				if (tUserChoise.equals("0")) {	
+				if (tUserChoise.equals("1")) {	
 					this.viewSubjects(rootSubject);
 					break;
 				}
 
-				System.out.println("This chose isn't performed, please try again! (press " + 
-						"5" + " to exit and ? to help)"); 
+				System.out.println("This chose isn't performed, please try again! (type " + 
+						"5" + " to return the previous menu and ? to help)"); 
 				System.out.println(); 
 				System.out.println("The system waits for your choise ...");
 			}
@@ -174,12 +177,12 @@ public class ForumFunctions
 
 
 	public boolean manageLogin() { 
-		System.out.println("Please type your username (or esc to return the main menu)");
+		System.out.println("Please type your username (or type esc to return the main menu)");
 		String tUsername = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tUsername.equals(ESCAPE_SEQUENCE))
 			return false;
 
-		System.out.println("Please type your password (or esc to return the main menu)");
+		System.out.println("Please type your password (or type esc to return the main menu)");
 		String tPassword = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tPassword.equals(ESCAPE_SEQUENCE))
 			return false;
@@ -208,7 +211,7 @@ public class ForumFunctions
 
 			if (tSubjectThreads.isEmpty()) {
 				System.out.println("Thrs subject " + ForumPromt.CONT.getForumSubjectByID(rootSubject) +
-						" has no opened threads!!! (press " + this.ESCAPE_SEQUENCE + " to exit or ? to help)");
+						" has no opened threads!!! (type " + this.ESCAPE_SEQUENCE + " to exit or ? to help)");
 
 				while (true) {
 
@@ -223,7 +226,7 @@ public class ForumFunctions
 						return;
 					}
 
-					System.out.println("This chose isn't performed, please try again! (press " + 
+					System.out.println("This chose isn't performed, please try again! (type " + 
 							this.ESCAPE_SEQUENCE + " to exit or ? to help)"); 
 					System.out.println(); 
 					System.out.println("The system waits for your choise ...");
@@ -232,7 +235,7 @@ public class ForumFunctions
 
 			}
 			else {
-				System.out.println("please choose the desired id (press " + 
+				System.out.println("please choose the desired id (type " + 
 						this.ESCAPE_SEQUENCE + " to exit or ? to help)");
 				System.out.println();		
 
@@ -261,7 +264,7 @@ public class ForumFunctions
 						this.viewThreadMessages(tLongUserChoise);
 					}
 					catch (NumberFormatException e) {
-						System.out.println("This chose isn't performed, please try again! (press " + 
+						System.out.println("This chose isn't performed, please try again! (type " + 
 								this.ESCAPE_SEQUENCE + " to exit or ? to help)"); 
 						System.out.println(); 
 						System.out.println("The system waits for your choise ...");
@@ -278,7 +281,7 @@ public class ForumFunctions
 
 
 	private void openNewThread(long subjectID) {
-		if (!ForumPromt.CONT.isTheUsserLoggedIn()) {
+		if (!ForumPromt.CONT.isAUserLoggedIn()) {
 			System.out.println("You should log-in to the system in order to post messages!");
 			System.out.println();
 			if (!this.manageLogin())
@@ -289,14 +292,14 @@ public class ForumFunctions
 		System.out.println("You are at the messages posting form!");
 		System.out.println();		
 
-		System.out.println("please type the message title! (press " + this.ESCAPE_SEQUENCE + " to exit)");
+		System.out.println("please type the message title! (type " + this.ESCAPE_SEQUENCE + " to exit)");
 
 		String tMsgTitle = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tMsgTitle.equals(ESCAPE_SEQUENCE)) {
 			checkShouldStayLogin();
 			return;
 		}
-		System.out.println("please type the message content! (press " + this.ESCAPE_SEQUENCE + " to exit)");
+		System.out.println("please type the message content! (type " + this.ESCAPE_SEQUENCE + " to exit)");
 
 		String tMsgDescription = ForumPromt.USER_CHOICE_SCANNER.next();
 		if (tMsgDescription.equals(ESCAPE_SEQUENCE)) {
@@ -324,7 +327,7 @@ public class ForumFunctions
 			else
 				subjects = ForumPromt.CONT.getSubjectsByRoot(rootSubject);
 
-			System.out.println("please choose the desired subject id (press " + 
+			System.out.println("please choose the desired subject id (type " + 
 					this.ESCAPE_SEQUENCE + " to exit)");
 			System.out.println();
 
@@ -347,7 +350,7 @@ public class ForumFunctions
 				this.view(tLongUserChoise);
 			}
 			catch (NumberFormatException e) {
-				System.out.println("This chose isn't performed, please try again! (press " + 
+				System.out.println("This chose isn't performed, please try again! (type " + 
 						this.ESCAPE_SEQUENCE + " to exit and ? to help)"); 
 				System.out.println(); 
 				System.out.println("The system waits for your choise ...");

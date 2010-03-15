@@ -15,7 +15,7 @@ public class ForumPromt {
 	public static Controller CONT = new Controller();
 	
 	private enum StartOperation { 
-		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_NEW_SUBJECT, START_EXIT, START_ERROR, START_HELP; 
+		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
 
 		/** 
 		 * This method is used instead the standard ordinal() method, used with enums. 
@@ -38,8 +38,6 @@ public class ForumPromt {
 		System.out.println("\t" + StartOperation.START_LOGIN.ordinalPlus1()         + ": login to the forum"); 
 		System.out.println("\t" + StartOperation.START_REGISTER.ordinalPlus1()      + ": register to the forum"); 
 		System.out.println("\t" + StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + ": browse the forum as a guest user"); 
-		System.out.println();
-		System.out.println("\t" + StartOperation.START_NEW_SUBJECT.ordinalPlus1()   + ": add new subject to the forum"); 
 		System.out.println("\t" + StartOperation.START_EXIT.ordinalPlus1()          + ": exit the program\n"); 
 		System.out.println("The system waits for your choose ..."); 
 	} 
@@ -70,8 +68,6 @@ public class ForumPromt {
 				return StartOperation.START_REGISTER; 
 			if (tReadText.equals(StartOperation.START_VIEW_MESSAGES.ordinalPlus1() + "")) 
 				return StartOperation.START_VIEW_MESSAGES;
-			if (tReadText.equals(StartOperation.START_NEW_SUBJECT.ordinalPlus1() + "")) 
-				return StartOperation.START_NEW_SUBJECT;
 			if (tReadText.equals(StartOperation.START_EXIT.ordinalPlus1() + "")) 
 				return StartOperation.START_EXIT; 
 			if (tReadText.equals("?")) 
@@ -106,11 +102,9 @@ public class ForumPromt {
 		case START_VIEW_MESSAGES:
 			new ForumFunctions().view(-1);
 			return true; 
-		case START_NEW_SUBJECT:
-			new ForumFunctions().addNewSubject(-1);
-			return true;
 		case START_EXIT:  
-			System.out.println("Exiting ..."); 
+			System.out.println("Exiting ...");
+			System.out.println("Done"); 
 			System.exit(0);
 			return true; // just to calm the compiler 
 		case START_HELP: 
@@ -121,14 +115,14 @@ public class ForumPromt {
 	}
 
 	public void playDummy() { 
-		while (true) { 
+		while (true) {
 			printStartPromt(); // print welcome ... 
 
 			// get the user choice and redirect it or exit if exit is pressed 
 			while (!redirectOperations(getStartScreenOperation())) { 
-				System.out.println("This choise isn't performed, please try again! (press " + 
+				System.out.println("This choice isn't performed, please try again! (press " + 
 						StartOperation.START_EXIT.ordinalPlus1() + 
-				" to exit and ? to help)"); 
+				" to exit and ? to main menu)"); 
 				System.out.println(); 
 				System.out.println("The system waits for your choose ..."); 
 			} 

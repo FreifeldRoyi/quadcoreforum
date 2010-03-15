@@ -70,16 +70,8 @@ public class ForumMessageImplTest {
 	 */
 	@Test	
 	public void testAddReplyToMe() {
-		try { // the message shouldn't be found in the database
 
-			ForumSubject tForumSubject = new ForumSubjectImpl("test1, test2");
-			new ForumImpl().   .addForumSubject(fs)getMessageByID(tMessage2.getMessageID());
-			fail("The message shouldn't be found");
-		}
-		catch (MessageNotFoundException e) {
-			return; // do nothing - the message should be found
-		}
-
+	
 	}
 
 	/**

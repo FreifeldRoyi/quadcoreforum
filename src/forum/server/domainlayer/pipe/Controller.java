@@ -80,7 +80,7 @@ public class Controller implements DomainDataHandler {
 		}
 	}
 
-	public boolean isTheUsserLoggedIn() {
+	public boolean isAUserLoggedIn() {
 		return this.user != null;
 	}
 

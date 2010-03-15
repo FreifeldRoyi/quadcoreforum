@@ -19,45 +19,6 @@ import forum.server.persistentlayer.ForumType;
  */
 public interface persistenceDataHandler
 {
-
-	/**
-	 * Performs a login of a given user to the forum, according to a given username and password
-	 * 
-	 * @param username
-	 * 		The username of the user who tries to login the system
-	 * @param password
-	 * 		The password of the user who tries to login the system
-	 * 
-	 * @throws JAXBException
-	 * 		In case there is a problem during the validation against the database schema or
-	 * 		if any unexpected errors occur while marshalling / unmarshalling
-	 * @throws IOException
-	 * 		In case there is a problem with the database xml file
-	 * @throws AlreadyConnectedException
-	 * 		In case a user with the given username is already connected to the forum
-	 * @throws NotRegisteredException
-	 * 		In case the user with the given username isn't registered to the forum
-	 * @throws
-	 * 		In case the given password is wrong
-	 */
-//	public void login(String username, String password) throws JAXBException, IOException, AlreadyConnectedException,
-//	NotRegisteredException, WrongPasswordException;
-
-	/**
-	 * Performs a logout of a user with the given username, by updating its status in the database as disconnected
-	 * 
-	 * @param username
-	 * 		The username of the user who should be sign out the forum
-	 * @throws JAXBException
-	 * 		In case there is a problem during the validation against the database schema or
-	 * 		if any unexpected errors occur while marshalling / unmarshalling
-	 * @throws IOException
-	 * 		In case there is a problem with the database xml file
-	 * @throws NotConnectedException
-	 * 		In case the given username isn't connected
-	 */
-//	public void logoutUser(String username) throws JAXBException, IOException, NotConnectedException;
-
 	/**
 	 * This method updates the database with a new registered user
 	 * 
@@ -202,6 +163,15 @@ public interface persistenceDataHandler
 	 */
 	public void updateMessage(long messageID, String newTitle, String newContent) throws JAXBException,
 	IOException, MessageNotFoundException;
-	
+
+	/**
+	 * Performs an unmarshalling from the database and returns the created ForumType instance
+	 * 
+	 * @return
+	 * 		An unnmarshalled ForumType object instance
+	 * 
+	 * @throws JAXBException
+	 * 		In case the database xml file doesn't conform to the schema
+	 */
 	public ForumType getForumFromDatabase() throws JAXBException;
 }
