@@ -19,6 +19,12 @@ public interface ForumMessage
 	
 	
 	/*Methods*/
+	
+	/**
+	 * Used only for the first time fill
+	 * @param forumMessage
+	 */
+	public void addMessageReplyData(ForumMessage forumMessage);
 	public void addReplyToMe(ForumMessage fm);	
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException;
 	public String msgToString();

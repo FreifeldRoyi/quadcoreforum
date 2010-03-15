@@ -12,12 +12,25 @@ public class ForumThreadImpl implements ForumThread
 	private int numOfResponses;
 	private ForumMessage latestPost;
 	
+
+	/**
+	 * Used for the first time fill (from the database)
+	 * @param root
+	 */
+	public ForumThreadImpl(ForumMessage root, ForumMessage latestPost, int numOfReponses, int numOfViews)
+	{
+		this.rootMessage = root;
+		this.latestPost = latestPost; // TODO do we want a shallow or a deep copy???
+		this.numOfResponses = numOfReponses;
+		this.numOfViews = numOfViews;
+	}
+
 	public ForumThreadImpl(ForumMessage root)
 	{
 		this.rootMessage = root;
 		this.latestPost = root; // TODO do we want a shallow or a deep copy???
-		this.numOfResponses = 1;
-		this.numOfViews = 1;
+		this.numOfResponses = 0;
+		this.numOfViews = 0;
 	}
 	
 	@Override

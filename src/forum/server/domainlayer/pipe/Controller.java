@@ -45,7 +45,7 @@ public class Controller implements DomainDataHandler {
 
 	public String getForumSubjectByID(long id) {
 		try {
-			return Controller.forum.getForumSubject(id).toString();
+			return Controller.forum.getForumSubjectByID(id).toString();
 		} catch (SubjectNotFoundException e) {
 			return "error: subject not found";
 		}
@@ -60,7 +60,7 @@ public class Controller implements DomainDataHandler {
 		Map<Long, String> toReturn = new HashMap<Long, String>();
 		try {
 			if (rootSubjectID != -1)
-				for (ForumSubject tForumSubject : Controller.forum.getForumSubject(rootSubjectID).getSubSubjects())
+				for (ForumSubject tForumSubject : Controller.forum.getForumSubjectByID(rootSubjectID).getSubSubjects())
 					toReturn.put(tForumSubject.getSubjectID(), tForumSubject.toString());
 			else
 				for (ForumSubject tForumSubject : Controller.forum.getForumSubjects())
@@ -94,7 +94,7 @@ public class Controller implements DomainDataHandler {
 	{
 		try 
 		{
-			ForumSubject tRoot = forum.getForumSubject(subjectID);
+			ForumSubject tRoot = forum.getForumSubjectByID(subjectID);
 			RegisteredUser tMsgUser;
 			tMsgUser = forum.getUserByUsername(username);
 			ForumMessage tMsg = new ForumMessageImpl(tMsgUser, title, content);
@@ -124,7 +124,7 @@ public class Controller implements DomainDataHandler {
 			String description) 
 	{
 		try {
-			ForumSubject tForumSubject = forum.getForumSubject(fatherID);
+			ForumSubject tForumSubject = forum.getForumSubjectByID(fatherID);
 			ForumSubject tNewSubject = new ForumSubjectImpl(description, name);
 			tForumSubject.addSubSubject(tNewSubject);
 			return "A subject " + name + " has successfully added as a sub-subject of " +
@@ -227,7 +227,7 @@ public class Controller implements DomainDataHandler {
 			String content) {
 		ForumMessage tFather;
 		try {
-			tFather = this.forum.findMessage(fatherID);
+			tFather = this.forum.getMessageByID(fatherID);
 			RegisteredUser tUser = this.forum.getUserByUsername(username);
 			ForumMessage tNewMsg = new ForumMessageImpl(tUser, title, content);
 
