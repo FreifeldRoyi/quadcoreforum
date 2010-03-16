@@ -1,6 +1,5 @@
 package forum.server.domainlayer.pipe;
 
-import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.exceptions.user.AlreadyConnectedException;
 import forum.server.exceptions.user.NotConnectedException;
 import forum.server.exceptions.user.NotRegisteredException;
