@@ -3,12 +3,6 @@
 
 
 
-    <xsd:simpleType name="ConnectionStatusType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="Connected"></xsd:enumeration>
-			<xsd:enumeration value="Disconected"></xsd:enumeration>
-		</xsd:restriction>
-	</xsd:simpleType>
 
 	<xsd:complexType name="NamedComponentType">
 		<xsd:sequence>
