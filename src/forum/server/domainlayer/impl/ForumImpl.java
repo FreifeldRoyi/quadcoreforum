@@ -251,4 +251,12 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 		pipe.registerToForum(user.getUsername(), user.getPassword(), user.getLastName(), 
 				user.getPrivateName(), user.getEMail());	
 	}
+
+	public void updateAMessage(long messageID, String newTitle,
+			String newContent) throws JAXBException, IOException, MessageNotFoundException {
+		this.getMessageByID(messageID).updateMe(newTitle, newContent);
+		
+	}
+	
+	
 }

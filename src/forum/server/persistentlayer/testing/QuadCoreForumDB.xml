@@ -2,96 +2,80 @@
 <ForumType>
     <registeredUsers>
         <username>user1</username>
-        <e-mail>mail@mymail.com</e-mail>
-        <password>pass1</password>
-        <lastName>b</lastName>
-        <firstName>a</firstName>
-        <numOfPostedMessages>3</numOfPostedMessages>
-        <postedMessages>
-            <messageID>11</messageID>
-            <author>user1</author>
-            <title>title3</title>
-            <content>content2</content>
-            <date>2010-03-16+02:00</date>
-            <time>03:00:56.406+02:00</time>
-        </postedMessages>
+        <e-mail>hello@hello</e-mail>
+        <password>123</password>
+        <lastName>test1</lastName>
+        <firstName>test1</firstName>
+        <numOfPostedMessages>2</numOfPostedMessages>
     </registeredUsers>
     <forumSubjects>
-        <name>name1</name>
-        <description>my description1</description>
+        <name>subject1</name>
+        <description>description1</description>
         <numOfMessages>0</numOfMessages>
-        <subjectID>7</subjectID>
+        <subjectID>1</subjectID>
         <subSubjects>
-            <name>name2</name>
-            <description>my description2</description>
+            <name>subject3</name>
+            <description>description3</description>
             <numOfMessages>0</numOfMessages>
-            <subjectID>8</subjectID>
+            <subjectID>3</subjectID>
             <subThreads>
                 <startMessage>
-                    <messageID>10</messageID>
+                    <messageID>1</messageID>
                     <author>user1</author>
-                    <title>title2</title>
-                    <content>content2</content>
+                    <title>title1</title>
+                    <content>content2-updated</content>
                     <date>2010-03-16+02:00</date>
-                    <time>03:00:56.390+02:00</time>
-                    <replies>
-                        <messageID>11</messageID>
-                        <author>user1</author>
-                        <title>title3</title>
-                        <content>content2</content>
-                        <date>2010-03-16+02:00</date>
-                        <time>03:00:56.406+02:00</time>
-                    </replies>
+                    <time>11:43:36.843+02:00</time>
                 </startMessage>
                 <lastMessage>
-                    <messageID>10</messageID>
+                    <messageID>1</messageID>
                     <author>user1</author>
                     <title>title2</title>
                     <content>content2</content>
                     <date>2010-03-16+02:00</date>
-                    <time>03:00:56.390+02:00</time>
+                    <time>11:43:36.843+02:00</time>
                 </lastMessage>
                 <numOfViews>0</numOfViews>
                 <numOfResponses>0</numOfResponses>
             </subThreads>
             <numOfThreads>1</numOfThreads>
             <lastAddedMessage>
-                <messageID>10</messageID>
+                <messageID>1</messageID>
                 <author>user1</author>
                 <title>title2</title>
                 <content>content2</content>
                 <date>2010-03-16+02:00</date>
-                <time>03:00:56.390+02:00</time>
+                <time>11:43:36.843+02:00</time>
             </lastAddedMessage>
         </subSubjects>
         <subThreads>
             <startMessage>
-                <messageID>9</messageID>
+                <messageID>0</messageID>
                 <author>user1</author>
-                <title>title1</title>
+                <title>new-title</title>
                 <content>content1</content>
                 <date>2010-03-16+02:00</date>
-                <time>03:00:56.375+02:00</time>
+                <time>11:43:36.828+02:00</time>
             </startMessage>
             <lastMessage>
-                <messageID>9</messageID>
+                <messageID>0</messageID>
                 <author>user1</author>
                 <title>title1</title>
                 <content>content1</content>
                 <date>2010-03-16+02:00</date>
-                <time>03:00:56.375+02:00</time>
+                <time>11:43:36.828+02:00</time>
             </lastMessage>
             <numOfViews>0</numOfViews>
             <numOfResponses>0</numOfResponses>
         </subThreads>
         <numOfThreads>1</numOfThreads>
         <lastAddedMessage>
-            <messageID>9</messageID>
+            <messageID>0</messageID>
             <author>user1</author>
             <title>title1</title>
             <content>content1</content>
             <date>2010-03-16+02:00</date>
-            <time>03:00:56.375+02:00</time>
+            <time>11:43:36.828+02:00</time>
         </lastAddedMessage>
     </forumSubjects>
     <numOfMessages>2</numOfMessages>

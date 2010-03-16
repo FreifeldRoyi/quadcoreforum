@@ -3,32 +3,22 @@
  */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
-
-import java.util.Iterator;
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import forum.server.domainlayer.impl.ForumImpl;
-import forum.server.domainlayer.impl.ForumMessageImpl;
-import forum.server.domainlayer.impl.ForumSubjectImpl;
-import forum.server.domainlayer.impl.RegisteredUserImpl;
-import forum.server.domainlayer.interfaces.ForumMessage;
-import forum.server.domainlayer.interfaces.RegisteredUser;
-import forum.server.domainlayer.pipe.Controller;
-import forum.server.exceptions.message.MessageNotFoundException;
-import forum.server.persistentlayer.ForumType;
-import forum.server.persistentlayer.pipe.JAXBpersistenceDataHandler;
-import forum.server.persistentlayer.pipe.PersistenceFactory;
-import forum.server.persistentlayer.pipe.PersistenceDataHandler;
+import forum.server.domainlayer.impl.*;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.exceptions.message.*;
+import forum.server.persistentlayer.pipe.*;
 
 /**
  * @author sepetnit
  *
  */
-public class ForumMessageImplTest {
+public class ForumMessageImplTest extends TestCase {
 	private RegisteredUser tUser; 
 	private ForumMessage message1; 
 	private ForumMessage message2;

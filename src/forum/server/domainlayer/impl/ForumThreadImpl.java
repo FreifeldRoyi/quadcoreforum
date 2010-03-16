@@ -121,6 +121,7 @@ public class ForumThreadImpl implements ForumThread
 	@Override
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
 	{
+
 		return this.rootMessage.findMessage(msgID);
 	}
 
@@ -135,6 +136,14 @@ public class ForumThreadImpl implements ForumThread
 				"\tposting date: " + this.rootMessage.getDate() + "\n" +
 				"\tposting time: " + this.rootMessage.getTime() + "\n" +
 				"\tnumber of responses: " + this.numOfResponses;
+	}
+
+	public int getNumOfResponese() {
+		return this.numOfResponses;
+	}
+
+	public int getNumOfViews() {
+		return this.numOfViews;
 	}
 	
 }

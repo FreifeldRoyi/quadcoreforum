@@ -3,11 +3,11 @@
  */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +32,7 @@ import forum.server.persistentlayer.pipe.JAXBpersistenceDataHandler;
  * @author sepetnit
  *
  */
-public class ForumImplTest {
+public class ForumImplTest extends TestCase {
 
 	private Forum forum;
 	/**

@@ -1,5 +1,10 @@
 package forum.server.domainlayer.interfaces;
 
+import java.io.IOException;
+import java.util.Map;
+
+import javax.xml.bind.JAXBException;
+
 import forum.server.exceptions.message.MessageNotFoundException;
 
 public interface ForumMessage
@@ -85,7 +90,40 @@ public interface ForumMessage
 	 * @throws MessageNotFoundException
 	 */
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException;
+	
+	
+	/**
+	 * 
+	 * @return
+	 * 		A string representation of the message and its replies, used for debugging
+	 */
 	public String msgToString();
+	
+	/**
+	 * 
+	 * @return
+	 * 		A mapping which maps the replies of this message, to their representation
+	 */
+	public Map<Long, String> getRepliesRepresentation();
+	
+	
+	/**
+	 * Updates the title and the content of the message in the database layer and also delegates
+	 * the update to the persistent layer (database)
+	 * 
+	 * @param newTitle
+	 * 		The new title of the message
+	 * @param newContent
+	 * 		The new content of the message
+	 *  
+	 * @throws IOException 
+	 * 		In case of database read error
+	 * @throws JAXBException
+	 * 		In case of database write error 
+	 * @throws MessageNotFoundException 
+	 * 		In case, the database doesn't contain the message
+	 */
+	public void updateMe(String newTitle, String newContent) throws JAXBException, IOException, MessageNotFoundException;
 }
 
 /**

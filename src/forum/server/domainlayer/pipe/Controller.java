@@ -148,17 +148,6 @@ public class Controller implements DomainDataHandler {
 		}
 	}
 
-	@Override
-	public String getContent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void initialize() {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public String login(String username, String password){
@@ -229,5 +218,29 @@ public class Controller implements DomainDataHandler {
 			e.printStackTrace();
 		}
 	}
+	
+	public Map<Long, String> getMessageAndRepliesByRoot(long rootMessage) {
+		try {
+			return Controller.FORUM.getMessageByID(rootMessage).getRepliesRepresentation();
+		} catch (MessageNotFoundException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	public String updateAMessage(long messageID, String newTitle, String newContent) {
+		try {
+			Controller.FORUM.updateAMessage(messageID, newTitle, newContent);
+			return "the message was succcessfully updated!";
+		} catch (JAXBException e) {
+			return "database error!";
+		} catch (IOException e) {
+			return "database error!";
+		} catch (MessageNotFoundException e) {
+			return "database error - the message wasn't found in the database!";
+		}	
+	}
+
+	
 
 }

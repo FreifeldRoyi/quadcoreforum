@@ -3,10 +3,12 @@
  */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
+import java.util.Vector;
+
 import javax.xml.bind.JAXBException;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,13 +19,12 @@ import forum.server.domainlayer.interfaces.*;
 import forum.server.exceptions.subject.*;
 import forum.server.exceptions.user.*;
 import forum.server.persistentlayer.pipe.JAXBpersistenceDataHandler;
-import forum.server.persistentlayer.pipe.PersistenceFactory;
 
 /**
  * @author sepetnit
  *
  */
-public class ForumSubjectImplTest {
+public class ForumSubjectImplTest extends TestCase {
 
 	private RegisteredUser tUser;
 	private ForumMessage tMessage1;
@@ -72,7 +73,7 @@ public class ForumSubjectImplTest {
 			fail("for some reason, a subject with name2, already exists in the domain layer");
 		}
 		assertTrue(tNumOfSub + 1 == tForumSubject.getSubSubjects().size());		
-		assertFalse(tForumSubject.getSubSubjects().indexOf(tFssub) == -1);	
+		assertFalse(((Vector<ForumSubject>)tForumSubject.getSubSubjects()).indexOf(tFssub) == -1);	
 	}
 
 	/**

@@ -1,136 +1,112 @@
-/**
- * 
- */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author sepetnit
- *
- */
-public class RegisteredUserImplTest {
+import forum.server.domainlayer.impl.RegisteredUserImpl;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
+public class RegisteredUserImplTest extends TestCase {
+
+	RegisteredUserImpl user;
+	
 	@Before
 	public void setUp() throws Exception {
+		String usrNm = "Royif";
+		String pass = "1234";
+		String prvNm = "Royi";
+		String lstNm = "Freifeld";
+		String eml = "mail";
+		user = new RegisteredUserImpl(usrNm, pass, prvNm, lstNm, eml);
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#RegisteredUserImpl(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testRegisteredUserImpl() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getEMail()}.
-	 */
 	@Test
 	public void testGetEMail() {
-		fail("Not yet implemented");
+		if(!user.getEMail().equals("mail")){
+			fail("EMail is not equal");
+		}
 	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getLastName()}.
-	 */
+	
 	@Test
 	public void testGetLastName() {
-		fail("Not yet implemented");
+		if(!user.getLastName().equals("Freifeld")){
+			fail("LastName is not equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getPassword()}.
-	 */
 	@Test
 	public void testGetPassword() {
-		fail("Not yet implemented");
+		if(!user.getPassword().equals("1234")){
+			fail("Password is not equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getPostedMsgNumber()}.
-	 */
 	@Test
 	public void testGetPostedMsgNumber() {
-		fail("Not yet implemented");
+		assertEquals(0, user.getPostedMsgNumber());
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getPrivateName()}.
-	 */
 	@Test
 	public void testGetPrivateName() {
-		fail("Not yet implemented");
+		if(!user.getPrivateName().equals("Royi")){
+			fail("PrivateName is not equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#getUsername()}.
-	 */
 	@Test
 	public void testGetUsername() {
-		fail("Not yet implemented");
+		if(!user.getUsername().equals("Royif")){
+			fail("UserName is not equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#setLastName(java.lang.String)}.
-	 */
 	@Test
 	public void testSetLastName() {
-		fail("Not yet implemented");
+		if(!user.getLastName().equals("Freifeld")){
+			fail("LastName is not equal");
+		}
+		user.setLastName("Frei");
+		if(!user.getLastName().equals("Frei")){
+			fail("LastName wasnt set");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#setPassword(java.lang.String)}.
-	 */
 	@Test
 	public void testSetPassword() {
-		fail("Not yet implemented");
+		if(!user.getPassword().equals("1234")){
+			fail("Password is not equal");
+		}
+		user.setPassword("2345");
+		if(!user.getPassword().equals("2345")){
+			fail("Password wasnt set");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#setPostedMsgNumber(int)}.
-	 */
 	@Test
 	public void testSetPostedMsgNumber() {
-		fail("Not yet implemented");
+		assertEquals(0, user.getPostedMsgNumber());
+		user.setPostedMsgNumber(3);
+		assertEquals(3, user.getPostedMsgNumber());
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#setPrivateName(java.lang.String)}.
-	 */
 	@Test
 	public void testSetPrivateName() {
-		fail("Not yet implemented");
+		if(!user.getPrivateName().equals("Royi")){
+			fail("PrivateName is not equal");
+		}
+		user.setPrivateName("Yakir");
+		if(!user.getPrivateName().equals("Yakir")){
+			fail("PrivateName wasnt set");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#incPostedMsgNum()}.
-	 */
 	@Test
 	public void testIncPostedMsgNum() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.RegisteredUserImpl#toString()}.
-	 */
-	@Test
-	public void testToString() {
-		fail("Not yet implemented");
+		assertEquals(0, user.getPostedMsgNumber());
+		user.incPostedMsgNum();
+		assertEquals(1, user.getPostedMsgNumber());
 	}
 
 }

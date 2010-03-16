@@ -3,11 +3,11 @@
  */
 package forum.server.persistentlayer.testing;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,7 +23,7 @@ import forum.server.persistentlayer.pipe.*;
  * @author Sepetnitsky Vitali
  *
  */
-public class JAXBpersistenceDataHandlerTest {
+public class JAXBpersistenceDataHandlerTest extends TestCase {
 	private PersistenceDataHandler pipe;
 
 

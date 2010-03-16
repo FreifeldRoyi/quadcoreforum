@@ -1,152 +1,403 @@
-/**
- * 
- */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author sepetnit
- *
- */
-public class ForumThreadImplTest {
+import forum.server.domainlayer.impl.*;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.exceptions.message.*;
+import forum.server.exceptions.subject.*;
+import forum.server.exceptions.user.*;
+import forum.server.persistentlayer.pipe.JAXBpersistenceDataHandler;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
+public class ForumThreadImplTest extends TestCase
+{
+	private RegisteredUser tUser;
+	private Forum tForum;
+	private ForumMessage tMessage1;
+	private ForumMessage tMessage2;
+	private ForumSubject tForumSubject;
+	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()
+	{
+		try {
+			JAXBpersistenceDataHandler.testMode();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		this.tForum = new ForumImpl();
+		this.tUser = new RegisteredUserImpl("e", "ee", "eee", "eee", "eee@ma.com");
+		this.tMessage1 = new ForumMessageImpl(this.tUser, "hello", "world");
+		this.tForumSubject = new ForumSubjectImpl("a", "b");
+		
+		
+		try
+		{
+			this.tForum.addForumSubject(this.tForumSubject);
+			this.tForum.registerUser(this.tUser);
+			this.tForum.login("e", "ee");
+		}
+		catch (NotRegisteredException e)
+		{
+			//sadasd
+		}
+		catch (AlreadyConnectedException e)
+		{
+			//sad
+		} catch (UserAlreadyExistsException e) {
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		} catch (WrongPasswordException e) {
+			// TODO Auto-generated catch block
+		} catch (SubjectAlreadyExistsException e) {
+			// TODO Auto-generated catch block
+		}
+		
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() throws Exception 
+	{
+		JAXBpersistenceDataHandler.regularMode();
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#ForumThreadImpl(forum.server.domainlayer.interfaces.ForumMessage)}.
-	 */
 	@Test
-	public void testForumThreadImpl() {
+	public void testAddMessage() 
+	{
+		int numOfMessages = this.tForumSubject.getNumOfThreads();
+		try {
+			this.tForumSubject.openNewThread(this.tMessage1);
+		} catch (JAXBException e) {
+			System.out.println("jaxb error");
+		} catch (IOException e) {
+			System.out.println("io error");
+		} catch (NotRegisteredException e) {
+			System.out.println("not reg error");
+		} catch (SubjectNotFoundException e) {
+			//System.out.println("not found error");		
+		}
+		assertTrue(this.tForumSubject.getNumOfThreads() == numOfMessages + 1);
+	}
+
+	@Test
+	public void testDecNumOfResponses() 
+	{
+		int numOfMessages = this.tForumSubject.getNumOfThreads();
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue(numOfMessages + 1 == this.tForumSubject.getNumOfThreads()); // good adding
+
+		this.tForumSubject.getThreads().elementAt(location).decNumOfResponses();
+		
+		assertTrue(numOfMessages == this.tForumSubject.getThreads().elementAt(location).getNumOfResponese());		
+	}
+
+	@Test
+	public void testGetAuthor() 
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue(this.tForumSubject.getThreads().elementAt(location).getAuthor().equals(this.tUser.getUsername()));
+	}
+
+	@Test
+	public void testGetThreadSubject()
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		assertTrue(this.tForumSubject.getThreads().elementAt(location).getThreadSubject().equals(tMsg.getMessageTitle()));
+	}
+
+	@Test
+	public void testIncNumOfResponses() 
+	{
+		int numOfMessages = this.tForumSubject.getNumOfThreads();
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue(numOfMessages + 1 == this.tForumSubject.getNumOfThreads()); // good adding
+
+		this.tForumSubject.getThreads().elementAt(location).incNumOfResponses();
+		
+		assertTrue(numOfMessages + 1 == this.tForumSubject.getThreads().elementAt(location).getNumOfResponese());
+	}
+
+/*	@Test
+	public void testIncNumOfViews()
+	{
+		fail("Not yet implemented");
+	}*/
+
+	@Test
+	public void testGetLatestPostAuthor() 
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		assertTrue(this.tForumSubject.getThreads().elementAt(location).getLatestPostAuthor().equals( 
+			tMsg.getAuthor().getUsername()));
+	}
+
+/*	@Test SAME HERE AS TODO ABOVE
+	public void testGetLatestPostDate() 
+	{
 		fail("Not yet implemented");
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#addMessage(forum.server.domainlayer.interfaces.ForumMessage, forum.server.domainlayer.interfaces.ForumMessage)}.
-	 */
 	@Test
-	public void testAddMessage() {
+	public void testGetLatestPostTime()
+	{
 		fail("Not yet implemented");
+	}*/
+
+	@Test
+	public void testGetPostingDate()
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue (tMsg.getDate().equals(this.tForumSubject.getThreads().elementAt(location).getPostingDate()));
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#decNumOfResponses()}.
-	 */
 	@Test
-	public void testDecNumOfResponses() {
-		fail("Not yet implemented");
+	public void testGetPostingTime() 
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue (tMsg.getTime().equals(this.tForumSubject.getThreads().elementAt(location).getPostingTime()));
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getAuthor()}.
-	 */
 	@Test
-	public void testGetAuthor() {
-		fail("Not yet implemented");
+	public void testSetLatestPost()
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		ForumMessage tMsg2 = new ForumMessageImpl(this.tUser, "ttl2", "1243124");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		
+		ForumMessage temp = null;
+		try {
+			this.tForumSubject.getThreads().elementAt(location).addMessage(tMsg, tMsg2); //TODO I think there is a problem with adding
+			temp = tMsg.findMessage(tMsg2.getMessageID());
+		} catch (MessageNotFoundException e) {
+		}
+		assertTrue(temp == tMsg2);
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getRootMessage()}.
-	 */
 	@Test
-	public void testGetRootMessage() {
-		fail("Not yet implemented");
+	public void testGetRootMessageID() 
+	{
+		ForumMessage tMsg = new ForumMessageImpl(this.tUser, "ttl", "");
+		int location = 0;
+		
+		try 
+		{
+			this.tForumSubject.openNewThread(tMsg);
+			location = this.tForumSubject.getThreads().size() - 1;
+		} 
+		catch (JAXBException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (NotRegisteredException e) 
+		{
+			// TODO Auto-generated catch block
+		} 
+		catch (SubjectNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+		}		
+		
+		assertTrue (tMsg.getMessageID() == this.tForumSubject.getThreads().elementAt(location).getRootMessageID());
 	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getThreadSubject()}.
-	 */
-	@Test
-	public void testGetThreadSubject() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#incNumOfResponses()}.
-	 */
-	@Test
-	public void testIncNumOfResponses() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#incNumOfViews()}.
-	 */
-	@Test
-	public void testIncNumOfViews() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getLatestPostAuthor()}.
-	 */
-	@Test
-	public void testGetLatestPostAuthor() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getLatestPostDate()}.
-	 */
-	@Test
-	public void testGetLatestPostDate() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getLatestPostTime()}.
-	 */
-	@Test
-	public void testGetLatestPostTime() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getPostingDate()}.
-	 */
-	@Test
-	public void testGetPostingDate() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#getPostingTime()}.
-	 */
-	@Test
-	public void testGetPostingTime() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#setLatestPost(forum.server.domainlayer.interfaces.ForumMessage)}.
-	 */
-	@Test
-	public void testSetLatestPost() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.ForumThreadImpl#threadToString()}.
-	 */
-	@Test
-	public void testThreadToString() {
-		fail("Not yet implemented");
-	}
-
 }

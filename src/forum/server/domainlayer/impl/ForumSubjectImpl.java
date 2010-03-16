@@ -173,6 +173,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	@Override
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
 	{
+
 		ForumMessage toReturn = null;
 		for (ForumSubject tSubj : this.subSubjects.values())
 		{
@@ -189,7 +190,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		for (ForumThread tThread : this.threads)
 		{
 			try 
-			{
+			{	
 				toReturn = tThread.findMessage(msgID);
 				return toReturn;
 			}

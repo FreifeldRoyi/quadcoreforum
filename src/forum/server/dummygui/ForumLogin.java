@@ -3,6 +3,8 @@
  */
 package forum.server.dummygui;
 
+import java.io.IOException;
+
 import forum.server.exceptions.user.*;
 
 
@@ -55,7 +57,7 @@ public class ForumLogin {
 	public LoggedUserOperations getStartScreenOperation() { 
 		String tReadText = ""; 
 		try { 
-			tReadText = ForumPromt.USER_CHOICE_SCANNER.next();
+			tReadText = ForumPromt.USER_CHOICE_SCANNER.readLine();
 			for (LoggedUserOperations val : LoggedUserOperations.values())
 				if (tReadText.equals(val.ordinalPlus1() + ""))
 					return val;
@@ -105,21 +107,26 @@ public class ForumLogin {
 	}
 
 	public void manageLogin() { 
-		System.out.println("Please type your username (or type" + ESCAPE_SEQUENCE + " to return the main menu)");
-		String tUsername = ForumPromt.USER_CHOICE_SCANNER.next();
-		if (tUsername.equals(ESCAPE_SEQUENCE))
-			return;
+		try {
+			System.out.println("Please type your username (or type " + ESCAPE_SEQUENCE + " to return the main menu)");
+			String tUsername = ForumPromt.USER_CHOICE_SCANNER.readLine();
+			if (tUsername.equals(ESCAPE_SEQUENCE))
+				return;
 
-		System.out.println("Please type your password (or type" + ESCAPE_SEQUENCE + " to return the main menu)");
-		String tPassword = ForumPromt.USER_CHOICE_SCANNER.next();
-		if (tPassword.equals(ESCAPE_SEQUENCE))
-			return;
+			System.out.println("Please type your password (or type 2" + ESCAPE_SEQUENCE + " to return the main menu)");
+			String tPassword = ForumPromt.USER_CHOICE_SCANNER.readLine();
+			if (tPassword.equals(ESCAPE_SEQUENCE))
+				return;
 
-		String tRegAns = ForumPromt.CONT.login(tUsername, tPassword);
-		if (tRegAns.equals(SUCCESS_MESSAGE))
-			this.playLogged();
-		else
-			System.out.println(tRegAns);
+			String tRegAns = ForumPromt.CONT.login(tUsername, tPassword);
+			if (tRegAns.equals(SUCCESS_MESSAGE))
+				this.playLogged();
+			else
+				System.out.println(tRegAns);
+		}
+		catch (IOException e) {
+			System.out.println("promter error!");
+		}
 
 	}
 

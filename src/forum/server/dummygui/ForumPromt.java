@@ -1,13 +1,8 @@
 package forum.server.dummygui;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-import forum.server.domainlayer.interfaces.Forum;
 import forum.server.domainlayer.pipe.Controller;
 
 /** 
@@ -16,9 +11,10 @@ import forum.server.domainlayer.pipe.Controller;
  */ 
 public class ForumPromt { 
 
-	public static Scanner USER_CHOICE_SCANNER = new Scanner(System.in); 
-	public static Controller CONT = new Controller();
+	public static BufferedReader USER_CHOICE_SCANNER = new BufferedReader(new InputStreamReader(System.in));
 	
+	public static Controller CONT = new Controller();
+		
 	private enum StartOperation { 
 		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
 
@@ -66,7 +62,7 @@ public class ForumPromt {
 	public StartOperation getStartScreenOperation() { 
 		String tReadText = ""; 
 		try { 
-			tReadText = USER_CHOICE_SCANNER.next();  
+			tReadText = USER_CHOICE_SCANNER.readLine();  
 			if (tReadText.equals(StartOperation.START_LOGIN.ordinalPlus1() + "")) 
 				return StartOperation.START_LOGIN; 
 			if (tReadText.equals(StartOperation.START_REGISTER.ordinalPlus1() + "")) 
