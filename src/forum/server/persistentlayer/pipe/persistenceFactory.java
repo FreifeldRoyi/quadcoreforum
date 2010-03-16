@@ -16,13 +16,13 @@ import org.xml.sax.SAXException;
 
 public class PersistenceFactory 
 {
-	private static persistenceDataHandler PERSISTENCE_DATA_HANDLER = null;
+	private static PersistenceDataHandler PERSISTENCE_DATA_HANDLER = null;
 
 	/**
 	 * Initializes the forum database (in case it hasn't initialized yet, and returns a pipe which
 	 * handles the database operations)
 	 */
-	public static persistenceDataHandler getPipe() 
+	public static PersistenceDataHandler getPipe() 
 	{
 		if (PERSISTENCE_DATA_HANDLER == null) 
 		{

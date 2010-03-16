@@ -1,5 +1,10 @@
 package forum.server.dummygui;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Scanner;
 
 import forum.server.domainlayer.interfaces.Forum;
@@ -132,6 +137,15 @@ public class ForumPromt {
 	
 	public static void main (String[] args) {
 		new ForumPromt().playDummy(); // creates a new PromtForum instance which handles the promt
+		
+			
+		
+		
+		
+		
+		
+		
+		
 	}		
 } 
 

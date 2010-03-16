@@ -117,7 +117,7 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 	 */
 	private ForumMessage constructForumMessage(MessageType msgType) {
 		// creates the new message
-		ForumMessage toReturn = new ForumMessageImpl(this.registeredUsers.get(msgType.getAuthor().getUsername()),
+		ForumMessage toReturn = new ForumMessageImpl(this.registeredUsers.get(msgType.getAuthor()),
 				msgType.getTitle(), msgType.getContent());
 		// add all the replies to the message
 		for (MessageType tMsgType : msgType.getReplies()) {
@@ -202,7 +202,7 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 			if (tForumSubject.getName().equals(fs.getName()))
 				throw new SubjectAlreadyExistsException(fs.getName());
 		subjects.add(fs);
-		persistenceDataHandler pipe = PersistenceFactory.getPipe();		
+		PersistenceDataHandler pipe = PersistenceFactory.getPipe();		
 		pipe.addNewSubject(fs.getSubjectID(), fs.getName(), fs.getDescription());
 	}
 
@@ -246,7 +246,7 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 
 		this.registeredUsers.put(user.getUsername(), user);
 
-		persistenceDataHandler pipe = PersistenceFactory.getPipe();
+		PersistenceDataHandler pipe = PersistenceFactory.getPipe();
 
 		pipe.registerToForum(user.getUsername(), user.getPassword(), user.getLastName(), 
 				user.getPrivateName(), user.getEMail());	

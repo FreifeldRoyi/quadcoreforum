@@ -8,12 +8,10 @@ import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
-import forum.server.domainlayer.interfaces.ForumMessage;
-import forum.server.domainlayer.interfaces.RegisteredUser;
-import forum.server.exceptions.message.MessageNotFoundException;
-import forum.server.exceptions.user.NotRegisteredException;
-import forum.server.persistentlayer.pipe.PersistenceFactory;
-import forum.server.persistentlayer.pipe.persistenceDataHandler;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.exceptions.message.*;
+import forum.server.exceptions.user.*;
+import forum.server.persistentlayer.pipe.*;
 
 public class ForumMessageImpl implements ForumMessage 
 {
@@ -107,7 +105,7 @@ public class ForumMessageImpl implements ForumMessage
 	{		
 		this.replyMessages.add(forumMessage);
 
-		persistenceDataHandler pipe = PersistenceFactory.getPipe();
+		PersistenceDataHandler pipe = PersistenceFactory.getPipe();
 
 		try {
 			pipe.replyToMessage(this.messageID, forumMessage.getMessageID(), forumMessage.getAuthor().getUsername(),

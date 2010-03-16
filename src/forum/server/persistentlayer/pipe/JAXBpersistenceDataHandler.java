@@ -6,8 +6,11 @@
 package forum.server.persistentlayer.pipe;
 
 import java.util.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.*;
@@ -25,7 +28,7 @@ import forum.server.persistentlayer.*;
  * @author Sepetnitsky Vitali
  *
  */
-public class JAXBpersistenceDataHandler implements persistenceDataHandler
+public class JAXBpersistenceDataHandler implements PersistenceDataHandler
 {
 
 	private static String DB_FILES_LOCATION = 
@@ -41,6 +44,33 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 	private Unmarshaller unmarshaller;
 	private Marshaller marshaller;
 
+	public static void testMode() throws IOException {
+		DB_FILES_LOCATION = "src" + System.getProperty("file.separator") +
+		"forum" + System.getProperty("file.separator") +
+		"server" + System.getProperty("file.separator") +
+		"persistentlayer" + System.getProperty("file.separator") +
+		"testing" + System.getProperty("file.separator");
+
+		SCHEMA_FILE_FULL_LOCATION = DB_FILES_LOCATION + DB_FILE_NAME + ".xsd";
+		DB_FILE_FULL_LOCATION 	= DB_FILES_LOCATION + DB_FILE_NAME + ".xml";
+
+		Writer output = new BufferedWriter(new FileWriter(new File(DB_FILE_FULL_LOCATION)));
+		output.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t" + 
+				"<ForumType>\n\t\t" + 
+				"<numOfMessages>0</numOfMessages>\n" +
+				"</ForumType>"
+		);
+		output.close();
+	}
+
+	public static void regularMode() {
+		DB_FILES_LOCATION = "src" + System.getProperty("file.separator") +
+		"forum" + System.getProperty("file.separator") +
+		"server" + System.getProperty("file.separator");
+
+		SCHEMA_FILE_FULL_LOCATION = DB_FILES_LOCATION + DB_FILE_NAME + ".xsd";
+		DB_FILE_FULL_LOCATION 	= DB_FILES_LOCATION + DB_FILE_NAME + ".xml";
+	}
 
 	public JAXBpersistenceDataHandler() throws JAXBException, SAXException
 	{
@@ -146,10 +176,12 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		ForumType tForum = this.getForumFromDatabase();
 		UserType tMsgAuthor = this.getMessageAuthor(tForum, authorUsername);
 
+		tMsgAuthor.setNumOfPostedMessages(tMsgAuthor.getNumOfPostedMessages() + 1);
+
 		// an exception will be thrown if the message won't be found
 		SubjectType tMsgSubject = this.findSubject(tForum.getForumSubjects(), subjectID);
 
-		MessageType tMsg = ExtendedObjectFactory.createMessageType(messageID, tMsgAuthor, msgTitle, 
+		MessageType tMsg = ExtendedObjectFactory.createMessageType(messageID, authorUsername, msgTitle, 
 				msgContent);
 
 		tForum.setNumOfMessages(tForum.getNumOfMessages() + 1);
@@ -167,9 +199,9 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 	throws JAXBException, IOException, SubjectAlreadyExistsException
 	{
 		ForumType tForum = this.getForumFromDatabase();	
-		
+
 		this.checkDuplicateSubject(tForum.getForumSubjects(), subjectName);
-		
+
 		SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, subjectName, subjectDescription);
 		tForum.getForumSubjects().add(tNewSubject);		
 		this.marshalDatabase(tForum);
@@ -248,20 +280,51 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		throw new MessageNotFoundException(msgIDtoFind);		
 	}
 
+
+	private MessageType findMessage(SubjectType subjectToLookIn, long msgIDtoFind) 
+	throws MessageNotFoundException
+	{
+		// look in sub-threads
+		for (ThreadType tThreadType : subjectToLookIn.getSubThreads())
+		{
+			try
+			{
+				MessageType tMsgToReturn = this.findMessage(tThreadType.getStartMessage(), msgIDtoFind);
+				return tMsgToReturn;
+			}
+			catch (MessageNotFoundException e) {
+				continue;
+			}
+		}		
+		// look in sub-subjects
+		for (SubjectType tSubSubject : subjectToLookIn.getSubSubjects())
+		{
+			try
+			{
+				MessageType tMsgToReturn = this.findMessage(tSubSubject, msgIDtoFind);
+				return tMsgToReturn;
+			}
+			catch (MessageNotFoundException e) {
+				continue;
+			}
+		}
+
+		throw new MessageNotFoundException(msgIDtoFind);
+	}
+
+
 	private MessageType findMessage(ForumType forum, long msgIDtoFind) throws MessageNotFoundException 
 	{
+		// look in the forum subjects (the top level)
 		for (SubjectType tSubjectType : forum.getForumSubjects())
 		{
-			for (ThreadType tThreadType : tSubjectType.getSubThreads())
-			{
-				try
-				{
-					MessageType tMsgToReturn = this.findMessage(tThreadType.getStartMessage(), msgIDtoFind);
-					return tMsgToReturn;
-				}
-				catch (MessageNotFoundException e) {
-					continue;
-				}
+			try {
+				MessageType tMsgToReturn = this.findMessage(tSubjectType, msgIDtoFind);
+				return tMsgToReturn;
+			}
+
+			catch (MessageNotFoundException e1) {
+				continue;
 			}
 		}
 		throw new MessageNotFoundException(msgIDtoFind);
@@ -273,17 +336,18 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 		ForumType tForum = this.getForumFromDatabase();
 
 		MessageType father = this.findMessage(tForum, fatherID);
-		UserType tMsgAuthor = this.getMessageAuthor(tForum, authorUsername);		
-
+	
+		UserType tMsgAuthor = this.getMessageAuthor(tForum, authorUsername);
+		
 		MessageType tReply = ExtendedObjectFactory.createMessageType(messageID,
-				tMsgAuthor, replyTitle, replyContent);
+				authorUsername, replyTitle, replyContent);
 
-//		tReply.getThread().setNumOfResponses(tReply.getThread().getNumOfResponses() + 1);
-//		tReply.getThread().setLastMessage(tReply);
+		
 
 		father.getReplies().add(tReply);
 
 		tMsgAuthor.setNumOfPostedMessages(tMsgAuthor.getNumOfPostedMessages() + 1);
+		
 		tMsgAuthor.getPostedMessages().add(tReply);
 
 		this.marshalDatabase(tForum);		
@@ -293,7 +357,6 @@ public class JAXBpersistenceDataHandler implements persistenceDataHandler
 	MessageNotFoundException
 	{
 		ForumType tForum = this.getForumFromDatabase();
-
 		MessageType tMsgToEdit = this.findMessage(tForum, messageID);
 		tMsgToEdit.setTitle(newTitle);
 		tMsgToEdit.setContent(newContent);		
