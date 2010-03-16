@@ -13,8 +13,7 @@ import forum.server.exceptions.user.*;
 import forum.server.persistentlayer.pipe.*;
 import forum.server.persistentlayer.*;
 
-public class ForumImpl extends NamedComponentImpl implements Forum 
-{
+public class ForumImpl extends NamedComponentImpl implements Forum {
 	private Vector<ForumSubject> subjects;
 	private Map<String, RegisteredUser> registeredUsers;
 	private Map<String, RegisteredUser> registeredUsersByEmail;
@@ -25,8 +24,7 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 	/**
 	 * Constructs the forum objects according to the database
 	 */
-	public ForumImpl() 
-	{
+	public ForumImpl() {
 		subjects = new Vector<ForumSubject>();
 		registeredUsers = new HashMap<String, RegisteredUser>();
 		connectedUsers = new HashMap<String, RegisteredUser>();
@@ -51,8 +49,7 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 	 * @throws JAXBException
 	 * 		In case an error occured while trying read from the database
 	 */
-	private void updateForumByDatabase() throws JAXBException
-	{
+	private void updateForumByDatabase() throws JAXBException {
 		ForumType tForumType = PersistenceFactory.getPipe().getForumFromDatabase();
 
 		// first constructs all the users according to the database
@@ -138,13 +135,11 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 		return new Vector<RegisteredUser>(this.connectedUsers.values());
 	}
 
-	public int getNumOfConnectedUsers() 
-	{
+	public int getNumOfConnectedUsers() {
 		return this.connectedUsers.size();
 	}
 	
-	public Vector<ForumSubject> getForumSubjects() 
-	{
+	public Vector<ForumSubject> getForumSubjects() {
 		return this.subjects;
 	}
 
@@ -174,19 +169,15 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 		throw new SubjectNotFoundException(id);
 	}
 
-	public ForumMessage getMessageByID(long msgID) throws MessageNotFoundException
-	{
+	public ForumMessage getMessageByID(long msgID) throws MessageNotFoundException {
 		ForumMessage toReturn = null;
 
-		for (ForumSubject tSubj : this.subjects)
-		{
-			try
-			{
+		for (ForumSubject tSubj : this.subjects) {
+			try {
 				toReturn = tSubj.findMessage(msgID);
 				return toReturn;
 			}
-			catch (MessageNotFoundException e) 
-			{
+			catch (MessageNotFoundException e) {
 				continue;
 			}
 		}
@@ -257,6 +248,4 @@ public class ForumImpl extends NamedComponentImpl implements Forum
 		this.getMessageByID(messageID).updateMe(newTitle, newContent);
 		
 	}
-	
-	
 }
