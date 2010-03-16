@@ -3,7 +3,9 @@ package forum.server.domainlayer.impl;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
@@ -147,7 +149,13 @@ public class ForumMessageImpl implements ForumMessage
 	@Override
 	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
 	{
+		
+		if (this.getMessageID() == msgID)
+			return this;
+		
 		ForumMessage toReturn = null;
+
+		
 		
 		for (ForumMessage tMsg : this.replyMessages)
 		{
@@ -165,4 +173,33 @@ public class ForumMessageImpl implements ForumMessage
 		}
 		throw new MessageNotFoundException(msgID);
 	}
+	
+	
+	/**
+	 * Returns a string representation of the message
+	 */
+	public String toString() {
+		return "title: " + this.getMessageTitle() + "\n" +
+				"author: " + this.getAuthor().getUsername() + "\n" +
+				"content: " + this.getMessageContent() + "\n" +
+				"posting date: " + this.getDate() + "\n" +
+				"posting time: " + this.getTime();
+	}
+	
+	public Map<Long, String> getRepliesRepresentation() {
+		Map<Long, String> toReturn = new HashMap<Long, String>();
+		
+		toReturn.put(this.getMessageID(), this.toString());
+		for (ForumMessage tReply : this.replyMessages)
+			toReturn.put(tReply.getMessageID(), tReply.toString());
+		return toReturn;
+	}
+
+	public void updateMe(String newTitle, String newContent) throws JAXBException, IOException, MessageNotFoundException {
+		this.setMessageTitle(newTitle);
+		this.setMessageContent(newContent);
+		PersistenceFactory.getPipe().updateMessage(this.getMessageID(), newTitle, newContent);
+		
+	}
+	
 }

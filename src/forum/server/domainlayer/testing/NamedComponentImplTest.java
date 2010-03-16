@@ -1,96 +1,77 @@
-/**
- * 
- */
 package forum.server.domainlayer.testing;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import forum.server.domainlayer.impl.NamedComponentImpl;
 
-/**
- * @author sepetnit
- *
- */
-public class NamedComponentImplTest {
+public class NamedComponentImplTest extends TestCase {
+	
+	NamedComponentImpl nc;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@Before
 	public void setUp() throws Exception {
+		String desc = "The Description";
+		String name = "User";
+		nc = new NamedComponentImpl(desc,name);
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#NamedComponentImpl(java.lang.String, java.lang.String)}.
-	 */
-	@Test
-	public void testNamedComponentImpl() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#decMessagesNumber()}.
-	 */
-	@Test
-	public void testDecMessagesNumber() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#getDescription()}.
-	 */
 	@Test
 	public void testGetDescription() {
-		fail("Not yet implemented");
+		if (!nc.getDescription().equals("The Description")){
+			fail("Description is not Equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#getName()}.
-	 */
 	@Test
 	public void testGetName() {
-		fail("Not yet implemented");
+		if (!nc.getName().equals("User")){
+			fail("Name is not Equal");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#getNumOfMessages()}.
-	 */
 	@Test
 	public void testGetNumOfMessages() {
-		fail("Not yet implemented");
+		assertEquals(0, nc.getNumOfMessages());
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#incMessagesNumber()}.
-	 */
 	@Test
 	public void testIncMessagesNumber() {
-		fail("Not yet implemented");
+		assertEquals(0, nc.getNumOfMessages());
+		nc.incMessagesNumber();
+		assertEquals(1, nc.getNumOfMessages());
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#setDescription(java.lang.String)}.
-	 */
+	@Test
+	public void testDecMessagesNumber() {
+		nc.incMessagesNumber();
+		assertEquals(1, nc.getNumOfMessages());
+		nc.decMessagesNumber();
+		assertEquals(0, nc.getNumOfMessages());
+	}
 	@Test
 	public void testSetDescription() {
-		fail("Not yet implemented");
+		if (!nc.getDescription().equals("The Description")){
+			fail("Description is not Equal");
+		}
+		nc.setDescription("New Description");
+		if (!nc.getDescription().equals("New Description")){
+			fail("Description wasnt set");
+		}
 	}
 
-	/**
-	 * Test method for {@link forum.server.domainlayer.impl.NamedComponentImpl#setName(java.lang.String)}.
-	 */
 	@Test
 	public void testSetName() {
-		fail("Not yet implemented");
+		if (!nc.getName().equals("User")){
+			fail("Name is not Equal");
+		}
+		nc.setName("New User");
+		if (!nc.getName().equals("New User")){
+			fail("Name wasnt set");
+		}
+		
 	}
 
 }

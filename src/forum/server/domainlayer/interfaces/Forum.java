@@ -163,6 +163,27 @@ public interface Forum
 	 * 		In case a subject with the given id wasn't found
 	 */
 	public Map<Long, String> getForumThreadsBySubjectID(long rootSubjectID) throws SubjectNotFoundException;
+	
+	
+	/**
+	 * Finds and updates a message with the given id, with the new title and content
+	 * 
+	 * @param messageID
+	 * 		The id of the message which should be updated
+	 * @param newTitle
+	 * 		The new title of the message
+	 * @param newContent
+	 * 		The new content of the message
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case the message wasn't found in the database 
+	 * @throws IOException 
+	 * 		In case a database error occurred
+	 * @throws JAXBException 
+	 * 		In case a database error occurred
+	 */
+	public void updateAMessage(long messageID, String newTitle, String newContent) throws JAXBException, IOException, MessageNotFoundException;
+	
 }
 
 /**
