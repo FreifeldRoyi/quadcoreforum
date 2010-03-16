@@ -3,7 +3,6 @@ package forum.server.domainlayer.impl;
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.exceptions.message.MessageNotFoundException;
-import forum.server.persistentlayer.MessageType;
 
 public class ForumThreadImpl implements ForumThread 
 {

@@ -13,8 +13,7 @@ import forum.server.exceptions.subject.*;
 import forum.server.exceptions.user.*;
 import forum.server.persistentlayer.pipe.*;
 
-public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject 
-{
+public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject {
 
 	private static long SUBJECT_ID_COUNTER = 0;
 
@@ -30,9 +29,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	 * @param description
 	 * @param name
 	 */
-	public ForumSubjectImpl(long id, String description, String name) 
-	{
-
+	public ForumSubjectImpl(long id, String description, String name) {
 		super(description, name);
 		this.subjectID = id;
 		SUBJECT_ID_COUNTER++;
@@ -41,9 +38,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 
-	public ForumSubjectImpl(String description, String name) 
-	{
-
+	public ForumSubjectImpl(String description, String name) {
 		super(description, name);
 		this.subjectID = (ForumSubjectImpl.SUBJECT_ID_COUNTER++);
 		this.subSubjects = new HashMap<String, ForumSubject>();
@@ -52,8 +47,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 
 	@Override
 	public void addSubSubject(ForumSubject forumSubject) 
-	throws JAXBException, IOException, SubjectAlreadyExistsException
-	{
+	throws JAXBException, IOException, SubjectAlreadyExistsException {
 		if (this.subSubjects.get(forumSubject.getName()) != null)
 			throw new SubjectAlreadyExistsException(forumSubject.getName());
 
@@ -74,8 +68,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	@Override
-	public int getNumOfThreads() 
-	{
+	public int getNumOfThreads() {
 		int tAns = this.threads.size();
 		for (ForumSubject tForumSubject : this.subSubjects.values())
 			tAns += tForumSubject.getNumOfThreads();
@@ -83,8 +76,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	@Override
-	public Vector<ForumSubject> getSubSubjects() 
-	{
+	public Vector<ForumSubject> getSubSubjects() {
 		return new Vector<ForumSubject>(this.subSubjects.values());
 	}
 
@@ -106,18 +98,13 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		this.threads.add(ft);
 	}
 
-	
-	
-
 	@Override
-	public Vector<ForumThread> getThreads() 
-	{
+	public Vector<ForumThread> getThreads() {
 		return this.threads;
 	}
 
 	@Override
-	public void openNewThread (ForumMessage root) throws JAXBException, IOException, NotRegisteredException, SubjectNotFoundException
-	{
+	public void openNewThread (ForumMessage root) throws JAXBException, IOException, NotRegisteredException, SubjectNotFoundException {
 		this.threads.add(new ForumThreadImpl(root));
 
 		PersistenceDataHandler pipe = PersistenceFactory.getPipe();
@@ -132,8 +119,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 		return this.getName() + " " + this.getDescription();
 	}
 
-	public String subjToString() 
-	{
+	public String subjToString() {
 		String tAns = this.getName() + " " + this.getDescription();
 
 
@@ -152,8 +138,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	public ForumSubject getForumSubject(long id) throws SubjectNotFoundException {
 		ForumSubject toReturn = null;
 		for (ForumSubject tSubj : this.subSubjects.values()) {
-			try 
-			{
+			try {
 				if (tSubj.getSubjectID() == id)
 					return tSubj;
 				else { 
@@ -161,8 +146,7 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 					return toReturn;
 				}
 			}
-			catch (SubjectNotFoundException e)
-			{
+			catch (SubjectNotFoundException e) {
 				continue;
 			}
 
@@ -171,42 +155,33 @@ public class ForumSubjectImpl extends NamedComponentImpl implements ForumSubject
 	}
 
 	@Override
-	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
-	{
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException {
 
 		ForumMessage toReturn = null;
-		for (ForumSubject tSubj : this.subSubjects.values())
-		{
-			try 
-			{
+		for (ForumSubject tSubj : this.subSubjects.values()) {
+			try {
 				toReturn = tSubj.findMessage(msgID);
 				return toReturn;
 			}
-			catch (MessageNotFoundException e)
-			{
+			catch (MessageNotFoundException e) {
 				continue;
 			}
 		}
-		for (ForumThread tThread : this.threads)
-		{
-			try 
-			{	
+		for (ForumThread tThread : this.threads) {
+			try {	
 				toReturn = tThread.findMessage(msgID);
 				return toReturn;
 			}
-			catch (MessageNotFoundException e)
-			{
+			catch (MessageNotFoundException e) {
 				continue;
 			}
 		}
 		throw new MessageNotFoundException(msgID);
 	}
 
-
 	@Override
 	public Map<Long, String> getForumThreadsDesc() {
 		Map<Long, String> toReturn = new HashMap<Long, String>();
-
 		for (ForumThread tForumThread : this.getThreads())
 			toReturn.put(tForumThread.getRootMessageID(), tForumThread.toString());
 		return toReturn;

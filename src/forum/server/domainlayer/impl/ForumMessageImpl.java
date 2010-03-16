@@ -15,8 +15,7 @@ import forum.server.exceptions.message.*;
 import forum.server.exceptions.user.*;
 import forum.server.persistentlayer.pipe.*;
 
-public class ForumMessageImpl implements ForumMessage 
-{
+public class ForumMessageImpl implements ForumMessage {
 	private static long MESSAGE_ID_COUNTER = 0;
 
 	private long messageID;
@@ -26,8 +25,7 @@ public class ForumMessageImpl implements ForumMessage
 	private String content;
 	private Vector<ForumMessage> replyMessages;
 
-	public ForumMessageImpl(RegisteredUser usr, String ttl, String cnt)
-	{
+	public ForumMessageImpl(RegisteredUser usr, String ttl, String cnt) {
 		this.messageID = (MESSAGE_ID_COUNTER++);
 		this.author = usr;
 		this.title = ttl;
@@ -44,8 +42,7 @@ public class ForumMessageImpl implements ForumMessage
 	}
 
 	@Override
-	public RegisteredUser getAuthor() 
-	{
+	public RegisteredUser getAuthor() {
 		return this.author;
 	}
 
@@ -53,8 +50,7 @@ public class ForumMessageImpl implements ForumMessage
 	 * returns a date formatted as DD/MM/YYYY
 	 */
 	@Override
-	public String getDate() 
-	{
+	public String getDate() {
 		String toReturn = this.postTime.get(Calendar.DAY_OF_MONTH) + "//" +
 		this.postTime.get(Calendar.MONTH) + "//" +
 		this.postTime.get(Calendar.YEAR);
@@ -62,20 +58,17 @@ public class ForumMessageImpl implements ForumMessage
 	}
 
 	@Override
-	public String getMessageContent() 
-	{
+	public String getMessageContent() {
 		return this.content;
 	}
 
 	@Override
-	public String getMessageTitle() 
-	{
+	public String getMessageTitle() {
 		return this.title;
 	}
 
 	@Override
-	public String getTime() 
-	{
+	public String getTime() {
 		String toReturn = this.postTime.get(Calendar.HOUR_OF_DAY) + ":" +
 		this.postTime.get(Calendar.MINUTE) + ":" +
 		this.postTime.get(Calendar.SECOND);
@@ -83,14 +76,12 @@ public class ForumMessageImpl implements ForumMessage
 	}
 
 	@Override
-	public void setMessageContent(String body) 
-	{
+	public void setMessageContent(String body) {
 		this.content = body;
 	}
 
 	@Override
-	public void setMessageTitle(String t) 
-	{
+	public void setMessageTitle(String t) {
 		this.title = t;
 	}
 
@@ -103,8 +94,7 @@ public class ForumMessageImpl implements ForumMessage
 	}
 	
 	@Override
-	public void addReplyToMe(ForumMessage forumMessage) 
-	{		
+	public void addReplyToMe(ForumMessage forumMessage) {		
 		this.replyMessages.add(forumMessage);
 
 		PersistenceDataHandler pipe = PersistenceFactory.getPipe();
@@ -147,8 +137,7 @@ public class ForumMessageImpl implements ForumMessage
 	}
 
 	@Override
-	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
-	{
+	public ForumMessage findMessage(long msgID) throws MessageNotFoundException {
 		
 		if (this.getMessageID() == msgID)
 			return this;
@@ -157,17 +146,14 @@ public class ForumMessageImpl implements ForumMessage
 
 		
 		
-		for (ForumMessage tMsg : this.replyMessages)
-		{
+		for (ForumMessage tMsg : this.replyMessages) {
 			if (tMsg.getMessageID() == msgID)
 				return tMsg;
-			try 
-			{
+			try {
 				toReturn = tMsg.findMessage(msgID);
 				return toReturn;
 			}
-			catch (MessageNotFoundException e)
-			{
+			catch (MessageNotFoundException e) {
 				continue;
 			}
 		}
@@ -201,5 +187,4 @@ public class ForumMessageImpl implements ForumMessage
 		PersistenceFactory.getPipe().updateMessage(this.getMessageID(), newTitle, newContent);
 		
 	}
-	
 }
