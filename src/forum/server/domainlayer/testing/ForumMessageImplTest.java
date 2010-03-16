@@ -20,8 +20,9 @@ import forum.server.domainlayer.interfaces.RegisteredUser;
 import forum.server.domainlayer.pipe.Controller;
 import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.persistentlayer.ForumType;
+import forum.server.persistentlayer.pipe.JAXBpersistenceDataHandler;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
-import forum.server.persistentlayer.pipe.persistenceDataHandler;
+import forum.server.persistentlayer.pipe.PersistenceDataHandler;
 
 /**
  * @author sepetnit
@@ -39,6 +40,7 @@ public class ForumMessageImplTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		JAXBpersistenceDataHandler.testMode();
 		tUser = new RegisteredUserImpl("user1", "pass1", "a", "b", "mail@mymail.com");
 
 		message1 = new ForumMessageImpl(tUser, "title1", "content1");
@@ -46,6 +48,15 @@ public class ForumMessageImplTest {
 		message3 = new ForumMessageImpl(tUser, "title3", "content3");
 		message4 = new ForumMessageImpl(tUser, "title4", "content4");
 	}
+	
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		JAXBpersistenceDataHandler.regularMode();
+	}
+
 
 	/**
 	 * Test method for {@link forum.server.domainlayer.impl.ForumMessageImpl#addReplyToMe()}.
@@ -55,7 +66,6 @@ public class ForumMessageImplTest {
 		this.message1.addMessageReplyData(this.message2);
 
 		try { // the message shouldn't be found in the database
-
 			new ForumImpl().getMessageByID(this.message2.getMessageID());
 			fail("The message shouldn't be found");
 		}

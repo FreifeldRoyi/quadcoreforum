@@ -10,42 +10,29 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import forum.server.domainlayer.impl.ForumImpl;
-import forum.server.domainlayer.impl.ForumMessageImpl;
-import forum.server.domainlayer.impl.ForumSubjectImpl;
-import forum.server.domainlayer.impl.RegisteredUserImpl;
-import forum.server.domainlayer.interfaces.Forum;
-import forum.server.domainlayer.interfaces.ForumMessage;
-import forum.server.domainlayer.interfaces.ForumSubject;
-import forum.server.domainlayer.interfaces.ForumThread;
-import forum.server.domainlayer.interfaces.RegisteredUser;
-import forum.server.exceptions.message.MessageNotFoundException;
-import forum.server.exceptions.subject.SubjectAlreadyExistsException;
-import forum.server.exceptions.subject.SubjectNotFoundException;
-import forum.server.exceptions.user.AlreadyConnectedException;
-import forum.server.exceptions.user.NotConnectedException;
-import forum.server.exceptions.user.NotRegisteredException;
-import forum.server.exceptions.user.UserAlreadyExistsException;
-import forum.server.exceptions.user.WrongPasswordException;
-import forum.server.persistentlayer.pipe.persistenceDataHandler;
+import forum.server.domainlayer.impl.*;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.exceptions.message.*;
+import forum.server.exceptions.subject.*;
+import forum.server.exceptions.user.*;
 
 /**
  * @author sepetnit
  *
  */
 public class Controller implements DomainDataHandler {
-	private static Forum forum;
+	private static Forum FORUM;
 	private RegisteredUser user;
 
 	public Controller() {
 		this.user = null;
-		if (Controller.forum == null)
-			Controller.forum = new ForumImpl();
+		if (Controller.FORUM == null)
+			Controller.FORUM = new ForumImpl();
 	}	
 
 	public String getForumSubjectByID(long id) {
 		try {
-			return Controller.forum.getForumSubjectByID(id).toString();
+			return Controller.FORUM.getForumSubjectByID(id).toString();
 		} catch (SubjectNotFoundException e) {
 			return "error: subject not found";
 		}
@@ -60,10 +47,10 @@ public class Controller implements DomainDataHandler {
 		Map<Long, String> toReturn = new HashMap<Long, String>();
 		try {
 			if (rootSubjectID != -1)
-				for (ForumSubject tForumSubject : Controller.forum.getForumSubjectByID(rootSubjectID).getSubSubjects())
+				for (ForumSubject tForumSubject : Controller.FORUM.getForumSubjectByID(rootSubjectID).getSubSubjects())
 					toReturn.put(tForumSubject.getSubjectID(), tForumSubject.toString());
 			else
-				for (ForumSubject tForumSubject : Controller.forum.getForumSubjects())
+				for (ForumSubject tForumSubject : Controller.FORUM.getForumSubjects())
 					toReturn.put(tForumSubject.getSubjectID(), tForumSubject.toString());
 		} catch (SubjectNotFoundException e) {
 			System.out.println("error: subject wasn't found");
@@ -73,7 +60,7 @@ public class Controller implements DomainDataHandler {
 
 	public Map<Long, String> getSubjectThreads(long rootSubjectID) {
 		try {
-			return  Controller.forum.getForumThreadsBySubjectID(rootSubjectID);
+			return  Controller.FORUM.getForumThreadsBySubjectID(rootSubjectID);
 		} catch (SubjectNotFoundException e) {
 			System.out.println(e.getMessage());
 			return null;
@@ -94,9 +81,9 @@ public class Controller implements DomainDataHandler {
 	{
 		try 
 		{
-			ForumSubject tRoot = forum.getForumSubjectByID(subjectID);
+			ForumSubject tRoot = FORUM.getForumSubjectByID(subjectID);
 			RegisteredUser tMsgUser;
-			tMsgUser = forum.getUserByUsername(username);
+			tMsgUser = FORUM.getUserByUsername(username);
 			ForumMessage tMsg = new ForumMessageImpl(tMsgUser, title, content);
 			tRoot.openNewThread(tMsg);
 			return "success!";
@@ -124,7 +111,7 @@ public class Controller implements DomainDataHandler {
 			String description) 
 	{
 		try {
-			ForumSubject tForumSubject = forum.getForumSubjectByID(fatherID);
+			ForumSubject tForumSubject = FORUM.getForumSubjectByID(fatherID);
 			ForumSubject tNewSubject = new ForumSubjectImpl(description, name);
 			tForumSubject.addSubSubject(tNewSubject);
 			return "A subject " + name + " has successfully added as a sub-subject of " +
@@ -150,7 +137,7 @@ public class Controller implements DomainDataHandler {
 	public String addNewSubject(String name, String description) {
 		ForumSubject tNewSubject = new ForumSubjectImpl(description, name);
 		try {
-			this.forum.addForumSubject(tNewSubject);
+			Controller.FORUM.addForumSubject(tNewSubject);
 			return "the subject " + name + " was added successfuly!";
 		} catch (JAXBException e) {
 			return "JAXB error!";
@@ -176,7 +163,7 @@ public class Controller implements DomainDataHandler {
 	@Override
 	public String login(String username, String password){
 		try {
-			RegisteredUser tUser = forum.login(username, password);
+			RegisteredUser tUser = FORUM.login(username, password);
 			this.user = tUser;
 			return "success!";
 		} catch (AlreadyConnectedException e) {
@@ -193,7 +180,7 @@ public class Controller implements DomainDataHandler {
 	public String logout(String username) {
 		String toReturn = "success!";
 		try {
-			this.forum.logout(username);
+			Controller.FORUM.logout(username);
 			this.user = null;
 		} catch (NotConnectedException e) {
 			toReturn = e.getMessage();
@@ -208,7 +195,7 @@ public class Controller implements DomainDataHandler {
 		String toReturn = "success!";
 		RegisteredUser tUser = new RegisteredUserImpl(username, password, firstName, lastName, email);		
 		try {
-			this.forum.registerUser(tUser);
+			Controller.FORUM.registerUser(tUser);
 		}
 		catch (UserAlreadyExistsException e) {
 			toReturn = e.getMessage();
@@ -227,8 +214,8 @@ public class Controller implements DomainDataHandler {
 			String content) {
 		ForumMessage tFather;
 		try {
-			tFather = this.forum.getMessageByID(fatherID);
-			RegisteredUser tUser = this.forum.getUserByUsername(username);
+			tFather = Controller.FORUM.getMessageByID(fatherID);
+			RegisteredUser tUser = Controller.FORUM.getUserByUsername(username);
 			ForumMessage tNewMsg = new ForumMessageImpl(tUser, title, content);
 
 			tFather.addReplyToMe(tNewMsg);

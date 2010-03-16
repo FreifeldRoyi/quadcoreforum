@@ -17,7 +17,7 @@ import forum.server.persistentlayer.ForumType;
  * @author Vitali Sepetnitsky
  *
  */
-public interface persistenceDataHandler
+public interface PersistenceDataHandler
 {
 	/**
 	 * This method updates the database with a new registered user
@@ -37,6 +37,8 @@ public interface persistenceDataHandler
 	 * 		if any unexpected errors occur while marshalling / unmarshalling
 	 * @throws IOException
 	 * 		In case there is a problem with the database xml file
+	 * @throws UserAlreadyExistsException
+	 * 		In case a user with the given username already registered to the forum
 	 */
 	public void registerToForum(String username, String password, String lastName, String firstName,
 			String email) throws JAXBException, IOException, UserAlreadyExistsException;
@@ -58,7 +60,7 @@ public interface persistenceDataHandler
 	 * @throws IOException
 	 * 		In case there is a problem with the database xml file
 	 * @throws SubjectAlreadyExistsException
-	 * 		If there already exists a subject with the given name in the forum
+	 * 		If there already exists a subject with the given name in the top level of the forum
 	 */
 	public void addNewSubject(long subjectID, String subjectName, String subjectDescription) throws JAXBException, IOException, 
 	SubjectAlreadyExistsException;
@@ -80,12 +82,12 @@ public interface persistenceDataHandler
 	 * @throws IOException
 	 * 		In case there is a problem with the database xml file
 	 * @throws SubjectAlreadyExistsException
-	 * 		If there already exists a subject with the given name in the forum
+	 * 		If the root subject already has a sub-subject with the given name
 	 * @throws SubjectNotFoundException
 	 * 		In case the new subject should be a sub-subject of a non existing one
 	 */
-	public void addNewSubSubject(long fatherID, long subjectID, String subjectName, String subjectDescription) throws JAXBException, IOException, 
-	SubjectAlreadyExistsException, SubjectNotFoundException;	
+	public void addNewSubSubject(long fatherID, long subjectID, String subjectName, String subjectDescription)
+	throws JAXBException, IOException, SubjectAlreadyExistsException, SubjectNotFoundException;	
 	
 	/**
 	 * Adds a new message, by openning a new messages thread within a given subject, and updates the database with the given message

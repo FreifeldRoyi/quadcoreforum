@@ -63,17 +63,16 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link MessageType} class which is initialized with the given parameters		
 	 */
-	public static MessageType createMessageType(long msgID, UserType author,
+	public static MessageType createMessageType(long msgID, String authorUsername,
 			String title, String content) {
 		GregorianCalendar tCurrDateTime = new GregorianCalendar();
 		MessageType tMsgType = factory.createMessageType();
 		tMsgType.setMessageID(msgID);
-		tMsgType.setAuthor(author);
+		tMsgType.setAuthor(authorUsername);
 		tMsgType.setTitle(title);
 		tMsgType.setContent(content);
 		tMsgType.setDate(new XMLGregorianCalendarImpl(tCurrDateTime));
 		tMsgType.setTime(new XMLGregorianCalendarImpl(tCurrDateTime));
-		author.setNumOfPostedMessages(author.getNumOfPostedMessages() + 1);
 		return tMsgType;
 	}
 	
