@@ -5,6 +5,11 @@ import java.util.*;
 
 import javax.xml.bind.JAXBException;
 
+import forum.server.domainlayer.impl.message.ForumSubjectImpl;
+import forum.server.domainlayer.impl.message.ForumThreadImpl;
+import forum.server.domainlayer.impl.message.NamedComponentImpl;
+import forum.server.domainlayer.impl.user.ForumMessageImpl;
+import forum.server.domainlayer.impl.user.RegisteredUserImpl;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.exceptions.message.*;
 import forum.server.exceptions.subject.*;

@@ -10,36 +10,27 @@ public interface UIMember extends UIUser
 {
 
 	/**
-	 * @return member's day of birth
+	 * @return
+	 * 		The username of the member
 	 */
-	public String getDateOfBirth();
+	public String getUsername();
 
 	/**
-	 * @return member's first name
+	 * @return
+	 * 		The first name of the member
 	 */
 	public String getFirstName();
 
 	/**
-	 * @return member's gender
-	 */
-	public String getGender();
-
-	/**
-	 * @return member's last name
+	 * @return
+	 * 		The last name of the member
 	 */
 	public String getLastName();
 
 	/**
-	 * @return member's residence
+	 * 
+	 * @return
+	 * 		The e-mail address of the member
 	 */
-	public String getResidence();
-
-	/**
-	 * @return member's username
-	 */
-	public String getUsername();
-
-
-
-
+	public String getEmail();	
 }

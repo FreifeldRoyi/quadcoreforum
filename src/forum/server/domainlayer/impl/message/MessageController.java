@@ -30,8 +30,6 @@ public class MessageController
 	private final PersistenceDataHandler pipe; // A pipe to the persistence layer
 	private ForumSubject currSubject; // the current subject asked by the user
 
-
-
 	/**
 	 * The class constructor.
 	 * 
