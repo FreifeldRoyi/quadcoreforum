@@ -2,7 +2,7 @@ package forum.tcpcommunicationlayer;
 
 import java.io.Serializable;
 
-import forum.server.domainlayer.ForumFacade;
+import forum.server.ForumFacade;
 
 /**
  * This is the interface for all the messages sent by the client to the server.

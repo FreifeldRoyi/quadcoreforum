@@ -3,8 +3,9 @@ package forum.server.domainlayer.impl.message;
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumThread;
 import forum.server.exceptions.message.MessageNotFoundException;
+import forum.server.presentationlayer.UIThread;
 
-public class ForumThreadImpl implements ForumThread 
+public class ForumThreadImpl implements ForumThread
 {
 	private ForumMessage rootMessage;
 	private int numOfViews;
@@ -144,5 +145,6 @@ public class ForumThreadImpl implements ForumThread
 	public int getNumOfViews() {
 		return this.numOfViews;
 	}
+
 	
 }

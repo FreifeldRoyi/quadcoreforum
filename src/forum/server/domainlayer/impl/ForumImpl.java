@@ -144,9 +144,6 @@ public class ForumImpl extends NamedComponentImpl implements Forum {
 		return this.connectedUsers.size();
 	}
 	
-	public Vector<ForumSubject> getForumSubjects() {
-		return this.subjects;
-	}
 
 	public RegisteredUser getUserByUsername(String username) throws NotRegisteredException {
 		RegisteredUser toReturn = this.registeredUsers.get(username);
@@ -174,6 +171,11 @@ public class ForumImpl extends NamedComponentImpl implements Forum {
 		throw new SubjectNotFoundException(id);
 	}
 
+	public Vector<ForumSubject> getForumSubjects() {
+		return this.subjects;
+	}
+
+	
 	public ForumMessage getMessageByID(long msgID) throws MessageNotFoundException {
 		ForumMessage toReturn = null;
 

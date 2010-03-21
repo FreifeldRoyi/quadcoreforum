@@ -133,9 +133,10 @@ public class SystemLogger {
 	 * 		The message priority level (will appear in the log file)
 	 */
 	public static void logAMessage(String message, Level level ) {
-		if (SystemLogger.LOGGER == null){
+		if (SystemLogger.LOGGER == null) {
 			if (createLogger())
 				SystemLogger.LOGGER.log(level, message);
+			// TODO: consider send a failure e-mail to the forum admin
 		}
 		else
 			SystemLogger.LOGGER.log(level, message);	

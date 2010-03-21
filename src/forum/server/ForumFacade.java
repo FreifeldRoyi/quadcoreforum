@@ -5,7 +5,9 @@ import java.util.Set;
 
 import forum.server.exceptions.message.MessageNotFoundException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.exceptions.user.NotConnectedException;
 import forum.server.exceptions.user.NotRegisteredException;
+import forum.server.exceptions.user.UserAlreadyExistsException;
 import forum.server.presentationlayer.*;
 
 /**
@@ -27,8 +29,7 @@ public interface ForumFacade {
 	 * @return
 	 * 		The created guest
 	 */
-	UIUser registerGuest();
-
+	UIUser addGuest();
 
 	/**
 	 * Unregisters a guest with a given id. 
@@ -38,14 +39,13 @@ public interface ForumFacade {
 	 * @param userId
 	 * 		The guest id
 	 */
-	public void unregisterGuest(final long userId);
-
+	public void removeGuest(final long userId); // if an exception occurred it will be handled internally
 
 	/**
 	 * @return
 	 * 		The number of active forum guests - who currently view the forum contents
 	 */
-	public int getActiveGuests();
+	public Set<UIUser> getActiveGuests();
 
 	/**
 	 * @return
@@ -53,6 +53,9 @@ public interface ForumFacade {
 	 */
 	public Set<String> getActiveMemberNames();
 
+	
+	/////////////////////////////////
+	
 	/**
 	 * 
 	 * Registers a new user, with the given parameters, to the forum
@@ -68,16 +71,14 @@ public interface ForumFacade {
 	 * @param email
 	 * 		The e-mail of the new user
 	 * 
-	 * @return
-	 * 		A message which describes the domain layer response:
-	 * 			A success message in case of a successful registration
-	 * 			An error message which describes the failure, in case it occurred
+	 * @throws UserAlreadyExistsException
+	 * 		If a user with the same user-name or e-mail already exists in the system
 	 *
 	 * Note: The registration doesn't make the user logged-in, this means that the user has to login in order to 
 	 * use the privileges of a registered user
 	 */
-	public String registerToForum(final String username, final String password, final String lastName,
-			final String firstName, final String email);
+	public void registerToForum(final String username, final String password, final String lastName,
+			final String firstName, final String email) throws UserAlreadyExistsException;
 
 	/**
 	 * 
@@ -102,12 +103,10 @@ public interface ForumFacade {
 	 * @param username
 	 * 		The user-name of the user who should be logged out
 	 *
-	 * @return
-	 * 		A message which describes the domain layer response:
-	 * 			A success message in case of a successful logout
-	 * 			An error message which describes the failure, in case it occurred	  		
+	 * @throws NotConnectedException
+	 * 		If a user with the given user-name isn't connected 
 	 */
-	public String logout(final String username);
+	public void logout(final String username) throws NotConnectedException;
 
 	/**
 	 * 
@@ -140,11 +139,12 @@ public interface ForumFacade {
 	 * 		The description of the new subject
 	 *
 	 * @return
-	 * 		A message which describes the response:
-	 * 			A success message in case of a successful subject adding
-	 * 			An error message which describes the failure, in case it occurred	  		
+	 * 		The created subject data accessible via a UISubject interface
+	 * @throws SubjectNotFoundException
+	 *		In case the id of the father subject wasn't found
 	 */
-	public UISubject addNewSubject(final long fatherID, final String name, final String description);
+	public UISubject addNewSubject(final long fatherID, final String name, final String description)
+			throws SubjectNotFoundException;
 
 	/**
 	 * Finds and returns all the subject's sub-subjects data, accessible via the UISubject interface.
@@ -152,10 +152,10 @@ public interface ForumFacade {
 	 * @param fatherID
 	 * 		The id of the root subject, whose sub-subjects' data should be returned.
 	 * 		If the id is -1, then the forum root subjects data is returned
+	 *
 	 * @return
 	 * 		A collection of all the sub-subjects of the subject with the given id, accessible via the
 	 * 		UISubject interface.
-	 * 
 	 * @throws SubjectNotFoundException
 	 *		In case the id of the father subject wasn't found
 	 */
@@ -176,11 +176,12 @@ public interface ForumFacade {
 	 * 		The content of the new thread's root message
 	 * 
 	 * @return
-	 * 		A message which describes the domain layer response:
-	 * 			A success message in case of a successful message adding
-	 * 			An error message which describes the failure, in case it occurred	  		
+	 * 		The created thread data, accessible via a UISubject interface
+	 * @throws SubjectNotFoundException
+	 *		In case the id of the father subject wasn't found
 	 */
-	public String openNewThread(long subjectID, final String username, final String title, final String content);
+	public UIThread openNewThread(long subjectID, final String username, final String title,
+			final String content) throws SubjectNotFoundException;
 
 	/**
 	 * 
@@ -188,10 +189,10 @@ public interface ForumFacade {
 	 * 
 	 * @param rootSubjectID
 	 * 		The if of the subject whose threads should be represented
+	 * 
 	 * @return
 	 * 		A collection of all the threads of the subject with the given id, accessible via the
 	 * 		UIThread interface.
-	 * 
 	 * @throws SubjectNotFoundException
 	 *		In case the id of the father subject wasn't found
 	 */
@@ -214,9 +215,11 @@ public interface ForumFacade {
 	 * 
 	 * @return
 	 * 		The data of the new reply, accessible via a UIMessage interface
+	 * @throws MessageNotFoundException
+	 * 		In case the root message wasn't found
 	 */
 	public UIMessage addNewReply(final long fatherID, final String userName, final String title,
-			final String content);
+			final String content) throws MessageNotFoundException;
 
 	/**
 	 * Finds and updates a message with the given id, with the new title and content
@@ -228,10 +231,12 @@ public interface ForumFacade {
 	 * @param newContent
 	 * 		The new content of the message
 	 * 
+	 * @return
+	 * 		The updated message, accessible via a UIMessage interface
 	 * @throws MessageNotFoundException
 	 * 		In case the message wasn't found in the database
 	 */
-	public void updateAMessage(final long messageID, final String newTitle, 
+	public UIMessage updateAMessage(final long messageID, final String newTitle, 
 			final String newContent) throws MessageNotFoundException;
 
 	/**

@@ -1,6 +1,7 @@
 package forum.server.domainlayer.impl.message ;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Vector;
 
@@ -13,6 +14,9 @@ import forum.server.exceptions.subject.SubjectAlreadyExistsException;
 import forum.server.exceptions.subject.SubjectNotFoundException;
 import forum.server.persistentlayer.pipe.PersistenceDataHandler;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
+import forum.server.presentationlayer.UIMessage;
+import forum.server.presentationlayer.UISubject;
+import forum.server.presentationlayer.UIThread;
 
 /**
  * This class is a controller for all message's actions.
@@ -28,7 +32,7 @@ public class MessageController
 
 	/** reference to the forum object which holds the users and the messages in the forum system **/
 	private final PersistenceDataHandler pipe; // A pipe to the persistence layer
-	private ForumSubject currSubject; // the current subject asked by the user
+	//private ForumSubject currSubject; // the current subject asked by the user
 
 	/**
 	 * The class constructor.
@@ -39,6 +43,81 @@ public class MessageController
 		this.pipe = PersistenceFactory.getPipe();
 		currSubject = null;
 	}
+
+	/*
+	public ForumSubject addSubject(final long userId, final long containerDirectoryId, final String newDirName) throws UnpermittedActionException, NotFoundException
+
+	public ForumMessage addReply(final long threadId, final long userId, final String msg)
+	throws UnpermittedActionException, NotFoundException
+
+	public ForumThread addThread(final long dirId, final long userId, final String subject, final String msg)
+	throws UnpermittedActionException, NotFoundException
+
+	public void editMessage(final long postId, final long userId, final String msg)
+	throws UnpermittedActionException, NotFoundException
+
+
+
+	public Collection<UISubject> getSubSubjects(final long dirId) throws NotFoundException
+
+	public Collection<UIThread> getThreads(final long dirId) throws NotFoundException
+
+	public Collection<UIMessage> getPosts(final long threadId) throws NotFoundException
+	 */	
+
+
+	// Subject related methods:
+
+	public UISubject addNewSubject(final long fatherID, final String name, final String description) {
+		
+	}
+
+	public Collection<UISubject> getSubjects(final long fatherID) throws SubjectNotFoundException {
+		
+	}
+
+	// Thread related methods:
+
+	public String openNewThread(long subjectID, final String username, final String title, final String content) {
+		
+	}
+
+	public Collection<UIThread> getThreads(final long fatherID) throws SubjectNotFoundException {
+		
+	}
+
+	// Message related methods:
+
+	public UIMessage addNewReply(final long fatherID, final String userName, final String title,
+			final String content) {
+		
+	}
+
+	public void updateAMessage(final long messageID, final String newTitle, 
+			final String newContent) throws MessageNotFoundException {
+		
+	}
+
+	public Collection<UIMessage> getReplies(final long fatherID) throws MessageNotFoundException {
+		
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*
+
+
 
 
 	public Vector<ForumSubject> getForumSubjects() {
@@ -86,7 +165,7 @@ public class MessageController
 
 		/* Methods */
 
-		public void addForumSubject(ForumSubject fs) throws 
+	/*		public void addForumSubject(ForumSubject fs) throws 
 		JAXBException, IOException, SubjectAlreadyExistsException {
 			for (ForumSubject tForumSubject : subjects)
 				if (tForumSubject.getName().equals(fs.getName()))
@@ -102,28 +181,6 @@ public class MessageController
 			this.getMessageByID(messageID).updateMe(newTitle, newContent);
 
 		}
-
-
-
-		public ForumSubject addSubject(final long userId, final long containerDirectoryId, final String newDirName) throws UnpermittedActionException, NotFoundException
-
-		public ForumMessage addReply(final long threadId, final long userId, final String msg)
-		throws UnpermittedActionException, NotFoundException
-
-		public ForumThread addThread(final long dirId, final long userId, final String subject, final String msg)
-		throws UnpermittedActionException, NotFoundException
-
-		public void editMessage(final long postId, final long userId, final String msg)
-		throws UnpermittedActionException, NotFoundException
-
-
-		public Vector<ForumSubject> getSubSubjects(final long dirId) throws NotFoundException
-
-		public Vector<ForumThread> getThreads(final long dirId) throws NotFoundException
-
-		public Vector<ForumThread> getPosts(final long threadId) throws NotFoundException
-		
-		public ForumPost viewPost(final long postId) throws NotFoundException
 
 
 
@@ -182,17 +239,17 @@ public class MessageController
 
 
 		/**
-		 * add new subDirectory under an existing directory
-		 * (the root is build when the forum is initialized)
-		 * @param userId the user which ask to add this directory
-		 * @param containerDirectoryId the id of the directory under it the new subDirectory will be added
-		 * @param newDirName the name for the new subDirectory
-		 * @return the new directory for presentation
-		 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-		 * this action
-		 * @throws NotFoundException if the container directory was not found
-		 */
-		public ForumSubject addSubject(final long userId, final long containerDirectoryId, final String newDirName) throws UnpermittedActionException, NotFoundException
+	 * add new subDirectory under an existing directory
+	 * (the root is build when the forum is initialized)
+	 * @param userId the user which ask to add this directory
+	 * @param containerDirectoryId the id of the directory under it the new subDirectory will be added
+	 * @param newDirName the name for the new subDirectory
+	 * @return the new directory for presentation
+	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
+	 * this action
+	 * @throws NotFoundException if the container directory was not found
+	 */
+	/*		public ForumSubject addSubject(final long userId, final long containerDirectoryId, final String newDirName) throws UnpermittedActionException, NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("user " + userId + " requests to add a directory named " +
 					newDirName + " to directory " + containerDirectoryId + ".") ;
@@ -220,17 +277,17 @@ public class MessageController
 
 
 		/**
-		 * create a new post in thread.
-		 * @param threadId location of the new post
-		 * @param userId the id of the user requested to perform this action
-		 * @param msg the wanted message in the post
-		 * @return the new post for presentation
-		 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-		 * this action
-		 * @throws NotFoundException if the thread or the user was not found
-		 * @post messages has a new post with the wanted message, and the wanted thread holds its id.
-		 */
-		public ForumMessage addReply(final long threadId, final long userId, final String msg)
+	 * create a new post in thread.
+	 * @param threadId location of the new post
+	 * @param userId the id of the user requested to perform this action
+	 * @param msg the wanted message in the post
+	 * @return the new post for presentation
+	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
+	 * this action
+	 * @throws NotFoundException if the thread or the user was not found
+	 * @post messages has a new post with the wanted message, and the wanted thread holds its id.
+	 */
+	/*		public ForumMessage addReply(final long threadId, final long userId, final String msg)
 		throws UnpermittedActionException, NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).fine("user " + userId + " requests to add a post to thread " + threadId + ".") ;
@@ -258,19 +315,19 @@ public class MessageController
 		}
 
 		/**
-		 * create a new thread in a sub-forum, with a first post.
-		 * @param dirId location of the new thread
-		 * @param userId the member requested to perform this action
-		 * @param subject the thread subject
-		 * @param msg the wanted message for the first post in the new created thread
-		 * @return the new thread for presentation
-		 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-		 * this action
-		 * @throws NotFoundException if the directory or the user was not found
-		 * @post a new thread with the wanted subject was created in the the wanted thread, and its first post
-		 * includes the given message.
-		 */
-		public ForumThread addThread(final long dirId, final long userId, final String subject, final String msg)
+	 * create a new thread in a sub-forum, with a first post.
+	 * @param dirId location of the new thread
+	 * @param userId the member requested to perform this action
+	 * @param subject the thread subject
+	 * @param msg the wanted message for the first post in the new created thread
+	 * @return the new thread for presentation
+	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
+	 * this action
+	 * @throws NotFoundException if the directory or the user was not found
+	 * @post a new thread with the wanted subject was created in the the wanted thread, and its first post
+	 * includes the given message.
+	 */
+	/*		public ForumThread addThread(final long dirId, final long userId, final String subject, final String msg)
 		throws UnpermittedActionException, NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("user " + userId + " requests to add a thread named " +
@@ -305,16 +362,16 @@ public class MessageController
 
 
 		/**
-		 * edit the wanted post (only if member is the writer of the post, or moderator)
-		 * @param postId the wanted post to edit
-		 * @param userId the member requested to perform this action
-		 * @param msg the new message to edit instead of the current message in the post
-		 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-		 * this action
-		 * @throws NotFoundException if the post or the user was not found
-		 * @post the post holds the new message (msg) instead of the previous one.
-		 */
-		public void editMessage(final long postId, final long userId, final String msg)
+	 * edit the wanted post (only if member is the writer of the post, or moderator)
+	 * @param postId the wanted post to edit
+	 * @param userId the member requested to perform this action
+	 * @param msg the new message to edit instead of the current message in the post
+	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
+	 * this action
+	 * @throws NotFoundException if the post or the user was not found
+	 * @post the post holds the new message (msg) instead of the previous one.
+	 */
+	/*		public void editMessage(final long postId, final long userId, final String msg)
 		throws UnpermittedActionException, NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("user " + userId + " is requesting to edit post " + postId + ".") ;
@@ -341,12 +398,12 @@ public class MessageController
 		}
 
 		/**
-		 * get all threads's posts in a presentation form
-		 * @param threadId the thread to retrieve its threads
-		 * @return vector of all posts in a form of passing to the presentation layer
-		 * @throws NotFoundException when the thread was not found
-		 */
-		public Vector<ForumThread> getPosts(final long threadId) throws NotFoundException
+	 * get all threads's posts in a presentation form
+	 * @param threadId the thread to retrieve its threads
+	 * @return vector of all posts in a form of passing to the presentation layer
+	 * @throws NotFoundException when the thread was not found
+	 */
+	/*	public Vector<ForumThread> getPosts(final long threadId) throws NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("viewing thread " + threadId + " posts.") ;
 			final Thread thread = this.forum.getMessages().getThread(threadId);
@@ -361,12 +418,12 @@ public class MessageController
 		}
 
 		/**
-		 * get all directory's subDirectories in a presentation
-		 * @param dirId the directory to retrieve its subDirectories
-		 * @return vector of all subDirectories in a form of passing to the presentation layer
-		 * @throws NotFoundException when the directory was not found
-		 */
-		public Vector<ForumSubject> getSubSubjects(final long dirId) throws NotFoundException
+	 * get all directory's subDirectories in a presentation
+	 * @param dirId the directory to retrieve its subDirectories
+	 * @return vector of all subDirectories in a form of passing to the presentation layer
+	 * @throws NotFoundException when the directory was not found
+	 */
+	/*	public Vector<ForumSubject> getSubSubjects(final long dirId) throws NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("viewing directory " + dirId + " subDirectories.") ;
 			final Directory directory = this.forum.getMessages().getDirectory(dirId);
@@ -382,12 +439,12 @@ public class MessageController
 
 
 		/**
-		 * get all directory's threads in a presentation form
-		 * @param dirId the directory to retrieve its threads
-		 * @return vector of all threads in a form of passing to the presentation layer
-		 * @throws NotFoundException when the directory was not found
-		 */
-		public Vector<ForumThread> getThreads(final long dirId) throws NotFoundException
+	 * get all directory's threads in a presentation form
+	 * @param dirId the directory to retrieve its threads
+	 * @return vector of all threads in a form of passing to the presentation layer
+	 * @throws NotFoundException when the directory was not found
+	 */
+	/*		public Vector<ForumThread> getThreads(final long dirId) throws NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("viewing directory " + dirId + " threads.") ;
 			final Directory directory = this.forum.getMessages().getDirectory(dirId);
@@ -402,17 +459,19 @@ public class MessageController
 		}
 
 		/**
-		 * view the wanted post
-		 * @param postId the wanted post to view
-		 * @return the post in a form of passing to the presentation layer
-		 * for performing this action
-		 * @throws NotFoundException if the post or the user was not found
-		 * @post no change is made in the system.
-		 **/
-		public ForumPost viewPost(final long postId) throws NotFoundException
+	 * view the wanted post
+	 * @param postId the wanted post to view
+	 * @return the post in a form of passing to the presentation layer
+	 * for performing this action
+	 * @throws NotFoundException if the post or the user was not found
+	 * @post no change is made in the system.
+	 **/
+	/*		public ForumPost viewPost(final long postId) throws NotFoundException
 		{
 			Log.getLogger(Subsystem.SERVICES).info("viewing post " + postId + ".") ;
 			final Post post = this.forum.getMessages().getPost(postId);
 			return post;
 		}
-	}
+
+	 */
+}
