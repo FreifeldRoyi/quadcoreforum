@@ -9,7 +9,7 @@ package forum.server.presentationlayer;
 public interface UISubject {
 	/**
 	 * @return
-	 * 		The id of the subject
+	 * 		The unique id of the subject
 	 */
 	public long getId();
 

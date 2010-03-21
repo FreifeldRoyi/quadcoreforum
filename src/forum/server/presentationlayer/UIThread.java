@@ -8,13 +8,15 @@ package forum.server.presentationlayer;
  */
 public interface UIThread {
 	/**
-	 * @return id of Thread
+	 * @return
+			The id of the thread, this is the id of its root message
 	 */
 	public long getId();
 
 	/**
-	 * @return the thread's topic
+	 * @return
+	 * 		The title of the thread, this is the title of its root message 
 	 */
-	public String getTh();
+	public String getTitle();
 
 }

@@ -9,7 +9,8 @@ package forum.server.presentationlayer;
 public interface UIUser {
 	
 	/**
-	 * @return User id
+	 * @return
+	 * 		The unique id of the user
 	 */
 	public long getId();
 }

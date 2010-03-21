@@ -12,7 +12,7 @@ public interface UIMessage {
 	
 	/**
 	 * @return
-			The id of the message
+			The unique id of the message
 	 */
 	public long getId();
 

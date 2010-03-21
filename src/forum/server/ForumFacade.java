@@ -1,10 +1,18 @@
 package forum.server;
 
+import java.util.Collection;
+import java.util.Set;
+
+import forum.server.exceptions.message.MessageNotFoundException;
+import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.exceptions.user.NotRegisteredException;
+import forum.server.presentationlayer.*;
+
 /**
  * With this interface the Controller layer of the server communicates with the
  * domain layer of the server.  
  * 
- * This interface contains all the forum logic and provides all the forum functionallities to
+ * This interface contains all the forum logic and provides all the forum functionalities to
  * the upper layers.
  * 
  * @author Vitali Sepetnitsky 
@@ -14,359 +22,252 @@ public interface ForumFacade {
 	// User related methods:
 
 	/**
-	 * Login function is responsible of login an existing member to the forum system .
+	 * Creates a new guest in the system and saves it in the guests set.
 	 *
-	 * @param name the username of the member
-	 * @param password the password of the member
-	 *
-	 * @return the member
-	 *
-	 * @throws NotFoundException in case the username does not exist.
-	 * @throws BadPasswordException in case the password is wrong
-	 * @throws RemoteException if connection to the forum has failed.
+	 * @return
+	 * 		The created guest
 	 */
-	UIUser login(final String name, final String password) throws NotFoundException,
-	BadPasswordException, RemoteException ;
-
-	/**
-	 * Register function is responsible of register the new member to the forum. And also updating the
-	 * UserServer for a new member.
-	 * The action does not makes the user active!!
-	 * which means that the user has to login in order to use the privileges of a registered member!
-	 *
-	 * @param name the username of the new member
-	 * @param password the password of the new member
-	 *
-	 * @throws DuplicationException occur when there are two same username's.
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	void register(final String name, final String password) throws DuplicationException, RemoteException ;
+	UIUser registerGuest();
 
 
 	/**
+	 * Unregisters a guest with a given id. 
+	 * 
+	 * This method is used when a user stops using a guest id it was given)
+	 * 
+	 * @param userId
+	 * 		The guest id
+	 */
+	public void unregisterGuest(final long userId);
+
+
+	/**
+	 * @return
+	 * 		The number of active forum guests - who currently view the forum contents
+	 */
+	public int getActiveGuests();
+
+	/**
+	 * @return
+	 * 		A set currently active forum members user-names
+	 */
+	public Set<String> getActiveMemberNames();
+
+	/**
+	 * 
+	 * Registers a new user, with the given parameters, to the forum
 	 * 
 	 * @param username
+	 * 		The user-name of the new user
 	 * @param password
-	 * @param firstName
+	 * 		The password of the new user
 	 * @param lastName
-	 * @param dob
-	 * @param chosenGender
-	 * @param residence
-	 * @throws DuplicationException
-	 * @throws RemoteException
+	 * 		The last name of the new user
+	 * @param firstName
+	 * 		The first name of the new user
+	 * @param email
+	 * 		The e-mail of the new user
+	 * 
+	 * @return
+	 * 		A message which describes the domain layer response:
+	 * 			A success message in case of a successful registration
+	 * 			An error message which describes the failure, in case it occurred
+	 *
+	 * Note: The registration doesn't make the user logged-in, this means that the user has to login in order to 
+	 * use the privileges of a registered user
 	 */
-	void register(String username, String password, String firstName, String lastName, String dob,
-			String chosenGender, String residence) throws DuplicationException, RemoteException ;
-
-
+	public String registerToForum(final String username, final String password, final String lastName,
+			final String firstName, final String email);
 
 	/**
-	 * create new guest in the system.
-	 * creates a User object and puts it in the guests set in the user serve.
-	 * @return the newly created guest
-	 * @throws RemoteException if connection to the forum has failed.
+	 * 
+	 * logs-in a user with the given parameters
+	 * 
+	 * @param username
+	 * 		The user-name of the required user
+	 * @param password
+	 * 		The password of the required user
+	 * 
+	 * @return
+	 * 		The logged-in user data, accessible via the UIMember interface or
+	 * 		an error message which describes the failure, in case it occurred	  		
 	 */
-	UIUser registerGuest() throws RemoteException ;
-
-
-	/**
-	 * unregister a guest (used when a user stops using a guest id it was given)
-	 * @param userId the guest id
-	 * @throws RemoteException if connection failed
-	 */
-	public void unregisterGuest(long userId) throws  RemoteException;
-
-	/**
-	 * logout a member by changing its 'active' flag to false
-	 * (the new state will be seen from all places that holds a reference to this member)
-	 * @param userId the id of the user that asked to logout
-	 * @throws NotFoundException if the user was not found, or it was not found as a member
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	void logout(final long userId) throws NotFoundException, RemoteException ;
-
-	/**
-	 * @return number of active guests
-	 * @throws RemoteException if connection failed
-	 */
-	public int getActiveGuests() throws  RemoteException;
-
-	/**
-	 * @return the usernames of active members
-	 * @throws RemoteException if connection failed
-	 */
-	public Set<String> getActiveMemberNames() throws  RemoteException;
-
-	/**
-	 * @param userId id of the user to find
-	 * @return a member by its id
-	 * @throws NotFoundException if no such member exists
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	UIMember getMemberById(final long userId) throws NotFoundException, RemoteException ;
+	public UIMember login(final String username, final String password);
 
 
 	/**
 	 * 
-	 * @param userId
-	 * @param oldPassword
-	 * @param newPassword
-	 * @throws NotFoundException
-	 * @throws BadPasswordException
-	 * @throws RemoteException 
+	 * Logs out a user whose user-name is the given one
+	 * 
+	 * @param username
+	 * 		The user-name of the user who should be logged out
+	 *
+	 * @return
+	 * 		A message which describes the domain layer response:
+	 * 			A success message in case of a successful logout
+	 * 			An error message which describes the failure, in case it occurred	  		
 	 */
-	void updatePassword(long userId, String oldPassword, String newPassword) throws
-	NotFoundException, BadPasswordException,RemoteException;
-
+	public String logout(final String username);
 
 	/**
 	 * 
-	 * @param userId
-	 * @param newFirstName
-	 * @param newLastName
-	 * @param dob
-	 * @param chosenGender
-	 * @param newResidence
-	 * @throws NotFoundException
-	 * @throws RemoteException
+	 * Returns the user whose user-name equals to the given one
+	 * 
+	 * @param username
+	 * 		The required user-name
+	 * @return
+	 * 		A reference to the RegistereedUser domain object, whose user-name equals to the given one
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a user with the given user-name isn't registered to the forum
 	 */
-	void updateMemberDetails(long userId, String newFirstName, String newLastName, String dob, String chosenGender,
-			String newResidence) throws NotFoundException,RemoteException;
+	public UIMember getUserByUsername(final String username) throws NotRegisteredException;
 
-
-	/**
-	 * @param username name of the user to find
-	 * @return a member id by its username
-	 * @throws NotFoundException if no such member exists
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	long getMemberId(final String username) throws NotFoundException, RemoteException ;
+	// Subject related methods:
 
 	/**
-	 * Adds the administrator privileges to a specific user (must be a member).
+	 * 
+	 * Adds a new sub-subject under a subject whose id is the given one.
+	 * In case the fatherID is -1 the new subject will be added as one of the root subjects of the
+	 * whole forum.
+	 * 
+	 * @param fatherID
+	 * 		The id of the root subject (to which a new sub-subject will be added),
+	 * 		can be -1 in case the subject should be added as one of the root subjects - at the top level.
+	 * @param name
+	 * 		The name of the new subject
+	 * @param description
+	 * 		The description of the new subject
 	 *
-	 * @param adminId the admin id who gives the privileges
-	 * @param userName the username of the user how received the privileges
-	 *
-	 * @throws NotFoundException the not found exception
-	 * @throws UnpermittedActionException the unPermitted action exception
-	 * @throws RemoteException if connection to the forum has failed.
+	 * @return
+	 * 		A message which describes the response:
+	 * 			A success message in case of a successful subject adding
+	 * 			An error message which describes the failure, in case it occurred	  		
 	 */
-	void addAdministratorPrivileges(final long adminId, final String userName)
-	throws NotFoundException, UnpermittedActionException, RemoteException ;
+	public UISubject addNewSubject(final long fatherID, final String name, final String description);
 
 	/**
-	 * Adds the moderator privileges to a specific user (must be a member).
-	 *
-	 * @param adminId the admin id who gives the privileges
-	 * @param userName the username of the user how received the privileges
-	 *
-	 * @throws NotFoundException the not found exception
-	 * @throws UnpermittedActionException the unPermitted action exception
-	 * @throws RemoteException if connection to the forum has failed.
+	 * Finds and returns all the subject's sub-subjects data, accessible via the UISubject interface.
+	 * 
+	 * @param fatherID
+	 * 		The id of the root subject, whose sub-subjects' data should be returned.
+	 * 		If the id is -1, then the forum root subjects data is returned
+	 * @return
+	 * 		A collection of all the sub-subjects of the subject with the given id, accessible via the
+	 * 		UISubject interface.
+	 * 
+	 * @throws SubjectNotFoundException
+	 *		In case the id of the father subject wasn't found
 	 */
-	void addModeratorPrivileges(final long adminId, final String userName)
-	throws NotFoundException, UnpermittedActionException, RemoteException ;
+	public Collection<UISubject> getSubjects(final long fatherID) throws SubjectNotFoundException;
+
+	// Thread related methods:
+
+	/**
+	 * Opens a new thread under the given subject and adds a new message as its root
+	 * 
+	 * @param subjectId
+	 * 		The id of the subject under which the new thread should be created
+	 * @param username
+	 * 		The user-name of the user who opens the new thread
+	 * @param title	
+	 * 		The title of the new thread's root message
+	 * @param content
+	 * 		The content of the new thread's root message
+	 * 
+	 * @return
+	 * 		A message which describes the domain layer response:
+	 * 			A success message in case of a successful message adding
+	 * 			An error message which describes the failure, in case it occurred	  		
+	 */
+	public String openNewThread(long subjectID, final String username, final String title, final String content);
+
+	/**
+	 * 
+	 * Finds and returns all the subject's threads data, accessible via the UIThread interface.
+	 * 
+	 * @param rootSubjectID
+	 * 		The if of the subject whose threads should be represented
+	 * @return
+	 * 		A collection of all the threads of the subject with the given id, accessible via the
+	 * 		UIThread interface.
+	 * 
+	 * @throws SubjectNotFoundException
+	 *		In case the id of the father subject wasn't found
+	 */
+	public Collection<UIThread> getThreads(final long fatherID) throws SubjectNotFoundException;
 
 	// Message related methods:
 
 	/**
-	 * @return the root directory in presentation form
-	 * @throws RemoteException if connection to the forum has failed.
+	 *
+	 * Adds a new message as a reply to the given one - doesn't open a new thread
+	 * 
+	 * @param fatherID
+	 * 		A message to which the reply should be added 
+	 * @param userName
+	 * 		The user-name of the reply author
+	 * @param title
+	 * 		The title of the new reply
+	 * @param content
+	 * 		The content of the new reply
+	 * 
+	 * @return
+	 * 		The data of the new reply, accessible via a UIMessage interface
 	 */
-	UIDirectory getRootDirectory() throws RemoteException ;
+	public UIMessage addNewReply(final long fatherID, final String userName, final String title,
+			final String content);
 
 	/**
-	 * create a new post in thread.
-	 * @param threadId location of the new post
-	 * @param userId the id of the user requested to perform this action
-	 * @param msg the wanted message in the post
-	 * @return the new post for presentation
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the thread or the user was not found
-	 * @post messages has a new post with the wanted message, and the wanted thread holds its id.
-	 * @throws RemoteException if connection to the forum has failed.
-	 * @throws RemoteException if connection to the forum has failed.
+	 * Finds and updates a message with the given id, with the new title and content
+	 * 
+	 * @param messageID
+	 * 		The id of the message which should be updated
+	 * @param newTitle
+	 * 		The new title of the message
+	 * @param newContent
+	 * 		The new content of the message
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case the message wasn't found in the database
 	 */
-	UIPost addPost(final long threadId, final long userId, final String msg)
-	throws UnpermittedActionException, NotFoundException, RemoteException ;
+	public void updateAMessage(final long messageID, final String newTitle, 
+			final String newContent) throws MessageNotFoundException;
 
 	/**
-	 * create a new thread in a sub-forum, with a first post.
-	 * @param dirId location of the new thread
-	 * @param userId the member requested to perform this action
-	 * @param subject the thread subject
-	 * @param msg the wanted message for the first post in the new created thread
-	 * @return the new thread for presentation
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the directory or the user was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 * @post a new thread with the wanted subject was created in the the wanted thread, and its first post
-	 * includes the given message.
+	 * 
+	 * Finds and returns all the replies data, accessible via the UIMessage interface.
+	 * 
+	 * @param fatherID
+	 * 		The id of the message whose replies should be represented
+	 * @return
+	 * 		A collection of all the replies of the message with the given id, accessible via the
+	 * 		UIMessage interface.
+	 * 
+	 * @throws MessageNotFoundException
+	 *		In case the id of the root message wasn't found
 	 */
-	UIThread addThread(final long dirId, final long userId, final String subject,
-			final String msg) throws UnpermittedActionException, NotFoundException, RemoteException ;
+	public Collection<UIMessage> getReplies(final long fatherID) throws MessageNotFoundException;
 
-	/**
-	 * view the wanted post
-	 * @param postId the wanted post to view
-	 * @return the post in a form of passing to the presentation layer
-	 * for performing this action
-	 * @throws NotFoundException if the post or the user was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 * @post no change is made in the system.
-	 */
-	UIPost viewPost(final long postId) throws NotFoundException, RemoteException ;
+}
+	// Update related messages:
 
-	/**
-	 * edit the wanted post (only if member is the writer of the post)
-	 * @param postId the wanted post to edit
-	 * @param userId the member requested to perform this action
-	 * @param msg the new message to edit instead of the current message in the post
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the post or the user was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 * @post the post holds the new message (msg) instead of the previous one.
-	 */
-	void editPost(final long postId, final long userId, final String msg)
-	throws UnpermittedActionException, NotFoundException, RemoteException ;
+	// TODO: void updatePassword(long userId, String oldPassword, String newPassword);
 
-	/**
-	 * edit the wanted thread topic
-	 * @param threadId the wanted thread to edit
-	 * @param userId the member requested to perform this action
-	 * @param topic the new topic to edit instead of the current topic in the thread
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the post or the user was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 * @post the thread holds the new topic instead of the previous one.
-	 */
-	void editThreadTopic(final long threadId, final long userId, final String topic)
-	throws UnpermittedActionException, NotFoundException, RemoteException ;
+	// TODO: void updateMemberDetails( ... )
 
-	/**
-	 * get all directory's subDirectories in a presentation
-	 * @param dirId the directory to retrieve its subDirectories
-	 * @return vector of all subDirectories in a form of passing to the presentation layer
-	 * @throws NotFoundException when the directory was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Vector<UIDirectory> getSubDirectories(final long dirId) throws NotFoundException, RemoteException ;
+	// Deletion related messages:
 
-	/**
-	 * get all directory's threads in a presentation form
-	 * @param dirId the directory to retrieve its threads
-	 * @return vector of all threads in a form of passing to the presentation layer
-	 * @throws NotFoundException when the directory was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Vector<UIThread> getThreads(final long dirId) throws NotFoundException, RemoteException ;
+	// TODO: void deleteThread(final long userId, final long dirId, final long threadId);
 
-	/**
-	 * get all threads's posts in a presentation form
-	 * @param threadId the thread to retrieve its threads
-	 * @return vector of all posts in a form of passing to the presentation layer
-	 * @throws NotFoundException when the thread was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Vector<UIPost> getPosts(final long threadId) throws NotFoundException, RemoteException ;
-
-	/**
-	 * add new subDirectory under an existing directory
-	 * (the root is build when the forum is initialized)
-	 * @param userId the user which ask to add this directory
-	 * @param containerDirectoryId the id of the directory under it the new subDirectory will be added
-	 * @param newDirName the name for the new subDirectory
-	 * @return the new directory for presentation
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the container directory was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	UIDirectory addDirectory(final long userId, final long containerDirectoryId,
-			final String newDirName) throws UnpermittedActionException, NotFoundException, RemoteException ;
-
-	/**
-	 * delete a thread with all its content from a directory
-	 * @param userId the user which ask to add this directory
-	 * @param dirId the id of the directory under it the thread should be deleted
-	 * @param threadId the id of the thread to delete
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the container directory was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	void deleteThread(final long userId, final long dirId, final long threadId)
-	throws UnpermittedActionException, NotFoundException, RemoteException ;
-
-	/**
-	 * delete a post with all its content from a thread
-	 * @param userId the user which ask to add this directory
-	 * @param threadId the id of the thread under it the post should be deleted
-	 * @param postId the id of the post to delete
-	 * @throws UnpermittedActionException if the user doesn't own the appropriate Privilege for performing
-	 * this action
-	 * @throws NotFoundException if the container directory was not found
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	void deletePost(final long userId, final long postId, final long threadId)
-	throws UnpermittedActionException, NotFoundException, RemoteException ;
+	// TODO: void deleteMessage(final long userId, final long postId, final long threadId);
 
 	// Search related methods:
 
-	/**
-	 * Search by content, searches for post according to content that the user wrote
-	 * responsible for uploading all Posts that contain the same words/sentences that the client asks
-	 *
-	 * @param message the message that the user want to get messages according to
-	 *
-	 * @return set<SearchResult> all desirable messages
-	 *
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Set<SearchResult> searchByContent(final String message) throws RemoteException ;
+	//TODO: Set<SearchResult> searchByContent(final String message);
 
-	/**
-	 * Search by author. searches for post according to author username that the user typed.
-	 * responsible for uploading all Posts that contain the same author name matched to the user request.
-	 *
-	 * @param authorName the username of the authors of the messages that the user wants
-	 *
-	 * @return the set<SearchResult> all desirable messages
-	 *
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Set<SearchResult> searchByAuthor(final String authorName) throws  RemoteException ;
+	// TODO: Set<SearchResult> searchByAuthor(final String authorName);
 
-	/**
-	 * Search by date. searches for post according to range of dates
-	 *
-	 * @param fromDate the date from which the user wants the messages
-	 * @param toDate the date to which the user wants the messages
-	 *
-	 * @return the set< SearchResult> all desirable messages
-	 *
-	 * @throws RemoteException if connection to the forum has failed.
-	 */
-	Set<SearchResult> searchByDate(final Date fromDate, final Date toDate) throws RemoteException ;
+	// TODO: Set<SearchResult> searchByDate(final Date fromDate, final Date toDate);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
+	// and there can be more and more ...

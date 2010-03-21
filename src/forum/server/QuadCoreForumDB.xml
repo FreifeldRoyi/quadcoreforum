@@ -64,6 +64,14 @@
         <firstName>eee</firstName>
         <numOfPostedMessages>1</numOfPostedMessages>
     </registeredUsers>
+    <registeredUsers>
+        <username>dahany</username>
+        <e-mail>d@d</e-mail>
+        <password>bad2b5fa0e68043aba57c82f1db59339</password>
+        <lastName>yakir</lastName>
+        <firstName>dahan</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+    </registeredUsers>
     <forumSubjects>
         <name>aaa</name>
         <description>bbb</description>
