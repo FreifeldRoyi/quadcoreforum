@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.dummygui;
+package forum.server.presentationlayer;
 
 import java.io.IOException;
 

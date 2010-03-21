@@ -11,6 +11,9 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import forum.server.domainlayer.impl.*;
+import forum.server.domainlayer.impl.message.ForumSubjectImpl;
+import forum.server.domainlayer.impl.user.ForumMessageImpl;
+import forum.server.domainlayer.impl.user.RegisteredUserImpl;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.exceptions.message.*;
 import forum.server.exceptions.subject.*;

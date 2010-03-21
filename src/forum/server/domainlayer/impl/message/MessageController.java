@@ -85,7 +85,7 @@ public class MessageController
 			throw new MessageNotFoundException(msgID);
 		}
 
-		
+
 		/* Methods */
 
 		public void addForumSubject(ForumSubject fs) throws 
@@ -104,6 +104,47 @@ public class MessageController
 			this.getMessageByID(messageID).updateMe(newTitle, newContent);
 
 		}
+
+
+
+		public ForumSubject addSubject(final long userId, final long containerDirectoryId, final String newDirName) throws UnpermittedActionException, NotFoundException
+
+		public ForumMessage addReply(final long threadId, final long userId, final String msg)
+		throws UnpermittedActionException, NotFoundException
+
+		public ForumThread addThread(final long dirId, final long userId, final String subject, final String msg)
+		throws UnpermittedActionException, NotFoundException
+
+		public void editMessage(final long postId, final long userId, final String msg)
+		throws UnpermittedActionException, NotFoundException
+
+
+		public Vector<ForumSubject> getSubSubjects(final long dirId) throws NotFoundException
+
+		public Vector<ForumThread> getThreads(final long dirId) throws NotFoundException
+
+		public Vector<ForumThread> getPosts(final long threadId) throws NotFoundException
+		
+		public ForumPost viewPost(final long postId) throws NotFoundException
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
