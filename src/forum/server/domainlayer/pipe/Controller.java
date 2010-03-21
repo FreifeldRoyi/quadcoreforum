@@ -5,6 +5,7 @@ package forum.server.domainlayer.pipe;
 
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,7 +156,8 @@ public class Controller implements DomainDataHandler {
 	@Override
 	public String login(String username, String password){
 		try {
-			RegisteredUser tUser = FORUM.login(username, password);
+			String tEncryptedPass = MessageEncryption.encryptMD5(password);
+			RegisteredUser tUser = FORUM.login(username, tEncryptedPass);
 			this.user = tUser;
 			return "success!";
 		} catch (AlreadyConnectedException e) {
@@ -163,6 +165,8 @@ public class Controller implements DomainDataHandler {
 		} catch (NotRegisteredException e) {
 			return e.getMessage();
 		} catch (WrongPasswordException e) {
+			return e.getMessage();
+		} catch (NoSuchAlgorithmException e) {
 			return e.getMessage();
 		}
 
@@ -185,8 +189,10 @@ public class Controller implements DomainDataHandler {
 	public String registerToForum(String username, String password,
 			String lastName, String firstName, String email) {
 		String toReturn = "success!";
-		RegisteredUser tUser = new RegisteredUserImpl(username, password, firstName, lastName, email);		
+				
 		try {
+			String tEncryptedPass = MessageEncryption.encryptMD5(password);
+			RegisteredUser tUser = new RegisteredUserImpl(username, tEncryptedPass, firstName, lastName, email);
 			Controller.FORUM.registerUser(tUser);
 		}
 		catch (UserAlreadyExistsException e) {
@@ -196,6 +202,8 @@ public class Controller implements DomainDataHandler {
 			toReturn = e.getMessage();
 		}
 		catch (IOException e) {
+			toReturn = e.getMessage();
+		} catch (NoSuchAlgorithmException e) {
 			toReturn = e.getMessage();
 		}
 		return toReturn;
