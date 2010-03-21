@@ -21,5 +21,5 @@ public abstract class ClientMessage implements Serializable {
 	 * @return ServerResponse A response that should be sent back to the client
 	 */
 	public abstract ServerResponse doOperation(ForumFacade forum);
-
+		
 }

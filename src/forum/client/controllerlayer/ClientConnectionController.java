@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import forum.Settings;
+import forum.server.Settings;
 import forum.tcpcommunicationlayer.*;
 
 /**
@@ -27,7 +27,7 @@ public class ClientConnectionController extends Thread {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	
-	private static Logger log = Logger.getLogger(Settings.loggerName);
+	private static Logger log = Logger.getLogger(Settings.LOG_FILE_NAME);
 	
 	public ClientConnectionController(String addr, short port) throws IOException {
 		InetAddress ia = InetAddress.getByName(addr);
@@ -115,7 +115,7 @@ public class ClientConnectionController extends Thread {
 		System.out.println(
 				"help menu:" + "\n" +
 				"- help " +  "\n" +
-				"- add_message <message content>" + "\n" +
+				"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
 				"- add_reply <message id to reply to> <message content>" + "\n" +
 				"- modify_message <message id to modify> <new message content>" + "\n" +
 				"- view_forum" + "\n" +
@@ -139,9 +139,10 @@ public class ClientConnectionController extends Thread {
 		try {
 			StringTokenizer st = new StringTokenizer(str);
 			String command = st.nextToken();
-			
-			if (command.equals("add_message")) {							
-				return new AddMessageMessage(str.substring(command.length()+1));
+			/** adding a new thread with a new first message **/ 
+			if (command.equals("add_message")) {
+				
+				return new AddNewThread();
 			}
 			if (command.equals("view_forum")) {
 				return new ViewForumMessage();
