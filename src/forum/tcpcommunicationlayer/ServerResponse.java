@@ -36,5 +36,20 @@ public class ServerResponse implements Serializable {
 	public boolean hasExecuted() {
 		return m_hasExecuted;
 	}
+	/**
+	 * setter to the m_hasExecuted class member
+	 * @param execflag - value for the HasExecuted class member. 
+	 */
+	public void setHasExecuted(boolean execflag){
+		m_hasExecuted = execflag;
+	}
+	
+	/**
+	 * setter to the m_response class member
+	 * @param response -value for the response class member.
+	 */
+	public void setResponse(String response){
+		m_response = response;
+	}
 
 }
