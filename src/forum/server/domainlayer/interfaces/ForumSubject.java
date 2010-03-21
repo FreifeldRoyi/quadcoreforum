@@ -12,8 +12,7 @@ import forum.server.exceptions.subject.*;
 import forum.server.exceptions.user.*;
 
 
-public interface ForumSubject extends NamedComponent
-{
+public interface ForumSubject extends NamedComponent {
 	
 	/* Getters */
 	

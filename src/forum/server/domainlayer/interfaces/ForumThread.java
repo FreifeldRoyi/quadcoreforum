@@ -2,8 +2,7 @@ package forum.server.domainlayer.interfaces;
 
 import forum.server.exceptions.message.*;
 
-public interface ForumThread 
-{
+public interface ForumThread {
 	
 	/* Methods */
 

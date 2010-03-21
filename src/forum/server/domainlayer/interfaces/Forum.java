@@ -16,8 +16,7 @@ import forum.server.exceptions.message.*;
 import forum.server.exceptions.subject.*;
 import forum.server.exceptions.user.*;
 
-public interface Forum 
-{
+public interface Forum {
 
 	/* Methods */
 	
@@ -185,8 +184,3 @@ public interface Forum
 	public void updateAMessage(long messageID, String newTitle, String newContent) throws JAXBException, IOException, MessageNotFoundException;
 	
 }
-
-/**
- * TODO write proper JavaDoc for Forum
- * TODO add methods
- */
