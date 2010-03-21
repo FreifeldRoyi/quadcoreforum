@@ -1,4 +1,4 @@
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer.impl.message;
 
 import forum.server.domainlayer.interfaces.ForumMessage;
 import forum.server.domainlayer.interfaces.ForumThread;

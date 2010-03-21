@@ -12,9 +12,9 @@ import forum.server.domainlayer.pipe.Controller;
 public class ForumPromt { 
 
 	public static BufferedReader USER_CHOICE_SCANNER = new BufferedReader(new InputStreamReader(System.in));
-	
+
 	public static Controller CONT = new Controller();
-		
+
 	private enum StartOperation { 
 		START_LOGIN, START_REGISTER, START_VIEW_MESSAGES, START_EXIT, START_ERROR, START_HELP; 
 
@@ -129,19 +129,9 @@ public class ForumPromt {
 			} 
 		} 
 	}
-	
-	
+
+
 	public static void main (String[] args) {
 		new ForumPromt().playDummy(); // creates a new PromtForum instance which handles the promt
-		
-			
-		
-		
-		
-		
-		
-		
-		
-	}		
-} 
-
+	} 
+}

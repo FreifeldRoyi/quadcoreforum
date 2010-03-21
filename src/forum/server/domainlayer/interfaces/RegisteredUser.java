@@ -1,7 +1,6 @@
 package forum.server.domainlayer.interfaces;
 
-public interface RegisteredUser 
-{	
+public interface RegisteredUser {
 	/* Getters */
 	
 	/**

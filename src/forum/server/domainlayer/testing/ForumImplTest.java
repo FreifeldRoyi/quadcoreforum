@@ -4,6 +4,7 @@
 package forum.server.domainlayer.testing;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.xml.bind.JAXBException;
 
@@ -13,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.ForumImpl;
 import forum.server.domainlayer.impl.ForumSubjectImpl;
 import forum.server.domainlayer.impl.RegisteredUserImpl;
@@ -42,6 +44,9 @@ public class ForumImplTest extends TestCase {
 	public void setUp() throws Exception {
 		JAXBpersistenceDataHandler.testMode();
 		forum = new ForumImpl();
+		
+		SystemLogger.switchToOnlyFileLogMode();
+		SystemLogger.logAMessage("setup", Level.FINE);
 	}
 
 	/**

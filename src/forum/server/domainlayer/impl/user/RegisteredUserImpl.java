@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer.impl.user;
 
 import forum.server.domainlayer.interfaces.RegisteredUser;
 

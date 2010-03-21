@@ -1,4 +1,4 @@
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer.impl.message;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -7,8 +7,7 @@ import javax.xml.bind.JAXBException;
 
 import forum.server.exceptions.message.MessageNotFoundException;
 
-public interface ForumMessage
-{
+public interface ForumMessage {
 
 	/* Setters */
 
@@ -18,7 +17,7 @@ public interface ForumMessage
 	 * @param t
 	 * 		A new title, to which the message title should be changed
 	 */
-	public void setMessageTitle (String t);	
+	public void setMessageTitle(String t);	
 	
 	/**
 	 * Sets the content of the message, to be the given one
@@ -26,7 +25,7 @@ public interface ForumMessage
 	 * @param content
 	 * 		A new content, to which the message content should be changed
 	 */
-	public void setMessageContent (String content);
+	public void setMessageContent(String content);
 	
 
 	/* Getters */
@@ -125,9 +124,3 @@ public interface ForumMessage
 	 */
 	public void updateMe(String newTitle, String newContent) throws JAXBException, IOException, MessageNotFoundException;
 }
-
-/**
- * TODO don't forget to change time/date return type.
- * TODO write proper JavaDoc
- * TODO private member timeDate of type GregorianCalendar
- */

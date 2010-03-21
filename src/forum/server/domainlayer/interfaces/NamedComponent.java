@@ -1,7 +1,6 @@
 package forum.server.domainlayer.interfaces;
 
-public interface NamedComponent 
-{
+public interface NamedComponent {
 	/* Setters */
 
 	/**
@@ -53,6 +52,4 @@ public interface NamedComponent
 	 * Decrease the messages number of this component
 	 */
 	public void decMessagesNumber();
-	
-
 }
