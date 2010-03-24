@@ -36,7 +36,7 @@ public class AddNewThread extends ClientMessage {
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
 		
-		//TO DO : the UIThread object should include a method which will announce if the operation did well.
+		//TODO : the UIThread object should include a method which will announce if the operation did well.
 		 
 		ServerResponse returnObj=new ServerResponse("", true); 
 		try{

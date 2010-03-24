@@ -114,8 +114,8 @@ public class ClientConnectionController extends Thread {
 	private void printHelp() {
 		System.out.println(
 				"help menu:" + "\n" +
-				"- help " +  "\n" +
-				"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
+		/*done*/		"- help " +  "\n" +
+		/*done*/		"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
 				"- add_reply <message id to reply to> <message content>" + "\n" +
 				"- modify_message <message id to modify> <new message content>" + "\n" +
 				"- view_forum" + "\n" +
@@ -123,6 +123,7 @@ public class ClientConnectionController extends Thread {
 				"- login <username> <password>" + "\n" +
 				"- register <realname> <e-mail> <username> <password>" + "\n" +
 				"- disconnect" + "\n" +
+				"- view_Active_Guests" + "\n" +
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
 		);								
 		
@@ -138,20 +139,27 @@ public class ClientConnectionController extends Thread {
 	private ClientMessage handleCommand(String str) throws BadCommandException {		
 		try {
 			String[]splitTokens = str.split("\\ ");
-			//StringTokenizer st = new StringTokenizer(str);
-			//String command = st.nextToken();
 			
 			/** adding a new thread with a new first message **/ 
 			if (splitTokens[0].equals("add_message")) {
 				if (splitTokens.length != 4){
-					System.out.println("usage: add_message <parent subject id> <username> <message title> <message content>");
+					throw new BadCommandException("usage: add_message <parent subject id> <username> <message title> <message content>");
 				}
 				else{
+					try {
 					long tid = Long.parseLong(splitTokens[1]);
-					
 					return new AddNewThread(tid,splitTokens[2],splitTokens[3],splitTokens[4]);
+					}
+					catch( NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}			
 				}
 			}
+
+			if (splitTokens[0].equals("view_Active_Guests")) {
+				return new ViewActiveGuests();
+			}
+			
 			if (command.equals("view_forum")) {
 				return new ViewForumMessage();
 			}
