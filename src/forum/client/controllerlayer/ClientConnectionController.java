@@ -14,6 +14,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 import forum.server.Settings;
+import forum.server.exceptions.subject.SubjectNotFoundException;
 import forum.tcpcommunicationlayer.*;
 
 /**
@@ -116,11 +117,12 @@ public class ClientConnectionController extends Thread {
 				"help menu:" + "\n" +
 		/*done*/		"- help " +  "\n" +
 		/*done*/		"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
-				"- add_reply <message id to reply to> <message content>" + "\n" +
+				"-add_new_subject<father message id> <subject name> <subject description>" + "\n"+
+				"- add_reply <message id to reply to> <message content> " + "\n" +
 				"- modify_message <message id to modify> <new message content>" + "\n" +
 				"- view_forum" + "\n" +
-				"- logoff" + "\n" +
-				"- login <username> <password>" + "\n" +
+		/*done*/		"- logoff <username>" + "\n" +
+		/*done*/		"- login <username> <password>" + "\n" +
 		/*done*/		"- register <desired user name> <password> <last Name> <first Name> <email> " + "\n" +
 				"- disconnect" + "\n" +
 		/*done*/		"- view_Active_Guests" + "\n" +
@@ -165,22 +167,52 @@ public class ClientConnectionController extends Thread {
 				return new ViewActiveMemberNames();
 			}
 			
-			if (command.equals("view_forum")) {
-				return new ViewForumMessage();
+			if (splitTokens[0].equals("add_new_subject")) {
+				if (splitTokens.length != 4){
+					throw new BadCommandException("add_new_subject<father message id> <subject name> <subject description>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new AddNewSubject(tid,splitTokens[2],splitTokens[3]);
+					}
+					catch( SubjectNotFoundException e){
+						throw new BadCommandException("the id of the father subject wasn't found");
+					}			
+				}
 			}
 			if (splitTokens[0].equals("login")) {
-				return new LoginMessage(splitTokens[1],splitTokens[2]);
+				if(splitTokens.length!= 3){
+					throw new BadCommandException("login <username> <password>");
+					
+				}
+				else{
+					return new LoginMessage(splitTokens[1],splitTokens[2]);
+				}
 			}
-			if (command.equals("logoff")) {
-				return new LogoffMessage();
-			}
+					
+			if (splitTokens[0].equals("logoff")) {
+				if (splitTokens.length != 2){
+					throw new BadCommandException("logoff <username>");
+				}
+				else{
+					try {
+					return new LogoffMessage(splitTokens[1]);
+					}
+					catch( NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}			
+				}
+			}			
 			if (splitTokens[0].equals("register")) {
 				if (splitTokens.length != 6){
 					throw new BadCommandException("register <desired user name> <password> <last Name> <first Name> <email>");
 				}
 				else{
 				return new RegisterMessage(splitTokens[1],splitTokens[2],splitTokens[3],splitTokens[4],splitTokens[5]);
+				}
 			}
+			
 			if (command.equals("add_reply")) {
 				String messageIdS = st.nextToken();
 				long messageId = Long.parseLong(messageIdS);
