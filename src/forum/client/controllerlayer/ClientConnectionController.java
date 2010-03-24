@@ -121,9 +121,10 @@ public class ClientConnectionController extends Thread {
 				"- view_forum" + "\n" +
 				"- logoff" + "\n" +
 				"- login <username> <password>" + "\n" +
-				"- register <realname> <e-mail> <username> <password>" + "\n" +
+		/*done*/		"- register <desired user name> <password> <last Name> <first Name> <email> " + "\n" +
 				"- disconnect" + "\n" +
-				"- view_Active_Guests" + "\n" +
+		/*done*/		"- view_Active_Guests" + "\n" +
+		/*done*/		"- view_Active_Member_Names" + "\n"+
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
 		);								
 		
@@ -142,7 +143,7 @@ public class ClientConnectionController extends Thread {
 			
 			/** adding a new thread with a new first message **/ 
 			if (splitTokens[0].equals("add_message")) {
-				if (splitTokens.length != 4){
+				if (splitTokens.length != 5){
 					throw new BadCommandException("usage: add_message <parent subject id> <username> <message title> <message content>");
 				}
 				else{
@@ -160,17 +161,25 @@ public class ClientConnectionController extends Thread {
 				return new ViewActiveGuests();
 			}
 			
+			if (splitTokens[0].equals("view_Active_Member_Names")) {
+				return new ViewActiveMemberNames();
+			}
+			
 			if (command.equals("view_forum")) {
 				return new ViewForumMessage();
 			}
-			if (command.equals("login")) {
-				return new LoginMessage(st.nextToken(),st.nextToken());
+			if (splitTokens[0].equals("login")) {
+				return new LoginMessage(splitTokens[1],splitTokens[2]);
 			}
 			if (command.equals("logoff")) {
 				return new LogoffMessage();
 			}
-			if (command.equals("register")) {
-				return new RegisterMessage(st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken());
+			if (splitTokens[0].equals("register")) {
+				if (splitTokens.length != 6){
+					throw new BadCommandException("register <desired user name> <password> <last Name> <first Name> <email>");
+				}
+				else{
+				return new RegisterMessage(splitTokens[1],splitTokens[2],splitTokens[3],splitTokens[4],splitTokens[5]);
 			}
 			if (command.equals("add_reply")) {
 				String messageIdS = st.nextToken();

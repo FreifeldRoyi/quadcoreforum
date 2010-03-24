@@ -15,10 +15,13 @@ public class AddNewThread extends ClientMessage {
 
 	private static final long serialVersionUID = 8912617401305761411L;
 
-	/* The content of the message to add. */
+	/* The content of the new message. */
 	private String m_content;
+	/* The title of the new message. */
 	private String m_title; 
+	/* The message creator user name */
 	private String m_username;
+	/* The id of the subject under which the new thread should be created */
 	private long m_subjectId;
 
 	public AddNewThread(long subid,String username ,String title, String content) {
