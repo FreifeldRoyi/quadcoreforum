@@ -137,12 +137,20 @@ public class ClientConnectionController extends Thread {
 	 */
 	private ClientMessage handleCommand(String str) throws BadCommandException {		
 		try {
-			StringTokenizer st = new StringTokenizer(str);
-			String command = st.nextToken();
+			String[]splitTokens = str.split("\\ ");
+			//StringTokenizer st = new StringTokenizer(str);
+			//String command = st.nextToken();
+			
 			/** adding a new thread with a new first message **/ 
-			if (command.equals("add_message")) {
-				
-				return new AddNewThread();
+			if (splitTokens[0].equals("add_message")) {
+				if (splitTokens.length != 4){
+					System.out.println("usage: add_message <parent subject id> <username> <message title> <message content>");
+				}
+				else{
+					long tid = Long.parseLong(splitTokens[1]);
+					
+					return new AddNewThread(tid,splitTokens[2],splitTokens[3],splitTokens[4]);
+				}
 			}
 			if (command.equals("view_forum")) {
 				return new ViewForumMessage();
