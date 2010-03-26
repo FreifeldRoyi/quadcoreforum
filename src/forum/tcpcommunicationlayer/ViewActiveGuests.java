@@ -22,6 +22,7 @@ public class ViewActiveGuests extends ClientMessage {
 			returnObj.setResponse("Can't view the active guests in the Forum");
 		}
 		else{
+			//TODO - print the set to the screen
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("the Active guests can be viewed");
 		}
