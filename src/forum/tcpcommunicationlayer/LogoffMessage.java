@@ -13,10 +13,10 @@ public class LogoffMessage extends ClientMessage {
 	/*
 	 *  The user-name of the user who should be logged out
 	 */
-	String m_usename;
+	String m_username;
 	
 	public LogoffMessage(String username){
-		m_usename=username;
+		m_username=username;
 	}
 	
 	/* (non-Javadoc)
@@ -28,7 +28,7 @@ public class LogoffMessage extends ClientMessage {
 		//I assumed that if an exception didn't occurred then everything is O.K!
 		ServerResponse returnObj=new ServerResponse("", true); 
 		try{
-			forum.logout(m_usename);
+			forum.logout(m_username);
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("The user is logged out.");
 
