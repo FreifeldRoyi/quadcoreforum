@@ -1,5 +1,6 @@
 package forum.tcpcommunicationlayer;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import forum.server.ForumFacade;
@@ -22,7 +23,15 @@ public class ViewActiveGuests extends ClientMessage {
 			returnObj.setResponse("Can't view the active guests in the Forum");
 		}
 		else{
-			//TODO - print the set to the screen
+			if (answer.isEmpty()){
+				System.out.println("There are no active guests at the moment");
+			}
+			else{
+				Iterator<UIUser> iter =answer.iterator();
+				while(iter.hasNext()){
+					System.out.println(iter.next().toString());
+				}
+			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("the Active guests can be viewed");
 		}

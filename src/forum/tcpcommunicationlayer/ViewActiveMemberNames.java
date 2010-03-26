@@ -1,8 +1,10 @@
 package forum.tcpcommunicationlayer;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import forum.server.ForumFacade;
+
 /**
  * @author lital Badash
  */
@@ -20,7 +22,15 @@ public class ViewActiveMemberNames extends ClientMessage {
 			returnObj.setResponse("Can't view the active member names in the Forum");
 		}
 		else{
-			//TODO -print the set to the screen
+			if (answer.isEmpty()){
+				System.out.println("There are no active members at the moment");
+			}
+			else{
+				Iterator<String> iter =answer.iterator();
+				while(iter.hasNext()){
+					System.out.println(iter.next());
+				}
+			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("the Active member names can be viewed");
 		}
