@@ -9,7 +9,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
@@ -116,17 +115,20 @@ public class ClientConnectionController extends Thread {
 		System.out.println(
 				"help menu:" + "\n" +
 		/*done*/		"- help " +  "\n" +
-		/*done*/		"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
-		/*done*/		"- add_new_subject<father message id> <subject name> <subject description>" + "\n"+
-						"- view_subjects<root subject id>" + "\n"+
-				"- add_reply <message id to reply to> <message content> " + "\n" +
-				"- modify_message <message id to modify> <new message content>" + "\n" +
-				"- view_forum" + "\n" +
+		/*done*/		"- add_message <root subject id> <username> <message title> <message content>" + "\n" +
+		/*done*/		"- add_new_subject<root message id> <subject name> <subject description>" + "\n"+				
+		/*done*/		"- add_reply <message id to reply to> <username> <message title><message content> " + "\n" +
+		/*done*/		"- modify_message <message id to modify>e <new message title> <new message content>" + "\n" +
+				//we don't have such function"- view_forum" + "\n" +
 		/*done*/		"- logoff <username>" + "\n" +
 		/*done*/		"- login <username> <password>" + "\n" +
 		/*done*/		"- register <desired user name> <password> <last Name> <first Name> <email> " + "\n" +
+		/*done*/		"- view_subjects<root subject id>" + "\n"+
+		/*done*/		"- view_subject_content <root subject id>" + "\n"+
+		/*done*/		"- view_message_replies <root message id>" + "\n"+
 		/*done*/		"- view_Active_Guests" + "\n" +
 		/*done*/		"- view_Active_Member_Names" + "\n"+
+					
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
 		);								
 		
@@ -146,7 +148,7 @@ public class ClientConnectionController extends Thread {
 			/** adding a new thread with a new first message **/ 
 			if (splitTokens[0].equals("add_message")) {
 				if (splitTokens.length != 5){
-					throw new BadCommandException("usage: add_message <parent subject id> <username> <message title> <message content>");
+					throw new BadCommandException("usage: add_message <root subject id> <username> <message title> <message content>");
 				}
 				else{
 					try {
@@ -155,7 +157,7 @@ public class ClientConnectionController extends Thread {
 					}
 					catch( NumberFormatException e){
 						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}			
+					}
 				}
 			}
 
@@ -168,7 +170,7 @@ public class ClientConnectionController extends Thread {
 			}
 			if (splitTokens[0].equals("view_subjects")) {
 				if (splitTokens.length != 2){
-					throw new BadCommandException("view_subjects<root subject id>");
+					throw new BadCommandException("usage: view_subjects<root subject id>");
 				}
 				else{
 					try {
@@ -177,22 +179,52 @@ public class ClientConnectionController extends Thread {
 					}
 					catch(NumberFormatException e){
 						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}			
+					}
+				}
+				
+			}
+			if (splitTokens[0].equals("view_subject_content")) {
+				if (splitTokens.length != 2){
+					throw new BadCommandException("usage: view_subject_content <root subject id>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new ViewSubjectContent(tid);
+					}
+					catch(NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}
+				}
+				
+			}
+			if (splitTokens[0].equals("view_message_replies")) {
+				if (splitTokens.length != 2){
+					throw new BadCommandException("usage: view_message_replies <root message id>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new ViewMessageReplies(tid);
+					}
+					catch(NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}
 				}
 				
 			}
 			
 			if (splitTokens[0].equals("add_new_subject")) {
 				if (splitTokens.length != 4){
-					throw new BadCommandException("add_new_subject<father message id> <subject name> <subject description>");
+					throw new BadCommandException("add_new_subject<root message id> <subject name> <subject description>");
 				}
 				else{
 					try {
 					long tid = Long.parseLong(splitTokens[1]);
 					return new AddNewSubject(tid,splitTokens[2],splitTokens[3]);
 					}
-					catch( SubjectNotFoundException e){
-						throw new BadCommandException("the id of the father subject wasn't found");
+					catch(NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
 					}			
 				}
 			}
@@ -210,12 +242,7 @@ public class ClientConnectionController extends Thread {
 					throw new BadCommandException("logoff <username>");
 				}
 				else{
-					try {
-					return new LogoffMessage(splitTokens[1]);
-					}
-					catch( NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}			
+					return new LogoffMessage(splitTokens[1]);			
 				}
 			}			
 			if (splitTokens[0].equals("register")) {
@@ -227,15 +254,33 @@ public class ClientConnectionController extends Thread {
 				}
 			}
 			
-			if (command.equals("add_reply")) {
-				String messageIdS = st.nextToken();
-				long messageId = Long.parseLong(messageIdS);
-				return new AddReplyMessage(messageId,str.substring(command.length()+messageIdS.length()+2));
+			if (splitTokens.equals("add_reply")) {
+				if (splitTokens.length != 5){
+					throw new BadCommandException("usage: add_reply <message id to reply to> <username> <message title><message content>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new AddReplyMessage(tid,splitTokens[2],splitTokens[3],splitTokens[4]);
+					}
+					catch( NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}
+				}
 			}			
-			if (command.equals("modify_message")) {
-				String messageIdS = st.nextToken();
-				long messageId = Long.parseLong(messageIdS);
-				return new ModifyMessageMessage(messageId,str.substring(command.length()+messageIdS.length()+2));
+			if (splitTokens[0].equals("modify_message")) {
+				if (splitTokens.length != 4){
+					throw new BadCommandException("usage: modify_message <message id to modify>e <new message title> <new message content>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new ModifyMessageMessage(tid,splitTokens[2],splitTokens[3]);
+					}
+					catch( NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}
+				}
 			}
 			
 			// TODO Add Search messages.

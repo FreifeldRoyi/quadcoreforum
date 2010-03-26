@@ -1,6 +1,7 @@
 package forum.tcpcommunicationlayer;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import forum.server.ForumFacade;
 import forum.server.exceptions.message.MessageNotFoundException;
@@ -27,6 +28,15 @@ public class ViewMessageReplies extends ClientMessage {
 		try{
 			Collection<UIMessage> ans= forum.getReplies(m_messageId);
 			//TODO - print the collection to the screen. 
+			if (ans.isEmpty()){
+				System.out.println("There are no replies under the root message with id "+ m_messageId +"to view");
+			}
+			else{
+				Iterator<UIMessage> iter =ans.iterator();
+				while(iter.hasNext()){
+					System.out.println(iter.next().toString());
+				}
+			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("view messages content");
 

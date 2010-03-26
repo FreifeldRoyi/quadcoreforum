@@ -10,15 +10,15 @@ public class AddNewSubject extends ClientMessage {
 	 *	The id of the root subject (to which a new sub-subject will be added),
 	 *	can be -1 in case the subject should be added as one of the root subjects - at the top level. 
 	 */
-	long m_fatherMessageId;
+	private long m_fatherMessageId;
 	/*
  	*	The name of the new subject 
  	*/
-	String m_subjectName;	
+	private String m_subjectName;	
 	/*
  	*	The Subject Description
  	*/
-	String m_subjectDescription;
+	private String m_subjectDescription;
 	
 	public AddNewSubject(long id, String name, String desc){
 		m_fatherMessageId=id;

@@ -1,6 +1,7 @@
 package forum.tcpcommunicationlayer;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import forum.server.ForumFacade;
 import forum.server.exceptions.subject.SubjectNotFoundException;
@@ -28,7 +29,16 @@ public class ViewSubjects extends ClientMessage {
 		ServerResponse returnObj=new ServerResponse("", true); 
 		try{
 			Collection<UISubject> ans= forum.getSubjects(m_rootSubjectId);
-			//TODO - print the collection to the screen. 
+			// print the collection to the screen.
+			if (ans.isEmpty()){
+				System.out.println("There are no subjects under the root subject with id "+ m_rootSubjectId +"to view");
+			}
+			else{
+				Iterator<UISubject> iter =ans.iterator();
+				while(iter.hasNext()){
+					System.out.println(iter.next().toString());
+				}
+			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("view subject");
 
