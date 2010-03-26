@@ -4,13 +4,11 @@ import java.util.Collection;
 
 import forum.server.ForumFacade;
 import forum.server.exceptions.subject.SubjectNotFoundException;
-import forum.server.presentationlayer.UISubject;
 import forum.server.presentationlayer.UIThread;
 
 public class ViewSubjectContent extends ClientMessage {
 
-	
-	private static final long serialVersionUID = 1985266194860142002L;
+	private static final long serialVersionUID = -6416381943980457966L;
 	/*
 	 * The id of the subject whose threads should be represented
 	 */
@@ -31,7 +29,7 @@ public class ViewSubjectContent extends ClientMessage {
 		}
 		catch(SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("The Forum could'nt display the subjects -check for the root subject id ");
+			returnObj.setResponse("The Forum could'nt display the subject content -check for the root subject id ");
 
 		}
 		
