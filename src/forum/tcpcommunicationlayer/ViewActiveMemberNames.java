@@ -20,6 +20,7 @@ public class ViewActiveMemberNames extends ClientMessage {
 			returnObj.setResponse("Can't view the active member names in the Forum");
 		}
 		else{
+			//TODO -print the set to the screen
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("the Active member names can be viewed");
 		}

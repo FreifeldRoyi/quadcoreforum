@@ -117,14 +117,14 @@ public class ClientConnectionController extends Thread {
 				"help menu:" + "\n" +
 		/*done*/		"- help " +  "\n" +
 		/*done*/		"- add_message <parent subject id> <username> <message title> <message content>" + "\n" +
-				"-add_new_subject<father message id> <subject name> <subject description>" + "\n"+
+		/*done*/		"- add_new_subject<father message id> <subject name> <subject description>" + "\n"+
+						"- view_subjects<root subject id>" + "\n"+
 				"- add_reply <message id to reply to> <message content> " + "\n" +
 				"- modify_message <message id to modify> <new message content>" + "\n" +
 				"- view_forum" + "\n" +
 		/*done*/		"- logoff <username>" + "\n" +
 		/*done*/		"- login <username> <password>" + "\n" +
 		/*done*/		"- register <desired user name> <password> <last Name> <first Name> <email> " + "\n" +
-				"- disconnect" + "\n" +
 		/*done*/		"- view_Active_Guests" + "\n" +
 		/*done*/		"- view_Active_Member_Names" + "\n"+
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
@@ -166,6 +166,21 @@ public class ClientConnectionController extends Thread {
 			if (splitTokens[0].equals("view_Active_Member_Names")) {
 				return new ViewActiveMemberNames();
 			}
+			if (splitTokens[0].equals("view_subjects")) {
+				if (splitTokens.length != 2){
+					throw new BadCommandException("view_subjects<root subject id>");
+				}
+				else{
+					try {
+					long tid = Long.parseLong(splitTokens[1]);
+					return new ViewSubjects(tid);
+					}
+					catch(NumberFormatException e){
+						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
+					}			
+				}
+				
+			}
 			
 			if (splitTokens[0].equals("add_new_subject")) {
 				if (splitTokens.length != 4){
@@ -183,8 +198,7 @@ public class ClientConnectionController extends Thread {
 			}
 			if (splitTokens[0].equals("login")) {
 				if(splitTokens.length!= 3){
-					throw new BadCommandException("login <username> <password>");
-					
+					throw new BadCommandException("login <username> <password>");			
 				}
 				else{
 					return new LoginMessage(splitTokens[1],splitTokens[2]);
