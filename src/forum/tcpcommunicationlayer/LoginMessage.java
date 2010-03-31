@@ -1,7 +1,11 @@
 package forum.tcpcommunicationlayer;
 
-import forum.server.ForumFacade;
-import forum.server.presentationlayer.UIMember;
+import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.impl.ForumFacade;
+import forum.server.domainlayer.impl.interfaces.UIMember;
+import forum.server.persistentlayer.DatabaseRetrievalException;
+import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;
 
 /**
  * @author Lital Badash
@@ -10,42 +14,45 @@ import forum.server.presentationlayer.UIMember;
 public class LoginMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -2723317717299435031L;
-	
-	/** 
-	 * The username of the user. 
-	 */
-	private String m_username;
-	
-	/** 
-	 * The password of the user. 
-	 */
-	private String m_password;
+
+	/* The user-name of the user. */
+	private String username;
+	/* The password of the user. */
+	private String password;
 
 	public LoginMessage(String username, String password) {
-		m_username = username;
-		m_password = password; 
+		this.username = username;
+		this.password = password; 
 	}
 
 	/* (non-Javadoc)
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
-	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj=new ServerResponse("", true); 
-		UIMember answer = forum.login(m_username, m_password);
 		//TODO - again ot is not clear what the return value is in case of a failure - I assumed it is null.
-		if (answer!=null){	
+		// response (Vitali) --> No! exception will be thrown.
+				
+		ServerResponse returnObj = new ServerResponse("", true); 
+		try {
+			UIMember tResponse = forum.login(this.username, this.password);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("you are logged in");
-
-		}
-		else {
+			returnObj.setResponse("Welcome " + "\t" + tResponse.getId() + "\t" + 
+					tResponse.getUsername() + "\t" +
+					tResponse.getLastName() + " " +
+					tResponse.getFirstName());
+		} 
+		catch (NotRegisteredException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("The Forum couldn't logged you in-check for your credentials");
-
+			returnObj.setResponse(e.getMessage());
+		} 
+		catch (WrongPasswordException e) {
+			returnObj.setHasExecuted(false);
+			returnObj.setResponse(e.getMessage());
 		}
-		
+		catch (DatabaseRetrievalException e) {
+			returnObj.setHasExecuted(false);
+			returnObj.setResponse(e.getMessage());
+		}		
 		return returnObj;
 	}
-
 }

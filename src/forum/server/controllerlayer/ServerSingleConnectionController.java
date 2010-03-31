@@ -6,10 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
-import forum.server.ForumFacade;
 import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.impl.ForumFacade;
+import forum.server.domainlayer.impl.MainForumLogic;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
 
@@ -22,17 +22,17 @@ public class ServerSingleConnectionController implements Runnable {
 
 	private static final ExecutorService pool = Executors.newCachedThreadPool();
 	
-	private Socket m_socket;
+	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
-	// TODO create an instance (maybe singleton?) of the facade.
-	private ForumFacade forum = null;
+	private ForumFacade forum;
 	
 	private ServerSingleConnectionController(Socket socket) throws IOException {
-		m_socket = socket;		
-		out = new ObjectOutputStream(m_socket.getOutputStream());
-		out.flush();
-		in = new ObjectInputStream(m_socket.getInputStream());		
+		this.forum = MainForumLogic.getInstance();
+		this.socket = socket;		
+		this.out = new ObjectOutputStream(this.socket.getOutputStream());
+		this.out.flush();
+		this.in = new ObjectInputStream(this.socket.getInputStream());		
 	}
 	
 	/**
@@ -56,49 +56,45 @@ public class ServerSingleConnectionController implements Runnable {
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
-	@Override
 	public void run() {		
-		SystemLogger.info("Communication has started between "+m_socket.getInetAddress()+" and the server.");
+		SystemLogger.info("Communication has started between " + this.socket.getInetAddress() + " and the server.");
 		
 		try {
 			while (true) {
 				/* Receive a message from the client */
-				Object o = in.readObject();
-				if (o == null) {
-					SystemLogger.info("Client "+m_socket.getInetAddress()+"has disconnected from the server.");
+				Object tReceivedObject = this.in.readObject();
+				if (tReceivedObject == null) {
+					SystemLogger.info("Client " + this.socket.getInetAddress()+ " has disconnected from the server.");
 					break;
 				}
-				if (!(o instanceof ClientMessage)) {
-					SystemLogger.warning("Received an invalid message from client"+m_socket.getInetAddress()+".");
+				if (!(tReceivedObject instanceof ClientMessage)) {
+					SystemLogger.warning("Received an invalid message from client " + this.socket.getInetAddress() + ".");
 					break;
 				}	
-				
-				SystemLogger.info("Received a message from client "+m_socket.getInetAddress()+".");
-				ClientMessage message = (ClientMessage)o;
+				SystemLogger.info("Received a message from client " + this.socket.getInetAddress() + ".");
+				ClientMessage message = (ClientMessage)tReceivedObject;
+			
 				/* Operate on the message */				
-				ServerResponse response = message.doOperation(forum); 
+				ServerResponse response = message.doOperation(this.forum);
 				/* Send response back to the client */
-				SystemLogger.info("Sending a response back to client "+m_socket.getInetAddress()+".");
-				out.writeObject(response);
+				SystemLogger.info("Sending a response back to client " + this.socket.getInetAddress() + ".");
+				this.out.writeObject(response);
 			} 
 		}
 		catch (IOException e) {
-			SystemLogger.severe("A readObject operation failed with client "+m_socket.getInetAddress()+".");
-			e.printStackTrace();				
+			SystemLogger.severe("A readObject operation failed with client " + this.socket.getInetAddress() + ".");
 		} catch (ClassNotFoundException e) {
-			SystemLogger.severe("A bad  operation failed with client "+m_socket.getInetAddress()+".");			
-			e.printStackTrace();
+			SystemLogger.severe("A bad  operation failed with client " + this.socket.getInetAddress() + ".");			
 		} finally {
-			SystemLogger.info("Closing connection with client "+m_socket.getInetAddress()+".");
+			SystemLogger.info("Closing connection with client "+ this.socket.getInetAddress() + ".");
 			try {
-				in.close();
-				out.close();
-				m_socket.close();
+				this.in.close();
+				this.out.close();
+				this.socket.close();
 			} catch (IOException e) {
 				SystemLogger.severe("Failed to close I/O streams with some client.");
 				e.printStackTrace();
 			}			
 		}
 	}
-
 }

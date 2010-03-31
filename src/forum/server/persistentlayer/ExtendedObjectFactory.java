@@ -7,8 +7,12 @@
  */
 package forum.server.persistentlayer;
 
+import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Vector;
+
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import forum.server.domainlayer.impl.user.Permission;
 
 /**
  * @author Sepetnitsky Vitali
@@ -35,16 +39,22 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link UserType} class which is initialized with the given parameters		
 	 */
-	public static UserType createUserType(String username, String password, String lastName,
-			String firstName, String email) {
-		UserType tUserType = factory.createUserType();
-		tUserType.setUsername(username);
-		tUserType.setPassword(password);
-		tUserType.setLastName(lastName);
-		tUserType.setFirstName(firstName);
-		tUserType.setEMail(email);
-		tUserType.setNumOfPostedMessages(0);
-		return tUserType;
+	public static MemberType createMemberType(final long id, final String username, final String password, final String lastName,
+			final String firstName, final String email, Collection<Permission> permissions) {
+		MemberType tMemberType = factory.createMemberType();
+		// parse the give permissions and create their string representation
+		Collection<String> tSringPermissions = new Vector<String>();
+		for (Permission tCurrentPermission : permissions)
+			tSringPermissions.add(tCurrentPermission.toString());
+		tMemberType.setUserID(id);
+		tMemberType.setUsername(username);
+		tMemberType.setPassword(password);
+		tMemberType.setLastName(lastName);
+		tMemberType.setFirstName(firstName);
+		tMemberType.setEMail(email);
+		tMemberType.setNumOfPostedMessages(0);
+		tMemberType.getPrivileges().addAll(tSringPermissions);
+		return tMemberType;
 	}
 
 	/**
@@ -63,16 +73,15 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link MessageType} class which is initialized with the given parameters		
 	 */
-	public static MessageType createMessageType(long msgID, String authorUsername,
+	public static MessageType createMessageType(final long id, final long authorID,
 			String title, String content) {
 		GregorianCalendar tCurrDateTime = new GregorianCalendar();
 		MessageType tMsgType = factory.createMessageType();
-		tMsgType.setMessageID(msgID);
-		tMsgType.setAuthor(authorUsername);
+		tMsgType.setMessageID(id);
+		tMsgType.setAuthor(authorID);
 		tMsgType.setTitle(title);
 		tMsgType.setContent(content);
-		tMsgType.setDate(new XMLGregorianCalendarImpl(tCurrDateTime));
-		tMsgType.setTime(new XMLGregorianCalendarImpl(tCurrDateTime));
+		tMsgType.setPostTime(new XMLGregorianCalendarImpl(tCurrDateTime));
 		return tMsgType;
 	}
 	
@@ -85,10 +94,12 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link ThreadType} class which is initialized with the given parameters
 	 */
-	public static ThreadType createThreadType(MessageType startMessage) {
+	public static ThreadType createThreadType(final long id, final String topic, final long startMessageID) {
 		ThreadType tThreadType = factory.createThreadType();
-		tThreadType.setStartMessage(startMessage);
-		tThreadType.setLastMessage(startMessage);
+		tThreadType.setThreadID(id);
+		tThreadType.setTopic(topic);
+		tThreadType.setStartMessageID(startMessageID);
+		tThreadType.setLastMessageID(startMessageID);
 		tThreadType.setNumOfViews(0);
 		tThreadType.setNumOfResponses(0);
 		return tThreadType;
@@ -108,14 +119,11 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of a {@link SubjectType} which is initialized with the given parameters
 	 */
-	public static SubjectType createSubject(long subjectID, String name, String description) {
+	public static SubjectType createSubject(final long subjectID, final String name, final String description) {
 		SubjectType tSubjectType = factory.createSubjectType();
 		tSubjectType.setSubjectID(subjectID);
 		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
-		tSubjectType.setLastAddedMessage(null);
-		tSubjectType.setNumOfMessages(0);
-		tSubjectType.setNumOfThreads(0);
 		return tSubjectType;
 	}		
 }

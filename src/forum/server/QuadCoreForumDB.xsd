@@ -8,33 +8,45 @@
 		<xsd:sequence>
 			<xsd:element name="name" type="xsd:string"></xsd:element>
 			<xsd:element name="description" type="xsd:string"></xsd:element>
-			<xsd:element name="numOfMessages">
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:int">
-						<xsd:minInclusive value="0"></xsd:minInclusive>
-					</xsd:restriction>
-				</xsd:simpleType>
+			<xsd:element name="numOfMessages" type="NonNegativeLong">
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:complexType name="UserType">
+	<xsd:complexType name="MemberType">
 		<xsd:sequence>
+			<xsd:element name="userID" type="NonNegativeLong">
+			</xsd:element>
 			<xsd:element name="username" type="xsd:string"></xsd:element>
-            <xsd:element name="e-mail">
+			<xsd:element name="e-mail">
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:pattern value=".+(@).+"></xsd:pattern>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
-            <xsd:element name="password" type="xsd:string"></xsd:element>
+			<xsd:element name="password" type="xsd:string"></xsd:element>
 			<xsd:element name="lastName" type="xsd:string"></xsd:element>
 			<xsd:element name="firstName" type="xsd:string"></xsd:element>
-			<xsd:element name="numOfPostedMessages" type="xsd:int"></xsd:element>
+			<xsd:element name="numOfPostedMessages" type="xsd:long"></xsd:element>
 			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="postedMessages" type="MessageType"></xsd:element>
+				<xsd:element name="postedMessagesIDs" type="xsd:long"></xsd:element>
 			</xsd:sequence>
+			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="privileges">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="ADD_SUBJECT"></xsd:enumeration>
+							<xsd:enumeration value="DELETE_SUBJECT"></xsd:enumeration>
+							<xsd:enumeration value="OPEN_THREAD"></xsd:enumeration>
+							<xsd:enumeration value="REPLY_TO_MESSAGE"></xsd:enumeration>
+							<xsd:enumeration value="DELETE_THREAD"></xsd:enumeration>
+							<xsd:enumeration value="DELETE_MESSAGE"></xsd:enumeration>
+							<xsd:enumeration value="EDIT_MESSAGE"></xsd:enumeration>
+							<xsd:enumeration value="VIEW_ALL"></xsd:enumeration>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element></xsd:sequence>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -42,30 +54,23 @@
 		<xsd:complexContent>
 			<xsd:extension base="NamedComponentType">
 				<xsd:sequence>
-                    <xsd:element name="subjectID" type="xsd:long"></xsd:element>
+                    <xsd:element name="subjectID" type="NonNegativeLong"></xsd:element>
 
 					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="subSubjects"
-							type="SubjectType">
+						<xsd:element name="subSubjectsIDs"
+							type="NonNegativeLong">
 						</xsd:element>
 					</xsd:sequence>
 
 					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-						<xsd:element name="subThreads"
-							type="ThreadType">
+						<xsd:element name="threadsIDs"
+							type="NonNegativeLong">
 						</xsd:element>
 					</xsd:sequence>
 
-					<xsd:element name="numOfThreads">
-						<xsd:simpleType>
-							<xsd:restriction base="xsd:int">
-								<xsd:minInclusive value="0"></xsd:minInclusive>
-							</xsd:restriction>
-						</xsd:simpleType>
-					</xsd:element>
 
-					<xsd:element name="lastAddedMessage"
-						type="MessageType" minOccurs="0" maxOccurs="1">
+					<xsd:element name="lastAddedMessageID"
+						type="NonNegativeLong" minOccurs="0" maxOccurs="1">
 					</xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
@@ -74,35 +79,26 @@
     
     <xsd:complexType name="MessageType">
     	<xsd:sequence>
-    		<xsd:element name="messageID" type="xsd:long"></xsd:element>
-    		<xsd:element name="author" type="xsd:string"></xsd:element>
+    		<xsd:element name="messageID" type="NonNegativeLong"></xsd:element>
+    		<xsd:element name="author" type="xsd:long"></xsd:element>
     		<xsd:element name="title" type="xsd:string"></xsd:element>
     		<xsd:element name="content" type="xsd:string"></xsd:element>
-    		<xsd:element name="date" type="xsd:date"></xsd:element>
-    		<xsd:element name="time" type="xsd:time"></xsd:element>
+    		<xsd:element name="postTime" type="xsd:dateTime"></xsd:element>
     		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-    			<xsd:element name="replies" type="MessageType"></xsd:element>
+    			<xsd:element name="repliesIDs" type="NonNegativeLong"></xsd:element>
     		</xsd:sequence>
     	</xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="ThreadType">
     	<xsd:sequence>
-    		<xsd:element name="startMessage" type="MessageType"></xsd:element>
-    		<xsd:element name="lastMessage" type="MessageType"></xsd:element>
-    		<xsd:element name="numOfViews">
-    			<xsd:simpleType>
-    				<xsd:restriction base="xsd:int">
-    					<xsd:minInclusive value="0"></xsd:minInclusive>
-    				</xsd:restriction>
-    			</xsd:simpleType>
+    		<xsd:element name="threadID" type="NonNegativeLong"></xsd:element>
+            <xsd:element name="topic" type="xsd:string"></xsd:element>
+            <xsd:element name="startMessageID" type="NonNegativeLong"></xsd:element>
+    		<xsd:element name="lastMessageID" type="NonNegativeLong"></xsd:element>
+    		<xsd:element name="numOfViews" type="NonNegativeLong">
     		</xsd:element>
-    		<xsd:element name="numOfResponses">
-    			<xsd:simpleType>
-    				<xsd:restriction base="xsd:int">
-    					<xsd:minInclusive value="0"></xsd:minInclusive>
-    				</xsd:restriction>
-    			</xsd:simpleType>
+    		<xsd:element name="numOfResponses" type="NonNegativeLong">
     		</xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
@@ -110,26 +106,25 @@
 	<xsd:element name="ForumType">
   	  <xsd:complexType>
     		<xsd:sequence>
-
     			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-    				<xsd:element name="registeredUsers"
-    					type="UserType">
+    				<xsd:element name="members" type="MemberType">
     				</xsd:element>
     			</xsd:sequence>
-    			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-    				<xsd:element name="forumSubjects"
-    					type="SubjectType">
-    				</xsd:element>
-    			</xsd:sequence>
-    			<xsd:element name="numOfMessages">
-    				<xsd:simpleType>
-    					<xsd:restriction base="xsd:int">
-    						<xsd:minInclusive value="0"></xsd:minInclusive>
-    					</xsd:restriction>
-    				</xsd:simpleType>
-    			</xsd:element>
+    			<xsd:sequence minOccurs="0" maxOccurs="unbounded"><xsd:element name="subjects" type="SubjectType">
+    			</xsd:element></xsd:sequence>
+    			<xsd:sequence minOccurs="0" maxOccurs="unbounded"><xsd:element name="threads" type="ThreadType">
+    			</xsd:element></xsd:sequence>
+    			<xsd:sequence minOccurs="0" maxOccurs="unbounded"><xsd:element name="messages" type="MessageType">
+    			</xsd:element></xsd:sequence>
     		</xsd:sequence>
   	  </xsd:complexType>
 	</xsd:element>
 
+
+
+	<xsd:simpleType name="NonNegativeLong">
+		<xsd:restriction base="xsd:long">
+			<xsd:minInclusive value="0"></xsd:minInclusive>
+		</xsd:restriction>
+	</xsd:simpleType>
 </xsd:schema>
