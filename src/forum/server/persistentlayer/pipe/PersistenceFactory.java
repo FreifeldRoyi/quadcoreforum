@@ -28,7 +28,7 @@ public class PersistenceFactory
 		{
 			try
 			{
-				PERSISTENCE_DATA_HANDLER = new JAXBpersistenceDataHandler();
+				PERSISTENCE_DATA_HANDLER = JAXBpersistenceDataHandler.getInstance();
 			} 
 			catch (JAXBException e) 
 			{

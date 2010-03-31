@@ -1,19 +1,15 @@
 package forum.client.controllerlayer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 
-import forum.server.Settings;
-import forum.server.exceptions.subject.SubjectNotFoundException;
+import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.impl.MainForumLogic;
+
+import forum.server.domainlayer.impl.interfaces.UIMember;
+import forum.server.domainlayer.impl.interfaces.UIUser;
 import forum.tcpcommunicationlayer.*;
 
 /**
@@ -23,47 +19,83 @@ import forum.tcpcommunicationlayer.*;
  */
 public class ClientConnectionController extends Thread {
 
-	private Socket m_socket;
+	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
-	
-	private static Logger log = Logger.getLogger(Settings.LOG_FILE_NAME);
-	
+
+	private UIUser me;
+
+	private long loggedID;
+	private String loggedUsername;
+	private String loggedFullName;
+
 	public ClientConnectionController(String addr, short port) throws IOException {
-		InetAddress ia = InetAddress.getByName(addr);
-		connect(ia,port);
+		InetAddress tInetAddress = InetAddress.getByName(addr);
+		connect(tInetAddress, port);
 	}
-	
-	@Override
+
 	public void run() {
-		BufferedReader prompt = new BufferedReader(new InputStreamReader(System.in));  
+		BufferedReader prompt = new BufferedReader(new InputStreamReader(System.in));
+		this.loggedID = -1;
+		this.loggedUsername = null;
+		this.loggedFullName = null;
+
+		me = MainForumLogic.getInstance().addGuest();
 		try {
 			printHelp();
 			while (true) {
+				if (this.me != null) 
+					System.out.println("Hello guest! Your id is " + me.getId() + ".");
+				else
+					System.out.println("Hello " + this.loggedFullName + "!" +
+							" Your id is " + this.loggedID + ".");
 				/* Receives a command from the user. */
 				System.out.print("> ");
 				String str = prompt.readLine();
-				
+
 				if (str == null) {
 					break;
 				}
-				
+
 				if (str.equals("disconnect")) {
+					if (me != null)
+						MainForumLogic.getInstance().removeGuest(this.me.getId());
+					else {
+						out.writeObject(new LogoffMessage(this.loggedUsername));
+						/* receive response from the server. */
+						Object o = in.readObject();
+						if (o == null) {
+							SystemLogger.severe("Lost connection to server.");
+							break;
+						}
+						if (!(o instanceof ServerResponse)) {
+							SystemLogger.severe("Received an invalid response from server.");
+							break;
+						}
+
+						ServerResponse res = (ServerResponse)o;
+						/* Check if the server has done the command. */
+						if (res.hasExecuted()) {
+							System.out.println("done!");
+						}
+						else {
+							System.out.println("failed!");
+						}
+					}
 					break;
 				}
-				
+
 				if (str.equals("help")) {
 					printHelp();
 					continue;
 				}
-								
+
 				ClientMessage msg;
 				try {
 					/* Handles the command. */
-					msg = handleCommand(str);						
+					msg = handleCommand(str);
 				} catch (BadCommandException e) {
-					log.info("The user has inputed an invalid command.");
-					e.printStackTrace();
+					SystemLogger.info("The user has inputed an invalid command.");
 					System.out.println();
 					continue;
 				}
@@ -72,14 +104,14 @@ public class ClientConnectionController extends Thread {
 				/* receive response from the server. */
 				Object o = in.readObject();
 				if (o == null) {
-					log.severe("Lost connection to server.");
+					SystemLogger.severe("Lost connection to server.");
 					break;
 				}
 				if (!(o instanceof ServerResponse)) {
-					log.severe("Received an invalid response from server.");
+					SystemLogger.severe("Received an invalid response from server.");
 					break;
 				}
-				
+
 				ServerResponse res = (ServerResponse)o;
 				/* Check if the server has done the command. */
 				if (res.hasExecuted()) {
@@ -89,14 +121,32 @@ public class ClientConnectionController extends Thread {
 					System.out.println("failed!");
 				}
 				/* Print the response from the server */
-				System.out.println(res.getResponse());
-				
+
+				if (res.getResponse() != null && res.getResponse().startsWith("Welcome")) {
+					MainForumLogic.getInstance().removeGuest(this.me.getId());
+					this.me = null;
+					String[] tSplittedRes = res.getResponse().split("\t");
+					this.loggedID = Long.parseLong(tSplittedRes[1]);
+					this.loggedUsername = tSplittedRes[2];
+					this.loggedFullName = tSplittedRes[3];
+				}
+				else if (res.getResponse() != null && res.getResponse().equals("The user is logged out.")) {
+					this.loggedID = -1;
+					this.loggedFullName = null;
+					this.loggedUsername = null;
+					this.me = MainForumLogic.getInstance().addGuest();
+					System.out.println(res.getResponse());
+				}
+				else
+					System.out.println(res.getResponse());
 			}
-		} catch (ClassNotFoundException e) {
-			log.severe("Received an invalid object from the server.");
+		}
+		catch (ClassNotFoundException e) {
+			SystemLogger.severe("Received an invalid object from the server.");
 			e.printStackTrace();
-		} catch (IOException e) {
-			log.severe("IOException occured while trying to read/send/write.");
+		}
+		catch (IOException e) {
+			SystemLogger.severe("IOException occured while trying to read/send/write.");
 			e.printStackTrace();			
 		}
 		finally {			
@@ -105,33 +155,33 @@ public class ClientConnectionController extends Thread {
 				prompt.close();
 				closeConnection();
 			} catch (IOException e) {
-				log.severe("IOException while trying to close streams.");
+				SystemLogger.severe("IOException while trying to close streams.");
 				e.printStackTrace();
 			}			
 		}
 	}
-	
+
 	private void printHelp() {
 		System.out.println(
 				"help menu:" + "\n" +
-		/*done*/		"- help " +  "\n" +
-		/*done*/		"- add_message <root subject id> <username> <message title> <message content>" + "\n" +
-		/*done*/		"- add_new_subject<root message id> <subject name> <subject description>" + "\n"+				
-		/*done*/		"- add_reply <message id to reply to> <username> <message title><message content> " + "\n" +
-		/*done*/		"- modify_message <message id to modify>e <new message title> <new message content>" + "\n" +
-				//we don't have such function"- view_forum" + "\n" +
-		/*done*/		"- logoff <username>" + "\n" +
-		/*done*/		"- login <username> <password>" + "\n" +
-		/*done*/		"- register <desired user name> <password> <last Name> <first Name> <email> " + "\n" +
-		/*done*/		"- view_subjects<root subject id>" + "\n"+
-		/*done*/		"- view_subject_content <root subject id>" + "\n"+
-		/*done*/		"- view_message_replies <root message id>" + "\n"+
-		/*done*/		"- view_Active_Guests" + "\n" +
-		/*done*/		"- view_Active_Member_Names" + "\n"+
-					
+				"\t" + "User operations:" + "\n" +
+				"\t" + "\t" + "- help " +  "\n" +
+				"\t" + "\t" + "- login <username> <password>" + "\n" +
+				"\t" + "\t" + "- logoff" + "\n" +
+				"\t" + "\t" + "- register <username> <password> <lastname> <firstname> <e-mail>" + "\n" +
+				"\n" + "\t" + "View content operations:" + "\n" +
+				"\t" + "\t" + "- view_subjects <root subject id> (-1 to view the root subjects of the forum)" + "\n" +
+				"\t" + "\t" + "- view_subject_content <subject id>" + "\n" +
+				"\t" + "\t" + "- view_message_and_replies <message_id>" + "\n" +
+				"\n" + "\t" + "Add/Update/Delete operations:" + "\n" +
+				"\t" + "\t" + "- open_new_thread <parent subject id> <thread topic> <message title> <message content>" + "\n" +
+				"\t" + "\t" + "- add_reply <message id to reply to> <message title> <message content>" + "\n" +
+				"\t" + "\t" + "- modify_message <message id to modify> <new message title> <new message content>" + "\n" +
+				"\n" +				
+				"\t" + "- disconnect" + "\n" +
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
 		);								
-		
+
 	}
 
 	/**
@@ -143,172 +193,67 @@ public class ClientConnectionController extends Thread {
 	 */
 	private ClientMessage handleCommand(String str) throws BadCommandException {		
 		try {
-			String[]splitTokens = str.split("\\ ");
-			
-			/** adding a new thread with a new first message **/ 
-			if (splitTokens[0].equals("add_message")) {
-				if (splitTokens.length != 5){
-					throw new BadCommandException("usage: add_message <root subject id> <username> <message title> <message content>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new AddNewThread(tid,splitTokens[2],splitTokens[3],splitTokens[4]);
-					}
-					catch( NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-			}
+			final long tUserID = this.me != null ? this.me.getId() : this.loggedID;
 
-			if (splitTokens[0].equals("view_Active_Guests")) {
-				return new ViewActiveGuests();
+			StringTokenizer tStringTokenizer = new StringTokenizer(str);
+			String command = tStringTokenizer.nextToken();
+			/** adding a new thread with a new first message **/ 
+			if (command.equals("login"))
+				return new LoginMessage(tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
+			if (command.equals("logoff")) {
+				String tUserName = this.loggedUsername != null? this.loggedUsername : "";
+				return new LogoffMessage(tUserName);
 			}
-			
-			if (splitTokens[0].equals("view_Active_Member_Names")) {
-				return new ViewActiveMemberNames();
-			}
-			if (splitTokens[0].equals("view_subjects")) {
-				if (splitTokens.length != 2){
-					throw new BadCommandException("usage: view_subjects<root subject id>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new ViewSubjects(tid);
-					}
-					catch(NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-				
-			}
-			if (splitTokens[0].equals("view_subject_content")) {
-				if (splitTokens.length != 2){
-					throw new BadCommandException("usage: view_subject_content <root subject id>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new ViewSubjectContent(tid);
-					}
-					catch(NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-				
-			}
-			if (splitTokens[0].equals("view_message_replies")) {
-				if (splitTokens.length != 2){
-					throw new BadCommandException("usage: view_message_replies <root message id>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new ViewMessageReplies(tid);
-					}
-					catch(NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-				
-			}
-			
-			if (splitTokens[0].equals("add_new_subject")) {
-				if (splitTokens.length != 4){
-					throw new BadCommandException("add_new_subject<root message id> <subject name> <subject description>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new AddNewSubject(tid,splitTokens[2],splitTokens[3]);
-					}
-					catch(NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}			
-				}
-			}
-			if (splitTokens[0].equals("login")) {
-				if(splitTokens.length!= 3){
-					throw new BadCommandException("login <username> <password>");			
-				}
-				else{
-					return new LoginMessage(splitTokens[1],splitTokens[2]);
-				}
-			}
-					
-			if (splitTokens[0].equals("logoff")) {
-				if (splitTokens.length != 2){
-					throw new BadCommandException("logoff <username>");
-				}
-				else{
-					return new LogoffMessage(splitTokens[1]);			
-				}
-			}			
-			if (splitTokens[0].equals("register")) {
-				if (splitTokens.length != 6){
-					throw new BadCommandException("register <desired user name> <password> <last Name> <first Name> <email>");
-				}
-				else{
-				return new RegisterMessage(splitTokens[1],splitTokens[2],splitTokens[3],splitTokens[4],splitTokens[5]);
-				}
-			}
-			
-			if (splitTokens.equals("add_reply")) {
-				if (splitTokens.length != 5){
-					throw new BadCommandException("usage: add_reply <message id to reply to> <username> <message title><message content>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new AddReplyMessage(tid,splitTokens[2],splitTokens[3],splitTokens[4]);
-					}
-					catch( NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-			}			
-			if (splitTokens[0].equals("modify_message")) {
-				if (splitTokens.length != 4){
-					throw new BadCommandException("usage: modify_message <message id to modify>e <new message title> <new message content>");
-				}
-				else{
-					try {
-					long tid = Long.parseLong(splitTokens[1]);
-					return new ModifyMessageMessage(tid,splitTokens[2],splitTokens[3]);
-					}
-					catch( NumberFormatException e){
-						throw new BadCommandException("The first argument must be a number we got: ," + splitTokens[1]);
-					}
-				}
-			}
-			
+			if (command.equals("register"))
+				return new RegisterMessage(tStringTokenizer.nextToken(), tStringTokenizer.nextToken(),
+						tStringTokenizer.nextToken(), tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
+			if (command.equals("register"))
+				return new RegisterMessage(tStringTokenizer.nextToken(), tStringTokenizer.nextToken(),
+						tStringTokenizer.nextToken(), tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
+			if (command.equals("view_subjects"))
+				return new ViewSubjectsMessage(Long.parseLong(tStringTokenizer.nextToken()));
+			if (command.equals("view_subject_content"))
+				return new ViewSubjectContentMessage(Long.parseLong(tStringTokenizer.nextToken()));
+			if (command.equals("view_message_and_replies"))
+				return new ViewSubjectContentMessage(Long.parseLong(tStringTokenizer.nextToken()));
+			if (command.equals("open_new_thread"))
+				return new AddNewThreadMessage(tUserID,
+						Long.parseLong(tStringTokenizer.nextToken()), tStringTokenizer.nextToken(),
+						tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
+			if (command.equals("add_reply"))
+				return new AddReplyMessage(tUserID,
+						Long.parseLong(tStringTokenizer.nextToken()), tStringTokenizer.nextToken(),
+						tStringTokenizer.nextToken());
+			if (command.equals("modify_message"))
+				return new AddReplyMessage(tUserID,
+						Long.parseLong(tStringTokenizer.nextToken()), tStringTokenizer.nextToken(),
+						tStringTokenizer.nextToken());	
 			// TODO Add Search messages.
 			// TODO Add Admin messages
 			// TODO Add Moderator messages.
 		}
 		catch(Exception e) {
-			throw new BadCommandException("The command "+str+" is invalid.");
+			throw new BadCommandException("The command " + str + " is invalid.");
 		}
-		
-		throw new BadCommandException("The command "+str+" is unknown.");		
+
+		throw new BadCommandException("The command " + str + " is unknown.");		
 	}	
 
 	private void connect(InetAddress addr, short port) throws IOException {
 		SocketAddress sa = new InetSocketAddress(addr,port);
 		/* Connect to the server */
-		m_socket = new Socket();
-		m_socket.connect(sa);
-		out = new ObjectOutputStream(m_socket.getOutputStream());
+		this.socket = new Socket();
+		this.socket.connect(sa);
+		out = new ObjectOutputStream(this.socket.getOutputStream());
 		out.flush();
-		in = new ObjectInputStream(m_socket.getInputStream());
-		log.info("The client is connected to the server.");
+		in = new ObjectInputStream(this.socket.getInputStream());
+		SystemLogger.info("The client is connected to the server.");
 	}
-	
+
 	private void closeConnection() throws IOException {
 		in.close();
 		out.close();
-		m_socket.close();
+		this.socket.close();
 	}
 
 	/**
@@ -322,13 +267,15 @@ public class ClientConnectionController extends Thread {
 		try {
 			/* Create a logger for the client (to a file...). */
 			FileHandler handler = new FileHandler(logFileName);
-			log.addHandler(handler);
+			///////////////////////////////////////////////////
+			SystemLogger.addFileHandler(handler);
+			//////////////////////////////////////////////////
 		} catch (SecurityException e) {		
 			e.printStackTrace();
 		} catch (IOException e) {		
 			e.printStackTrace();
 		}
-				
+
 		try {
 			/* Start the client */
 			Thread thread = new ClientConnectionController("127.0.0.1",(short)1234);
@@ -339,12 +286,9 @@ public class ClientConnectionController extends Thread {
 				e.printStackTrace();
 			}
 		} catch (IOException e) {
-			log.severe("An IOException was thrown while trying to connect to the server.");
-			e.printStackTrace();
-		}		
-				
-		log.info("Exiting...");
-
+			SystemLogger.severe("An IOException was thrown while trying to connect to the server.");
+		}			
+		SystemLogger.info("Exiting...");
 	}
 
 }

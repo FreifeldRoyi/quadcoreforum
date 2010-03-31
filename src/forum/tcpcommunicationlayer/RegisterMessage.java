@@ -1,7 +1,8 @@
 package forum.tcpcommunicationlayer;
 
-import forum.server.ForumFacade;
-import forum.server.exceptions.user.UserAlreadyExistsException;
+import forum.server.domainlayer.impl.ForumFacade;
+import forum.server.persistentlayer.DatabaseUpdateException;
+import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
 
 /**
  * @author Lital Badash
@@ -10,38 +11,29 @@ import forum.server.exceptions.user.UserAlreadyExistsException;
 public class RegisterMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -3267419208356408002L;
-	
-	/**
-	 * The user last name.
-	 */
-	private String m_lastname;
 
-	/**
-	 * The user first name.
-	 */
-	private String m_firstname;
-	
-	/**
-	 * The e-mail of the user.
-	 */
-	private String m_email;
-	
-	/** 
-	 * The username of the user. 
-	 */
-	private String m_username;
-	
-	/** 
-	 * The password of the user. 
-	 */
-	private String m_password;
+	/* The user-name of the user. */
+	private String username;
 
-	public RegisterMessage(String username, String password , String lastname ,String firstname, String email) {
-		m_firstname = firstname;
-		m_lastname = lastname;
-		m_email = email;
-		m_username = username;
-		m_password = password;		
+	/* The password of the user. */
+	private String password;
+
+	/* The user last name. */
+	private String lastname;
+
+	/* The user first name. */
+	private String firstname;
+
+	/* The e-mail of the user. */
+	private String email;
+
+	public RegisterMessage(final String username, final String password, final String lastname, 
+			final String firstname, final String email) {
+		this.username = username;
+		this.password = password;		
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.email = email;
 	}
 
 	/* (non-Javadoc)
@@ -50,20 +42,19 @@ public class RegisterMessage extends ClientMessage {
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj=new ServerResponse("", true); 
-		try{
-			forum.registerToForum(m_username, m_password, m_lastname, m_firstname, m_email);
+		try {
+			forum.registerNewMember(this.username, this.password, this.lastname, this.firstname, this.email);
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("you successfuly registered the forum");
-
 		}
-		catch(UserAlreadyExistsException e) {
+		catch (MemberAlreadyExistsException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("The Forum could'nt register you to the forum, the user name you chose already exist in the forum");
-
+			returnObj.setResponse(e.getMessage());
+		} 
+		catch (DatabaseUpdateException e) {
+			returnObj.setHasExecuted(false);
+			returnObj.setResponse(e.getMessage());
 		}
-		
 		return returnObj;
-
 	}
-
 }

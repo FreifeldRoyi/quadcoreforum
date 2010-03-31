@@ -96,6 +96,10 @@ public class SystemLogger {
 		boolean ans = true;
 		try {
 			SystemLogger.LOGGER = Logger.getLogger("");
+			// Remove all the default handlers
+			for (Handler tHandler : SystemLogger.LOGGER.getHandlers())
+				SystemLogger.LOGGER.removeHandler(tHandler);
+			SystemLogger.LOGGER.setUseParentHandlers(false);
 			//Set the log level specifying which message levels will be logged by this logger
 			SystemLogger.LOGGER.setLevel(SystemLogger.DEFAULT_LOG_LEVEL);
 			if (SystemLogger.LOG_TO_FILE_BY_DEFAULT)
@@ -132,7 +136,7 @@ public class SystemLogger {
 	 * @param level
 	 * 		The message priority level (will appear in the log file)
 	 */
-	public static void logAMessage(String message, Level level ) {
+	private static void logAMessage(String message, Level level ) {
 		if (SystemLogger.LOGGER == null) {
 			if (createLogger())
 				SystemLogger.LOGGER.log(level, message);
@@ -143,13 +147,13 @@ public class SystemLogger {
 	}
 
 	/**
-	 * Logs a message with a SEVERE level
+	 * Logs a message with a FINE level
 	 * 
 	 * @param message
 	 * 		The message which should be logged
 	 */
-	public static void severe(String message) {
-		SystemLogger.logAMessage(message, Level.SEVERE);
+	public static void fine(String message) {
+		SystemLogger.logAMessage(message, Level.FINE);
 	}
 	
 	/**
@@ -172,7 +176,33 @@ public class SystemLogger {
 		SystemLogger.logAMessage(message, Level.WARNING);
 	}
 	
+	/**
+	 * Logs a message with a SEVERE level
+	 * 
+	 * @param message
+	 * 		The message which should be logged
+	 */
+	public static void severe(String message) {
+		SystemLogger.logAMessage(message, Level.SEVERE);
+	}
+
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	public static void addFileHandler(FileHandler handler) {
+		SystemLogger.LOGGER.addHandler(handler);
+	}
+
 	
+	
+	
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+	/*******************************************************************************************/
+
 	/**
 	 * Changes the logging mode to file only, the logging won't be done to the CLI
 	 * 
