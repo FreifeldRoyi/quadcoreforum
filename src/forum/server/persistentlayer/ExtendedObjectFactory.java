@@ -119,11 +119,12 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of a {@link SubjectType} which is initialized with the given parameters
 	 */
-	public static SubjectType createSubject(final long subjectID, final String name, final String description) {
+	public static SubjectType createSubject(final long subjectID, final String name, final String description, boolean isTopLevel) {
 		SubjectType tSubjectType = factory.createSubjectType();
 		tSubjectType.setSubjectID(subjectID);
 		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
+		tSubjectType.setIsToLevel(isTopLevel);
 		return tSubjectType;
 	}		
 }

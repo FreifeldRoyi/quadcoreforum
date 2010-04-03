@@ -40,12 +40,19 @@ public class MessagesController {
 
 	public Collection<UISubject> getSubjects(final long fatherID) throws SubjectNotFoundException, 
 	DatabaseRetrievalException {
-		SystemLogger.info("Sub-subjects of a subject with id " + fatherID + " are requested to view.");
-		final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
-		final Collection<Long> tSubSubjectsIDs = tFatherSubject.getSubSubjects();
+		final String tLoggerMessage = fatherID != -1 ? "Sub-subjects of a subject with id " + fatherID + " are requested to view." :
+			"The forum top-level subjects are requested to view";
+		SystemLogger.info(tLoggerMessage);
 		final Collection<UISubject> toReturn = new Vector<UISubject>();
-		for (long tSubjectID : tSubSubjectsIDs)
-			toReturn.add(this.dataHander.getMessagesCache().getSubjectByID(tSubjectID));
+
+		if (fatherID == -1) 
+			toReturn.addAll(this.dataHander.getMessagesCache().getToLevelSubjects());
+		else {
+			final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
+			final Collection<Long> tSubSubjectsIDs = tFatherSubject.getSubSubjects();
+			for (long tSubjectID : tSubSubjectsIDs)
+				toReturn.add(this.dataHander.getMessagesCache().getSubjectByID(tSubjectID));
+		}
 		return toReturn;
 	}
 
@@ -62,13 +69,13 @@ public class MessagesController {
 			if (tApplicant.isAllowed(tPermissionToCheck)) {
 				SystemLogger.info("permission granted for user " + userID + ".");
 				if (fatherID == -1) {
-					ForumSubject toReturn = this.dataHander.getMessagesCache().createNewSubject(name, description);
+					ForumSubject toReturn = this.dataHander.getMessagesCache().createNewSubject(name, description, true);
 					SystemLogger.info("A subject named " + name + " was added to the top level of the forum");
 					return toReturn;
 				}	
 				else {	
 					ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
-					ForumSubject tNewSubject = this.dataHander.getMessagesCache().createNewSubject(name, description);				
+					ForumSubject tNewSubject = this.dataHander.getMessagesCache().createNewSubject(name, description, false);
 					tFatherSubject.addSubSubject(tNewSubject.getId());
 					this.dataHander.getMessagesCache().updateInDatabase(tFatherSubject);
 					SystemLogger.info("A subject named " + name + " was added as a sub-subject of a subject named " + 

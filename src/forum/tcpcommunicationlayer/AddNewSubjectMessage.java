@@ -7,7 +7,7 @@ import forum.server.persistentlayer.pipe.message.exceptions.SubjectAlreadyExists
 import forum.server.persistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 
-public class AddNewSubject extends ClientMessage {
+public class AddNewSubjectMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -2417678029351227054L;
 
@@ -28,7 +28,7 @@ public class AddNewSubject extends ClientMessage {
 	 */
 	private String subjectDescription;
 
-	public AddNewSubject(final long userID, final long fatherID, final String name, final String description){
+	public AddNewSubjectMessage(final long userID, final long fatherID, final String name, final String description){
 		this.userID = userID;
 		this.fatherID = fatherID;
 		this.subjectName = name;
@@ -40,11 +40,11 @@ public class AddNewSubject extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj=new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse("", true); 
 		try {
 			forum.addNewSubject(this.userID, this.fatherID, this.subjectName, this.subjectDescription);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The Forum added a new subject successfuly");
+			returnObj.setResponse("The new subject was added successfuly to the forum");
 		} 
 		catch (SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);

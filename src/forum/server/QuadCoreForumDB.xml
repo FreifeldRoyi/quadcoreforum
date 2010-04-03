@@ -2,49 +2,62 @@
 <ForumType>
     <members>
         <userID>0</userID>
-        <username>username</username>
-        <e-mail>test@test</e-mail>
-        <password>password</password>
-        <lastName>lastName</lastName>
-        <firstName>firstName</firstName>
+        <username>admin</username>
+        <e-mail>admin@admin</e-mail>
+        <password>81dc9bdb52d04dc20036dbd8313ed055</password>
+        <lastName>admin</lastName>
+        <firstName>admin</firstName>
         <numOfPostedMessages>0</numOfPostedMessages>
-        <postedMessagesIDs>0</postedMessagesIDs>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>ADD_SUB_SUBJECT</privileges>
         <privileges>ADD_SUBJECT</privileges>
-    </members>
-    <members>
-        <userID>0</userID>
-        <username>sepetnit</username>
-        <e-mail>n@n</e-mail>
-        <password>d253b2f2ef402e4dcb412d7556d1321c</password>
-        <lastName>sep</lastName>
-        <firstName>vit</firstName>
-        <numOfPostedMessages>0</numOfPostedMessages>
-        <privileges>VIEW_ALL</privileges>
-        <privileges>REPLY_TO_MESSAGE</privileges>
-        <privileges>OPEN_THREAD</privileges>
         <privileges>EDIT_MESSAGE</privileges>
-    </members>
-    <members>
-        <userID>0</userID>
-        <username>dahany</username>
-        <e-mail>d@f</e-mail>
-        <password>d253b2f2ef402e4dcb412d7556d1321c</password>
-        <lastName>dahan</lastName>
-        <firstName>yakir</firstName>
-        <numOfPostedMessages>0</numOfPostedMessages>
-        <privileges>REPLY_TO_MESSAGE</privileges>
-        <privileges>OPEN_THREAD</privileges>
-        <privileges>EDIT_MESSAGE</privileges>
+        <privileges>DELETE_SUBJECT</privileges>
+        <privileges>DELETE_MESSAGE</privileges>
         <privileges>VIEW_ALL</privileges>
+        <privileges>DELETE_THREAD</privileges>
+        <privileges>SET_MODERATOR</privileges>
+        <privileges>EDIT_SUBJECT</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
     </members>
     <subjects>
         <name>name</name>
         <description>description</description>
         <numOfMessages>0</numOfMessages>
-        <subjectID>0</subjectID>
+        <subjectID>1000</subjectID>
         <subSubjectsIDs>0</subSubjectsIDs>
         <threadsIDs>0</threadsIDs>
         <lastAddedMessageID>0</lastAddedMessageID>
+        <isToLevel>false</isToLevel>
+    </subjects>
+    <subjects>
+        <name>a</name>
+        <description>r</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>0</subjectID>
+        <subSubjectsIDs>0</subSubjectsIDs>
+        <isToLevel>true</isToLevel>
+    </subjects>
+    <subjects>
+        <name>t</name>
+        <description>y</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>0</subjectID>
+        <isToLevel>true</isToLevel>
+    </subjects>
+    <subjects>
+        <name>e</name>
+        <description>4</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>0</subjectID>
+        <isToLevel>true</isToLevel>
+    </subjects>
+    <subjects>
+        <name>aa</name>
+        <description>dd</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>0</subjectID>
+        <isToLevel>false</isToLevel>
     </subjects>
     <threads>
         <threadID>0</threadID>

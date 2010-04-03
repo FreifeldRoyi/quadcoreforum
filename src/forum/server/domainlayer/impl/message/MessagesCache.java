@@ -48,6 +48,15 @@ public class MessagesCache {
 
 	// Subject related methods
 
+	// TODO: allow top level subjects cache saving
+	public Collection<ForumSubject> getToLevelSubjects() throws DatabaseRetrievalException {
+		Collection<ForumSubject> toReturn = this.pipe.getTopLevelSubjects();
+		for (ForumSubject tCurrentSubject : toReturn)
+			this.idsToSubjectsMapping.put(tCurrentSubject.getId(), tCurrentSubject);
+		return toReturn;
+	}
+	
+	
 	public ForumSubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		if (this.idsToMessagesMapping.containsKey(subjectID))
 			return this.idsToSubjectsMapping.get(subjectID);
@@ -58,11 +67,11 @@ public class MessagesCache {
 		}
 	}
 
-	public ForumSubject createNewSubject(final String name, final String description) throws SubjectAlreadyExistsException,
+	public ForumSubject createNewSubject(final String name, final String description, boolean isTopLevel) throws SubjectAlreadyExistsException,
 	DatabaseUpdateException {
 		long tSubjectID = this.getNextSubjectID();
-		this.pipe.addNewSubject(tSubjectID, name, description);
-		ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description);
+		this.pipe.addNewSubject(tSubjectID, name, description, isTopLevel);
+		ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description, isTopLevel);
 		this.idsToSubjectsMapping.put(tNewSubject.getId(), tNewSubject);
 		return tNewSubject;			
 	}

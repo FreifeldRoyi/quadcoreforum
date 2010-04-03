@@ -2,6 +2,7 @@ package forum.server.domainlayer.impl;
 
 import java.util.*;
 
+import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.message.*;
 import forum.server.domainlayer.impl.user.*;
 
@@ -22,7 +23,7 @@ public class MainForumLogic implements ForumFacade {
 
 	private static ForumFacade FORUM_FACADE_INSTANCE;
 	
-	public static ForumFacade getInstance() {
+	public static ForumFacade getInstance() throws DatabaseUpdateException {
 		if (MainForumLogic.FORUM_FACADE_INSTANCE == null)
 			MainForumLogic.FORUM_FACADE_INSTANCE = new MainForumLogic();
 		return MainForumLogic.FORUM_FACADE_INSTANCE;
@@ -30,14 +31,18 @@ public class MainForumLogic implements ForumFacade {
 	
 	/**
 	 * Constructs the forum objects according to the database
+	 * @throws DatabaseUpdateException 
 	 */
-	private MainForumLogic() {
-		this.dataHandler = new ForumDataHandler();		
+	private MainForumLogic() throws DatabaseUpdateException {
+		try {
+			this.dataHandler = new ForumDataHandler();
+		} catch (DatabaseUpdateException e) {
+			SystemLogger.info(e.getMessage());
+			throw e;
+		}		
 		this.usersController = new UsersController(this.dataHandler);
 		this.messagesController = new MessagesController(this.dataHandler);	
 	}
-
-
 
 	/**
 	 * Here are the methods for the forum initializing according to the database
@@ -216,7 +221,7 @@ public class MainForumLogic implements ForumFacade {
 	 * @see 
 	 * 		ForumFacade#addNewSubject(long, long, String)
 	 */
-	public UISubject addNewSubject(final long fatherID, final long userID, final String name, 
+	public UISubject addNewSubject(final long userID, final long fatherID, final String name, 
 			final String description) throws SubjectAlreadyExistsException, SubjectNotFoundException, NotRegisteredException, 
 			NotPermittedException, DatabaseUpdateException {
 		return this.messagesController.addNewSubject(userID, fatherID, name, description);

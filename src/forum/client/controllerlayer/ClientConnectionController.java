@@ -23,7 +23,7 @@ public class ClientConnectionController extends Thread {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 
-	private UIUser me;
+	private long me;
 
 	private long loggedID;
 	private String loggedUsername;
@@ -34,18 +34,59 @@ public class ClientConnectionController extends Thread {
 		connect(tInetAddress, port);
 	}
 
+	
+	private boolean registerAsNewGuest() throws IOException, ClassNotFoundException {
+		out.writeObject(new AddNewGuestMessage());
+		/* receive response from the server. */
+		Object o = in.readObject();
+		if (o == null) {
+			SystemLogger.severe("Lost connection to server.");
+			return false;
+		}
+		if (!(o instanceof ServerResponse)) {
+			SystemLogger.severe("Received an invalid response from server.");
+			return false;
+		}
+
+		ServerResponse res = (ServerResponse)o;
+		this.me = Long.parseLong(res.getResponse());
+		return true;
+	}
+
+	private boolean removeMeAsGuest() throws IOException, ClassNotFoundException {
+		out.writeObject(new RemoveGuestMessage(this.me));
+		/* receive response from the server. */
+		Object o1 = in.readObject();
+		if (o1 == null) {
+			SystemLogger.severe("Lost connection to server.");
+			return false;
+		}
+		if (!(o1 instanceof ServerResponse)) {
+			SystemLogger.severe("Received an invalid response from server.");
+			return false;
+		}
+		return true;
+	}	
+	
+	
+	
+	
+	
 	public void run() {
 		BufferedReader prompt = new BufferedReader(new InputStreamReader(System.in));
 		this.loggedID = -1;
 		this.loggedUsername = null;
 		this.loggedFullName = null;
 
-		me = MainForumLogic.getInstance().addGuest();
 		try {
 			printHelp();
+
+			this.registerAsNewGuest();
+
 			while (true) {
-				if (this.me != null) 
-					System.out.println("Hello guest! Your id is " + me.getId() + ".");
+
+				if (this.me != -1) 
+					System.out.println("Hello guest! Your id is " + me + ".");
 				else
 					System.out.println("Hello " + this.loggedFullName + "!" +
 							" Your id is " + this.loggedID + ".");
@@ -58,24 +99,38 @@ public class ClientConnectionController extends Thread {
 				}
 
 				if (str.equals("disconnect")) {
-					if (me != null)
-						MainForumLogic.getInstance().removeGuest(this.me.getId());
+					if (me != -1) {
+					
+						
+						if (!this.removeMeAsGuest()) break;
+						
+
+						
+						
+						
+						
+						
+						
+						
+						
+						
+					}
 					else {
 						out.writeObject(new LogoffMessage(this.loggedUsername));
 						/* receive response from the server. */
-						Object o = in.readObject();
-						if (o == null) {
+						Object tLogoffResponse = in.readObject();
+						if (tLogoffResponse == null) {
 							SystemLogger.severe("Lost connection to server.");
 							break;
 						}
-						if (!(o instanceof ServerResponse)) {
+						if (!(tLogoffResponse instanceof ServerResponse)) {
 							SystemLogger.severe("Received an invalid response from server.");
 							break;
 						}
 
-						ServerResponse res = (ServerResponse)o;
+						ServerResponse tLogoffServerResponse = (ServerResponse)tLogoffResponse;
 						/* Check if the server has done the command. */
-						if (res.hasExecuted()) {
+						if (tLogoffServerResponse.hasExecuted()) {
 							System.out.println("done!");
 						}
 						else {
@@ -123,8 +178,8 @@ public class ClientConnectionController extends Thread {
 				/* Print the response from the server */
 
 				if (res.getResponse() != null && res.getResponse().startsWith("Welcome")) {
-					MainForumLogic.getInstance().removeGuest(this.me.getId());
-					this.me = null;
+					this.removeMeAsGuest();
+					this.me = -1;
 					String[] tSplittedRes = res.getResponse().split("\t");
 					this.loggedID = Long.parseLong(tSplittedRes[1]);
 					this.loggedUsername = tSplittedRes[2];
@@ -134,7 +189,7 @@ public class ClientConnectionController extends Thread {
 					this.loggedID = -1;
 					this.loggedFullName = null;
 					this.loggedUsername = null;
-					this.me = MainForumLogic.getInstance().addGuest();
+					this.registerAsNewGuest();
 					System.out.println(res.getResponse());
 				}
 				else
@@ -174,6 +229,7 @@ public class ClientConnectionController extends Thread {
 				"\t" + "\t" + "- view_subject_content <subject id>" + "\n" +
 				"\t" + "\t" + "- view_message_and_replies <message_id>" + "\n" +
 				"\n" + "\t" + "Add/Update/Delete operations:" + "\n" +
+				"\t" + "\t" + "- add_new_subject <parent subject id> <new subject name> <new subject description>" + "\n" +
 				"\t" + "\t" + "- open_new_thread <parent subject id> <thread topic> <message title> <message content>" + "\n" +
 				"\t" + "\t" + "- add_reply <message id to reply to> <message title> <message content>" + "\n" +
 				"\t" + "\t" + "- modify_message <message id to modify> <new message title> <new message content>" + "\n" +
@@ -193,7 +249,7 @@ public class ClientConnectionController extends Thread {
 	 */
 	private ClientMessage handleCommand(String str) throws BadCommandException {		
 		try {
-			final long tUserID = this.me != null ? this.me.getId() : this.loggedID;
+			final long tUserID = this.me != -1 ? this.me : this.loggedID;
 
 			StringTokenizer tStringTokenizer = new StringTokenizer(str);
 			String command = tStringTokenizer.nextToken();
@@ -216,6 +272,9 @@ public class ClientConnectionController extends Thread {
 				return new ViewSubjectContentMessage(Long.parseLong(tStringTokenizer.nextToken()));
 			if (command.equals("view_message_and_replies"))
 				return new ViewSubjectContentMessage(Long.parseLong(tStringTokenizer.nextToken()));
+			if (command.equals("add_new_subject"))
+				return new AddNewSubjectMessage(tUserID, Long.parseLong(tStringTokenizer.nextToken()), 
+						tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
 			if (command.equals("open_new_thread"))
 				return new AddNewThreadMessage(tUserID,
 						Long.parseLong(tStringTokenizer.nextToken()), tStringTokenizer.nextToken(),

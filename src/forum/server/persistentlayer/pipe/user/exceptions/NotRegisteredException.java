@@ -16,7 +16,7 @@ public class NotRegisteredException extends Exception {
 	}
 	
 	public NotRegisteredException(long userID) {
-		super("A user with an id + " + userID + "is not registered!");
+		super("A user with an id " + userID + " is not registered!");
 	}
 	
 	

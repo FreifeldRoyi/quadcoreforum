@@ -6,6 +6,8 @@
 package forum.server.persistentlayer.pipe;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.File;
 
 import javax.xml.XMLConstants;
@@ -142,12 +144,16 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBI
 
 	// Subject related methods
 
+	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
+		return this.messagesHandler.getTopLevelSubjects();
+	}
+	
 	public ForumSubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		return this.messagesHandler.getSubjectByID(subjectID);
 	}
 
-	public void addNewSubject(long subjectID, String name, String description) throws DatabaseUpdateException {
-		this.messagesHandler.addNewSubject(subjectID, name, description);
+	public void addNewSubject(long subjectID, String name, String description, boolean isTopLevel) throws DatabaseUpdateException {
+		this.messagesHandler.addNewSubject(subjectID, name, description, isTopLevel);
 	}
 
 	public void updateSubject(long id, Collection<Long> subSubjects,

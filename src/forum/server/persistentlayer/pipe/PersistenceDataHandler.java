@@ -181,10 +181,12 @@ public interface PersistenceDataHandler
 			final Collection<Permission> permissions) throws DatabaseUpdateException;	
 
 	// Subject related methods
-	
+
+	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException;
+
 	public ForumSubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException;
 
-	public void addNewSubject(final long subjectID, final String name, final String description) throws DatabaseUpdateException;
+	public void addNewSubject(final long subjectID, final String name, final String description, boolean isTopLevel) throws DatabaseUpdateException;
 
 	public void updateSubject(final long id, final Collection<Long> subSubjects,
 			final Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException;
@@ -209,4 +211,5 @@ public interface PersistenceDataHandler
 	DatabaseUpdateException;
 
 	public Collection<Long> deleteAMessage(final long messageID) throws MessageNotFoundException, DatabaseUpdateException;
+
 }

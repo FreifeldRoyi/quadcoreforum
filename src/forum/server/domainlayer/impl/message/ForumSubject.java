@@ -9,6 +9,8 @@ public class ForumSubject extends NamedComponentImpl implements UISubject {
 	private Collection<Long> subSubjectsIDs;
 	private Collection<Long> threadsIDs;
 	
+	private boolean isToLevel;
+	
 	/**
 	 * @param id
 	 * 		The unique identification number of this subject.
@@ -17,7 +19,7 @@ public class ForumSubject extends NamedComponentImpl implements UISubject {
 	 * @param description
 	 * 		The description of this subject.
 	 */
-	public ForumSubject(long id, final String name, final String description) {
+	public ForumSubject(long id, final String name, final String description, boolean isTopLevel) {
 		super(name, description);
 		this.subjectID = id;
 		this.subSubjectsIDs = new Vector<Long>();
@@ -25,8 +27,8 @@ public class ForumSubject extends NamedComponentImpl implements UISubject {
 	}
 	
 	public ForumSubject(long id, final String name, final String description, final Collection<Long> subSubjects,
-			final Collection<Long> threads) {
-		this(id, name, description);
+			final Collection<Long> threads, boolean isToLevel) {
+		this(id, name, description, isToLevel);
 		this.subSubjectsIDs.addAll(subSubjects);
 		this.threadsIDs.addAll(threads);
 	}	
@@ -70,5 +72,8 @@ public class ForumSubject extends NamedComponentImpl implements UISubject {
 		return this.getName() + " " + this.getDescription();
 	}
 
-
+	public boolean isToLevel() {
+		return this.isToLevel;
+	}
+	
 }
