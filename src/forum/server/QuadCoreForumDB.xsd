@@ -44,6 +44,9 @@
 							<xsd:enumeration value="DELETE_MESSAGE"></xsd:enumeration>
 							<xsd:enumeration value="EDIT_MESSAGE"></xsd:enumeration>
 							<xsd:enumeration value="VIEW_ALL"></xsd:enumeration>
+							<xsd:enumeration value="ADD_SUB_SUBJECT"></xsd:enumeration>
+							<xsd:enumeration value="SET_MODERATOR"></xsd:enumeration>
+							<xsd:enumeration value="EDIT_SUBJECT"></xsd:enumeration>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element></xsd:sequence>
@@ -54,7 +57,9 @@
 		<xsd:complexContent>
 			<xsd:extension base="NamedComponentType">
 				<xsd:sequence>
-                    <xsd:element name="subjectID" type="NonNegativeLong"></xsd:element>
+					<xsd:element name="subjectID"
+						type="NonNegativeLong">
+					</xsd:element>
 
 					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
 						<xsd:element name="subSubjectsIDs"
@@ -72,6 +77,7 @@
 					<xsd:element name="lastAddedMessageID"
 						type="NonNegativeLong" minOccurs="0" maxOccurs="1">
 					</xsd:element>
+					<xsd:element name="isToLevel" type="xsd:boolean"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

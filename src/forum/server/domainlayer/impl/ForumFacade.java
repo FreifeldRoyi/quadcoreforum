@@ -3,6 +3,7 @@ package forum.server.domainlayer.impl;
 import java.util.Collection;
 import java.util.Set;
 
+import forum.server.domainlayer.SearchEngine;
 import forum.server.domainlayer.impl.interfaces.*;
 import forum.server.domainlayer.impl.message.NotPermittedException;
 
@@ -20,7 +21,7 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
  * 
  * @author Vitali Sepetnitsky 
  */
-public interface ForumFacade {
+public interface ForumFacade extends SearchEngine {
 
 	// User related methods:
 

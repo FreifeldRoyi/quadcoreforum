@@ -19,11 +19,21 @@ public class MessagesPersistenceHandler {
 
 	// Subject related methods
 
+	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
+		ForumType tForum = this.inOutUtil.unmarshalDatabase();
+		Collection<ForumSubject> toReturn = new Vector<ForumSubject>();
+		for (SubjectType tCurrentSubjectType : tForum.getSubjects())
+			if (tCurrentSubjectType.isIsToLevel())
+				toReturn.add(new ForumSubject(tCurrentSubjectType.getSubjectID(), 
+						tCurrentSubjectType.getName(), tCurrentSubjectType.getDescription(), tCurrentSubjectType.isIsToLevel()));
+		return toReturn;
+	}
+	
 	public ForumSubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		ForumType tForum = this.inOutUtil.unmarshalDatabase();
 		SubjectType tSubjectType = this.getSubjectByID(tForum, subjectID);		
 		ForumSubject toReturn = new ForumSubject(tSubjectType.getSubjectID(), 
-				tSubjectType.getName(), tSubjectType.getDescription());
+				tSubjectType.getName(), tSubjectType.getDescription(), tSubjectType.isIsToLevel());
 		return toReturn;
 	}
 
@@ -34,10 +44,10 @@ public class MessagesPersistenceHandler {
 		throw new SubjectNotFoundException(subjectID);
 	}
 
-	public void addNewSubject(long subjectID, String name, String description) throws DatabaseUpdateException {
+	public void addNewSubject(long subjectID, String name, String description, boolean isTopLevel) throws DatabaseUpdateException {
 		try {
 			ForumType tForum = this.inOutUtil.unmarshalDatabase();
-			SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, name, description);
+			SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, name, description, isTopLevel);
 			tForum.getSubjects().add(tNewSubject);
 			this.inOutUtil.marshalDatabase(tForum);
 		}
@@ -182,4 +192,6 @@ public class MessagesPersistenceHandler {
 			throw new DatabaseUpdateException();
 		}
 	}
+
+	
 }
