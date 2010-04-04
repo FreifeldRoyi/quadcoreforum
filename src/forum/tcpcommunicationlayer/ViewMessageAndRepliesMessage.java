@@ -3,8 +3,8 @@ package forum.tcpcommunicationlayer;
 import java.util.Collection;
 import java.util.Iterator;
 
-import forum.server.domainlayer.impl.ForumFacade;
-import forum.server.domainlayer.impl.interfaces.UIMessage;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.pipe.message.exceptions.MessageNotFoundException;
 

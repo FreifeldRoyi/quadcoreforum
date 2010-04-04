@@ -8,12 +8,9 @@ package forum.server.persistentlayer.pipe;
 
 import java.util.*;
 
-import forum.server.domainlayer.impl.message.ForumMessage;
-import forum.server.domainlayer.impl.message.ForumSubject;
-import forum.server.domainlayer.impl.message.ForumThread;
-import forum.server.domainlayer.impl.user.ForumMember;
-import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.ForumUser;
+import forum.server.domainlayer.user.*;
+import forum.server.domainlayer.message.*;
+
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
@@ -33,8 +30,11 @@ public interface PersistenceDataHandler {
 	 * 
 	 * @return
 	 * 		The first member id which is free in the database and isn't assigned to any member
+	 * 
+	 * @throws DatabaseRetrievalException 
+	 * 		In case the required data can't be retrieved due to a database connection error
 	 */
-	public long getFirstFreeMemberID();
+	public long getFirstFreeMemberID() throws DatabaseRetrievalException;
 	
 	/**
 	 * 
@@ -132,8 +132,11 @@ public interface PersistenceDataHandler {
 	 * 
 	 * @return
 	 * 		The first subject id which is free and not assigned to any subject in the database
-	 */
-	public long getFirstFreeSubjectID();
+	 * 
+	 * @throws DatabaseRetrievalException 
+	 * 		In case the required data can't be retrieved due to a database connection error
+s	 */
+	public long getFirstFreeSubjectID() throws DatabaseRetrievalException;
 
 	/**
 	 * 
@@ -187,8 +190,11 @@ public interface PersistenceDataHandler {
 	 * 
 	 * @return
 	 * 		The next thread id which is free and isn't assigned to any thread in the database
+	 * 
+	 * @throws DatabaseRetrievalException 
+	 * 		In case the required data can't be retrieved due to a database connection error
 	 */
-	public long getFirstFreeThreadID();
+	public long getFirstFreeThreadID() throws DatabaseRetrievalException;
 	
 	/**
 	 * Finds and returns a thread whose id equals to the given one
@@ -245,8 +251,11 @@ public interface PersistenceDataHandler {
 	 * 
 	 * @return
 	 * 		The first message id which is free and isn't assigned to any message in the database
+	 * 
+	 * @throws DatabaseRetrievalException 
+	 * 		In case the required data can't be retrieved due to a database connection error
 	 */
-	public long getFirstFreeMessageID();
+	public long getFirstFreeMessageID() throws DatabaseRetrievalException;
 
 	/**
 	 * Finds and returns a message whose id equals to the given one

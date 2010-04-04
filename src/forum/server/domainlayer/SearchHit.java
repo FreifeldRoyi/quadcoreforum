@@ -1,6 +1,6 @@
 package forum.server.domainlayer;
 
-import forum.server.domainlayer.impl.message.ForumMessage;
+import forum.server.domainlayer.message.ForumMessage;
 
 /**
  * A single search hit returned after a search operation.

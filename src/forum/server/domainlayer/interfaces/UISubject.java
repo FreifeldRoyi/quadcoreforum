@@ -1,4 +1,4 @@
-package forum.server.domainlayer.impl.interfaces;
+package forum.server.domainlayer.interfaces;
 
 /**
  * This interface is used to present the data of a ForumSubject object

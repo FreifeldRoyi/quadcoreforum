@@ -4,7 +4,7 @@ import java.util.*;
 
 import forum.server.persistentlayer.*;
 import forum.server.persistentlayer.pipe.*;
-import forum.server.domainlayer.impl.user.*;
+import forum.server.domainlayer.user.*;
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
 /**
@@ -16,6 +16,21 @@ import forum.server.persistentlayer.pipe.user.exceptions.*;
  * @author Sepetnitsky Vitali
  */
 public class UsersPersistenceHandler {
+
+	/**
+	 * @param data
+	 * 		The forum data from required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeMemberID()
+	 */
+	public long getFirstFreeMemberID(ForumType data) {
+		long toReturn = -1;
+		for (MemberType tCurrentMember : data.getMembers())
+			if (tCurrentMember.getUserID() > toReturn)
+				toReturn = tCurrentMember.getUserID();
+		return toReturn++;
+	}
 
 	/**
 	 * @param data

@@ -6,7 +6,7 @@
  * of storing the forum active guests in the repository
  */
 
-package forum.server.domainlayer.impl.user;
+package forum.server.domainlayer.user;
 
 import java.util.*;
 
@@ -39,6 +39,7 @@ public class UsersCache {
 	 */
 	public UsersCache() throws DatabaseRetrievalException {
 		this.pipe = PersistenceFactory.getPipe();
+		this.nextFreeGuestID = -1;
 		this.nextFreeMemberID = this.pipe.getFirstFreeMemberID();
 		this.idsToUsersMapping = new HashMap<Long, ForumUser>();
 	}

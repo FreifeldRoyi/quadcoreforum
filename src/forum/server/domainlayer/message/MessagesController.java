@@ -7,19 +7,18 @@
  * and present the forum pages (like getting content of subjects and threads by their id-s) 
  * and all other administrative methods of adding and deleting subjects, threads and messages.
  */
-package forum.server.domainlayer.impl.message ;
+package forum.server.domainlayer.message ;
 
 import java.util.*;
 
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.ForumDataHandler;
-import forum.server.domainlayer.impl.ForumFacade;
-import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.ForumUser;
+import forum.server.domainlayer.*;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.user.*;
+
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
-import forum.server.domainlayer.impl.interfaces.*;
 
 import forum.server.persistentlayer.pipe.message.exceptions.*;
 import forum.server.persistentlayer.pipe.user.exceptions.*;

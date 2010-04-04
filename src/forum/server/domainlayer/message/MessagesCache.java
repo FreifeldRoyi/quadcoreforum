@@ -5,7 +5,7 @@
  * In addition this class serves as a cache memory which holds a repository of loaded content of the forum database in order
  * to speed up the data access operations.
  */
-package forum.server.domainlayer.impl.message;
+package forum.server.domainlayer.message;
 
 import java.util.Collection;
 import java.util.HashMap;

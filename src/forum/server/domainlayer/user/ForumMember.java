@@ -1,11 +1,11 @@
 /**
  * This class represents a member of the forum (a registered user)
  */
-package forum.server.domainlayer.impl.user;
+package forum.server.domainlayer.user;
 
 import java.util.*;
 
-import forum.server.domainlayer.impl.interfaces.UIMember;
+import forum.server.domainlayer.interfaces.UIMember;
 
 /**
  * @author Freifeld Royi

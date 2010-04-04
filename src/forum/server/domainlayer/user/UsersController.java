@@ -3,17 +3,17 @@
  * users handling
  */
 
-package forum.server.domainlayer.impl.user ;
+package forum.server.domainlayer.user ;
 
 import java.util.*;
 
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.ForumDataHandler;
-import forum.server.domainlayer.impl.ForumFacade;
+import forum.server.domainlayer.ForumDataHandler;
+import forum.server.domainlayer.ForumFacade;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
-import forum.server.domainlayer.impl.interfaces.*;
+import forum.server.domainlayer.interfaces.*;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 

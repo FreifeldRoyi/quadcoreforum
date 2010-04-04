@@ -2,9 +2,9 @@
  * This exception occurs when a user which doesn't have a permission to perform an operation asks to perform
  * this operation 
  */
-package forum.server.domainlayer.impl.message;
+package forum.server.domainlayer.message;
 
-import forum.server.domainlayer.impl.user.Permission;
+import forum.server.domainlayer.user.Permission;
 
 /**
  * @author sepetnit

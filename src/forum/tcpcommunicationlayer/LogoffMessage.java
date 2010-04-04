@@ -1,6 +1,6 @@
 package forum.tcpcommunicationlayer;
 
-import forum.server.domainlayer.impl.ForumFacade;
+import forum.server.domainlayer.ForumFacade;
 import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
 
 /**

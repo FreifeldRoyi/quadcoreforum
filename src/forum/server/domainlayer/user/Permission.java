@@ -1,4 +1,4 @@
-package forum.server.domainlayer.impl.user;
+package forum.server.domainlayer.user;
 
 /**
  * This enumeration is responsible to declare the available permissions which determine what are the access 

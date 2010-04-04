@@ -6,10 +6,6 @@ import java.util.*;
 import java.util.logging.FileHandler;
 
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.MainForumLogic;
-
-import forum.server.domainlayer.impl.interfaces.UIMember;
-import forum.server.domainlayer.impl.interfaces.UIUser;
 import forum.tcpcommunicationlayer.*;
 
 /**

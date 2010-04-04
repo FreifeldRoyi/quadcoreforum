@@ -4,17 +4,14 @@
 package forum.server.persistentlayer.pipe.message.exceptions;
 
 /**
- * @author sepetnit
+ * @author Sepetnitsky Vitali
  *
  */
 public class ThreadNotFoundException extends Exception {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9183868442639991790L;
+	private static final long serialVersionUID = -6083962457516364040L;
 
 	public ThreadNotFoundException(long threadID) {
-		super("A thread with the thread id " + threadID + " wasn't found!");
+		super("A thread with the id " + threadID + " wasn't found!");
 	}
 }

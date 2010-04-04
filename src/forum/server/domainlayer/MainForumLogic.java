@@ -2,16 +2,17 @@
  * This class implements the ForumFacase interface by delegating its methods to the users
  * and messages controllers.
  */
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer;
 
 import java.util.*;
 
 import forum.server.domainlayer.SearchHit;
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.message.*;
-import forum.server.domainlayer.impl.user.*;
 
-import forum.server.domainlayer.impl.interfaces.*;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.message.*;
+import forum.server.domainlayer.user.*;
+
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 

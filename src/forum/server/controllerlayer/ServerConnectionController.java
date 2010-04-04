@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.MainForumLogic;
+import forum.server.domainlayer.MainForumLogic;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 

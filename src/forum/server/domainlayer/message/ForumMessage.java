@@ -1,11 +1,11 @@
-package forum.server.domainlayer.impl.message;
+package forum.server.domainlayer.message;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
-import forum.server.domainlayer.impl.interfaces.UIMessage;
+import forum.server.domainlayer.interfaces.UIMessage;
 
 public class ForumMessage implements UIMessage {
 	
