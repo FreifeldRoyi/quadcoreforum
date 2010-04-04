@@ -18,7 +18,7 @@ public class AddNewGuestMessage extends ClientMessage {
 		ServerResponse returnObj=new ServerResponse("", true); 
 		UIUser tNewGuest = forum.addGuest();
 		returnObj.setHasExecuted(true);
-		returnObj.setResponse(tNewGuest.getId() + "");
+		returnObj.setResponse(tNewGuest.getID() + "");
 		return returnObj;
 	}
 }

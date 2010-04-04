@@ -1,9 +1,15 @@
+/**
+ * This class is responsible for managing users authorization, login and registration methods, and all other operations related to
+ * users handling
+ */
+
 package forum.server.domainlayer.impl.user ;
 
 import java.util.*;
 
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.ForumDataHandler;
+import forum.server.domainlayer.impl.ForumFacade;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
@@ -11,16 +17,14 @@ import forum.server.domainlayer.impl.interfaces.*;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
-/**
- * The Class UserController is responsible for managing users authorization. Also responsible for login and
- * registration.
- */
 public class UsersController {
+	// the handler through which the class accesses the cache instances through which the operations
+	// of persistence are performed
 	private ForumDataHandler dataHandler;
-	
-	private long activeGuestsCounter;
-	private Set<String> activeMembersUsernames;
-	
+	// the current number of guests connected to the forum
+	private long guestsCounter;
+	// stores a set of all the user-names of members currently connected to the forum
+	private Collection<String> activeMembersUserNames;
 	
 	/**
 	 * The class constructor.
@@ -29,91 +33,35 @@ public class UsersController {
 	 */
 	public UsersController(ForumDataHandler dataHandler) {
 		this.dataHandler = dataHandler;
-		this.activeMembersUsernames = new HashSet<String>();
-	}
-	
-	public long registerNewMember(final String username, final String password, final String lastName,
-			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException {
-		SystemLogger.info("A User requests to register with username " + username);
-		final Set<Permission> tPermissions = this.getDefaultMemberPermissions();
-		final String tEncryptedPassword = this.encryptOrDecryptPassword(password);
-		final Member newMember = this.dataHandler.getUsersCache().createNewMember(username, tEncryptedPassword, lastName, 
-				firstName, email, tPermissions);
-		SystemLogger.info("New member with username " + username + " has successfuly been registered");
-		return newMember.getId();
+		this.guestsCounter = 0;
+		this.activeMembersUserNames = new HashSet<String>();
 	}
 
-	private String encryptOrDecryptPassword(final String password) {
-		return PasswordEnDecryptor.encryptMD5(password);
-	}
-	
-	/**
-	 * 
-	 * @param enteredPassword
-	 * @param realPassword
-	 * 
-	 * @inv 
-	 * 		enteredPassword != null && realPassword != null
-	 * @return
-	 */
-	private boolean checkPasswordValidity(final String enteredPassword, final String realPassword) {
-		return realPassword.equals(this.encryptOrDecryptPassword(enteredPassword));
-	}
-
-	public UIMember login(final String username, final String password) throws NotRegisteredException, 
-	WrongPasswordException, DatabaseRetrievalException {
-		SystemLogger.fine("A member with username " + username + " tries to log-in");
-		final Member tMemberToLogIn = this.dataHandler.getUsersCache().getMemberByUsername(username);
-		if (tMemberToLogIn == null) {
-			SystemLogger.fine("A member with username " + username + " doesn't exist, can't log-in");
-			throw new NotRegisteredException(username);
-		}
-		if (!this.checkPasswordValidity(password, tMemberToLogIn.getPassword())) {
-			SystemLogger.fine("Can't log-in a member with username " + username + " because a wrong password was given");
-			throw new WrongPasswordException();
-		}
-		this.addActiveMemberUsername(username);
-		return tMemberToLogIn;
-	}
-
-	public void logout(final String username) throws NotConnectedException {
-		SystemLogger.fine("A user with username " + username + " requests to log-out the forum");
-		if (this.activeMembersUsernames.contains(username))
-			this.removeActiveMemberUsername(username);
-		else throw new NotConnectedException(username);		
-	}
-
-	
-	public long getMemberIdByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException {
-		Member tMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
-		if (tMember == null)
-			throw new NotRegisteredException(username);
-		else
-			return tMember.getId();
-	}
-	
-	private void removeActiveMemberUsername(String usernameToRemove) {
-		this.activeMembersUsernames.remove(usernameToRemove);
-	}
-	
-	private void addActiveMemberUsername(String usernameToAdd) {
-		this.activeMembersUsernames.add(usernameToAdd);
-	}
-	
-	public Set<String> getActiveMemberNames() {
-		return this.activeMembersUsernames;
-	}
-	
 	// Guest related methods
-	
+
+	/**
+	 * @see
+	 * 		ForumFacade#getActiveGuestsNumber()
+	 */
+	public long getActiveGuestsNumber() {
+		return this.guestsCounter;
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#addGuest()
+	 */
 	public UIUser addGuest() {
 		SystemLogger.fine("A new guest has connected to the forum");
 		this.incActiveGuestsCounter();
-		System.out.println(this.activeGuestsCounter + " sa");
 		final Set<Permission> permissions = this.getDefaultGuestPermissions();
 		return this.dataHandler.getUsersCache().createNewGuest(permissions);
 	}
 	
+	/**
+	 * @see
+	 * 		ForumFacade#removeGuest(long)
+	 */
 	public void removeGuest(final long guestId) {
 		SystemLogger.fine("The guest with id " + guestId + " tries to exit from the forum.");
 		try {
@@ -126,18 +74,142 @@ public class UsersController {
 		}
 	}
 
+	/**
+	 * Increases the counter of the guests currently connected to the forum
+	 */
 	private void incActiveGuestsCounter() {
-		this.activeGuestsCounter++;
+		this.guestsCounter++;
 	}
 
+	/**
+	 * Decreases the counter of guests currently connected to the forum
+	 */
 	private void decActiveGuestsCounter() {
-		this.activeGuestsCounter--;
+		this.guestsCounter--;
+	}
+
+	// User related methods
+
+	/**
+	 * 
+	 * @return
+	 * 		A collection of all the user-name of members which are currently active
+	 * 		(logged-in to the forum)
+	 */
+	public Collection<String> getActiveMemberNames() {
+		return this.activeMembersUserNames;
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#getMemberIdByUsername(String)
+	 */
+	public long getMemberIdByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumMember tMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
+		if (tMember == null)
+			throw new NotRegisteredException(username);
+		else
+			return tMember.getID();
+	}
+
+	/**
+	 * @see	ForumFacade#registerNewMember(String, String, String, String, String)
+	 */
+	public long registerNewMember(final String username, final String password, final String lastName,
+			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException {
+		SystemLogger.info("A User requests to register with username " + username);
+		final Set<Permission> tPermissions = this.getDefaultMemberPermissions();
+		final String tEncryptedPassword = this.encryptPassword(password);
+		final ForumMember newMember = this.dataHandler.getUsersCache().createNewMember(username, tEncryptedPassword, lastName, 
+				firstName, email, tPermissions);
+		SystemLogger.info("New member with username " + username + " has successfuly been registered");
+		return newMember.getID();
+	}
+
+	/**
+	 * 
+	 * Encrypts the given password in order to check its validity against the stored one
+	 * 
+	 * @param password
+	 * 		The password which should be encrypted
+	 * @return
+	 * 		The encrypted password
+	 */
+	private String encryptPassword(final String password) {
+		return PasswordEncryptor.encryptMD5(password);
 	}
 	
-	public long getActiveGuestsNumber() {
-		return this.activeGuestsCounter;
+	/**
+	 * 
+	 * Encrypts the entered password according to a chosen encryption algorithm and checks
+	 * whether the encrypted password is valid, against the given real password 
+	 * 
+	 * @param enteredPassword
+	 * 		The password which was entered by the user
+	 * @param realPassword
+	 * 		The real password to which the entered password is compared
+	 * @inv 
+	 * 		enteredPassword != null && realPassword != null
+	 * 
+	 * @return
+	 * 		True if the entered password is valid and false otherwise
+	 */
+	private boolean checkPasswordValidity(final String enteredPassword, final String realPassword) {
+		return realPassword.equals(this.encryptPassword(enteredPassword));
 	}
-	
+
+	/**
+	 * Adds a new user-name of a member who has been logged-in to the forum
+	 *  
+	 * @param usernameToAdd
+	 * 		The user-name of the member which should be added to the active members collection
+	 */
+	private void addActiveMemberUsername(String usernameToAdd) {
+		this.activeMembersUserNames.add(usernameToAdd);
+	}
+
+	/**
+	 * Removes a user-name of a member who has been logged-out from the forum
+	 * 
+	 * @param usernameToRemove
+	 * 		The user-name of the member which should be removed from the active
+	 * 		members collection
+	 */
+	private void removeActiveMemberUsername(String usernameToRemove) {
+		this.activeMembersUserNames.remove(usernameToRemove);
+	}	
+
+	/**
+	 * @see
+	 * 		ForumFacade#login(String, String)
+	 */
+	public UIMember login(final String username, final String password) throws NotRegisteredException, 
+	WrongPasswordException, DatabaseRetrievalException {
+		SystemLogger.fine("A member with username " + username + " tries to log-in");
+		final ForumMember tMemberToLogIn = this.dataHandler.getUsersCache().getMemberByUsername(username);
+		if (tMemberToLogIn == null) {
+			SystemLogger.fine("A member with username " + username + " doesn't exist, can't log-in");
+			throw new NotRegisteredException(username);
+		}
+		if (!this.checkPasswordValidity(password, tMemberToLogIn.getPassword())) {
+			SystemLogger.fine("Can't log-in a member with username " + username + " because a wrong password was given");
+			throw new WrongPasswordException();
+		}
+		this.addActiveMemberUsername(username);
+		return tMemberToLogIn;
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#logout(String)
+	 */
+	public void logout(final String username) throws NotConnectedException {
+		SystemLogger.fine("A user with username " + username + " requests to log-out the forum");
+		if (this.activeMembersUserNames.contains(username))
+			this.removeActiveMemberUsername(username);
+		else throw new NotConnectedException(username);		
+	}
+
 	// Default permissions methods
 	
 	/**

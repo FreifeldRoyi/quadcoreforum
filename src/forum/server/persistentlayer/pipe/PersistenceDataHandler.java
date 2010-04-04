@@ -1,5 +1,6 @@
 /**
- * 
+ * This interface is the main interface of the persistent layer, it contains all the methods which are used by the
+ * upper layers in order to update the forum database
  */
 
 package forum.server.persistentlayer.pipe;
@@ -10,9 +11,9 @@ import java.util.*;
 import forum.server.domainlayer.impl.message.ForumMessage;
 import forum.server.domainlayer.impl.message.ForumSubject;
 import forum.server.domainlayer.impl.message.ForumThread;
-import forum.server.domainlayer.impl.user.Member;
+import forum.server.domainlayer.impl.user.ForumMember;
 import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.User;
+import forum.server.domainlayer.impl.user.ForumUser;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
@@ -24,31 +25,144 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
  * @author Vitali Sepetnitsky
  *
  */
-public interface PersistenceDataHandler
-{
+public interface PersistenceDataHandler {
+	
+	// User related methods
+
+	/**
+	 * 
+	 * @return
+	 * 		The first member id which is free in the database and isn't assigned to any member
+	 */
+	public long getFirstFreeMemberID();
+	
+	/**
+	 * 
+	 * @return
+	 * 		A collection of all the forum members
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public Collection<ForumMember> getAllMembers() throws DatabaseRetrievalException;
+
+	/**
+	 * Finds and returns a member whose id equals to the given one
+	 * 
+	 * The returned member is returned in a format which allows to retrieve his permissions only since this
+	 * method is used to check whether the member with the given id, has some permissions
+	 * 
+	 * @param id
+	 * 		The id of the member which should be returned
+	 * 
+	 * @return
+	 * 		The found member in a format which allows to get his permissions only
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a member with the given id isn't registered in the forum (doesn't exist in the database)
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public ForumUser getUserByID(final long id) throws NotRegisteredException, DatabaseRetrievalException;
+
+	/**
+	 * Finds and returns a member whose user-name is equal to the given one
+	 * 
+	 * (The user-names of the forum members should be unique)
+	 * 
+	 * @param username
+	 * 		The user-name of the required member
+	 * 
+	 * @return
+	 * 		The found member
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a member with the given user-name isn't registered in the forum (doesn't exist in the database)
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public ForumMember getMemberByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException;
+
+	/**
+	 * Finds and returns a member whose e-mail is equal to the given one
+	 * 
+	 * (The e-mails of the forum members should be unique)
+	 * 
+	 * @param email
+	 * 		The e-mail of the required member
+	 * 
+	 * @return
+	 * 		The found member
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a member with the given e-mail isn't registered in the forum (doesn't exist in the database)
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public ForumMember getMemberByEmail(final String email) throws NotRegisteredException, DatabaseRetrievalException;
+
 	/**
 	 * This method updates the database with a new registered user
 	 * 
+	 * @param id
+	 * 		The id of the new member
 	 * @param username
-	 * 		The given username
+	 * 		The user-name of the new member
 	 * @param password
-	 * 		The given password
+	 * 		The password of the new member
 	 * @param lastName
-	 * 		The given lastName
+	 * 		The lastName of the new member
 	 * @param firstName
-	 * 		The given firstName
+	 * 		The firstName of the new member
 	 * @param email
-	 * 		The given e-mail
+	 * 		The e-mail of the new member
+	 * @param permissions
+	 * 		The permissions set of the new member
 	 * 
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-//	public void registerToForum(String username, String password, String lastName, String firstName,
-//			String email) throws DatabaseUpdateException;
+	public void addNewMember(final long id, final String username, final String password,
+			final String lastName, final String firstName, final String email, 
+			final Collection<Permission> permissions) throws DatabaseUpdateException;	
 
+	// Subject related methods
 
 	/**
-	 * This method updates the database with a new subject which is added to the top level
+	 * 
+	 * @return
+	 * 		The first subject id which is free and not assigned to any subject in the database
+	 */
+	public long getFirstFreeSubjectID();
+
+	/**
+	 * 
+	 * @return
+	 * 		A collection of the top-level (root) subjects of the forum
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException;
+
+	/**
+	 * Finds and returns a subject whose id equals to the given one
+	 * 
+	 * @param subjectID
+	 * 		The id of the subject which should be returned
+	 * 
+	 * @return
+	 * 		The found subject
+	 * 
+	 * @throws SubjectNotFoundException
+	 * 		In case a subject with the given id hasb't been found in the database
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
+	public ForumSubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException;
+
+	/**
+	 * This method updates the database with a new subject
      *
      * @param subjectID
      * 		A unique id of the new subject 
@@ -56,136 +170,12 @@ public interface PersistenceDataHandler
 	 * 		The name of the new subject
 	 * @param subjectDescription
 	 * 		The description of the new subject
-	 * 		
-	 * @throws SubjectAlreadyExistsException
-	 * 		If there already exists a subject with the given name in the top level of the forum
+	 * @param isTopLevel
+	 * 		Whether the new subject is a top-level one or it is a sub-subject of an existing subject
+	 * 
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	//public void addNewSubject(long subjectID, String subjectName, String subjectDescription) throws SubjectAlreadyExistsException,
-	//DatabaseUpdateException;
-
-	
-	/**
-	 * This method updates the database with a new sub-subject of a given ancestor subject
-
-	 * @param father
-	 * 		The name of the ancestor subject
-	 * @param subjectName
-	 * 		The name of the new subject
-	 * @param subjectDescription
-	 * 		The description of the new subject
-	 * 		
-	 * @throws SubjectAlreadyExistsException
-	 * 		If the root subject already has a sub-subject with the given name
-	 * @throws SubjectNotFoundException
-	 * 		In case the new subject should be a sub-subject of a non existing one
-	 * @throws DatabaseUpdateException
-	 * 		In case there is a problem with the database updating
-	 * 
-	 */
-	//public void addNewSubSubject(long fatherID, long subjectID, String subjectName, String subjectDescription)
-	//throws SubjectAlreadyExistsException, SubjectNotFoundException, DatabaseUpdateException;	
-	
-	/**
-	 * Adds a new message, by openning a new messages thread within a given subject, and updates the database with the given message
-	 * 
-	 * @param messageID
-	 * 		A unique id of the new message
-	 * @param subjectName
-	 * 		The given subject
-	 * @param authorUsername
-	 * 		The username of the message author
-	 * @param msgTitle
-	 * 		The title of the message
-	 * @throws NotRegisteredException
-	 * 		In case the author isn't one of the registered users
-	 * @throws NotConnectedException 
-	 * 		In case the author is a registered forum user, but he isn't connected now and therefore can't
-	 * 		post messages in the forum
-	 * @throws SubjectNotFoundException
-	 * 		In case the given subject name is invalid
-	 * @throws DatabaseUpdateException
-	 * 		In case there is a problem with the database update
-	 */
-	//public void addNewMessage(long messageID, long subjectID, String authorUsername, String msgTitle) 
-	//throws DatabaseUpdateException;
-
-	/**
-	 * Adds a reply to an existing message which is identificated by the given id
-	 * 
-	 * @param fatherID
-	 * 		The created message will be a reply to a message with this id
-	 * @param messageID
-	 * 		A unique ID of the created message
-	 * @param authorUsername
-	 * 		The reply author
-	 * @param replyTitle
-	 * 		The title of the reply message
-	 * @param replyContent
-	 * 		The content of the reply message
-	 * 
-	 * @throws MessageNotFoundException
-	 * 		In case the given message id which is supposed to be the reply father, wasn't found
-	 * @throws NotRegisteredException
-	 * 		In case the author isn't one of the registered users
-	 * @throws DatabaseUpdateException
-	 * 		In case there is a problem with the database update
-	 */
-	//public void replyToMessage(long fatherID, long messageID, String authorUsername, String replyTitle, String replyContent) 
-	//throws MessageNotFoundException, DatabaseUpdateException;
-
-	/**
-	 * Updates the title and the content of a specific message (the message is identified by the given id) 
-	 * to be the given one
-	 * 
-	 * @param messageID
-	 * 		The ID of the message
-	 * @param newTitle
-	 * 		The updated title of the message
-	 * @param newContent
-	 * 		The updated content of the message
-	 * @throws DatabaseRetrievalException 
-	 * 
-	 * @throws MessageNotFoundException
-	 * 		In case the message which should be updated wasn't found
-	 * @throws DatabaseUpdateException
-	 * 		In case there is a problem with the database update
-	 */
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-	// User related methods
-	
-	public Collection<Member> getAllMembers() throws DatabaseRetrievalException;
-
-	public User getMemberByID(final long id) throws NotRegisteredException, DatabaseRetrievalException;
-	
-	public Member getMemberByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException;
-
-	public Member getMemberByEmail(final String email) throws NotRegisteredException, DatabaseRetrievalException;
-
-	public void addNewMember(final long id, final String username, final String password,
-			final String lastName, final String firstName, final String email, 
-			final Collection<Permission> permissions) throws DatabaseUpdateException;	
-
-	// Subject related methods
-
-	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException;
-
-	public ForumSubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException;
-
 	public void addNewSubject(final long subjectID, final String name, final String description, boolean isTopLevel) throws DatabaseUpdateException;
 
 	public void updateSubject(final long id, final Collection<Long> subSubjects,
@@ -193,23 +183,138 @@ public interface PersistenceDataHandler
 
 	// Thread related methods
 
+	/**
+	 * 
+	 * @return
+	 * 		The next thread id which is free and isn't assigned to any thread in the database
+	 */
+	public long getFirstFreeThreadID();
+	
+	/**
+	 * Finds and returns a thread whose id equals to the given one
+	 * 
+	 * @param threadID
+	 * 		The id of the thread which should be returned
+	 * 
+	 * @return
+	 * 		The found thread
+	 * 
+	 * @throws ThreadNotFoundException
+	 * 		In case a thread with the given id hasb't been found in the database
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
 	public ForumThread getThreadByID(final long threadID) throws ThreadNotFoundException, DatabaseRetrievalException;
 
+	/**
+	 * Opens a new messages thread with a given root message
+	 * 
+	 * @param threadID
+	 * 		The id of the new thread
+	 * @param topic
+	 * 		The topic of the new thread
+	 * @param rootID
+	 * 		A id of the thread's root message
+	 *
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
 	public void openNewThread(final long threadID, final String topic, final long rootID) throws DatabaseUpdateException;
 
+	/**
+	 * Deletes a thread whose id equals to the given one, from the database
+	 * 
+	 * @param threadID
+	 * 		The id of the thread which should be removed from the database
+	 * 
+	 * @return
+	 * 		A collection of all the messages ids which has been deleted as a consequences of the thread removal,
+	 * 		these messages are the thread's root message and its replies (recursively)
+	 * 
+	 * @throws ThreadNotFoundException
+	 * 		In case a thread with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException,
 	DatabaseUpdateException;
 	
 	// Message related methods	
 
+	/**
+	 * 
+	 * @return
+	 * 		The first message id which is free and isn't assigned to any message in the database
+	 */
+	public long getFirstFreeMessageID();
+
+	/**
+	 * Finds and returns a message whose id equals to the given one
+	 * 
+	 * @param messageID
+	 * 		The id of the message which should be returned
+	 * 
+	 * @return
+	 * 		The found message
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case a message with the given id hasb't been found in the database
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */
 	public ForumMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException;
 
+	/**
+	 * 
+	 * Adds a new message to the forum
+	 * 
+	 * @param messageID
+	 * 		A unique id of the message
+	 * @param userID
+	 * 		The id of the message author
+	 * @param title
+	 * 		The title of the message
+	 * @param content
+	 * 		The content of the message
+	 * 
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
 	public void addNewMessage(final long messageID, final long userID, final String title,
 			final String content) throws DatabaseUpdateException;
-	
+
+	/**
+	 * Updates the title and the content of a specific message to be the given one
+	 * 
+	 * @param messageID
+	 * 		The ID of the message
+	 * @param newTitle
+	 * 		The updated title of the message
+	 * @param newContent
+	 * 		The updated content of the message
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case the message which should be updated wasn't found
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
 	public void updateMessage(final long messageID, final String newTitle, final String newContent) throws MessageNotFoundException, 
 	DatabaseUpdateException;
 
+	/**
+	 * Deletes a message whose id equals to the given one, from the database
+	 * 
+	 * @param messageID
+	 * 		The id of the message which should be removed from the database
+	 * 
+	 * @return
+	 * 		A collection of all the messages ids which has been deleted as a consequences of this message removal,
+	 * 		these messages are all the message replies (recursively)
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case a message with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
 	public Collection<Long> deleteAMessage(final long messageID) throws MessageNotFoundException, DatabaseUpdateException;
-
 }

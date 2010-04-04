@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.MainForumLogic;
+import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
 /**
@@ -16,7 +17,7 @@ import forum.server.persistentlayer.DatabaseUpdateException;
 public class ServerConnectionController extends Thread {	
 	public void run() {
 		short port = 1234;
-		
+
 		try {
 			ServerSocket tServerSocket = new ServerSocket(port);
 			SystemLogger.info("Server has started running on port " + port + ".");
@@ -26,21 +27,26 @@ public class ServerConnectionController extends Thread {
 				SystemLogger.info("A connection was accepted from: " + tSocket.getInetAddress() + ".");
 				ServerSingleConnectionController.startConnection(tSocket);
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			e.printStackTrace();
 			SystemLogger.severe("An error has occurred in the server (IOException).");
-		} catch (DatabaseUpdateException e) {
+		} 
+		catch (DatabaseRetrievalException e) {
+			SystemLogger.severe("An error has occurred in the server (DatabaseRetrievalException).");	
+		}
+		catch (DatabaseUpdateException e) {
 			SystemLogger.severe("An error has occurred in the server (DatabaseUpdateException).");	
 		}
 		SystemLogger.info("Server has closed.");
 	}
-	
+
 	/**
 	 * @param
 	 * 		args
 	 */
 	public static void main(String[] args) {		
-		
+
 		Thread tThread = new ServerConnectionController();
 		/* Start the thread */
 		tThread.start();

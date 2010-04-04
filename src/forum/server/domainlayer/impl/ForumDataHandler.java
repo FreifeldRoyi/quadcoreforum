@@ -1,5 +1,8 @@
 /**
+ * This class is connected to the persistent layer through the two caches - users and messages cache.
  * 
+ * The class is responsible of initializing of the connection to the database and contains getters to the
+ * cache memories of the forum through which database related operations are performed
  */
 package forum.server.domainlayer.impl;
 
@@ -9,32 +12,49 @@ import java.util.Set;
 
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.message.MessagesCache;
-import forum.server.domainlayer.impl.user.Member;
-import forum.server.domainlayer.impl.user.PasswordEnDecryptor;
+import forum.server.domainlayer.impl.user.ForumMember;
+import forum.server.domainlayer.impl.user.PasswordEncryptor;
 import forum.server.domainlayer.impl.user.Permission;
 import forum.server.domainlayer.impl.user.UsersCache;
+import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
 
 /**
- * @author sepetnit
+ * @author Vitali Sepetnitsky
  *
  */
 public class ForumDataHandler {
-	private static String ADMIN_INIITIAL_USERNAME = "admin";
-	private static String ADMIN_ENCRYPTED_PASSWORD = PasswordEnDecryptor.encryptMD5("1234");
-	private static Set<Permission> ADMIN_PERMISSIONS = new HashSet<Permission>(); 
+	// the initial user-name of the forum administrator which will be given it when the forum is initialized 
+	private static final String ADMIN_INIITIAL_USERNAME = "admin";
+	private static final String ADMIN_ENCRYPTED_PASSWORD = PasswordEncryptor.encryptMD5("1234");
+	private static final String ADMIN_EMAIL = "qcforuminfo@gmail.com";
+	private static final Set<Permission> ADMIN_PERMISSIONS = new HashSet<Permission>();
 	
-	static { // initializes admin permissions
+	static { // initializes administrator permissions
 		ForumDataHandler.ADMIN_PERMISSIONS.addAll(Arrays.asList(Permission.values()));
 	}	
 	
+	// this cache is responsible of handling the users connected to the forum
 	private final UsersCache usersCache;
+	// this cache is responsible if handling the forum subjects, threads and messages
 	private final MessagesCache messagesCache;
 	
-	private Member admin;
+	// the forum administrator
+	private ForumMember admin;
 	
-	public ForumDataHandler() throws DatabaseUpdateException {
+	/**
+	 * The class constructor.
+	 * 
+	 * Initializes the caches which are connected to the database through the persistent layer.
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case a connection with the forum database can't be established
+	 * @throws DatabaseUpdateException
+	 * 		In case a connection error with the database has occurred while trying to update it with the new admin
+	 * 		details
+	 */
+	public ForumDataHandler() throws DatabaseRetrievalException, DatabaseUpdateException {
 		SystemLogger.info("Initializes cache memories");
 		this.usersCache = new UsersCache();
 		this.messagesCache = new MessagesCache();
@@ -42,13 +62,20 @@ public class ForumDataHandler {
 		this.initializeAdmin();
 	}
 	
+	/**
+	 * Initializes the forum administrator details to the initial details.
+	 * 
+	 * @throws DatabaseUpdateException
+	 * 		In case a connection error to the database has occurred while trying to update it with the new admin
+	 * 		details
+	 */
 	private void initializeAdmin() throws DatabaseUpdateException {
 		SystemLogger.info("Building initial administrator");
 		try {
 			this.admin = this.getUsersCache().createNewMember(ForumDataHandler.ADMIN_INIITIAL_USERNAME, 
 					ForumDataHandler.ADMIN_ENCRYPTED_PASSWORD, ForumDataHandler.ADMIN_INIITIAL_USERNAME,
 					ForumDataHandler.ADMIN_INIITIAL_USERNAME,
-					"admin@admin",
+					ForumDataHandler.ADMIN_EMAIL,
 					ForumDataHandler.ADMIN_PERMISSIONS);
 		}
 		catch (MemberAlreadyExistsException e) {
@@ -56,10 +83,22 @@ public class ForumDataHandler {
 		}
 	}	
 	
+	/**
+	 * 
+	 * @return
+	 * 		The cache memory which handles the database operations of the forum
+	 * 		users, through the persistent layer
+	 */
 	public UsersCache getUsersCache() {
 		return this.usersCache;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * 		The cache memory which handles the database operation of the forum 
+	 * 		content (subjects, messages and threads) through the persistent layer
+	 */
 	public MessagesCache getMessagesCache() {
 		return this.messagesCache;
 	}
