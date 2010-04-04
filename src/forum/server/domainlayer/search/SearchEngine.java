@@ -1,4 +1,4 @@
-package forum.server.domainlayer;
+package forum.server.domainlayer.search;
 
 import forum.server.domainlayer.message.ForumMessage;
 
