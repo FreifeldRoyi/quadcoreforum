@@ -1,8 +1,7 @@
 package forum.tcpcommunicationlayer;
 
-import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.ForumFacade;
-import forum.server.domainlayer.impl.interfaces.UIMember;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIMember;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;

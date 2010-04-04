@@ -4,11 +4,11 @@
  * The class is a base class of the forum member, its purpose is to handle a set of the user's permission
  * of operation he is allowed to perform
  */
-package forum.server.domainlayer.impl.user;
+package forum.server.domainlayer.user;
 
 import java.util.*;
 
-import forum.server.domainlayer.impl.interfaces.UIUser;
+import forum.server.domainlayer.interfaces.UIUser;
 
 /**
  * @author Vitali Sepetnitsky

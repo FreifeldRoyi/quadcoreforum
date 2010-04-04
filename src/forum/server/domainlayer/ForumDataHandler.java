@@ -4,18 +4,15 @@
  * The class is responsible of initializing of the connection to the database and contains getters to the
  * cache memories of the forum through which database related operations are performed
  */
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.impl.message.MessagesCache;
-import forum.server.domainlayer.impl.user.ForumMember;
-import forum.server.domainlayer.impl.user.PasswordEncryptor;
-import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.UsersCache;
+import forum.server.domainlayer.message.*;
+import forum.server.domainlayer.user.*;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;

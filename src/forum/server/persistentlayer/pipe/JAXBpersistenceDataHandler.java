@@ -16,12 +16,8 @@ import org.xml.sax.SAXException;
 
 import forum.server.Settings;
 
-import forum.server.domainlayer.impl.message.ForumMessage;
-import forum.server.domainlayer.impl.message.ForumSubject;
-import forum.server.domainlayer.impl.message.ForumThread;
-import forum.server.domainlayer.impl.user.ForumMember;
-import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.ForumUser;
+import forum.server.domainlayer.message.*;
+import forum.server.domainlayer.user.*;
 import forum.server.persistentlayer.*;
 
 import forum.server.persistentlayer.pipe.user.*;
@@ -165,9 +161,9 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#getFirstFreeMessageID()
 	 */
 
-	public long getFirstFreeMemberID() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getFirstFreeMemberID() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.usersHandler.getFirstFreeMemberID(tForum);
 	}
 
 	/**
@@ -229,9 +225,9 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeSubjectID()
 	 */
-	public long getFirstFreeSubjectID() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getFirstFreeSubjectID() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getFirstFreeSubjectID(tForum);
 	}
 
 	/**
@@ -290,9 +286,9 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeThreadID()
 	 */
-	public long getFirstFreeThreadID() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getFirstFreeThreadID() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getFirstFreeThreadID(tForum);
 	}
 
 	/**
@@ -341,9 +337,9 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeMessageID()
 	 */
-	public long getFirstFreeMessageID() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getFirstFreeMessageID() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getFirstFreeMessageID(tForum);
 	}
 
 	/**

@@ -1,9 +1,9 @@
-package forum.server.domainlayer.impl;
+package forum.server.domainlayer;
 
 import java.util.Collection;
 import forum.server.domainlayer.SearchEngine;
-import forum.server.domainlayer.impl.interfaces.*;
-import forum.server.domainlayer.impl.message.NotPermittedException;
+import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.message.NotPermittedException;
 
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;

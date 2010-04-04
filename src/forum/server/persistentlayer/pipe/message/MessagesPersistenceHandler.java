@@ -6,7 +6,7 @@ import java.util.Vector;
 import forum.server.persistentlayer.*;
 import forum.server.persistentlayer.pipe.*;
 import forum.server.persistentlayer.pipe.message.exceptions.*;
-import forum.server.domainlayer.impl.message.*;
+import forum.server.domainlayer.message.*;
 
 /**
  * This class is responsible of performing the operations of reading from and writing to the database
@@ -21,6 +21,22 @@ import forum.server.domainlayer.impl.message.*;
 
 public class MessagesPersistenceHandler {
 
+	// subject related methods
+	
+	/**
+	 * @param data
+	 * 		The forum data from required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeSubjectID()
+	 */
+	public long getFirstFreeSubjectID(ForumType forum) {
+		long toReturn = -1;
+		for (SubjectType tCurrentSubject : forum.getSubjects())
+			if (tCurrentSubject.getSubjectID() > toReturn)
+				toReturn = tCurrentSubject.getSubjectID();
+		return toReturn++;
+	}
 
 	/**
 	 * @param data
@@ -106,6 +122,21 @@ public class MessagesPersistenceHandler {
 
 	/**
 	 * @param data
+	 * 		The forum data from required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeThreadID()
+	 */
+	public long getFirstFreeThreadID(ForumType forum) {
+		long toReturn = -1;
+		for (ThreadType tCurrentThread : forum.getThreads())
+			if (tCurrentThread.getThreadID() > toReturn)
+				toReturn = tCurrentThread.getThreadID();
+		return toReturn++;
+	}
+
+	/**
+	 * @param data
 	 * 		The forum data from which the required thread should be retrieved
 	 * 
 	 * @see
@@ -170,6 +201,21 @@ public class MessagesPersistenceHandler {
 	}
 
 	// Message related methods
+
+	/**
+	 * @param data
+	 * 		The forum data from required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeMessageID()
+	 */
+	public long getFirstFreeMessageID(ForumType forum) {
+		long toReturn = -1;
+		for (MessageType tCurrentMessage : forum.getMessages())
+			if (tCurrentMessage.getMessageID() > toReturn)
+				toReturn = tCurrentMessage.getMessageID();
+		return toReturn++;
+	}
 
 	/**
 	 * @param data

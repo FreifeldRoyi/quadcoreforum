@@ -1,7 +1,7 @@
 package forum.tcpcommunicationlayer;
 
-import forum.server.domainlayer.impl.ForumFacade;
-import forum.server.domainlayer.impl.interfaces.UIUser;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIUser;
 
 public class AddNewGuestMessage extends ClientMessage {
 

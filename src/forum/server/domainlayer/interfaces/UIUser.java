@@ -1,6 +1,6 @@
-package forum.server.domainlayer.impl.interfaces;
+package forum.server.domainlayer.interfaces;
 
-import forum.server.domainlayer.impl.user.Permission;
+import forum.server.domainlayer.user.Permission;
 
 /**
  * This interface is used to present the data of a ForumUser object

@@ -7,8 +7,8 @@ package forum.server.persistentlayer.pipe;
 
 import java.util.*;
 
-import forum.server.domainlayer.impl.message.*;
-import forum.server.domainlayer.impl.user.*;
+import forum.server.domainlayer.user.*;
+import forum.server.domainlayer.message.*;
 
 import forum.server.persistentlayer.*;
 
@@ -88,8 +88,6 @@ public class PersistentToDomainConverter {
 				toConvert.getTopic(), toConvert.getStartMessageID());
 	}
 
-	
-	
 	/**
 	 * Converts a {@link MessageType} object to a {@link ForumMessage} object
 	 * 

@@ -12,7 +12,7 @@ import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import forum.server.domainlayer.impl.user.Permission;
+import forum.server.domainlayer.user.Permission;
 
 /**
  * @author Sepetnitsky Vitali

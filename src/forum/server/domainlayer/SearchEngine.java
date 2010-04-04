@@ -1,6 +1,6 @@
 package forum.server.domainlayer;
 
-import forum.server.domainlayer.impl.message.ForumMessage;
+import forum.server.domainlayer.message.ForumMessage;
 
 /**
  * @author Tomer Heber

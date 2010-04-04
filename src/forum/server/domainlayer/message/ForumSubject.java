@@ -1,11 +1,11 @@
 /**
  * Represents a subject (or directory) in the forum 
  */
-package forum.server.domainlayer.impl.message;
+package forum.server.domainlayer.message;
 
 import java.util.*;
 
-import forum.server.domainlayer.impl.interfaces.UISubject;
+import forum.server.domainlayer.interfaces.UISubject;
 
 public class ForumSubject implements UISubject {
 	

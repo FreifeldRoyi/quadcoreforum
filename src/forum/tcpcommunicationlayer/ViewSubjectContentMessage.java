@@ -3,9 +3,9 @@ package forum.tcpcommunicationlayer;
 import java.util.Collection;
 import java.util.Iterator;
 
-import forum.server.domainlayer.impl.ForumFacade;
-import forum.server.domainlayer.impl.interfaces.UISubject;
-import forum.server.domainlayer.impl.interfaces.UIThread;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UISubject;
+import forum.server.domainlayer.interfaces.UIThread;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 
 import forum.server.persistentlayer.pipe.message.exceptions.*;

@@ -2,9 +2,9 @@
  * This class represents a thread of the forum which is a container of its root message
  * and other statistical information
  */
-package forum.server.domainlayer.impl.message;
+package forum.server.domainlayer.message;
 
-import forum.server.domainlayer.impl.interfaces.UIThread;
+import forum.server.domainlayer.interfaces.UIThread;
 
 public class ForumThread implements UIThread {
 

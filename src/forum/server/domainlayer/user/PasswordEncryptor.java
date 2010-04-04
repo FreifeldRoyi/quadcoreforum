@@ -1,7 +1,7 @@
 /**
  * A simple password Digestion mechanism
  */
-package forum.server.domainlayer.impl.user;
+package forum.server.domainlayer.user;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
