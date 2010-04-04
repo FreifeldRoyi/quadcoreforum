@@ -1,7 +1,5 @@
 package forum.server.domainlayer.impl.interfaces;
 
-import java.util.Date;
-
 /**
  * This interface is used to present the data of a ForumMessage object
  * 
@@ -37,13 +35,20 @@ public interface UIMessage {
 
 	/**
 	 * @return
-			The date when this message was created
+			The date when this message was created, formatted as dd/mm/yyyy
 	 */
 	public String getDate();
 	
 	/**
 	 * @return
-			The time when this message was created
+			The time when this message was created, formatted as hh:mm:ss
 	 */
 	public String getTime();
+	
+	/**
+	 * 
+	 * @return
+	 * 		A string representation of the message
+	 */
+	public String toString();
 }

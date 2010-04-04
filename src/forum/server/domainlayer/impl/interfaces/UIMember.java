@@ -10,10 +10,16 @@ public interface UIMember extends UIUser {
 	
 	/**
 	 * @return
-	 * 		The username of the member
+	 * 		The user-name of the member
 	 */
 	public String getUsername();
 
+	/**
+	 * @return
+	 * 		The last name of the member
+	 */
+	public String getLastName();
+	
 	/**
 	 * @return
 	 * 		The first name of the member
@@ -21,15 +27,24 @@ public interface UIMember extends UIUser {
 	public String getFirstName();
 
 	/**
-	 * @return
-	 * 		The last name of the member
-	 */
-	public String getLastName();
-
-	/**
 	 * 
 	 * @return
 	 * 		The e-mail address of the member
 	 */
 	public String getEmail();
+	
+	/**
+	 * 
+	 * @return
+	 * 		The number of messages posted by the member
+	 */
+	public int getPostsNumber();
+	
+	/**
+	 * 
+	 * @return
+	 * 		A string representation of the member
+	 */
+	public String toString();
+
 }

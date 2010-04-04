@@ -6,8 +6,6 @@
 package forum.server.persistentlayer.pipe;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.io.File;
 
 import javax.xml.XMLConstants;
@@ -21,9 +19,9 @@ import forum.server.Settings;
 import forum.server.domainlayer.impl.message.ForumMessage;
 import forum.server.domainlayer.impl.message.ForumSubject;
 import forum.server.domainlayer.impl.message.ForumThread;
-import forum.server.domainlayer.impl.user.Member;
+import forum.server.domainlayer.impl.user.ForumMember;
 import forum.server.domainlayer.impl.user.Permission;
-import forum.server.domainlayer.impl.user.User;
+import forum.server.domainlayer.impl.user.ForumUser;
 import forum.server.persistentlayer.*;
 
 import forum.server.persistentlayer.pipe.user.*;
@@ -36,14 +34,15 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
  * @author Sepetnitsky Vitali
  *
  */
-public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBInOutUtil
-{
+public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 
 	private JAXBContext jaxbContent;
 	private Unmarshaller unmarshaller;
 	private Marshaller marshaller;
 
+	// handles the physical operations of writing and reading of the database, related to the users
 	private UsersPersistenceHandler usersHandler;
+	// handles the physical operations of writing and reading of the database, related to the forum content (subjects, messages and threads)
 	private MessagesPersistenceHandler messagesHandler;
 
 	/*	public static void testMode() throws IOException {
@@ -75,12 +74,37 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBI
 	}
 	 */
 
+
+	/**
+	 * This method initializes a single instance of the class as being implemented using the Singleton design
+	 * pattern
+	 * 
+	 * @return
+	 * 		A single instance of the class
+	 * @throws JAXBException
+	 * 		In case a JAXB xml database retrieval error has occurred because of a database file which isn't
+	 * 		compatible with the schema
+	 * @throws SAXException
+	 * 		In case a JAXB xml database retrieval error has occurred
+	 */
 	public static JAXBpersistenceDataHandler getInstance() throws JAXBException, SAXException {
 		JAXBpersistenceDataHandler toReturn = new JAXBpersistenceDataHandler();
 		toReturn.setInternalHandlers(toReturn);
 		return toReturn;
 	}
 
+	/**
+	 * 
+	 * The class constructor.
+	 * 
+	 * initializes the JAXB marshaller and unmarshaller objects to be connected to the database.
+	 * 
+	 * @throws JAXBException
+	 * 		In case a JAXB xml database retrieval error has occurred because of a database file which isn't
+	 * 		compatible with the schema
+	 * @throws SAXException
+	 * 		In case a JAXB xml database retrieval error has occurred
+	 */
 	private JAXBpersistenceDataHandler() throws JAXBException, SAXException {
 		this.jaxbContent = JAXBContext.newInstance("forum.server.persistentlayer");		
 		this.unmarshaller = this.jaxbContent.createUnmarshaller();
@@ -92,11 +116,21 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBI
 	}
 
 	public void setInternalHandlers(JAXBpersistenceDataHandler util) {
-		this.usersHandler = new UsersPersistenceHandler(util);
-		this.messagesHandler = new MessagesPersistenceHandler(util);
+		this.usersHandler = new UsersPersistenceHandler();
+		this.messagesHandler = new MessagesPersistenceHandler();
 	}
 
-	public ForumType unmarshalDatabase() throws DatabaseRetrievalException {
+	/**
+	 * Unmarshalles the database file and creates a persistence layer forum type object which
+	 * contains all the forum data stored in the database, in an accessible way
+	 * 
+	 * @return
+	 * 		An instance of {@link ForumType} which contains all the forum data in an accessible way
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved from the database
+	 */
+	private ForumType unmarshalDatabase() throws DatabaseRetrievalException {
 		try {
 			ForumType tForum = (ForumType)this.unmarshaller.unmarshal(new File(
 					Settings.DB_FILE_FULL_LOCATION));
@@ -109,7 +143,13 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBI
 		}
 	}
 
-	public void marshalDatabase(ForumType forum) throws DatabaseUpdateException {
+	/**
+	 * Marshalles the given {@link ForumType} data to the database file
+	 * 
+	 * @throws DatabaseUpdateException
+	 * 		In case an error occurred while trying to update the database with the given data 
+	 */
+	private void marshalDatabase(ForumType forum) throws DatabaseUpdateException {
 		try {
 			marshaller.marshal(forum, new File(Settings.DB_FILE_FULL_LOCATION));
 		}
@@ -120,78 +160,246 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler, JAXBI
 
 	// User related methods
 
-	public Collection<Member> getAllMembers() throws DatabaseRetrievalException {
-		return this.usersHandler.getAllMembers();
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeMessageID()
+	 */
+
+	public long getFirstFreeMemberID() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
-	public User getMemberByID(final long memberID) throws NotRegisteredException, DatabaseRetrievalException {
-		return this.usersHandler.getMemberByID(memberID);
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getAllMembers()
+	 */
+	public Collection<ForumMember> getAllMembers() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.usersHandler.getAllMembers(tForum);
 	}
 
-	public Member getMemberByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException {
-		return this.usersHandler.getMemberByUsername(username);
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getUserByID(long)
+	 */
+	public ForumUser getUserByID(final long memberID) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.usersHandler.getUserByID(tForum, memberID);
 	}
 
-	public Member getMemberByEmail(final String email) throws NotRegisteredException, DatabaseRetrievalException {
-		return this.usersHandler.getMemberByEmail(email);
+	/**
+	 * @see	
+	 * 		PersistenceDataHandler#getMemberByUsername(String)
+	 */
+	public ForumMember getMemberByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.usersHandler.getMemberByUsername(tForum, username);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getMemberByEmail(String)
+	 */
+	public ForumMember getMemberByEmail(final String email) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.usersHandler.getMemberByEmail(tForum, email);
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#addNewMember(long, String, String, String, String, String, Collection)
+	 */
 	public void addNewMember(final long id, final String username, final String password,
 			final String lastName, final String firstName, final String email,
 			final Collection<Permission> permissions) throws DatabaseUpdateException {
-		this.usersHandler.addNewMember(id, username, password, lastName, firstName, email, permissions);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.usersHandler.addNewMember(tForum, id, username, password, lastName, firstName, email, permissions);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Subject related methods
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeSubjectID()
+	 */
+	public long getFirstFreeSubjectID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getTopLevelSubjects()
+	 */
 	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
-		return this.messagesHandler.getTopLevelSubjects();
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getTopLevelSubjects(tForum);
 	}
-	
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getSubjectByID(long)
+	 */
 	public ForumSubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
-		return this.messagesHandler.getSubjectByID(subjectID);
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getSubjectByID(tForum, subjectID);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#addNewSubject(long, String, String, boolean)
+	 */
 	public void addNewSubject(long subjectID, String name, String description, boolean isTopLevel) throws DatabaseUpdateException {
-		this.messagesHandler.addNewSubject(subjectID, name, description, isTopLevel);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.messagesHandler.addNewSubject(tForum, subjectID, name, description, isTopLevel);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#updateSubject(long, Collection, Collection)
+	 */
 	public void updateSubject(long id, Collection<Long> subSubjects,
 			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
-		this.messagesHandler.updateSubject(id, subSubjects, threads);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.messagesHandler.updateSubject(tForum, id, subSubjects, threads);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Thread related methods
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeThreadID()
+	 */
+	public long getFirstFreeThreadID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getThreadByID(long)
+	 */
 	public ForumThread getThreadByID(long threadID) throws ThreadNotFoundException, DatabaseRetrievalException {
-		return this.messagesHandler.getThreadByID(threadID);
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getThreadByID(tForum, threadID);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#openNewThread(long, String, long)
+	 */
 	public void openNewThread(long threadID, String topic, long rootID) throws DatabaseUpdateException {
-		this.messagesHandler.openNewThread(threadID, topic, rootID);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.messagesHandler.openNewThread(tForum, threadID, topic, rootID);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#deleteAThread(long)
+	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
-		return this.messagesHandler.deleteAThread(threadID);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			Collection<Long> toReturn = this.messagesHandler.deleteAThread(tForum, threadID);
+			this.marshalDatabase(tForum);
+			return toReturn;
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Message related methods	
 
-	public ForumMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
-		return this.messagesHandler.getMessageByID(messageID);
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeMessageID()
+	 */
+	public long getFirstFreeMessageID() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getMessageByID(long)
+	 */
+	public ForumMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getMessageByID(tForum, messageID);
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#addNewMessage(long, long, String, String)
+	 */
 	public void addNewMessage(final long messageID, final long userID, final String title, final String content) 
 	throws DatabaseUpdateException {
-		this.messagesHandler.addNewMessage(messageID, userID, title, content);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.messagesHandler.addNewMessage(tForum, messageID, userID, title, content);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#updateMessage(long, String, String)
+	 */
 	public void updateMessage(final long messageID, final String newTitle, final String newContent) throws MessageNotFoundException, 
 	DatabaseUpdateException {
-		this.messagesHandler.updateMessage(messageID, newTitle, newContent);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.messagesHandler.updateMessage(tForum, messageID, newTitle, newContent);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#deleteAMessage(long)
+	 */
 	public Collection<Long> deleteAMessage(final long messageID) throws MessageNotFoundException, DatabaseUpdateException {
-		return this.messagesHandler.deleteAMessage(messageID);
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			Collection<Long> toReturn = this.messagesHandler.deleteAMessage(tForum, messageID);
+			this.marshalDatabase(tForum);
+			return toReturn;
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 }

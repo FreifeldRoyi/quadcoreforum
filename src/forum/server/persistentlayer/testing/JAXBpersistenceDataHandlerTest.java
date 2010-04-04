@@ -141,7 +141,7 @@ public class JAXBpersistenceDataHandlerTest extends TestCase {
 								tSubject1.getSubThreads().get(0).getStartMessage().getMessageID() == 0 &&
 								tSubject1.getSubThreads().get(0).getStartMessage().
 								getAuthor().equals("user1") &&
-								tSubject1.getSubThreads().get(0).getStartMessage().getTitle().equals("test-message1") &&
+								tSubject1.getSubThreads().get(0).getStartMessage().getTopic().equals("test-message1") &&
 								tSubject1.getSubThreads().get(0).getStartMessage().getContent().equals("test-content1")
 						);
 
@@ -150,7 +150,7 @@ public class JAXBpersistenceDataHandlerTest extends TestCase {
 								tSubject2.getSubThreads().get(0).getStartMessage().getMessageID() == 2 &&
 								tSubject2.getSubThreads().get(0).getStartMessage().
 								getAuthor().equals("user1") &&
-								tSubject2.getSubThreads().get(0).getStartMessage().getTitle().equals("test-message2") &&
+								tSubject2.getSubThreads().get(0).getStartMessage().getTopic().equals("test-message2") &&
 								tSubject2.getSubThreads().get(0).getStartMessage().getContent().equals("test-content2")
 						);
 

@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.impl.ForumFacade;
 import forum.server.domainlayer.impl.MainForumLogic;
+import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
@@ -31,8 +32,9 @@ public class ServerSingleConnectionController implements Runnable {
 	private ServerSingleConnectionController(Socket socket) throws IOException {
 		try {
 			this.forum = MainForumLogic.getInstance();
-		} catch (DatabaseUpdateException e) {
-			throw new IOException();
+		}
+		catch (Exception e) {
+			// do nothing, the forum has been already initialized
 		}
 		this.socket = socket;		
 		this.out = new ObjectOutputStream(this.socket.getOutputStream());

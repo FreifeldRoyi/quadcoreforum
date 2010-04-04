@@ -36,7 +36,7 @@ public class LoginMessage extends ClientMessage {
 		try {
 			UIMember tResponse = forum.login(this.username, this.password);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("Welcome " + "\t" + tResponse.getId() + "\t" + 
+			returnObj.setResponse("Welcome " + "\t" + tResponse.getID() + "\t" + 
 					tResponse.getUsername() + "\t" +
 					tResponse.getLastName() + " " +
 					tResponse.getFirstName());

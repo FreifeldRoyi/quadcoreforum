@@ -1,134 +1,127 @@
+/**
+ * This class represents a thread of the forum which is a container of its root message
+ * and other statistical information
+ */
 package forum.server.domainlayer.impl.message;
 
 import forum.server.domainlayer.impl.interfaces.UIThread;
 
 public class ForumThread implements UIThread {
-	
+
 	private long threadID;
-	
+
 	private long rootMessageID;
 	private long latestPostID;
-
 	private String topic;
-	
 	private int numOfViews;
 	private int numOfResponses;
-	
+
+	// TODO: handle numOfResponses, numOfViews, latestPostID
+
 	/**
-	 * Used for the first time fill (from the database)
-	 * @param root
+	 * A full constructor of a forum-thread.
+	 * 
+	 * This constructor is used while creating a thread according to an existing thread (from the database)
+	 * 
+	 * @param threadID
+	 * 		The id of the thread
+	 * @param topic
+	 * 		The topic of the thread
+	 * @param rootID
+	 * 		The id of the thread root message
+	 * @param numOfReponses
+	 * 		The number of responses to one of the thread messages
+	 * @param numOfViews
+	 * 		The number of views of the thread content
 	 */
-	public ForumThread(final long threadID, final long rootID, int numOfReponses, int numOfViews)
+	public ForumThread(final long threadID, final String topic, final long rootID, int numOfReponses, int numOfViews)
 	{
 		this.threadID = threadID;
+		this.topic = topic;
 		this.rootMessageID = rootID;
 		this.numOfResponses = numOfReponses;
 		this.numOfViews = numOfViews;
 	}
 
-	public ForumThread(final long threadID, final String topic, final long rootID)
-	{
-		this.threadID = threadID;
-		this.rootMessageID = rootID;
-		this.latestPostID = rootID;
-		this.numOfResponses = 0;
-		this.numOfViews = 0;
-	}
-	
-	public void decNumOfResponses() {
-		if (this.numOfResponses > 0)
-			--this.numOfResponses;
-	}
-
-	public void incNumOfResponses() 
-	{
-		++this.numOfResponses;
+	/**
+	 * A constructor of a new forum thread, which doesn't currently exist in the database and therefore some of the
+	 * attributes are initialized to default values.
+	 *
+	 * @param threadID
+	 * 		The id of the new thread
+	 * @param topic
+	 * 		The topic of the new thread
+	 * @param rootID
+	 * 		The id of the thread root message
+	 */
+	public ForumThread(final long threadID, final String topic, final long rootID) {
+		this(threadID, topic, rootID, 0, 0);
 	}
 
-	public void incNumOfViews() 
-	{
-		++this.numOfViews;
+	// getters
+
+	/**
+	 * @see
+	 * 		UIThread#getID()
+	 */
+	public long getID() {
+		return this.threadID;
 	}
 
-/*
-	public String getLatestPostAuthor() 
-	{
-		return "" + this.latestPost.getAuthor();
+	/**
+	 * @see
+	 * 		UIThread#getTopic()
+	 */
+	public String getTopic() {
+		return this.topic;
 	}
 
-	@Override
-	public String getLatestPostDate() 
-	{
-		return this.latestPost.getDate();
-	}
-
-	@Override
-	public String getLatestPostTime() 
-	{
-		return this.latestPost.getTime();
-	}
-
-	@Override
-	public String getPostingDate() 
-	{
-		return this.rootMessage.getDate();
-	}
-
-	@Override
-	public String getPostingTime() 
-	{
-		return this.rootMessage.getTime();
-	}
-
-	@Override
-	public void setLatestPost(ForumMessage post) 
-	{
-		this.latestPost = post;
-	}
-
-	public String threadToString() {
-		return this.rootMessage.msgToString();
-	}
-
-	@Override
-	public ForumMessage findMessage(long msgID) throws MessageNotFoundException 
-	{
-
-		return this.rootMessage.findMessage(msgID);
-	}
-
+	/**
+	 * 
+	 * @return
+	 * 		The id of the thread's root message
+	 */
 	public long getRootMessageID() {
-		return this.rootMessage.getMessageID();
+		return this.rootMessageID;
 	}
-	
-	public String toString() {
-		return this.rootMessage.getMessageTitle() + "\n" +
-				"\tposted by: " + this.rootMessage.getAuthor().getUsername() + "\n" + 
-				"\tposting date: " + this.rootMessage.getDate() + "\n" +
-				"\tposting time: " + this.rootMessage.getTime() + "\n" +
-				"\tnumber of responses: " + this.numOfResponses;
-	}
-*/
-	
+
+	/**
+	 * @see
+	 * 		UIThread#getNumOfResponese()
+	 */
 	public int getNumOfResponese() {
 		return this.numOfResponses;
 	}
 
+	/**
+	 * @see
+	 * 		UIThread#getNumOfViews()
+	 */
 	public int getNumOfViews() {
 		return this.numOfViews;
 	}
 
-	
-	public long getId() {
-		return this.threadID;
+	// methods	
+
+	/**
+	 * Increases the number of responses to the thread's content
+	 */
+	public void incNumOfResponses() {
+		this.numOfResponses++;
 	}
 
-	public long getRootMessageID() {
-		return this.rootMessageID;
+	/**
+	 * Decreases the number of responses to the thread's content
+	 */
+	public void decNumOfResponses() {
+		if (this.numOfResponses > 0)
+			this.numOfResponses--;
 	}
-	
-	public String getTitle() {
-		return this.topic;
+
+	/**
+	 * Increases the number of views of the thread's content 
+	 */
+	public void incNumOfViews() {
+		this.numOfViews++;
 	}
-	
 }

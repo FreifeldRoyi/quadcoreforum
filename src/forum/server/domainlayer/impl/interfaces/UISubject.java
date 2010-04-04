@@ -11,11 +11,38 @@ public interface UISubject {
 	 * @return
 	 * 		The unique id of the subject
 	 */
-	public long getId();
+	public long getID();
 
 	/**
 	 * @return
 	 * 		The name of the subject
 	 */
 	public String getName();
+	
+	/**
+	 * 
+	 * @return
+	 * 		The description of the subject
+	 */
+	public String getDescription();
+	
+	/**
+	 * 
+	 * @return
+	 * 		The number of this subject sub-subjects
+	 */
+	public long getNumOfSubSubjects();
+	
+	/**
+	 * 
+	 * @return
+	 * 		The number of this subject threads
+	 */
+	public long getNumOfThreads();
+	/**
+	 * 
+	 * @return
+	 * 		A string representation of this subject
+	 */
+	public String toString();
 }

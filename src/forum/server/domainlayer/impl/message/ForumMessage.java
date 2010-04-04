@@ -8,51 +8,104 @@ import java.util.Vector;
 import forum.server.domainlayer.impl.interfaces.UIMessage;
 
 public class ForumMessage implements UIMessage {
+	
 	private long messageID;
-
 	private long authorID;
 	private String title;
 	private String content;
 
 	private GregorianCalendar postTime;
 
-	private Collection<Long> replies;
+	// the ids of the message replies
+	private Collection<Long> repliesIDs;
 
-	// used for constructing from the database
+	/**
+	 * 
+	 * A full constructor of the message, which initializes all its attributes with given values
+	 * 
+	 * This constructor is used while creating a message according to an existing message (from the database)
+	 * 
+	 * @param messageID
+	 * 		The id of the new message
+	 * @param authorID
+	 * 		The id of the message author
+	 * @param title
+	 * 		The title of the new message
+	 * @param content
+	 * 		The content of the new message
+	 * @param postTime
+	 * 		The time where the new message was posted
+	 * @param replies
+	 * 		A collection of the message replies' ids
+	 */
 	public ForumMessage(final long messageID, final long authorID, String title, String content, 
 			GregorianCalendar postTime, Collection<Long> replies) {
 		this.messageID = messageID;
 		this.authorID = authorID;
-		this.title = title;
-		this.content = content;
-
+		this.setTitle(title);
+		this.setContent(content);
 		this.setPostTime(postTime);
 		this.setReplies(replies);
 	}
 
-
+	/**
+	 * 
+	 * A constructor of a new message which hasn't exist yet in the database. 
+	 * 
+	 * The constructor initializes the message posting time and replies collection, to be default
+	 * values. 
+	 * 
+	 * @param messageID
+	 * 		The id of the new message
+	 * @param authorID
+	 * 		The id of the message author
+	 * @param title
+	 * 		The title of the new message
+	 * @param content
+	 * 		The content of the new message
+	 */
 	public ForumMessage(final long messageID, final long authorID, String title, String content) {
 		this(messageID, authorID, title, content, new GregorianCalendar(),
 				new Vector<Long>());
 	}
 
-	/*	public String getAuthor() {
-		return this.authorUsername;
-	}
+	// getters
+	
+	/**
+	 * @see
+	 * 		UIMessage#getID()
 	 */
-
 	public long getID() {
 		return this.messageID;
 	}
 
-
-
+	/**
+	 * @see
+	 * 		UIMessage#getAuthorID()
+	 */
 	public long getAuthorID() {
 		return this.authorID;
 	}
 
 	/**
-	 * returns a date formatted as dd/mm/yyyy
+	 * @see
+	 * 		UIMessage#getTitle()
+	 */
+	public String getTitle() {
+		return this.title;
+	}
+
+	/**
+	 * @see
+	 * 		UIMessage#getContent()
+	 */
+	public String getContent() {
+		return this.content;
+	}
+	
+	/**
+	 * @see
+	 * 		UIMessage#getDate()
 	 */
 	public String getDate() {
 		String toReturn = this.postTime.get(Calendar.DAY_OF_MONTH) + "//" +
@@ -61,15 +114,10 @@ public class ForumMessage implements UIMessage {
 		return toReturn;
 	}
 
-	public String getContent() {
-		return this.content;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-
+	/**
+	 * @see
+	 * 		UIMessage#getTime()
+	 */
 	public String getTime() {
 		String toReturn = this.postTime.get(Calendar.HOUR_OF_DAY) + ":" +
 		this.postTime.get(Calendar.MINUTE) + ":" +
@@ -77,71 +125,96 @@ public class ForumMessage implements UIMessage {
 		return toReturn;
 	}
 
-
-
+	/**
+	 * 
+	 * @return
+	 * 		A collection which contains the ids of this message replies
+	 */
 	public Collection<Long> getReplies() {
-		return this.replies;
+		return this.repliesIDs;
 	}	
 
-
+	// setters
+	
+	/**
+	 * Sets the title of the message to be the given one
+	 * 
+	 * @param title
+	 * 		The new title of the message
+	 */
 	public void setTitle(final String title) {
 		this.title = title;
 	}
 
+	/**
+	 * Sets the content of the message to be the given one
+	 * 
+	 * @param content
+	 * 		The new content of the message
+	 */
 	public void setContent(final String content) {
 		this.content = content;
 	}
 
+	/**
+	 * Sets the posting time of the message to be the given one
+	 * 
+	 * @param time
+	 * 		The time to which the message posting-time attribute should be updated 
+	 */
 	private void setPostTime(GregorianCalendar time) {
 		this.postTime = time;
 	}
 
-	// used by the constructor
+	/**
+	 * Sets the message replies collection, to be the given one
+	 * 
+	 * @param replies
+	 * 		The message replies
+	 */
 	private void setReplies(Collection<Long> replies) {
-		this.replies = replies;
+		this.repliesIDs = replies;
 	}
 
+	// methods
+	
+	/**
+	 * 
+	 * Updates the message with the given parameters
+	 * 
+	 * @param newTitle
+	 * 		The new title of the message
+	 * @param newContent
+	 * 		The new content of the message
+	 */
 	public void updateMe(String newTitle, String newContent) {
 		this.setTitle(newTitle);
 		this.setContent(newContent);
 	}
 
-	public void addReply(final long replyID) {		
-		this.replies.add(replyID);
-	}
-
-	public void deleteReply(final long replyID) {
-		this.replies.remove(replyID);
-	}
-
-	/*
-	public ForumMessage findMessage(long msgID) throws MessageNotFoundException {
-
-		if (this.getMessageID() == msgID)
-			return this;
-
-		ForumMessage toReturn = null;
-
-
-
-		for (ForumMessage tMsg : this.replyMessages) {
-			if (tMsg.getMessageID() == msgID)
-				return tMsg;
-			try {
-				toReturn = tMsg.findMessage(msgID);
-				return toReturn;
-			}
-			catch (MessageNotFoundException e) {
-				continue;
-			}
-		}
-		throw new MessageNotFoundException(msgID);
-	}
-
+	/**
+	 * Adds a new reply id to the message
+	 * 
+	 * @param replyID
+	 * 		The new reply id which should be added to the message
 	 */
+	public void addReply(final long replyID) {		
+		this.repliesIDs.add(replyID);
+	}
 
 	/**
-	 * Returns a string representation of the message
+	 * Removes the given id from the message replies collection
+	 * 
+	 * @param replyID
+	 * 		The id of the reply which should be removed from this message
+	 */
+	public void deleteReply(final long replyID) {
+		this.repliesIDs.remove(replyID);
+	}
+
+	/**
+	 * @see
+	 * 		UIMessage#toString()
 	 */
 	public String toString() {
 		return "title: " + this.getTitle() + "\n" +
@@ -150,22 +223,4 @@ public class ForumMessage implements UIMessage {
 		"posting date: " + this.getDate() + "\n" +
 		"posting time: " + this.getTime();
 	}
-
-	/*
-	public Map<Long, String> getRepliesRepresentation() {
-		Map<Long, String> toReturn = new HashMap<Long, String>();
-
-		toReturn.put(this.getMessageID(), this.toString());
-		for (ForumMessage tReply : this.replyMessages)
-			toReturn.put(tReply.getMessageID(), tReply.toString());
-		return toReturn;
-	}
-
-	public void updateMe(String newTitle, String newContent) {
-		this.setMessageTitle(newTitle);
-		this.setMessageContent(newContent);
-		PersistenceFactory.getPipe().updateMessage(this.getMessageID(), newTitle, newContent);
-
-	}
-	 */
 }

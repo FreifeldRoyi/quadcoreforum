@@ -1,79 +1,186 @@
+/**
+ * Represents a subject (or directory) in the forum 
+ */
 package forum.server.domainlayer.impl.message;
 
 import java.util.*;
 
 import forum.server.domainlayer.impl.interfaces.UISubject;
 
-public class ForumSubject extends NamedComponentImpl implements UISubject {
+public class ForumSubject implements UISubject {
+	
 	private long subjectID;
+	private String name;
+	private String description;
 	private Collection<Long> subSubjectsIDs;
 	private Collection<Long> threadsIDs;
-	
-	private boolean isToLevel;
-	
+	private boolean isTopLevel;
+
+
 	/**
+	 * A full constructor of the forum subject which initializes all its attributes according to the give
+	 * parameters
+	 * 
+	 * This constructor is used while constructing the subject according to the database
+	 * 
 	 * @param id
-	 * 		The unique identification number of this subject.
+	 * 		The id of the subject
 	 * @param name
-	 * 		The name of this subject.
+	 * 		The name of the subject
 	 * @param description
-	 * 		The description of this subject.
+	 * 		The description of the subject
+	 * @param subSubjectsIDs
+	 * 		A collection of this subject sub-subject ids
+	 * @param threadsIDs
+	 * 		A collection of this subjects threads ids
+	 * @param isTopLevel
+	 * 		Whether this subject is a top level one
+	 */
+	public ForumSubject(long id, final String name, final String description, final Collection<Long> subSubjectsIDs,
+			final Collection<Long> threadsIDs, boolean isTopLevel) {
+		this(id, name, description, isTopLevel);
+		this.subSubjectsIDs.addAll(subSubjectsIDs);
+		this.threadsIDs.addAll(threadsIDs);
+	}	
+
+	/**
+	 * 
+	 * The class constructor which is used to construct a new forum subject which doesn't exist in the database
+	 * and initializes some of the fields with default values.
+	 * 
+	 * @param id
+	 * 		The unique identification number of this subject
+	 * @param name
+	 * 		The name of this subject
+	 * @param description
+	 * 		The description of this subject
+	 * @param isTopLevel
+	 * 		Whether this subject should be a forum top-level subject
 	 */
 	public ForumSubject(long id, final String name, final String description, boolean isTopLevel) {
-		super(name, description);
+		this.name = name;
+		this.description = description;
 		this.subjectID = id;
 		this.subSubjectsIDs = new Vector<Long>();
 		this.threadsIDs = new Vector<Long>();
 	}
+
+	// getters
 	
-	public ForumSubject(long id, final String name, final String description, final Collection<Long> subSubjects,
-			final Collection<Long> threads, boolean isToLevel) {
-		this(id, name, description, isToLevel);
-		this.subSubjectsIDs.addAll(subSubjects);
-		this.threadsIDs.addAll(threads);
-	}	
-	
-	public void addSubSubject(final long subjectID) {
-		this.subSubjectsIDs.add(subjectID);
+	/**
+	 * @see
+	 * 		UISubject#getID()
+	 */
+	public long getID() {
+		return this.subjectID;
 	}
 
-	public void addThread(final long threadID) {
-		this.threadsIDs.add(threadID);
+	/**
+	 * @see
+	 * 		UISubject#getName()
+	 */
+	public String getName() {
+		return this.name;
 	}
 
-	public void deleteThread(final long threadID) {
-		this.threadsIDs.remove(threadID);
+	/**
+	 * @see
+	 * 		UISubject#getDescription()
+	 */
+	public String getDescription() {
+		return this.description;
+	}
+
+	/**
+	 * @see
+	 * 		UISubject#getNumOfSubSubjects()
+	 */
+	public long getNumOfSubSubjects() {
+		return this.threadsIDs.size();
+	}
+
+	/**
+	 * @see
+	 * 		UISubject#getNumOfThreads()
+	 */
+	public long getNumOfThreads() {
+		return this.threadsIDs.size();
 	}
 	
-	
-	
-
+	/**
+	 * 
+	 * @return
+	 * 		A collection of this subject sub-subjects ids
+	 */
 	public Collection<Long> getSubSubjects() {
 		return this.subSubjectsIDs;
 	}
 
+	/**
+	 * 
+	 * @return
+	 * 		A collection of this subject threads ids
+	 */
 	public Collection<Long> getThreads() {
 		return this.threadsIDs;
-	}
-
-	public long getSubjectID() {
-		return this.subjectID;
-	}
-
-	public long getNumOfThreads() {
-		return this.threadsIDs.size();
-	}
-
-	public long getId() {
-		return this.subjectID;
 	}
 
 	public String toString() {
 		return this.getName() + " " + this.getDescription();
 	}
 
-	public boolean isToLevel() {
-		return this.isToLevel;
+	/**
+	 * 
+	 * @return
+	 * 		Wether this subject is a top level one
+	 */
+	public boolean isTopLevel() {
+		return this.isTopLevel;
 	}
+
+	// methods
 	
+	/**
+	 * 
+	 * Adds a new id of a sub-subject of this subject
+	 * 
+	 * @param subjectID
+	 * 		The id of the new sub-subject which should be added to this subject
+	 */
+	public void addSubSubject(final long subjectID) {
+		this.subSubjectsIDs.add(subjectID);
+	}
+
+	/**
+	 * 
+	 * Removes an id of a sub-subject from this subject
+	 * 
+	 * @param subjectID
+	 * 		The id of the sub-subject which should be removed
+	 */
+	public void deleteSubSubject(final long subjectID) {
+		this.subSubjectsIDs.remove(subjectID);
+	}
+
+	/**
+	 * 
+	 * Adds a new id of a thread of this subject
+	 * 
+	 * @param threadID
+	 * 		The id of the new thread which should be added to this subject
+	 */
+	public void addThread(final long threadID) {
+		this.threadsIDs.add(threadID);
+	}
+
+	/**
+	 * 
+	 * Removes an id of a thread from this subject
+	 * 
+	 * @param threadID
+	 * 		The id of the thread which should be removed
+	 */
+	public void deleteThread(final long threadID) {
+		this.threadsIDs.remove(threadID);
+	}
 }

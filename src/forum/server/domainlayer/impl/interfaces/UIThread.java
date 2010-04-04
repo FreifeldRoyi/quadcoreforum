@@ -11,12 +11,26 @@ public interface UIThread {
 	 * @return
 			The id of the thread, this is the id of its root message
 	 */
-	public long getId();
+	public long getID();
 
 	/**
 	 * @return
-	 * 		The title of the thread, this is the title of its root message 
+	 * 		The topic of the thread
 	 */
-	public String getTitle();
+	public String getTopic();
 
+	/**
+	 * 
+	 * @return
+	 * 		The number of responses to the threads messages, this is the number of messages
+	 * 		posted in the thread - 1 (its root message)
+	 */
+	public int getNumOfResponese();
+
+	/**
+	 * 
+	 * @return
+	 * 		The number of views of this thread
+	 */
+	public int getNumOfViews();
 }

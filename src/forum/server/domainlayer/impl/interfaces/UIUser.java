@@ -14,7 +14,7 @@ public interface UIUser {
 	 * @return
 	 * 		The unique id of the user
 	 */
-	public long getId();
+	public long getID();
 	
 	/**
 	 * 

@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author Freifeld Royi
  */
-public class PasswordEnDecryptor
+public class PasswordEncryptor
 {
 	/**
 	 * Simple encryption mechanism. Uses MD5 encryption
