@@ -1,7 +1,7 @@
 package forum.server.domainlayer;
 
 import java.util.Collection;
-import forum.server.domainlayer.SearchEngine;
+import forum.server.domainlayer.search.*;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.message.NotPermittedException;
 
