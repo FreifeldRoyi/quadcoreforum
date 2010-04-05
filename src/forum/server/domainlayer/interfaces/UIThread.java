@@ -25,12 +25,19 @@ public interface UIThread {
 	 * 		The number of responses to the threads messages, this is the number of messages
 	 * 		posted in the thread - 1 (its root message)
 	 */
-	public int getNumOfResponese();
+	public long getNumOfResponses();
 
 	/**
 	 * 
 	 * @return
 	 * 		The number of views of this thread
 	 */
-	public int getNumOfViews();
+	public long getNumOfViews();
+	
+	/**
+	 * 
+	 * @return
+	 * 		A string representation of this thread
+	 */
+	public String toString();
 }

@@ -50,7 +50,7 @@ public class MessagesController {
 		final Collection<UISubject> toReturn = new Vector<UISubject>();
 
 		if (fatherID == -1) 
-			toReturn.addAll(this.dataHander.getMessagesCache().getToLevelSubjects());
+			toReturn.addAll(this.dataHander.getMessagesCache().getTopLevelSubjects());
 		else {
 			final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
 			final Collection<Long> tSubSubjectsIDs = tFatherSubject.getSubSubjects();

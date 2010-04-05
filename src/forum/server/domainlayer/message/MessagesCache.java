@@ -90,7 +90,7 @@ public class MessagesCache {
 	 * @throws DatabaseRetrievalException
 	 * 		In case the required data can't be retrieved from the database due to a database connection error
 	 */
-	public Collection<ForumSubject> getToLevelSubjects() throws DatabaseRetrievalException {
+	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
 		Collection<ForumSubject> toReturn = this.pipe.getTopLevelSubjects();
 		for (ForumSubject tCurrentSubject : toReturn)
 			this.idsToSubjectsMapping.put(tCurrentSubject.getID(), tCurrentSubject);

@@ -41,36 +41,6 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	// handles the physical operations of writing and reading of the database, related to the forum content (subjects, messages and threads)
 	private MessagesPersistenceHandler messagesHandler;
 
-	/*	public static void testMode() throws IOException {
-		Settings.DB_FILES_LOCATION = "src" + System.getProperty("file.separator") +
-		"forum" + System.getProperty("file.separator") +
-		"server" + System.getProperty("file.separator") +
-		"persistentlayer" + System.getProperty("file.separator") +
-		"testing" + System.getProperty("file.separator");
-
-		Settings.SCHEMA_FILE_FULL_LOCATION = Settings.DB_FILES_LOCATION + Settings.DB_FILE_NAME + ".xsd";
-		Settings.DB_FILE_FULL_LOCATION 	= Settings.DB_FILES_LOCATION + Settings.DB_FILE_NAME + ".xml";
-
-		Writer output = new BufferedWriter(new FileWriter(new File(Settings.DB_FILE_FULL_LOCATION)));
-		output.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\t" + 
-				"<ForumType>\n\t\t" + 
-				"<numOfMessages>0</numOfMessages>\n" +
-				"</ForumType>"
-		);
-		output.close();
-	}
-	 */
-	/*	public static void regularMode() {
-		Settings.DB_FILES_LOCATION = "src" + System.getProperty("file.separator") +
-		"forum" + System.getProperty("file.separator") +
-		"server" + System.getProperty("file.separator");
-
-		Settings.SCHEMA_FILE_FULL_LOCATION = Settings.DB_FILES_LOCATION + Settings.DB_FILE_NAME + ".xsd";
-		Settings.DB_FILE_FULL_LOCATION 	= Settings.DB_FILES_LOCATION + Settings.DB_FILE_NAME + ".xml";
-	}
-	 */
-
-
 	/**
 	 * This method initializes a single instance of the class as being implemented using the Singleton design
 	 * pattern

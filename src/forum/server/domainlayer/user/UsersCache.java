@@ -81,7 +81,7 @@ public class UsersCache {
 	 * 		In case the required data can't be retrieved from the forum database due to a database connection error
 	 */
 	public ForumUser getUserByID(final long id) throws NotRegisteredException, DatabaseRetrievalException {
-		if (this.idsToUsersMapping.containsKey(id))
+		if (this.containsUser(id))
 			return this.idsToUsersMapping.get(id);
 		else
 			return this.pipe.getUserByID(id);
@@ -96,13 +96,14 @@ public class UsersCache {
 	 * 		The user-name of the member which should be found and returned
 	 * 
 	 * @return
-	 * 		The found member
+	 * 		The found member or null if no member with the given user-name is registered to the forum
 	 * 
 	 * @throws DatabaseRetrievalException
 	 * 		In case the required data can't be retrieved from the forum database due to a database connection error
 	 */
 	public ForumMember getMemberByUsername(final String username) throws DatabaseRetrievalException {
 		try {
+			// TODO: Handle cache saving
 			ForumMember toReturn = this.pipe.getMemberByUsername(username);
 			return toReturn;
 		}
@@ -120,13 +121,14 @@ public class UsersCache {
 	 * 		The e-mail of the member which should be found and returned
 	 * 
 	 * @return
-	 * 		The found member
+	 * 		The found member or null if no member with the given e-mail is registered to the forum
 	 * 
 	 * @throws DatabaseRetrievalException
 	 * 		In case the required data can't be retrieved from the forum database due to a database connection error
 	 */
 	public ForumMember getMemberByEmail(final String email) throws DatabaseRetrievalException {
 		try {
+			// TODO: Handle cache saving
 			ForumMember toReturn = this.pipe.getMemberByEmail(email);
 			return toReturn;
 		}
@@ -157,7 +159,7 @@ public class UsersCache {
 	 * @return
 	 * 		Whether a user with the given id is already loaded in to the cache
 	 */
-	public boolean containsUser(final long id) {
+	private boolean containsUser(final long id) {
 		return this.idsToUsersMapping.containsKey(id);
 	}
 
@@ -172,10 +174,9 @@ public class UsersCache {
 	 * 		The created guest
 	 */
 	public ForumUser createNewGuest(final Collection<Permission> permissions) {
-		final long tId = this.getNextGuestID();
-		final ForumUser tNewUser = new ForumUser(tId, permissions);
-		this.idsToUsersMapping.put(tId, tNewUser);
-		System.out.println(this.nextFreeMemberID);
+		final long tID = this.getNextGuestID();
+		final ForumUser tNewUser = new ForumUser(tID, permissions);
+		this.idsToUsersMapping.put(tID, tNewUser);
 		return tNewUser;
 	}
 
@@ -232,7 +233,9 @@ public class UsersCache {
 			throw new DatabaseUpdateException();
 		}		
 		final long id = this.getNextFreeMemberID();
-		final ForumMember newMember = new ForumMember(id, username, password, lastName, firstName, email, permissions);
+		// the new member password should be saved encrypted even in the cache
+		final ForumMember newMember = new ForumMember(id, username, PasswordEncryptor.encryptMD5(password),
+				lastName, firstName, email, permissions);
 		this.pipe.addNewMember(newMember.getID(), username, password, lastName, firstName, email, permissions);	
 		this.idsToUsersMapping.put(id, newMember);
 		return newMember;
