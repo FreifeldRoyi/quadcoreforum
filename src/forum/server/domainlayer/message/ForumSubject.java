@@ -125,6 +125,10 @@ public class ForumSubject implements UISubject {
 		return this.threadsIDs;
 	}
 
+	/**
+	 * @see
+	 * 		UISubject#toString()
+	 */
 	public String toString() {
 		return this.getName() + " " + this.getDescription();
 	}
@@ -132,7 +136,7 @@ public class ForumSubject implements UISubject {
 	/**
 	 * 
 	 * @return
-	 * 		Wether this subject is a top level one
+	 * 		Whether this subject is a top level one
 	 */
 	public boolean isTopLevel() {
 		return this.isTopLevel;

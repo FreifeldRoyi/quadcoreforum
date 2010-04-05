@@ -39,7 +39,7 @@ public class PersistenceFactory
 			catch (SAXException e) 
 			{
 				System.out.println("An error was encountered while" +
-				"parsing the database file, the program will exit!!!");
+				" parsing the database file, the program will exit!!!");
 				System.exit(-1);
 			}
 		}

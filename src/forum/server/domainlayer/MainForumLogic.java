@@ -146,6 +146,15 @@ public class MainForumLogic implements ForumFacade {
 		return this.usersController.registerNewMember(username, password, lastName, firstName, email);
 	}
 	
+	/**
+	 * @see
+	 * 		ForumFacade#promoteToBeModerator(long, long)
+	 */
+	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException {
+		this.usersController.promoteToBeModerator(applicantID, userID);
+	}
+	
 	// Subject related methods
 
 	/**
@@ -191,6 +200,16 @@ public class MainForumLogic implements ForumFacade {
 
 	// Message related methods
 
+	/**
+	 * @see
+	 * 		ForumFacade#getMessageByID(long)
+	 */
+	public UIMessage getMessageByID(final long messageID)
+			throws MessageNotFoundException, DatabaseRetrievalException {
+		return this.messagesController.getMessageByID(messageID);
+	}
+
+	
 	/**
 	 * @see
 	 * 		ForumFacade#getMessagesByUserID(long)

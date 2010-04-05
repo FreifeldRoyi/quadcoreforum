@@ -21,37 +21,6 @@ public class ForumMember extends ForumUser implements UIMember {
 	private Collection<Long> postedMessagesIDs;
 
 	/**
-	 * A full constructor of a member, hasn't exist yet in the database and therefore some of his attributes are initialized to
-	 * default values
-	 *  
-	 * @param userID
-	 * 		The user id of the created member
-	 * @param username
-	 * 		The user-name of the created member
-	 * @param password
-	 * 		The password of the created member
-	 * @param lastName
-	 * 		The last name of the created member
-	 * @param firstName
-	 * 		The first name of the created member
-	 * @param email
-	 * 		The e-mail address of the created member
-	 * @param permissions
-	 * 		The permissions which are assigned to the created member
-	 */
-	public ForumMember(final long userID, final String username, final String password, 
-			final String lastName, final String firstName, final String email, final Collection<Permission> permissions, 
-			final Collection<Long> postedMessagesIDs) {
-		super(userID, permissions);
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.postedMessagesIDs = postedMessagesIDs;
-	}
-
-	/**
 	 * A constructor of a member, which initializes all the member attributes according to the given parameters
 	 * 
 	 * This constructor is used when a new member object is constructed according to an existing member (from the database) 
@@ -72,6 +41,37 @@ public class ForumMember extends ForumUser implements UIMember {
 	 * 		The permissions which are assigned to the created member
 	 * @param postedMessagesIDs
 	 * 		A collection of the messages ids which were posted by this member
+	 */
+	public ForumMember(final long userID, final String username, final String password, 
+			final String lastName, final String firstName, final String email, final Collection<Permission> permissions, 
+			final Collection<Long> postedMessagesIDs) {
+		super(userID, permissions);
+		this.username = username;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.postedMessagesIDs = postedMessagesIDs;
+	}
+
+	/**
+	 * A full constructor of a member, hasn't exist yet in the database and therefore some of his attributes are initialized to
+	 * default values
+	 *  
+	 * @param userID
+	 * 		The user id of the created member
+	 * @param username
+	 * 		The user-name of the created member
+	 * @param password
+	 * 		The password of the created member
+	 * @param lastName
+	 * 		The last name of the created member
+	 * @param firstName
+	 * 		The first name of the created member
+	 * @param email
+	 * 		The e-mail address of the created member
+	 * @param permissions
+	 * 		The permissions which are assigned to the created member
 	 */
 	public ForumMember(final long userID, final String username, final String password, final String lastName, 
 			final String firstName, final String email, final Collection<Permission> permissions) {

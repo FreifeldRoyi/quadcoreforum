@@ -11,7 +11,6 @@ package forum.server.domainlayer.message ;
 
 import java.util.*;
 
-import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.*;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.user.*;
@@ -50,7 +49,7 @@ public class MessagesController {
 		final Collection<UISubject> toReturn = new Vector<UISubject>();
 
 		if (fatherID == -1) 
-			toReturn.addAll(this.dataHander.getMessagesCache().getToLevelSubjects());
+			toReturn.addAll(this.dataHander.getMessagesCache().getTopLevelSubjects());
 		else {
 			final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
 			final Collection<Long> tSubSubjectsIDs = tFatherSubject.getSubSubjects();
@@ -192,9 +191,19 @@ public class MessagesController {
 	}
 
 	// Message related methods:
+	
+	/**
+	 * @see
+	 * 		ForumFacade#getMessageByID(long)
+	 */
+	public UIMessage getMessageByID(final long messageID)
+	throws MessageNotFoundException, DatabaseRetrievalException {
+		return this.dataHander.getMessagesCache().getMessageByID(messageID);
+	}
 
 	/**
-	 * @see ForumFacade#getReplies(long)
+	 * @see 
+	 * 		ForumFacade#getReplies(long)
 	 */
 	public Collection<UIMessage> getReplies(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
 		SystemLogger.info("Replies of a message with id " + messageID + " are requested to view.");
