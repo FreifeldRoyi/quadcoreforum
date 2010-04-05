@@ -193,6 +193,16 @@ public class MainForumLogic implements ForumFacade {
 
 	/**
 	 * @see
+	 * 		ForumFacade#getMessageByID(long)
+	 */
+	public UIMessage getMessageByID(final long messageID)
+			throws MessageNotFoundException, DatabaseRetrievalException {
+		return this.messagesController.getMessageByID();
+	}
+
+	
+	/**
+	 * @see
 	 * 		ForumFacade#getMessagesByUserID(long)
 	 */
 	public Collection<UIMessage> getMessagesByUserID(long authorID)

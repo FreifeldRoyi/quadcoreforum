@@ -253,6 +253,23 @@ public interface ForumFacade extends SearchEngine {
 	
 	// Message related methods:
 
+	
+	/**
+	 * Finds and returns a message whose id is equal to the given id
+	 * 
+	 * @param messageID
+	 * 		The id of the message which should be retrieved
+	 * 
+	 * @return
+	 * 		The found message
+	 * 
+	 * @throws MessageNotFoundException
+	 * 		In case a message with the given id wasn't found
+	 * @throws DatabaseRetrievalException
+	 * 	    If a problem has occurred while trying to retrieve the required data from the database
+	 */
+	public UIMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException;
+	
 	/**
 	 * Returns a collection of messages, accessible via the UIMessage interface, whose author id
 	 * is the given one.
