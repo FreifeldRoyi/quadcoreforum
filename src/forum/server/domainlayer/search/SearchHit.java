@@ -1,6 +1,6 @@
 package forum.server.domainlayer.search;
 
-import forum.server.domainlayer.message.ForumMessage;
+import forum.server.domainlayer.interfaces.UIMessage;
 
 /**
  * A single search hit returned after a search operation.
@@ -9,10 +9,10 @@ import forum.server.domainlayer.message.ForumMessage;
  */
 public class SearchHit {
 	
-	private ForumMessage message;
+	private UIMessage message;
 	private double score;
 
-	public SearchHit(ForumMessage message, double score) {
+	public SearchHit(UIMessage message, double score) {
 		this.message = message;
 		this.score = score;
 	}
@@ -21,8 +21,7 @@ public class SearchHit {
 		return this.score;
 	}
 	
-	public ForumMessage getMessage() {
+	public UIMessage getMessage() {
 		return this.message;
 	}
-
 }
