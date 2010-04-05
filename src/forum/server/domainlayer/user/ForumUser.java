@@ -76,6 +76,20 @@ public class ForumUser implements UIUser {
 	// methods
 	
 	/**
+	 * 
+	 * This method overrides the standard equals method and 
+	 * checks whether two users are the same one 
+	 * 
+	 * @see
+	 * 		Object#equals(Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		return (obj != null) && (obj instanceof ForumUser) && (((ForumUser)obj).getID() == 
+			this.getID());
+	}
+	
+	/**
 	 * Adds a permission to this user existing permissions
 	 */
 	public void addPermission(final Permission permissionToAdd) {

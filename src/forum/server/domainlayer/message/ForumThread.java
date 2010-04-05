@@ -13,8 +13,8 @@ public class ForumThread implements UIThread {
 	private long rootMessageID;
 	private long latestPostID;
 	private String topic;
-	private int numOfViews;
-	private int numOfResponses;
+	private long numOfResponses;
+	private long numOfViews;
 
 	// TODO: handle numOfResponses, numOfViews, latestPostID
 
@@ -87,9 +87,9 @@ public class ForumThread implements UIThread {
 
 	/**
 	 * @see
-	 * 		UIThread#getNumOfResponese()
+	 * 		UIThread#getNumOfResponses()
 	 */
-	public int getNumOfResponese() {
+	public long getNumOfResponses() {
 		return this.numOfResponses;
 	}
 
@@ -97,10 +97,18 @@ public class ForumThread implements UIThread {
 	 * @see
 	 * 		UIThread#getNumOfViews()
 	 */
-	public int getNumOfViews() {
+	public long getNumOfViews() {
 		return this.numOfViews;
 	}
 
+	/**
+	 * @see
+	 * 		UIThread#toString()
+	 */
+	public String toString() {
+		return this.getID() + " " + this.getTopic();
+	}
+	
 	// methods	
 
 	/**

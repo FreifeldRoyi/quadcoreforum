@@ -14,6 +14,7 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
 import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.message.NotPermittedException;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
@@ -54,7 +55,7 @@ public class UsersController {
 	public UIUser addGuest() {
 		SystemLogger.fine("A new guest has connected to the forum");
 		this.incActiveGuestsCounter();
-		final Set<Permission> permissions = this.getDefaultGuestPermissions();
+		final Collection<Permission> permissions = this.getDefaultGuestPermissions();
 		return this.dataHandler.getUsersCache().createNewGuest(permissions);
 	}
 	
@@ -62,15 +63,15 @@ public class UsersController {
 	 * @see
 	 * 		ForumFacade#removeGuest(long)
 	 */
-	public void removeGuest(final long guestId) {
-		SystemLogger.fine("The guest with id " + guestId + " tries to exit from the forum.");
+	public void removeGuest(final long guestID) {
+		SystemLogger.fine("The guest with id " + guestID + " tries to exit from the forum.");
 		try {
-			this.dataHandler.getUsersCache().removeGuest(guestId);
+			this.dataHandler.getUsersCache().removeGuest(guestID);
 			this.decActiveGuestsCounter();
-			SystemLogger.fine("The guest with id " + guestId + " has successfuly been removed from the forum.");
+			SystemLogger.fine("The guest with id " + guestID + " has successfuly been removed from the forum.");
 		}
 		catch (NotRegisteredException e) {
-			SystemLogger.fine("Error occured: a guest with an id " + guestId + " wasn't found in the system.");
+			SystemLogger.fine("Error occured: a guest with an id " + guestID + " wasn't found in the system.");
 		}
 	}
 
@@ -118,7 +119,7 @@ public class UsersController {
 	public long registerNewMember(final String username, final String password, final String lastName,
 			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException {
 		SystemLogger.info("A User requests to register with username " + username);
-		final Set<Permission> tPermissions = this.getDefaultMemberPermissions();
+		final Collection<Permission> tPermissions = this.getDefaultMemberPermissions();
 		final String tEncryptedPassword = this.encryptPassword(password);
 		final ForumMember newMember = this.dataHandler.getUsersCache().createNewMember(username, tEncryptedPassword, lastName, 
 				firstName, email, tPermissions);
@@ -210,6 +211,15 @@ public class UsersController {
 		else throw new NotConnectedException(username);		
 	}
 
+	/**
+	 * @see
+	 * 		ForumFacade#promoteToBeModerator(long, long)
+	 */
+	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException {
+		
+	}
+	
 	// Default permissions methods
 	
 	/**
@@ -217,8 +227,8 @@ public class UsersController {
 	 * @return
 	 * 		A default permissions for the guests of the forum.
 	 */
-	private Set<Permission> getDefaultGuestPermissions() {
-		final Set<Permission> toReturn = new HashSet<Permission>();
+	private Collection<Permission> getDefaultGuestPermissions() {
+		final Collection<Permission> toReturn = new HashSet<Permission>();
 		toReturn.add(Permission.VIEW_ALL);
 		return toReturn;
 	}
@@ -229,8 +239,8 @@ public class UsersController {
 	 * 		A default permission set for a forum-member user, the set contains all guest permissions
 	 * 		and additional permissions specified for the registered users of the forum.
 	 */
-	private Set<Permission> getDefaultMemberPermissions() {
-		final Set<Permission> toReturn = this.getDefaultGuestPermissions();
+	private Collection<Permission> getDefaultMemberPermissions() {
+		final Collection<Permission> toReturn = this.getDefaultGuestPermissions();
 		toReturn.add(Permission.OPEN_THREAD);
 		toReturn.add(Permission.REPLY_TO_MESSAGE);
 		toReturn.add(Permission.EDIT_MESSAGE);

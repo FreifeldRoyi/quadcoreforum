@@ -122,8 +122,8 @@ public class UsersPersistenceHandler {
 	 */
 	public void addNewMember(final ForumType data, final long id, final String username, final String password,
 			final String lastName, final String firstName, final String email, final Collection<Permission> permissions) {
-			MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, 
-					firstName, email, permissions);
-			data.getMembers().add(tNewMemberType);
+		MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, 
+				firstName, email, permissions);
+		data.getMembers().add(tNewMemberType);
 	}
 }
