@@ -24,4 +24,19 @@ public class SearchHit {
 	public UIMessage getMessage() {
 		return this.message;
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		boolean toReturn = false;
+		
+		if (o instanceof SearchHit)
+		{
+			SearchHit tSe = (SearchHit)o;
+			toReturn = this.message.equals(tSe.getMessage()) &&
+							this.score == tSe.getScore();
+		}
+		
+		return toReturn;	
+	}
 }

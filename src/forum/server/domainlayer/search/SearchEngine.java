@@ -1,6 +1,7 @@
 package forum.server.domainlayer.search;
 
-import forum.server.domainlayer.message.ForumMessage;
+import forum.server.domainlayer.interfaces.UIMessage;
+
 
 /**
  * @author Tomer Heber
@@ -16,7 +17,7 @@ public interface SearchEngine {
 	 *  
 	 * @param msg The message which we want to add to the indexing data base of the search engine.
 	 */
-	public void addData(ForumMessage msg);
+	public void addData(UIMessage msg);
 	
 	/**
 	 * Search for all the messages(SearchHit) written by the author called username.<br><br>
