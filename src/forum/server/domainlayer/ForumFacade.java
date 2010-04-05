@@ -20,7 +20,7 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
 /**
  * @author Vitali Sepetnitsky 
  */
-public interface ForumFacade extends SearchEngine {
+public interface ForumFacade { //extends SearchEngine {
 
 	// Guest related methods:
 

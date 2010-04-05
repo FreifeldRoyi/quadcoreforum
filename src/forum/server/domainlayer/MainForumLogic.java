@@ -239,8 +239,8 @@ public class MainForumLogic implements ForumFacade {
 		this.messagesController.deleteAMessage(userID, fatherID, messageID);
 	}
 
-	@Override
-	public void addData(ForumMessage msg) 
+	/*@Override
+	public void addData(UIMessage msg) 
 	{
 		// TODO Auto-generated method stub	
 	}
@@ -255,5 +255,5 @@ public class MainForumLogic implements ForumFacade {
 	public SearchHit[] searchByContent(String phrase, int from, int to) {
 		// TODO Auto-generated method stub
 		return null;
-	}
+	}*/
 }
