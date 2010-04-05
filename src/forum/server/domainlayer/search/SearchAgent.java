@@ -5,8 +5,6 @@ package forum.server.domainlayer.search;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Vector;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;

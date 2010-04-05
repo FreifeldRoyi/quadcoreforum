@@ -203,7 +203,6 @@ public class SearchIndex
 	 * creating word <-> word ID binding
 	 * and word ID <-> message ID
 	 * 
-	 * 
 	 * @param word - the word to add
 	 * @param msgID - the message ID that will be bound to the word
 	 */
@@ -229,6 +228,42 @@ public class SearchIndex
 			this.relations.put(tWordID, toAdd);
 		}
 	}
+	
+	/*
+	private Vector<Vector<String>> devideByBooleanOperators(String[] words)
+	{
+		Vector<Vector<String>> toReturn = null;
+		Vector<String> tWordsBoolForm = new Vector<String>();
+		
+		int tStartIndex = 0;
+		while (tStartIndex < words.length && (words[tStartIndex].equals("AND") || words[tStartIndex].equals("OR")))
+		{
+			++tStartIndex;
+		}
+		if (tStartIndex < words.length && (!words[tStartIndex].equals("AND") && !words[tStartIndex].equals("OR")))
+		{
+			tWordsBoolForm.add(words[tStartIndex]);
+			for (int tIndex = tStartIndex + 1; tIndex < words.length; ++tIndex)
+			{
+				if (words[tIndex].equals("AND") || words[tIndex].equals("OR"))
+				{
+					tWordsBoolForm.add(words[tIndex]);
+				}
+				else
+				{
+					
+				}
+			}
+		}		
+		
+		for (int tIndex = 0; tIndex < words.length; ++tIndex)
+		{
+			
+		}
+		
+		return toReturn;
+	}
+	*/
 }
 
 // TODO delete unneeded comments

@@ -32,6 +32,9 @@ public class MainForumLogic implements ForumFacade {
 	private final MessagesController messagesController;
 	/* Handles all the users of the forum: guests and members */
 	private final UsersController usersController;
+	
+	/* Search Engine */
+	private SearchAgent searcher;
 
 	private static ForumFacade FORUM_FACADE_INSTANCE;
 
@@ -60,6 +63,7 @@ public class MainForumLogic implements ForumFacade {
 	private MainForumLogic() throws DatabaseRetrievalException, DatabaseUpdateException {
 		try {
 			this.dataHandler = new ForumDataHandler();
+			this.searcher = new SearchAgent();
 		}
 		catch (DatabaseUpdateException e) {
 			SystemLogger.severe(e.getMessage());
@@ -195,7 +199,21 @@ public class MainForumLogic implements ForumFacade {
 	public UIThread openNewThread(final long userID, long subjectID, final String topic, final String title,
 			final String content) throws NotRegisteredException, NotPermittedException, SubjectNotFoundException,
 			DatabaseUpdateException {
-		return this.messagesController.openNewThread(userID, topic, subjectID, title, content);
+		UIThread toReturn = this.messagesController.openNewThread(userID, topic, subjectID, title, content);
+		
+		UIMessage tMsg = null;
+		try {
+			tMsg = getMessageByID(toReturn.getID());
+			this.searcher.addData(tMsg);
+		} catch (MessageNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DatabaseRetrievalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 
 	// Message related methods
@@ -236,7 +254,11 @@ public class MainForumLogic implements ForumFacade {
 	public UIMessage addNewReply(final long authorID, final long fatherID, final String title,
 			final String content) throws NotRegisteredException, NotPermittedException, MessageNotFoundException,
 			DatabaseUpdateException {
-		return this.messagesController.addNewReply(authorID, fatherID, title, content);
+		UIMessage toReturn = this.messagesController.addNewReply(authorID, fatherID, title, content);
+		
+		this.searcher.addData(toReturn);
+		
+		return toReturn;
 	}
 
 	/**
