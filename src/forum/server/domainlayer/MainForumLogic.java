@@ -197,7 +197,7 @@ public class MainForumLogic implements ForumFacade {
 	 */
 	public UIMessage getMessageByID(final long messageID)
 			throws MessageNotFoundException, DatabaseRetrievalException {
-		return this.messagesController.getMessageByID();
+		return this.messagesController.getMessageByID(messageID);
 	}
 
 	
