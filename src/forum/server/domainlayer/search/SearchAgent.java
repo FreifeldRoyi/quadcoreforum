@@ -3,7 +3,9 @@
  */
 package forum.server.domainlayer.search;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Vector;
 
 import forum.server.domainlayer.ForumFacade;
@@ -46,16 +48,11 @@ public class SearchAgent implements SearchEngine
 	public SearchHit[] searchByAuthor(String username, int from, int to) 
 	{
 		SearchHit[] toReturn = null;
-		Vector<SearchHit> tHits = new Vector<SearchHit>();
-		Collection<UIMessage> tDBMsg = null;
 		Long tUsrID = null;
-		long tPrimUsrID;
 		
 		try 
 		{
-			tPrimUsrID = this.facade.getMemberIdByUsername(username);
-			tUsrID = new Long(tPrimUsrID);
-			tDBMsg = this.facade.getMessagesByUserID(tPrimUsrID);
+			tUsrID = new Long(this.facade.getMemberIdByUsername(username));
 		} 
 		catch (NotRegisteredException e) 
 		{
@@ -66,22 +63,32 @@ public class SearchAgent implements SearchEngine
 			toReturn = new SearchHit[0];
 		}
 		
-		if (toReturn == null & tUsrID != null)
+	
+		if (toReturn == null & tUsrID != null) //no problems
 		{
 			Collection<SearchHit> tVolatileHits = this.indexer.getDataByAuthor(tUsrID);
-
-			for (UIMessage tMsg : tDBMsg)
+			if (-1 < from && from < to && from < tVolatileHits.size())
 			{
-				SearchHit tSe = new SearchHit(tMsg,1);
-				if (!tVolatileHits.contains(tSe))
+				if (tVolatileHits.size() < to)
+					to = tVolatileHits.size();
+	
+				toReturn = new SearchHit[to];
+				SearchHit[] tVolHitsArr = tVolatileHits.toArray(new SearchHit[0]);
+				
+				int tIndex = from;
+				while (tIndex != to)
 				{
-					tVolatileHits.add(tSe);
+					toReturn[tIndex - from] = tVolHitsArr[tIndex];
+					++tIndex;
 				}
+				
+				// TODO sort messages by date - needs a certain parser for the string
 			}
-			
-			// TODO sort messages by date - needs a certain parser to the string
-			
-			toReturn = tVolatileHits.toArray(new SearchHit[0]);
+		}
+		
+		else
+		{
+			toReturn = new SearchHit[0];
 		}
 		
 		return toReturn;
@@ -93,26 +100,38 @@ public class SearchAgent implements SearchEngine
 	@Override
 	public SearchHit[] searchByContent(String phrase, int from, int to) 
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	private Vector<String> ReservedWordsRemoval(String[] words)
-	{
-		Vector<String> toReturn = new Vector<String>();
-		Vector<String> tReservedWords = this.indexer.getReservedWords();
+		SearchHit[] toReturn = null;
+		Collection<SearchHit> tSearchHitUnsorted = this.indexer.getDataByContent(phrase.split(" "));
+		SearchHit[] tSearchHitSorted = this.sortByHitScore(tSearchHitUnsorted);
 		
-		for (int tIndex = 0; tIndex < words.length; ++tIndex)
+		if (-1 < from && from < to && from < tSearchHitSorted.length)
 		{
-			if (!tReservedWords.contains(words[tIndex]))
-				toReturn.add(words[tIndex]);
+			if (tSearchHitSorted.length < to)
+				to = tSearchHitSorted.length;
+			
+			toReturn = new SearchHit[to];
+			
+			int tIndex = from;
+			while (tIndex != to)
+			{
+				toReturn[tIndex - from] = tSearchHitSorted[tIndex];
+				++tIndex;
+			}
+		}
+		else
+		{
+			toReturn = new SearchHit[0];
 		}
 		
-		return toReturn;				
+		return toReturn;
 	}
 	
-	private Collection<UIMessage> getMessagesByContentFromDB(String[] words)
+	private SearchHit[] sortByHitScore(Collection<SearchHit> hits)
 	{
+		SearchHit[] toReturn = hits.toArray(new SearchHit[0]);
 		
+		Arrays.sort(toReturn, new SearchHitComparator());
+				
+		return toReturn;
 	}
 }

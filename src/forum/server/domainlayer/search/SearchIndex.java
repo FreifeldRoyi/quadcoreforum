@@ -122,7 +122,7 @@ public class SearchIndex
 		
 		for (int tIndex = 0; tIndex < wordsArr.length; ++tIndex)
 		{
-			if (this.words.containsKey(wordsArr[tIndex])) // if not we don't care since it's being handled somewhere else
+			if (this.words.containsKey(wordsArr[tIndex]))
 			{
 				//get collection of UI messages
 				//for every item in collection do
@@ -233,4 +233,3 @@ public class SearchIndex
 
 // TODO delete unneeded comments
 // TODO get data by content - support also boolean operators
-// TODO add sorting method - for content according to the score, for author according to the date
