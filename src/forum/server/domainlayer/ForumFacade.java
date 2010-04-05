@@ -135,6 +135,26 @@ public interface ForumFacade extends SearchEngine {
 	public long registerNewMember(final String username, final String password, final String lastName,
 			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException;
 
+	
+	/**
+	 * 
+	 * Makes a registered forum member to be a moderator and get specific moderator permissions like edit 
+	 * and delete messages
+	 * 
+	 * @param applicantID
+	 * 		The id of the user which asks the promotion, typically the forum administrator
+	 * @param userID
+	 * 		The id of the user for whom the promotion is asked
+	 * 
+	 * @throws NotPermittedException
+	 * 		In case the asking user doesn't have the permission to promote other users to be moderators
+	 * @throws NotRegisteredException
+	 * 		In case the user which should be promoted to be the forum moderator, isn't registered as a forum member
+	 * @throws DatabaseUpdateException
+	 *		If a problem has occurred while trying to update the database of the forum
+	 */
+	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException;
 
 	// Subject related methods:	
 	

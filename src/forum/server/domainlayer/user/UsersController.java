@@ -14,6 +14,7 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
 import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.message.NotPermittedException;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
@@ -210,6 +211,15 @@ public class UsersController {
 		else throw new NotConnectedException(username);		
 	}
 
+	/**
+	 * @see
+	 * 		ForumFacade#promoteToBeModerator(long, long)
+	 */
+	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException {
+		
+	}
+	
 	// Default permissions methods
 	
 	/**
