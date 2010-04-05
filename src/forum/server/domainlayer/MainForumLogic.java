@@ -240,7 +240,8 @@ public class MainForumLogic implements ForumFacade {
 	}
 
 	@Override
-	public void addData(ForumMessage msg) {
+	public void addData(ForumMessage msg) 
+	{
 		// TODO Auto-generated method stub	
 	}
 
