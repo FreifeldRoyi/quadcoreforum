@@ -154,9 +154,9 @@ public class MainForumLogic implements ForumFacade {
 	 * @see
 	 * 		ForumFacade#promoteToBeModerator(long, long)
 	 */
-	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException {
-		this.usersController.promoteToBeModerator(applicantID, userID);
+		this.usersController.promoteToBeModerator(applicantID, username);
 	}
 	
 	// Subject related methods
@@ -220,6 +220,24 @@ public class MainForumLogic implements ForumFacade {
 
 	/**
 	 * @see
+	 * 		ForumFacade#searchByAuthor(String, int, int)
+	 */
+	public SearchHit[] searchByAuthor(String username, int from, int to) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#searchByContent(String, int, int)
+	 */
+	public SearchHit[] searchByContent(String phrase, int from, int to) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * @see
 	 * 		ForumFacade#getMessageByID(long)
 	 */
 	public UIMessage getMessageByID(final long messageID)
@@ -279,22 +297,4 @@ public class MainForumLogic implements ForumFacade {
 	NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException {
 		this.messagesController.deleteAMessage(userID, fatherID, messageID);
 	}
-
-	/*@Override
-	public void addData(UIMessage msg) 
-	{
-		// TODO Auto-generated method stub	
-	}
-
-	@Override
-	public SearchHit[] searchByAuthor(String username, int from, int to) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SearchHit[] searchByContent(String phrase, int from, int to) {
-		// TODO Auto-generated method stub
-		return null;
-	}*/
 }

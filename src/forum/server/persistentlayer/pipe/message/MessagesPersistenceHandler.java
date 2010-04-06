@@ -35,7 +35,7 @@ public class MessagesPersistenceHandler {
 		for (SubjectType tCurrentSubject : forum.getSubjects())
 			if (tCurrentSubject.getSubjectID() > toReturn)
 				toReturn = tCurrentSubject.getSubjectID();
-		return toReturn++;
+		return ++toReturn;
 	}
 
 	/**
@@ -49,8 +49,7 @@ public class MessagesPersistenceHandler {
 		Collection<ForumSubject> toReturn = new Vector<ForumSubject>();
 		for (SubjectType tCurrentSubjectType : data.getSubjects())
 			if (tCurrentSubjectType.isIsToLevel())
-				toReturn.add(new ForumSubject(tCurrentSubjectType.getSubjectID(), 
-						tCurrentSubjectType.getName(), tCurrentSubjectType.getDescription(), tCurrentSubjectType.isIsToLevel()));
+				toReturn.add(PersistentToDomainConverter.convertSubjectTypeToForumSubject(tCurrentSubjectType));
 		return toReturn;
 	}
 
@@ -132,7 +131,7 @@ public class MessagesPersistenceHandler {
 		for (ThreadType tCurrentThread : forum.getThreads())
 			if (tCurrentThread.getThreadID() > toReturn)
 				toReturn = tCurrentThread.getThreadID();
-		return toReturn++;
+		return ++toReturn;
 	}
 
 	/**
@@ -214,7 +213,7 @@ public class MessagesPersistenceHandler {
 		for (MessageType tCurrentMessage : forum.getMessages())
 			if (tCurrentMessage.getMessageID() > toReturn)
 				toReturn = tCurrentMessage.getMessageID();
-		return toReturn++;
+		return ++toReturn;
 	}
 
 	/**
@@ -296,6 +295,7 @@ public class MessagesPersistenceHandler {
 					continue; // do nothing
 				}
 			}
+			tDeletedMessagesIDs.add(tMessageToDelete.getMessageID());
 			return tDeletedMessagesIDs;
 	}
 }

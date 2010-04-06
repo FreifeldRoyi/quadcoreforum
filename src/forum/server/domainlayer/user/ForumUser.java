@@ -105,4 +105,15 @@ public class ForumUser implements UIUser {
 	public void removePermission(final Permission permissionToRemove) {
 		this.permissions.remove(permissionToRemove);
 	}
+	
+	/**
+	 * Sets the permissions set of the current user to be the given permissions set
+	 * 
+	 * @param permissionsToSet
+	 * 		The permissions which should be assigned to the current user instead of his
+	 * 		current permissions
+	 */
+	public void setPermissions(final Collection<Permission> permissionsToSet) {
+		this.permissions = permissionsToSet;
+	}
 }

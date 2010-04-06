@@ -23,7 +23,7 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
  *
  */
 public interface PersistenceDataHandler {
-	
+
 	// User related methods
 
 	/**
@@ -35,7 +35,7 @@ public interface PersistenceDataHandler {
 	 * 		In case the required data can't be retrieved due to a database connection error
 	 */
 	public long getFirstFreeMemberID() throws DatabaseRetrievalException;
-	
+
 	/**
 	 * 
 	 * @return
@@ -126,6 +126,22 @@ public interface PersistenceDataHandler {
 			final String lastName, final String firstName, final String email, 
 			final Collection<Permission> permissions) throws DatabaseUpdateException;	
 
+	/**
+	 * Updates the permissions of user with the given id to the given permissions
+	 * 
+	 * @param userID
+	 * 		The id of the user whose permission should be be updated
+	 * @param permissions
+	 * 		A collection of permissions which should be assigned to the user
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case the user which should be updated wasn't found
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
+	public void updateUser(final long userID, final Collection<Permission> permissions) throws
+	NotRegisteredException, DatabaseUpdateException;
+
 	// Subject related methods
 
 	/**
@@ -166,9 +182,9 @@ s	 */
 
 	/**
 	 * This method updates the database with a new subject
-     *
-     * @param subjectID
-     * 		A unique id of the new subject 
+	 *
+	 * @param subjectID
+	 * 		A unique id of the new subject 
 	 * @param subjectName
 	 * 		The name of the new subject
 	 * @param subjectDescription
@@ -181,7 +197,22 @@ s	 */
 	 */
 	public void addNewSubject(final long subjectID, final String name, final String description, boolean isTopLevel) throws DatabaseUpdateException;
 
-	public void updateSubject(final long id, final Collection<Long> subSubjects,
+	/**
+	 * Updates the content of a specific subject to be the content of the given one
+	 * 
+	 * @param subjectID
+	 * 		The id of the subject to be updated
+	 * @param subSubjects
+	 * 		The collection of the subject sub-subjects' IDs
+	 * @param threads
+	 * 		The collection of the subject threads' IDs
+	 * 
+	 * @throws SubjectNotFoundException
+	 * 		In case the subject which should be updated wasn't found
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
+	public void updateSubject(final long subjectID, final Collection<Long> subSubjects,
 			final Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException;
 
 	// Thread related methods
@@ -195,7 +226,7 @@ s	 */
 	 * 		In case the required data can't be retrieved due to a database connection error
 	 */
 	public long getFirstFreeThreadID() throws DatabaseRetrievalException;
-	
+
 	/**
 	 * Finds and returns a thread whose id equals to the given one
 	 * 
@@ -244,7 +275,7 @@ s	 */
 	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException,
 	DatabaseUpdateException;
-	
+
 	// Message related methods	
 
 	/**

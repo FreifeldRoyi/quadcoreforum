@@ -14,6 +14,9 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
 import forum.server.domainlayer.interfaces.*;
+import forum.server.domainlayer.message.ForumMessage;
+import forum.server.domainlayer.message.ForumSubject;
+import forum.server.domainlayer.message.ForumThread;
 import forum.server.domainlayer.message.NotPermittedException;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;
@@ -212,12 +215,45 @@ public class UsersController {
 	}
 
 	/**
+	 * 
+	 * Checks whether the given user is a guest of the forum
+	 * 
+	 * @param userToCheck
+	 *		The user which should be checked to be a forum guest 
+	 * 
+	 * @return
+	 * 		True if the given user is forum guest and false otherwise
+	 */
+	private boolean isGuest(ForumUser userToCheck) {
+		return (userToCheck != null) && (userToCheck.getID() < 0);
+	}
+	
+	/**
 	 * @see
 	 * 		ForumFacade#promoteToBeModerator(long, long)
 	 */
-	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException {
-		
+		try {
+			SystemLogger.info("A user with id " + applicantID + " requests to promote a user " +
+					username + " to be forum moderator.");
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(applicantID);
+			if (tApplicant.isAllowed(Permission.SET_MODERATOR)) {
+				SystemLogger.info("Permission granted for user " + applicantID + ".");
+				final ForumUser tForumUser = this.dataHandler.getUsersCache().getMemberByUsername(username);
+				tForumUser.setPermissions(this.getDefaultModeratorPermissions());
+				this.dataHandler.getUsersCache().updateInDatabase(tForumUser);
+				SystemLogger.info("The user with " + username + " has been successfully promoted to be a " +
+						"moderator of the forum.");
+			}
+			else {
+				SystemLogger.info("unpermitted operation for user " + applicantID + ".");
+				throw new NotPermittedException(applicantID, Permission.SET_MODERATOR);
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 	
 	// Default permissions methods
@@ -244,6 +280,20 @@ public class UsersController {
 		toReturn.add(Permission.OPEN_THREAD);
 		toReturn.add(Permission.REPLY_TO_MESSAGE);
 		toReturn.add(Permission.EDIT_MESSAGE);
+		return toReturn;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * 		A default permission set for a forum-moderator user, the set contains all member permissions
+	 * 		and additional permissions specified for the moderators of the forum.
+	 */
+	private Collection<Permission> getDefaultModeratorPermissions() {
+		final Collection<Permission> toReturn = this.getDefaultMemberPermissions();
+		toReturn.add(Permission.DELETE_THREAD);
+		toReturn.add(Permission.DELETE_MESSAGE);
+		toReturn.add(Permission.SET_MODERATOR);
 		return toReturn;
 	}
 }

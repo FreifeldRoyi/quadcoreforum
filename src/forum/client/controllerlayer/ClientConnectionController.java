@@ -220,10 +220,13 @@ public class ClientConnectionController extends Thread {
 				"\t" + "\t" + "- login <username> <password>" + "\n" +
 				"\t" + "\t" + "- logoff" + "\n" +
 				"\t" + "\t" + "- register <username> <password> <lastname> <firstname> <e-mail>" + "\n" +
+				"\t" + "\t" + "- make moderator <username>" +
 				"\n" + "\t" + "View content operations:" + "\n" +
 				"\t" + "\t" + "- view_subjects <root subject id> (-1 to view the root subjects of the forum)" + "\n" +
 				"\t" + "\t" + "- view_subject_content <subject id>" + "\n" +
 				"\t" + "\t" + "- view_message_and_replies <message_id>" + "\n" +
+				"\t" + "\t" + "- search_by_author <author_user_name>" + "\n" +
+				"\t" + "\t" + "- search_by_content <phrase_to_search>" + "\n" +	
 				"\n" + "\t" + "Add/Update/Delete operations:" + "\n" +
 				"\t" + "\t" + "- add_new_subject <parent subject id> <new subject name> <new subject description>" + "\n" +
 				"\t" + "\t" + "- open_new_thread <parent subject id> <thread topic> <message title> <message content>" + "\n" +
@@ -233,7 +236,6 @@ public class ClientConnectionController extends Thread {
 				"\t" + "- disconnect" + "\n" +
 				"//TODO add more operations (Admin, Moderator, Search)"	+ "\n"			
 		);								
-
 	}
 
 	/**
@@ -282,10 +284,18 @@ public class ClientConnectionController extends Thread {
 			if (command.equals("modify_message"))
 				return new AddReplyMessage(tUserID,
 						Long.parseLong(tStringTokenizer.nextToken()), tStringTokenizer.nextToken(),
-						tStringTokenizer.nextToken());	
-			// TODO Add Search messages.
-			// TODO Add Admin messages
-			// TODO Add Moderator messages.
+						tStringTokenizer.nextToken());
+			if (command.equals("make moderator"))
+				return new PromoteToModeratorMessage(tUserID, tStringTokenizer.nextToken());
+			if (command.equals("search_by_author"))
+				return new SearchByAuthorMessage(tStringTokenizer.nextToken());
+			if (command.equals("search_by_content")) {
+				String tPhraseToSearch = "";
+				while (tStringTokenizer.hasMoreTokens())
+					tPhraseToSearch += tStringTokenizer.nextToken() + "";
+				tPhraseToSearch = tPhraseToSearch.substring(0, tPhraseToSearch.length() - 1);
+				return new SearchByContentMessage(tPhraseToSearch);
+			}
 		}
 		catch(Exception e) {
 			throw new BadCommandException("The command " + str + " is invalid.");

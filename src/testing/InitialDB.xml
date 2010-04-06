@@ -19,7 +19,7 @@
     <subSubjectsIDs>0</subSubjectsIDs>
     <threadsIDs>0</threadsIDs>
     <lastAddedMessageID>0</lastAddedMessageID>
-    <isToLevel>true</isToLevel>
+    <isToLevel>false</isToLevel>
   </subjects>
   <threads>
     <threadID>0</threadID>

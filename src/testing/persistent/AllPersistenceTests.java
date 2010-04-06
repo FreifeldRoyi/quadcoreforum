@@ -1,4 +1,4 @@
-package forum.server.persistentlayer.testing;
+package testing.persistent;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
