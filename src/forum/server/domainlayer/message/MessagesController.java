@@ -24,7 +24,7 @@ import forum.server.persistentlayer.pipe.user.exceptions.*;
 
 public class MessagesController {
 
-	private ForumDataHandler dataHander;
+	private ForumDataHandler dataHandler;
 
 	/**
 	 * The class constructor
@@ -32,7 +32,7 @@ public class MessagesController {
 	 * Initializes an instance of messages controller, that handles all the forum content activity
 	 */
 	public MessagesController(ForumDataHandler dataHandler) {
-		this.dataHander = dataHandler;
+		this.dataHandler = dataHandler;
 	}
 
 	// Subject related methods
@@ -48,13 +48,14 @@ public class MessagesController {
 		SystemLogger.info(tLoggerMessage);
 		final Collection<UISubject> toReturn = new Vector<UISubject>();
 
-		if (fatherID == -1) 
-			toReturn.addAll(this.dataHander.getMessagesCache().getTopLevelSubjects());
+		if (fatherID == -1)
+			toReturn.addAll(this.dataHandler.getMessagesCache().getTopLevelSubjects());
 		else {
-			final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
+			final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
 			final Collection<Long> tSubSubjectsIDs = tFatherSubject.getSubSubjects();
-			for (long tSubjectID : tSubSubjectsIDs)
-				toReturn.add(this.dataHander.getMessagesCache().getSubjectByID(tSubjectID));
+			for (long tSubjectID : tSubSubjectsIDs) {
+				toReturn.add(this.dataHandler.getMessagesCache().getSubjectByID(tSubjectID));
+			}
 		}
 		return toReturn;
 	}
@@ -71,26 +72,26 @@ public class MessagesController {
 
 			SystemLogger.info("A user with id " + userID + " requests to add a new subject named " + name + " to " + 
 					tLoggerMessageEnd + ".");
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 
 			if (tApplicant.isAllowed(tPermissionToCheck)) {
 				SystemLogger.info("permission granted for user " + userID + ".");
 				// checks that there doesn't exist a subject whose id is same as the given one, in the required level
 				Collection<UISubject> tRequiredLevelSubjects = this.getSubjects(fatherID);
-				for (UISubject tCurrentSubject :tRequiredLevelSubjects)
+				for (UISubject tCurrentSubject : tRequiredLevelSubjects)
 					if (tCurrentSubject.getName().equals(name))
 						throw new SubjectAlreadyExistsException(name);
 				// adds the new subject to the forum
 				if (fatherID == -1) {
-					ForumSubject toReturn = this.dataHander.getMessagesCache().createNewSubject(name, description, true);
+					ForumSubject toReturn = this.dataHandler.getMessagesCache().createNewSubject(name, description, true);
 					SystemLogger.info("A subject named " + name + " was added to the top level of the forum");
 					return toReturn;
 				}	
 				else {
-					ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
-					ForumSubject tNewSubject = this.dataHander.getMessagesCache().createNewSubject(name, description, false);
+					ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
+					ForumSubject tNewSubject = this.dataHandler.getMessagesCache().createNewSubject(name, description, false);
 					tFatherSubject.addSubSubject(tNewSubject.getID());
-					this.dataHander.getMessagesCache().updateInDatabase(tFatherSubject);
+					this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);					
 					SystemLogger.info("A subject named " + name + " was added as a sub-subject of a subject named " + 
 							tFatherSubject.getName());
 					return tNewSubject;
@@ -114,12 +115,12 @@ public class MessagesController {
 	 */
 	public Collection<UIThread> getThreads(final long fatherID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		SystemLogger.info("Threads of a subject with id " + fatherID + " are requested to view.");
-		final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
+		final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
 		final Collection<Long> tThreadsIDs = tFatherSubject.getThreads();
 		final Collection<UIThread> toReturn = new Vector<UIThread>();
 		for (long tThreadID : tThreadsIDs) {
 			try {
-				toReturn.add(this.dataHander.getMessagesCache().getThreadByID(tThreadID));
+				toReturn.add(this.dataHandler.getMessagesCache().getThreadByID(tThreadID));
 			}
 			catch (ThreadNotFoundException e) {
 				continue; // do nothing
@@ -138,15 +139,14 @@ public class MessagesController {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to open a new thread under the subject with id " +
 					subjectID + ".");
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 			if (tApplicant.isAllowed(Permission.OPEN_THREAD)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(subjectID);
-
-				final ForumMessage tNewMessage = this.dataHander.getMessagesCache().createNewMessage(userID, title, content);
-				final ForumThread tNewThread = this.dataHander.getMessagesCache().openNewThread(topic, tNewMessage.getID());		
+				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
+				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content);
+				final ForumThread tNewThread = this.dataHandler.getMessagesCache().openNewThread(topic, tNewMessage.getID());		
 				tFatherSubject.addThread(tNewThread.getID());			
-				this.dataHander.getMessagesCache().updateInDatabase(tFatherSubject);
+				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 				return tNewThread;
 			}
 			else {
@@ -164,17 +164,17 @@ public class MessagesController {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to delete ther thread with id " +
 					threadID + " from a subject with id " + fatherID);
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumThread tThreadToDelete = this.dataHander.getMessagesCache().getThreadByID(threadID);
-				final ForumSubject tFatherSubject = this.dataHander.getMessagesCache().getSubjectByID(fatherID);
+				final ForumThread tThreadToDelete = this.dataHandler.getMessagesCache().getThreadByID(threadID);
+				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
 
 				// delete the thread from the desired subject
 				tFatherSubject.deleteThread(threadID);
-				this.dataHander.getMessagesCache().updateInDatabase(tFatherSubject);
+				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 
-				this.dataHander.getMessagesCache().deleteATread(tThreadToDelete.getID());
+				this.dataHandler.getMessagesCache().deleteATread(tThreadToDelete.getID());
 
 				SystemLogger.info("A thread with id " + threadID + " was deleted successfuly from the subject " +
 						fatherID + " by a user " + userID);
@@ -198,7 +198,7 @@ public class MessagesController {
 	 */
 	public UIMessage getMessageByID(final long messageID)
 	throws MessageNotFoundException, DatabaseRetrievalException {
-		return this.dataHander.getMessagesCache().getMessageByID(messageID);
+		return this.dataHandler.getMessagesCache().getMessageByID(messageID);
 	}
 
 	/**
@@ -207,12 +207,12 @@ public class MessagesController {
 	 */
 	public Collection<UIMessage> getReplies(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
 		SystemLogger.info("Replies of a message with id " + messageID + " are requested to view.");
-		final ForumMessage tFatherMessage = this.dataHander.getMessagesCache().getMessageByID(messageID);
+		final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(messageID);
 		final Collection<Long> tRepliesIDs = tFatherMessage.getReplies();
 		final Collection<UIMessage> toReturn = new Vector<UIMessage>();
 		for (long tReplyID : tRepliesIDs) {
 			try {
-				toReturn.add(this.dataHander.getMessagesCache().getMessageByID(tReplyID));
+				toReturn.add(this.dataHandler.getMessagesCache().getMessageByID(tReplyID));
 			}
 			catch (MessageNotFoundException e) {
 				continue; // do nothing
@@ -231,14 +231,14 @@ public class MessagesController {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to add a new reply to a message with id " +
 					fatherID + ".");
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
-			final ForumMessage tFatherMessage = this.dataHander.getMessagesCache().getMessageByID(fatherID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
+			final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
 			if (tApplicant.isAllowed(Permission.REPLY_TO_MESSAGE)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumMessage tNewMessage = this.dataHander.getMessagesCache().createNewMessage(userID, title, content);
+				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content);
 				// adds the new reply to the replied message
 				tFatherMessage.addReply(tNewMessage.getID());
-				this.dataHander.getMessagesCache().updateInDatabase(tFatherMessage);
+				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
 				SystemLogger.info("A new reply was successfuly added to message " + fatherID + " by a user " + userID + ".");
 				return tNewMessage;
 			}
@@ -262,12 +262,12 @@ public class MessagesController {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to edit a message with id " +
 					messageID + ".");
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
-			final ForumMessage tMessageToEdit = this.dataHander.getMessagesCache().getMessageByID(messageID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
+			final ForumMessage tMessageToEdit = this.dataHandler.getMessagesCache().getMessageByID(messageID);
 			if (tApplicant.isAllowed(Permission.EDIT_MESSAGE) && tMessageToEdit.getAuthorID() == tApplicant.getID()) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				tMessageToEdit.updateMe(newTitle, newContent);
-				this.dataHander.getMessagesCache().updateInDatabase(tMessageToEdit);
+				this.dataHandler.getMessagesCache().updateInDatabase(tMessageToEdit);
 				return tMessageToEdit;
 			}
 			else {
@@ -289,14 +289,14 @@ public class MessagesController {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to delete a message with id " +
 					messageID + " from being a reply of " + fatherID + ".");
-			final ForumUser tApplicant = this.dataHander.getUsersCache().getUserByID(userID);
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumMessage tMessageToDelete = this.dataHander.getMessagesCache().getMessageByID(messageID);
-				final ForumMessage tFatherMessage = this.dataHander.getMessagesCache().getMessageByID(fatherID);
+				final ForumMessage tMessageToDelete = this.dataHandler.getMessagesCache().getMessageByID(messageID);
+				final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
 				tFatherMessage.deleteReply(tMessageToDelete.getID());
-				this.dataHander.getMessagesCache().updateInDatabase(tFatherMessage);
-				this.dataHander.getMessagesCache().deleteAMessage(messageID);
+				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
+				this.dataHandler.getMessagesCache().deleteAMessage(messageID);
 				SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
 						fatherID + " by a user " + userID);
 			}

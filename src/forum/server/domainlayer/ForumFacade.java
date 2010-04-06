@@ -143,8 +143,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 
 	 * @param applicantID
 	 * 		The id of the user which asks the promotion, typically the forum administrator
-	 * @param userID
-	 * 		The id of the user for whom the promotion is asked
+	 * @param username
+	 * 		The user-name of the user for whom the promotion is asked
 	 * 
 	 * @throws NotPermittedException
 	 * 		In case the asking user doesn't have the permission to promote other users to be moderators
@@ -153,7 +153,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @throws DatabaseUpdateException
 	 *		If a problem has occurred while trying to update the database of the forum
 	 */
-	public void promoteToBeModerator(final long applicantID, final long userID) throws NotPermittedException, 
+	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException;
 
 	// Subject related methods:	
@@ -272,7 +272,18 @@ public interface ForumFacade { //extends SearchEngine {
 	
 	
 	// Message related methods:
-
+	
+	/**
+	 * @see
+	 * 		SearchEngine#searchByAuthor(String, int, int)
+	 */
+	public SearchHit[] searchByAuthor(String username, int from, int to);
+	
+	/**
+	 * @see
+	 * 		SearchEngine#searchByContent(String, int, int)
+	 */
+	public SearchHit[] searchByContent(String phrase, int from, int to);
 	
 	/**
 	 * Finds and returns a message whose id is equal to the given id

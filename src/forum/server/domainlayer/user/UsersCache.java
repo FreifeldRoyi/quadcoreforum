@@ -14,6 +14,7 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.server.persistentlayer.pipe.PersistenceDataHandler;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
+import forum.server.persistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
 /**
@@ -240,4 +241,24 @@ public class UsersCache {
 		this.idsToUsersMapping.put(id, newMember);
 		return newMember;
 	}
+	
+	/**
+	 * 
+	 * Updates the data of the given user of the forum in the forum database
+	 * 
+	 * @param updatedUser
+	 * 		The updated user whose data should be updated in the database
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a user with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case the database can't be updated due to a database connection error
+	 */
+	public void updateInDatabase(ForumUser updatedUser) throws NotRegisteredException, DatabaseUpdateException {
+		// removes the user from the cache in order to allow the changes only after the next login and not right
+		// now. Therefore the user isn't updated in the cache but only via the database
+		this.idsToUsersMapping.remove(updatedUser.getID());
+		this.pipe.updateUser(updatedUser.getID(), updatedUser.getPermissions());
+	}
+
 }

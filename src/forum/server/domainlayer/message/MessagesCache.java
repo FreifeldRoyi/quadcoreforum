@@ -92,11 +92,11 @@ public class MessagesCache {
 	 */
 	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
 		Collection<ForumSubject> toReturn = this.pipe.getTopLevelSubjects();
-		for (ForumSubject tCurrentSubject : toReturn)
+		for (ForumSubject tCurrentSubject : toReturn) 
 			this.idsToSubjectsMapping.put(tCurrentSubject.getID(), tCurrentSubject);
 		return toReturn;
 	}
-	
+
 	/**
 	 * 
 	 * Finds and returns a subject whose id is equal to the give one
@@ -111,8 +111,8 @@ public class MessagesCache {
 	 * 		In case a subject with the given id hasn't been found in the cache and the database
 	 * @throws DatabaseRetrievalException
 	 */
-	public ForumSubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
-		if (this.idsToMessagesMapping.containsKey(subjectID))
+	public ForumSubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
+		if (this.idsToSubjectsMapping.containsKey(subjectID))
 			return this.idsToSubjectsMapping.get(subjectID);
 		else {
 			ForumSubject toReturn = this.pipe.getSubjectByID(subjectID);
@@ -161,7 +161,8 @@ public class MessagesCache {
 	 */
 	public void updateInDatabase(ForumSubject updatedSubject) throws SubjectNotFoundException, DatabaseUpdateException {
 		this.pipe.updateSubject(updatedSubject.getID(), updatedSubject.getSubSubjects(), updatedSubject.getThreads());
-		this.idsToSubjectsMapping.put(updatedSubject.getID(), updatedSubject);
+		if (!this.idsToSubjectsMapping.containsKey(updatedSubject.getID()))
+			this.idsToSubjectsMapping.put(updatedSubject.getID(), updatedSubject);
 	}
 
 	// Thread related methods
@@ -303,7 +304,7 @@ public class MessagesCache {
 		for (long tMessageID : tRecDeletedMessages)
 			this.idsToMessagesMapping.remove(tMessageID);
 	}
-	
+
 	/**
 	 * 
 	 * Updates the data of the given forum message in the forum database
@@ -317,7 +318,8 @@ public class MessagesCache {
 	 * 		In case the database can't be updated due to a database connection error
 	 */
 	public void updateInDatabase(ForumMessage updatedMessage) throws MessageNotFoundException, DatabaseUpdateException {
-		this.idsToMessagesMapping.put(updatedMessage.getID(), updatedMessage);
 		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent());
+		if (!this.idsToMessagesMapping.containsKey(updatedMessage.getID()))
+			this.idsToMessagesMapping.put(updatedMessage.getID(), updatedMessage);
 	}
 }
