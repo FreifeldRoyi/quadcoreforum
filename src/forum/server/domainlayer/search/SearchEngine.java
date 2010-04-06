@@ -53,5 +53,4 @@ public interface SearchEngine {
 	 * @return The search hits from index from till index to - 1
 	 */
 	public SearchHit[] searchByContent(String phrase, int from, int to);
-
 }

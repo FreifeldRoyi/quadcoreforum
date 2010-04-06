@@ -70,9 +70,10 @@ public class PersistentToDomainConverter {
 	 */
 	public static ForumSubject convertSubjectTypeToForumSubject(SubjectType toConvert) {
 		return new ForumSubject(toConvert.getSubjectID(), 
-				toConvert.getName(), toConvert.getDescription(), toConvert.isIsToLevel());
+				toConvert.getName(), toConvert.getDescription(), toConvert.getSubSubjectsIDs(),
+				toConvert.getThreadsIDs(), toConvert.isIsToLevel());
 	}
-	
+
 	/**
 	 * Converts a {@link ThreadType} object to a {@link ForumThread} object
 	 * 
