@@ -96,7 +96,7 @@ public class ForumSubject implements UISubject {
 	 * 		UISubject#getNumOfSubSubjects()
 	 */
 	public long getNumOfSubSubjects() {
-		return this.threadsIDs.size();
+		return this.subSubjectsIDs.size();
 	}
 
 	/**
@@ -125,6 +125,20 @@ public class ForumSubject implements UISubject {
 		return this.threadsIDs;
 	}
 
+	/**
+	 * 
+	 * This method overrides the standard equals method and 
+	 * checks whether two subjects are the same one 
+	 * 
+	 * @see
+	 * 		Object#equals(Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		return (obj != null) && (obj instanceof ForumSubject) && (((ForumSubject)obj).getID() == 
+			this.getID());
+	}
+	
 	/**
 	 * @see
 	 * 		UISubject#toString()

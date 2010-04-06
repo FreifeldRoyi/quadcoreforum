@@ -189,6 +189,22 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 		}
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#updateUser(long, Collection)
+	 */
+	public void updateUser(final long userID, final Collection<Permission> permissions) throws
+	NotRegisteredException, DatabaseUpdateException {
+		try {
+			ForumType tForum = this.unmarshalDatabase();
+			this.usersHandler.updateUser(tForum, userID, permissions);
+			this.marshalDatabase(tForum);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
 	// Subject related methods
 
 	/**

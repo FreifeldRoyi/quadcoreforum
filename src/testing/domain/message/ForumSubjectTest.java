@@ -50,14 +50,15 @@ public class ForumSubjectTest extends TestCase {
 	public void testSubSubjectsHandling() {	
 		int tNumOfSub = this.subjectUnderTest.getSubSubjects().size();
 		this.subjectUnderTest.addSubSubject(67L);
+		this.subjectUnderTest.addSubSubject(672L);
 		this.subjectUnderTest.addSubSubject(26L);
 		Collection<Long> tSubSubjectsIDs = this.subjectUnderTest.getSubSubjects();
-		assertTrue(tNumOfSub + 2 == tSubSubjectsIDs.size());		
+		assertTrue(tNumOfSub + 3 == tSubSubjectsIDs.size());		
 		assertTrue(tSubSubjectsIDs.contains(67L));
 		assertTrue(tSubSubjectsIDs.contains(26L));
 		this.subjectUnderTest.deleteSubSubject(67L);
 		tSubSubjectsIDs = this.subjectUnderTest.getSubSubjects();
-		assertTrue(tNumOfSub + 1 == tSubSubjectsIDs.size());		
+		assertTrue(tNumOfSub + 2 == tSubSubjectsIDs.size());		
 		assertTrue(tSubSubjectsIDs.contains(26L));
 	}
 

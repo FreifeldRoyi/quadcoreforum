@@ -1,15 +1,11 @@
-package testing.domain;
+package testing.domain.user;
 
-import testing.domain.user.ForumMemberTest;
-import testing.domain.user.ForumUserTest;
-import testing.domain.user.UsersCacheTest;
-import testing.domain.user.UsersControllerTest;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+
+import junit.framework.*;
 
 public class AllUserTests {
 
-	public static Test suite() {
+	public static junit.framework.Test suite() {
 		TestSuite suite = new TestSuite(
 				"Test for forum.testing.domainlayer.user");
 		//$JUnit-BEGIN$
@@ -21,5 +17,4 @@ public class AllUserTests {
 		//$JUnit-END$
 		return suite;
 	}
-
 }

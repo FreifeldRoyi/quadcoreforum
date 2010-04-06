@@ -29,7 +29,7 @@ public class UsersPersistenceHandler {
 		for (MemberType tCurrentMember : data.getMembers())
 			if (tCurrentMember.getUserID() > toReturn)
 				toReturn = tCurrentMember.getUserID();
-		return toReturn++;
+		return ++toReturn;
 	}
 
 	/**
@@ -41,14 +41,8 @@ public class UsersPersistenceHandler {
 	 */
 	public Collection<ForumMember> getAllMembers(ForumType data) {
 		Collection<ForumMember> toReturn = new Vector<ForumMember>();
-		for (MemberType tCurrentMemberType : data.getMembers()) {
-			try {
-				toReturn.add(this.getMemberTypeByID(data, tCurrentMemberType.getUserID()));
-			}
-			catch (NotRegisteredException e) {
-				continue; // do nothing
-			}
-		}
+		for (MemberType tCurrentMemberType : data.getMembers()) 
+			toReturn.add(PersistentToDomainConverter.convertMemberTypeToForumMember(tCurrentMemberType));
 		return toReturn;
 	}
 
@@ -60,7 +54,7 @@ public class UsersPersistenceHandler {
 	 * 		PersistenceDataHandler#getUserByID(long)
 	 */
 	public ForumUser getUserByID(ForumType data, long userID) throws NotRegisteredException {
-		return this.getMemberTypeByID(data, userID);
+		return PersistentToDomainConverter.convertMemberTypeToForumMember(this.getMemberTypeByID(data, userID));
 	}
 
 	/**
@@ -72,18 +66,17 @@ public class UsersPersistenceHandler {
 	 * 		The id of the member which should be found
 	 * 
 	 * @return
-	 * 		The found member
+	 * 		The found member type
 	 * 
 	 * @throws NotRegisteredException
 	 * 		In case a member with the given id isn't registered to the forum (and therefore hasn't been found in the database)
 	 */
-	private ForumMember getMemberTypeByID(ForumType forum, long memberID) throws NotRegisteredException {
+	private MemberType getMemberTypeByID(ForumType forum, long memberID) throws NotRegisteredException {
 		for (MemberType tCurrentMemberType : forum.getMembers())
 			if (tCurrentMemberType.getUserID() == memberID)
-				return PersistentToDomainConverter.convertMemberTypeToForumMember(tCurrentMemberType);
+				return tCurrentMemberType;
 		throw new NotRegisteredException(memberID);
 	}
-
 
 	/**
 	 * @param data
@@ -125,5 +118,35 @@ public class UsersPersistenceHandler {
 		MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, 
 				firstName, email, permissions);
 		data.getMembers().add(tNewMemberType);
+	}
+
+	/**
+	 * Parses and converts a collection of permissions of type {@link Permission} to a collection of strings
+	 * 
+	 * @param permissions
+	 * 		The collection of permissions which should be parsed and converted to collection of strings
+	 * 
+	 * @return
+	 * 		The created collection of {@link String} objects
+	 */
+	private Collection<String> parsePermissionsToString(Collection<Permission> permissions) {
+		Collection<String> toReturn = new HashSet<String>();
+		for (Permission tCurrentPermission : permissions)
+			toReturn.add(tCurrentPermission.toString());
+		return toReturn;
+	}
+
+	/**
+	 * @param data
+	 * 		The forum data where the user details should be updated
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#updateUser(long, Collection)
+	 */
+	public void updateUser(final ForumType data, final long userID, final Collection<Permission> permissions)
+	throws NotRegisteredException {
+		MemberType tMemberToUpdate = this.getMemberTypeByID(data, userID);
+		tMemberToUpdate.getPrivileges().clear();
+		tMemberToUpdate.getPrivileges().addAll(this.parsePermissionsToString(permissions));
 	}
 }

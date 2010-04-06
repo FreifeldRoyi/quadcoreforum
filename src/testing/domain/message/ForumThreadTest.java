@@ -46,7 +46,7 @@ public class ForumThreadTest extends TestCase {
 	 */
 	@Test
 	public void testNumOfResponsesHandling() {
-		int tCurrentNumOfResponses = this.threadUnderTest.getNumOfResponses();
+		long tCurrentNumOfResponses = this.threadUnderTest.getNumOfResponses();
 		this.threadUnderTest.incNumOfResponses();
 		assertEquals(this.threadUnderTest.getNumOfResponses(), tCurrentNumOfResponses + 1);
 		this.threadUnderTest.incNumOfResponses();
@@ -66,7 +66,7 @@ public class ForumThreadTest extends TestCase {
 	 */
 	@Test
 	public void numOfViewsHandling() {
-		int tCurrentNumOfViews = this.threadUnderTest.getNumOfViews();
+		long tCurrentNumOfViews = this.threadUnderTest.getNumOfViews();
 		this.threadUnderTest.incNumOfViews();
 		this.threadUnderTest.incNumOfViews();		
 		assertEquals(this.threadUnderTest.getNumOfViews(), tCurrentNumOfViews + 2);
