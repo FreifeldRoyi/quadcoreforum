@@ -26,15 +26,13 @@ import forum.server.persistentlayer.pipe.message.exceptions.*;
  *
  */
 public class MainForumLogic implements ForumFacade {
-	/* Handles all the forum data and is connected to the database */
-	private final ForumDataHandler dataHandler;
-	/* Handles subjects, threads and messages */
-	private final MessagesController messagesController;
+
 	/* Handles all the users of the forum: guests and members */
 	private final UsersController usersController;
-	
-	/* Search Engine */
-	private SearchAgent searcher;
+	/* Handles subjects, threads and messages */
+	private final MessagesController messagesController;
+	/* Search Controller */
+	private final SearchEngine searchController;
 
 	private static ForumFacade FORUM_FACADE_INSTANCE;
 
@@ -62,8 +60,10 @@ public class MainForumLogic implements ForumFacade {
 	 */
 	private MainForumLogic() throws DatabaseRetrievalException, DatabaseUpdateException {
 		try {
-			this.dataHandler = new ForumDataHandler();
-			this.searcher = new SearchAgent();
+			ForumDataHandler tDataHandler = new ForumDataHandler();
+			this.searchController = new SearchAgent();
+			this.usersController = new UsersController(tDataHandler);
+			this.messagesController = new MessagesController(tDataHandler);	
 		}
 		catch (DatabaseUpdateException e) {
 			SystemLogger.severe(e.getMessage());
@@ -73,9 +73,6 @@ public class MainForumLogic implements ForumFacade {
 			SystemLogger.severe(e.getMessage());
 			throw e;
 		}
-		
-		this.usersController = new UsersController(this.dataHandler);
-		this.messagesController = new MessagesController(this.dataHandler);	
 	}
 
 
@@ -204,7 +201,7 @@ public class MainForumLogic implements ForumFacade {
 		UIMessage tMsg = null;
 		try {
 			tMsg = getMessageByID(toReturn.getID());
-			this.searcher.addData(tMsg);
+			this.searchController.addData(tMsg);
 		} catch (MessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -223,8 +220,7 @@ public class MainForumLogic implements ForumFacade {
 	 * 		ForumFacade#searchByAuthor(String, int, int)
 	 */
 	public SearchHit[] searchByAuthor(String username, int from, int to) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.searchController.searchByAuthor(username, from, to);
 	}
 
 	/**
@@ -232,8 +228,7 @@ public class MainForumLogic implements ForumFacade {
 	 * 		ForumFacade#searchByContent(String, int, int)
 	 */
 	public SearchHit[] searchByContent(String phrase, int from, int to) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.searchController.searchByContent(phrase, from, to);
 	}
 	
 	/**
@@ -274,7 +269,7 @@ public class MainForumLogic implements ForumFacade {
 			DatabaseUpdateException {
 		UIMessage toReturn = this.messagesController.addNewReply(authorID, fatherID, title, content);
 		
-		this.searcher.addData(toReturn);
+		this.searchController.addData(toReturn);
 		
 		return toReturn;
 	}
