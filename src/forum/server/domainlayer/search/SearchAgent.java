@@ -21,12 +21,12 @@ import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 public class SearchAgent implements SearchEngine
 {
 	private SearchIndex indexer;
-	private ForumFacade facade;
+	//private ForumFacade facade;
 	
 	public SearchAgent() throws DatabaseRetrievalException, DatabaseUpdateException
 	{
 		this.indexer = SearchIndex.getInstance();
-		this.facade = MainForumLogic.getInstance();
+	//	this.facade = MainForumLogic.getInstance();
 	}
 
 	
@@ -48,7 +48,7 @@ public class SearchAgent implements SearchEngine
 		SearchHit[] toReturn = null;
 		Long tUsrID = null;
 		
-		try 
+		/*try 
 		{
 			tUsrID = new Long(this.facade.getMemberIdByUsername(username));
 		} 
@@ -59,7 +59,7 @@ public class SearchAgent implements SearchEngine
 		catch (DatabaseRetrievalException e) 
 		{
 			toReturn = new SearchHit[0];
-		}
+		}*/
 		
 	
 		if (toReturn == null & tUsrID != null) //no problems
