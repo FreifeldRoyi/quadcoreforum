@@ -67,16 +67,25 @@ public class SearchIndex
 	public void addMessage(UIMessage msg)
 	{
 		String[] tContentSplit = msg.getContent().split(" ");
+		String[] tSubjectSplit = msg.getTitle().split(" ");
 		Vector<String> tNoReservedWords = new Vector<String>();
 		
 		if (!this.items.containsKey(msg.getID()))
 		{
-			//removal of reserved words
+			//removal of reserved words from content
 			for (int tIndex = 0; tIndex < tContentSplit.length; ++tIndex)
 			{
 				if (!this.reserved_words.contains(tContentSplit[tIndex]))
 				{
 					tNoReservedWords.add(tContentSplit[tIndex]);
+				}
+			}
+			//removal of reserved words from subject
+			for (int tIndex = 0; tIndex < tSubjectSplit.length; ++tIndex)
+			{
+				if (!this.reserved_words.contains(tSubjectSplit[tIndex]))
+				{
+					tNoReservedWords.add(tSubjectSplit[tIndex]);
 				}
 			}
 		
@@ -134,7 +143,7 @@ public class SearchIndex
 				Collection<Long> tMsgID = this.relations.get(this.words.get(wordsArr[tIndex]));
 				for (Long tUImsgID : tMsgID)
 				{
-					UIMessage tUIMsg = this.items.get(this.relations.get(tUImsgID));
+					UIMessage tUIMsg = this.items.get(tUImsgID);
 					Double tValue;
 					
 					if (tHitTimes.containsKey(tUIMsg))
@@ -196,6 +205,16 @@ public class SearchIndex
 			toReturn.add(tStr.substring(0));
 		}
 		return toReturn;
+	}
+	
+	/**
+	 * adds a word to the reserved words volatile data.
+	 * The search engine will not search according to these words
+	 * @param word - the word to add
+	 */
+	public void addReservedWord(String word)
+	{
+		this.reserved_words.add(word);
 	}
 	
 	/**
