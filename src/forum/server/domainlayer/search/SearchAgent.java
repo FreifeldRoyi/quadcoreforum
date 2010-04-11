@@ -79,8 +79,6 @@ public class SearchAgent implements SearchEngine
 					toReturn[tIndex - from] = tVolHitsArr[tIndex];
 					++tIndex;
 				}
-				
-				// TODO sort messages by date - needs a certain parser for the string
 			}
 		}
 		
@@ -133,3 +131,6 @@ public class SearchAgent implements SearchEngine
 		return toReturn;
 	}
 }
+
+// TODO check for empty phrases! the indexer doe's not accept empty phrases for a search phrase
+// TODO remove unneeded comments

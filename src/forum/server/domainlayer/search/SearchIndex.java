@@ -125,47 +125,57 @@ public class SearchIndex
 	public Collection<SearchHit> getDataByContent(String[] wordsArr)
 	{
 		Vector<SearchHit> toReturn = new Vector<SearchHit>();
-		HashMap<UIMessage,Double> tHitTimes = new HashMap<UIMessage, Double>();
+		Vector<Vector<String>> tLogicalOperationDivided = divideByBooleanOperators(wordsArr);
+		Vector<HashMap<UIMessage,Double>> tLogicalOperationsHashes =  new Vector<HashMap<UIMessage,Double>>();
 		
-		for (int tIndex = 0; tIndex < wordsArr.length; ++tIndex)
+		for (int tCount = 0; tCount < tLogicalOperationDivided.size(); ++tCount)
 		{
-			if (this.words.containsKey(wordsArr[tIndex]))
+			HashMap<UIMessage, Double> toAdd = new HashMap<UIMessage, Double>();
+			tLogicalOperationsHashes.add(toAdd);
+		}
+		
+		for (int tIndex = 0; tIndex < tLogicalOperationDivided.size(); ++tIndex)
+		{
+			for (String tWord : tLogicalOperationDivided.elementAt(tIndex))
 			{
-				//get collection of UI messages
-				//for every item in collection do
-					//get UIMessage from items hash map
-					//if UI message is in tHitTimes then
-						//create new Double object with value + 1
-					//else
-						//create new Double object with value = 1
-				Collection<Long> tMsgID = this.relations.get(this.words.get(wordsArr[tIndex]));
-				for (Long tUImsgID : tMsgID)
+				if (this.words.containsKey(tWord))
 				{
-					UIMessage tUIMsg = this.items.get(tUImsgID);
-					Double tValue;
-					
-					if (tHitTimes.containsKey(tUIMsg))
+					Collection<Long> tMsgID = this.relations.get(this.words.get(tWord));
+					for (Long tUImsgID : tMsgID)
 					{
-						tValue = new Double(tHitTimes.get(tUIMsg).doubleValue() + 1);
+						UIMessage tUIMsg = this.items.get(tUImsgID);
+						Double tValue;
+						
+						if (tLogicalOperationsHashes.elementAt(tIndex).containsKey(tUIMsg))
+						{
+							tValue = new Double(tLogicalOperationsHashes.elementAt(tIndex).get(tUIMsg).doubleValue() + 1);
+						}
+						else
+						{
+							tValue = new Double(1);
+						}
+						
+						tLogicalOperationsHashes.elementAt(tIndex).put(tUIMsg, tValue);
 					}
-					else
-					{
-						tValue = new Double(1);
-					}
-					
-					tHitTimes.put(tUIMsg, tValue);
 				}
 			}
 		}
 		
-		Set<Map.Entry<UIMessage, Double>> tMapping = tHitTimes.entrySet();
-		Iterator<Map.Entry<UIMessage, Double>> tItr = tMapping.iterator();
+		HashMap<UIMessage, Pair<Integer, Double>> tMerge = merge(tLogicalOperationsHashes);
+		HashMap<Integer,Double> tMax = findMaxScores(tMerge);
+		
+		
+		//the next block of code will normalize the scores given to all hits
+		Set<Map.Entry<UIMessage, Pair<Integer,Double>>> tSetMappings = tMerge.entrySet();
+		Iterator<Map.Entry<UIMessage, Pair<Integer,Double>>> tItr = tSetMappings.iterator();
 		
 		while (tItr.hasNext())
 		{
-			Map.Entry<UIMessage, Double> tMe = (Map.Entry<UIMessage, Double>)tItr.next();
-			SearchHit sh = new SearchHit(tMe.getKey(), tMe.getValue().doubleValue());
-			toReturn.add(sh);
+			Map.Entry<UIMessage, Pair<Integer,Double>> tEntry = tItr.next();
+			SearchHit tSH = new SearchHit(tEntry.getKey(), tEntry.getValue().getFirst().intValue() + 
+					(tEntry.getValue().getSecond().doubleValue() / 
+							tMax.get(tEntry.getValue().getFirst()).doubleValue()));
+			toReturn.add(tSH);
 		}
 		
 		return toReturn;		
@@ -283,7 +293,73 @@ public class SearchIndex
 		
 		return toReturn;
 	}
+	
+	/**
+	 * The next block of code will merge all scores into one hash map
+	 * In Pair, the integer is the number of times the message appeared
+	 * and the double was the score sum
+	 * @param tLogicalOperationsHashes
+	 * @return a HashMap<UIMessage,Pair<Integer,Double>>
+	 */
+	private HashMap<UIMessage, Pair<Integer, Double>> merge(Vector<HashMap<UIMessage,Double>> tLogicalOperationsHashes)
+	{
+		HashMap<UIMessage,Pair<Integer, Double>> tMerge = new HashMap<UIMessage, Pair<Integer,Double>>();
+		for (HashMap<UIMessage,Double> tHash : tLogicalOperationsHashes)
+		{
+			Set<Map.Entry<UIMessage, Double>> tMappings = tHash.entrySet();
+			Iterator<Map.Entry<UIMessage, Double>> tItr = tMappings.iterator();
+			
+			while (tItr.hasNext())
+			{
+				Map.Entry<UIMessage, Double> tEntry = tItr.next();
+				
+				//handle new scores
+				if (tMerge.containsKey(tEntry.getKey()))
+				{
+					Pair<Integer,Double> tPair = tMerge.get(tEntry.getKey());
+					tPair.setFirst(tPair.getFirst() + 1);
+					tPair.setSecond(tPair.getSecond() + tEntry.getValue());
+				}
+				else
+				{
+					Pair<Integer,Double> tPair = new Pair<Integer,Double>(new Integer(1), tEntry.getValue());
+					tMerge.put(tEntry.getKey(), tPair);
+				}	
+			}
+		}
+		
+		return tMerge;
+	}
+	
+	/**
+	 * the next block of code will find the maximum score, 
+	 * and divide it according to appearance time
+	 * 
+	 * @param tMerge
+	 * @return
+	 */
+	private HashMap<Integer,Double> findMaxScores(HashMap<UIMessage, Pair<Integer, Double>> tMerge)
+	{
+		HashMap<Integer,Double> tMax = new HashMap<Integer, Double>();
+		Set<Map.Entry<UIMessage, Pair<Integer,Double>>> tSetMappings = tMerge.entrySet();
+		Iterator<Map.Entry<UIMessage, Pair<Integer,Double>>> tItr = tSetMappings.iterator();
+		
+		while (tItr.hasNext())
+		{
+			Map.Entry<UIMessage, Pair<Integer,Double>> tEntry = tItr.next();
+			
+			// TODO find a better structure for that if-else block
+			if (tMax.containsKey(tEntry.getValue().getFirst()))
+			{
+				if (tMax.get(tEntry.getValue().getFirst()).doubleValue() < tEntry.getValue().getSecond().doubleValue())
+					tMax.put(tEntry.getValue().getFirst(),tEntry.getValue().getSecond());
+			}
+			else
+			{
+				tMax.put(tEntry.getValue().getFirst(), tEntry.getValue().getSecond());
+			}
+		}
+		
+		return tMax;
+	}
 }
-
-// TODO delete unneeded comments
-// TODO get data by content - support also boolean operators
