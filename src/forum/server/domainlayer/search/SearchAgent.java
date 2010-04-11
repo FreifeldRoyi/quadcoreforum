@@ -62,7 +62,7 @@ public class SearchAgent implements SearchEngine
 		}*/
 		
 	
-		if (toReturn == null & tUsrID != null) //no problems
+		if (toReturn == null & tUsrID != null) //was used when the code in try-catch block wasn't a comment
 		{
 			Collection<SearchHit> tVolatileHits = this.indexer.getDataByAuthor(tUsrID);
 			if (-1 < from && from < to && from < tVolatileHits.size())

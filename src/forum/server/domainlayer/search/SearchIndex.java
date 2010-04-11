@@ -50,10 +50,8 @@ public class SearchIndex
 		this.users = new HashMap<Long, Collection<Long>>();
 		
 		//special search operators
-		this.reserved_words.add("or");
-		this.reserved_words.add("and");
-		this.reserved_words.add("+");
-		this.reserved_words.add("-");	
+		this.reserved_words.add("OR");
+		this.reserved_words.add("AND");	
 		
 		//nullify the number of word index
 		this.wordIdNumber = 0;		
@@ -248,41 +246,43 @@ public class SearchIndex
 		}
 	}
 	
-	/*
-	private Vector<Vector<String>> devideByBooleanOperators(String[] words)
+	/**
+	 * returns the words array divided to vector.
+	 * each Vector(String) contains words divided by OR
+	 * whereas each Vector(String) represents another element in 
+	 * an AND expression.
+	 * e.g - 
+	 * 		the returned vector contains V1, V2, V3. 
+	 * 		V1 - s11 OR s12 OR s13.....
+	 * 		V2 - s21 OR s22 OR s23.....
+	 * 		V3 - s31 OR s32 OR s33.....
+	 * 
+	 * 		V1 AND V2 AND V3		
+	 * 		
+	 * @param words - the split phrase wanted to be divided - NON EMPTY
+	 * @return a vector of vector of strings
+	 */
+	private Vector<Vector<String>> divideByBooleanOperators(String[] words)
 	{
-		Vector<Vector<String>> toReturn = null;
-		Vector<String> tWordsBoolForm = new Vector<String>();
+		Vector<Vector<String>> toReturn = new Vector<Vector<String>>();
+	
+		int tEndPlace = 0;
 		
-		int tStartIndex = 0;
-		while (tStartIndex < words.length && (words[tStartIndex].equals("AND") || words[tStartIndex].equals("OR")))
+		while (tEndPlace < words.length)
 		{
-			++tStartIndex;
-		}
-		if (tStartIndex < words.length && (!words[tStartIndex].equals("AND") && !words[tStartIndex].equals("OR")))
-		{
-			tWordsBoolForm.add(words[tStartIndex]);
-			for (int tIndex = tStartIndex + 1; tIndex < words.length; ++tIndex)
+			Vector<String> toAdd = new Vector<String>();
+			while (tEndPlace != words.length && !words[tEndPlace].equals("AND"))
 			{
-				if (words[tIndex].equals("AND") || words[tIndex].equals("OR"))
-				{
-					tWordsBoolForm.add(words[tIndex]);
-				}
-				else
-				{
-					
-				}
+				if (!words[tEndPlace].equals("OR"))
+					toAdd.add(words[tEndPlace]);
+				++tEndPlace;
 			}
-		}		
-		
-		for (int tIndex = 0; tIndex < words.length; ++tIndex)
-		{
-			
+			toReturn.add(toAdd);
+			++tEndPlace;
 		}
 		
 		return toReturn;
 	}
-	*/
 }
 
 // TODO delete unneeded comments

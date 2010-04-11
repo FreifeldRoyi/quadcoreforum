@@ -23,19 +23,6 @@ public class SearchIndexTest {
 	public void setUp() throws Exception {
 		this.se = SearchIndex.getInstance();
 	}
-
-	/*@Test
-	public void testGetDataByAuthor() {
-		UIMessage tMsg = new ForumMessage(0, 0, "woohoo", "bummrt", new GregorianCalendar(), null);
-		this.se.addMessage(tMsg);
-		
-		UIMessage tMsg2 = new ForumMessage(1, 1, "asd", "asdfasdf");
-		Vector<SearchHit> tMessages = (Vector<SearchHit>)this.se.getDataByAuthor(new Long(0));
-		assertEquals(tMessages.elementAt(0).getMessage(), tMsg);
-		
-		tMessages = (Vector<SearchHit>)this.se.getDataByAuthor(new Long(1));
-		assertEquals(tMessages.elementAt(0).getMessage(), tMsg2);
-	}*/
 	
 	@Test
 	public void testAddAndGetMessage() {
@@ -106,5 +93,23 @@ public class SearchIndexTest {
 		assertTrue(tMSGCol7.contains(tMsg1) && tMSGCol7.contains(tMsg2) && tMSGCol7.contains(tMsg3));
 		assertTrue(tMSGCol8.contains(tMsg4));
 	}
+	
+	// I used this test to check if my algorithm works... AND IT DOE'S =)
+	/*
+	public void testDivide()
+	{
+		String tPhraseToSearch1 = "word1 word2 word3 word4";
+		String tPhraseToSearch2 = "word1 word2 AND word3 word4";
+		String tPhraseToSearch3 = "word1 AND word2 AND word3 AND word4";
+		String tPhraseToSearch4 = "word1 word2 AND word3 OR word4";
+		
+		Vector<Vector<String>> tReturn1 = this.se.divideByBooleanOperators(tPhraseToSearch1.split(" "));
+		Vector<Vector<String>> tReturn2 = this.se.divideByBooleanOperators(tPhraseToSearch2.split(" "));
+		Vector<Vector<String>> tReturn3 = this.se.divideByBooleanOperators(tPhraseToSearch3.split(" "));
+		Vector<Vector<String>> tReturn4 = this.se.divideByBooleanOperators(tPhraseToSearch4.split(" "));
+		
+		return;
+	}
+	*/
 
 }
