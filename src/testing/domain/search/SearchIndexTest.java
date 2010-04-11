@@ -43,6 +43,11 @@ public class SearchIndexTest {
 		String[] words5 = {"msg1"};
 		String[] words6 = {"bla"};
 		
+		//test logic operation
+		String[] words7 = {"content3", "AND", "bla"};
+		String[] words8 = {"content3", "OR", "content4"};
+		String[] words9 = {"content3", "AND", "bla", "OR", "content4"};
+		
 		/* Test get by content */
 		Vector<SearchHit> tSHCol1 = (Vector<SearchHit>) this.se.getDataByContent(words1); //should hold tMsg1
 		Vector<SearchHit> tSHCol2 = (Vector<SearchHit>) this.se.getDataByContent(words2); //should hold tMsg2
@@ -51,12 +56,22 @@ public class SearchIndexTest {
 		Vector<SearchHit> tSHCol5 = (Vector<SearchHit>) this.se.getDataByContent(words5); //should hold tMsg1
 		Vector<SearchHit> tSHCol6 = (Vector<SearchHit>) this.se.getDataByContent(words6); //should hold tMsg1 tMsg2 tMsg3
 		
+		//logic
+		Vector<SearchHit> tSHCol7 = (Vector<SearchHit>) this.se.getDataByContent(words7); //should hold tMsg3 tMsg2 tMsg1
+		Vector<SearchHit> tSHCol8 = (Vector<SearchHit>) this.se.getDataByContent(words8); //should hold tMsg3 and tMsg4 with similar scores
+		Vector<SearchHit> tSHCol9 = (Vector<SearchHit>) this.se.getDataByContent(words9); //should hold tMsg1 tMsg2 tMsg3 tMsg4 where tMsg3 has higher score
+		
 		Vector<UIMessage> tMSGCol1 = new Vector<UIMessage>();
 		Vector<UIMessage> tMSGCol2 = new Vector<UIMessage>();
 		Vector<UIMessage> tMSGCol3 = new Vector<UIMessage>();
 		Vector<UIMessage> tMSGCol4 = new Vector<UIMessage>();
 		Vector<UIMessage> tMSGCol5 = new Vector<UIMessage>();
 		Vector<UIMessage> tMSGCol6 = new Vector<UIMessage>();
+		
+		//logic
+		Vector<UIMessage> tMSGCol7 = new Vector<UIMessage>();
+		Vector<UIMessage> tMSGCol8 = new Vector<UIMessage>();
+		Vector<UIMessage> tMSGCol9 = new Vector<UIMessage>();
 		
 		for (SearchHit tSh : tSHCol1)
 			tMSGCol1.add(tSh.getMessage());
@@ -71,6 +86,14 @@ public class SearchIndexTest {
 		for (SearchHit tSh : tSHCol6)
 			tMSGCol6.add(tSh.getMessage());
 		
+		//logic
+		for (SearchHit tSh : tSHCol7)
+			tMSGCol7.add(tSh.getMessage());
+		for (SearchHit tSh : tSHCol8)
+			tMSGCol8.add(tSh.getMessage());
+		for (SearchHit tSh : tSHCol9)
+			tMSGCol9.add(tSh.getMessage());
+		
 		assertTrue(tMSGCol1.contains(tMsg1));
 		assertTrue(tMSGCol2.contains(tMsg2));
 		assertTrue(tMSGCol3.contains(tMsg3));
@@ -78,20 +101,35 @@ public class SearchIndexTest {
 		assertTrue(tMSGCol5.contains(tMsg1));
 		assertTrue(tMSGCol6.contains(tMsg1) && tMSGCol6.contains(tMsg2) && tMSGCol6.contains(tMsg3));
 		
+		//logic
+		assertTrue(tMSGCol7.contains(tMsg3) && tMSGCol7.contains(tMsg2) && tMSGCol7.contains(tMsg1));
+		assertTrue(tMSGCol8.contains(tMsg3) && 
+				tMSGCol8.contains(tMsg4) && 
+				tSHCol8.elementAt(0).getScore() == tSHCol8.elementAt(1).getScore());
+		assertTrue(tMSGCol9.contains(tMsg1) &&
+				tMSGCol9.contains(tMsg2) &&
+				tMSGCol9.contains(tMsg3) && 
+				tMSGCol9.contains(tMsg4));
+		assertTrue(tSHCol9.elementAt(0).getScore() != tSHCol9.elementAt(1).getScore() &&
+				tSHCol9.elementAt(0).getScore() != tSHCol9.elementAt(2).getScore() &&
+				tSHCol9.elementAt(0).getScore() != tSHCol9.elementAt(3).getScore() &&
+				tSHCol9.elementAt(1).getScore() == tSHCol9.elementAt(2).getScore() &&
+				tSHCol9.elementAt(1).getScore() == tSHCol9.elementAt(3).getScore());
+		
 		/* Test get by author */
-		Vector<SearchHit> tSHCol7 = (Vector<SearchHit>) this.se.getDataByAuthor(new Long(0)); //should contain tMsg1 tMsg2 tMsg3
-		Vector<SearchHit> tSHCol8 = (Vector<SearchHit>) this.se.getDataByAuthor(new Long(1)); //should contain tMsg4
+		Vector<SearchHit> tSHCol10 = (Vector<SearchHit>) this.se.getDataByAuthor(new Long(0)); //should contain tMsg1 tMsg2 tMsg3
+		Vector<SearchHit> tSHCol11 = (Vector<SearchHit>) this.se.getDataByAuthor(new Long(1)); //should contain tMsg4
 		
-		Vector<UIMessage> tMSGCol7 = new Vector<UIMessage>();
-		Vector<UIMessage> tMSGCol8 = new Vector<UIMessage>();
+		Vector<UIMessage> tMSGCol10 = new Vector<UIMessage>();
+		Vector<UIMessage> tMSGCol11 = new Vector<UIMessage>();
 		
-		for (SearchHit tSh : tSHCol7)
-			tMSGCol7.add(tSh.getMessage());
-		for (SearchHit tSh : tSHCol8)
-			tMSGCol8.add(tSh.getMessage());
+		for (SearchHit tSh : tSHCol10)
+			tMSGCol10.add(tSh.getMessage());
+		for (SearchHit tSh : tSHCol11)
+			tMSGCol11.add(tSh.getMessage());
 		
-		assertTrue(tMSGCol7.contains(tMsg1) && tMSGCol7.contains(tMsg2) && tMSGCol7.contains(tMsg3));
-		assertTrue(tMSGCol8.contains(tMsg4));
+		assertTrue(tMSGCol10.contains(tMsg1) && tMSGCol10.contains(tMsg2) && tMSGCol10.contains(tMsg3));
+		assertTrue(tMSGCol11.contains(tMsg4));
 	}
 	
 	// I used this test to check if my algorithm works... AND IT DOE'S =)
