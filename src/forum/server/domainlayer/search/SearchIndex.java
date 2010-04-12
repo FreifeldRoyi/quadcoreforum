@@ -175,7 +175,7 @@ public class SearchIndex
 			double tScore = 
 				tEntry.getValue().getFirst().intValue() + 
 					(tEntry.getValue().getSecond().doubleValue() / 
-							tMax.get(tEntry.getValue().getFirst()).doubleValue()) - 1;
+							tMax.get(tEntry.getValue().getFirst()).doubleValue());
 			SearchHit tSH = new SearchHit(tEntry.getKey(), tScore);
 			toReturn.add(tSH);
 		}
