@@ -172,9 +172,11 @@ public class SearchIndex
 		while (tItr.hasNext())
 		{
 			Map.Entry<UIMessage, Pair<Integer,Double>> tEntry = tItr.next();
-			SearchHit tSH = new SearchHit(tEntry.getKey(), tEntry.getValue().getFirst().intValue() + 
+			double tScore = 
+				tEntry.getValue().getFirst().intValue() + 
 					(tEntry.getValue().getSecond().doubleValue() / 
-							tMax.get(tEntry.getValue().getFirst()).doubleValue()));
+							tMax.get(tEntry.getValue().getFirst()).doubleValue()) - 1;
+			SearchHit tSH = new SearchHit(tEntry.getKey(), tScore);
 			toReturn.add(tSH);
 		}
 		
