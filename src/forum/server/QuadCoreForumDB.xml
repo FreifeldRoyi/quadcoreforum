@@ -57,6 +57,19 @@
         <privileges>VIEW_ALL</privileges>
         <privileges>REPLY_TO_MESSAGE</privileges>
     </members>
+    <members>
+        <userID>3</userID>
+        <username>a</username>
+        <e-mail>r@r</e-mail>
+        <password>827ccb0eea8a706c4c34a16891f84e7b</password>
+        <lastName>b</lastName>
+        <firstName>c</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
     <subjects>
         <name>name</name>
         <description>description</description>
@@ -65,6 +78,20 @@
         <subSubjectsIDs>0</subSubjectsIDs>
         <threadsIDs>0</threadsIDs>
         <lastAddedMessageID>0</lastAddedMessageID>
+        <isToLevel>true</isToLevel>
+    </subjects>
+    <subjects>
+        <name>a</name>
+        <description>b</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>1</subjectID>
+        <isToLevel>true</isToLevel>
+    </subjects>
+    <subjects>
+        <name>u</name>
+        <description>i</description>
+        <numOfMessages>0</numOfMessages>
+        <subjectID>2</subjectID>
         <isToLevel>true</isToLevel>
     </subjects>
     <threads>

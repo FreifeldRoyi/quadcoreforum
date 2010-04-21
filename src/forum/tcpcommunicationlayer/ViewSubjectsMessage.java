@@ -35,7 +35,6 @@ public class ViewSubjectsMessage extends ClientMessage {
 			Collection<UISubject> tRetrievedSubjects = forum.getSubjects(this.fatherID);
 			// return a String representation of the retrieved subjects
 			String tResponse = "";
-
 			if (tRetrievedSubjects.isEmpty())
 				tResponse = "There are no subjects under the root subject with id " + this.fatherID + " to view";
 			else {

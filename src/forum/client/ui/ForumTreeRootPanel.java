@@ -15,27 +15,25 @@ public class ForumTreeRootPanel extends JPanel {
 	
 
 	private static final long serialVersionUID = -6952266542697445089L;
-	private ForumTree m_forumTree;
-	private JButton m_addMessageButton;
+	private ForumTree forumTree;
+	private JButton addMessageButton;
 	
-	public ForumTreeRootPanel(ForumTree forumTree) {
+	public ForumTreeRootPanel(ForumTree tree) {
 		super();
 		
-		//this.setPreferredSize(new Dimension(400,30));	
 		this.setBackground(Color.WHITE);
 		
-		m_addMessageButton = new JButton("Add New Message");
-		m_addMessageButton.addActionListener(new ActionListener() {
+		addMessageButton = new JButton("Add New Message");
+		addMessageButton.addActionListener(new ActionListener() {
 			
-			@Override
 			public void actionPerformed(ActionEvent e) {				
-				m_forumTree.addNewMessage(m_addMessageButton);
+				forumTree.addNewMessage(addMessageButton);
 			}
 		});
 		
-		this.add(m_addMessageButton);
+		this.add(addMessageButton);
 		
-		m_forumTree = forumTree;
+		this.forumTree = tree;
 	}
 
 }

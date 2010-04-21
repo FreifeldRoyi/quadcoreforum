@@ -14,9 +14,6 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 
 import forum.server.domainlayer.interfaces.*;
-import forum.server.domainlayer.message.ForumMessage;
-import forum.server.domainlayer.message.ForumSubject;
-import forum.server.domainlayer.message.ForumThread;
 import forum.server.domainlayer.message.NotPermittedException;
 
 import forum.server.persistentlayer.pipe.user.exceptions.*;

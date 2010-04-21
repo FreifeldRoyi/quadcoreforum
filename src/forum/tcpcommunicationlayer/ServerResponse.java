@@ -14,13 +14,10 @@ public class ServerResponse implements Serializable {
 	
 	private String m_response;
 	private boolean m_hasExecuted;
-	private Object responseObj;
-	
 	
 	public ServerResponse(String response, boolean hasExecuted) {
 		m_response = response;
 		m_hasExecuted = hasExecuted;
-		this.responseObj = null;
 	}
 	
 	/**

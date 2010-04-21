@@ -1,20 +1,35 @@
 package forum.client.controllerlayer;
 
 import java.awt.Component;
-import java.util.Observable;
+import java.io.IOException;
+
+import forum.client.ui.events.GUIEvent;
+import forum.server.domainlayer.SystemLogger;
 
 /**
  * This abstract class is in charge of the communication between the UI layer and the Controller layer.
  * 
  * @author Tomer Heber
  */
-public abstract class ControllerHandler extends Observable {
-
-	@Override
-	public synchronized void notifyObservers(Object o) {
+public abstract class ControllerHandler extends GUIObservable {
+	
+	protected ClientConnectionController connectionController;
+	
+	public synchronized void notifyObservers(GUIEvent event) {
 		setChanged();
-		super.notifyObservers(o);
+		super.notifyObservers(event);
 	}
+	
+	public void closeConnection() {
+		try {
+			this.connectionController.closeConnection();
+		} 
+		catch (IOException e) {
+			SystemLogger.severe("An I/O error occurred while closing.");
+		}
+	}
+	
+	public abstract boolean registerAsNewGuest(Component comp);
 	
 	/**
 	 * 
@@ -32,6 +47,8 @@ public abstract class ControllerHandler extends Observable {
 	 */
 	public abstract String getForumView();
 
+	public abstract void getSubjects(long fatherID, final Component comp);
+	
 	/**
 	 * Tries to modify a message.
 	 * 
@@ -60,4 +77,6 @@ public abstract class ControllerHandler extends Observable {
 	 */
 	public abstract void addNewMessage(Component comp);
 
+	
+	
 }

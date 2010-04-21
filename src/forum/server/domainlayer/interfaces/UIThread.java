@@ -9,7 +9,7 @@ package forum.server.domainlayer.interfaces;
 public interface UIThread {
 	/**
 	 * @return
-			The id of the thread, this is the id of its root message
+			The id of the thread
 	 */
 	public long getID();
 
@@ -19,6 +19,14 @@ public interface UIThread {
 	 */
 	public String getTopic();
 
+	
+	/**
+	 * 
+	 * @return
+	 * 		The id of the thread's root message
+	 */
+	public long getRootMessageID();
+	
 	/**
 	 * 
 	 * @return

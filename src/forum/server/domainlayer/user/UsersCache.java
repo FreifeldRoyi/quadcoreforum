@@ -14,7 +14,6 @@ import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.server.persistentlayer.pipe.PersistenceDataHandler;
 import forum.server.persistentlayer.pipe.PersistenceFactory;
-import forum.server.persistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 import forum.server.persistentlayer.pipe.user.exceptions.*;
 
 /**

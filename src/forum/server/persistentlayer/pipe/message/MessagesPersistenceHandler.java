@@ -48,7 +48,7 @@ public class MessagesPersistenceHandler {
 	public Collection<ForumSubject> getTopLevelSubjects(ForumType data) {
 		Collection<ForumSubject> toReturn = new Vector<ForumSubject>();
 		for (SubjectType tCurrentSubjectType : data.getSubjects())
-			if (tCurrentSubjectType.isIsToLevel())
+			if (tCurrentSubjectType.isIsToLevel() && tCurrentSubjectType.getSubjectID() != 0)
 				toReturn.add(PersistentToDomainConverter.convertSubjectTypeToForumSubject(tCurrentSubjectType));
 		return toReturn;
 	}

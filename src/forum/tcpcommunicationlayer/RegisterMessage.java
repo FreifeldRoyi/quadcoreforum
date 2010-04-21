@@ -41,7 +41,7 @@ public class RegisterMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj=new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse("", true); 
 		try {
 			forum.registerNewMember(this.username, this.password, this.lastname, this.firstname, this.email);
 			returnObj.setHasExecuted(true);

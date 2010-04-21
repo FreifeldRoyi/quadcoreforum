@@ -29,7 +29,6 @@ public class ServerConnectionController extends Thread {
 			}
 		} 
 		catch (IOException e) {
-			e.printStackTrace();
 			SystemLogger.severe("An error has occurred in the server (IOException).");
 		} 
 		catch (DatabaseRetrievalException e) {
