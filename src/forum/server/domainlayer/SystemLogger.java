@@ -41,6 +41,11 @@ public class SystemLogger {
 	 */
 	private static void setConsoleLogging() {
 		final ConsoleHandler console = new ConsoleHandler() ;
+		console.setFilter(new Filter() {
+			public boolean isLoggable(LogRecord record) {
+				return record.getLoggerName().equals("quadcoreforum");
+			}
+		});
 		console.setFormatter(SystemLogger.getCustomFormatter()) ;
 		console.setLevel(SystemLogger.DEFAULT_LOG_LEVEL) ;
 		SystemLogger.LOGGER.addHandler(console) ;
@@ -95,7 +100,7 @@ public class SystemLogger {
 	private static boolean createLogger() {
 		boolean ans = true;
 		try {
-			SystemLogger.LOGGER = Logger.getLogger("");
+			SystemLogger.LOGGER = Logger.getLogger("quadcoreforum");
 			// Remove all the default handlers
 			for (Handler tHandler : SystemLogger.LOGGER.getHandlers())
 				SystemLogger.LOGGER.removeHandler(tHandler);
@@ -155,7 +160,7 @@ public class SystemLogger {
 	public static void fine(String message) {
 		SystemLogger.logAMessage(message, Level.FINE);
 	}
-	
+
 	/**
 	 * Logs a message with an INFO level
 	 * 
@@ -165,7 +170,7 @@ public class SystemLogger {
 	public static void info(String message) {
 		SystemLogger.logAMessage(message, Level.INFO);
 	}
-	
+
 	/**
 	 * Logs a message with a WARNING level
 	 * 
@@ -175,7 +180,7 @@ public class SystemLogger {
 	public static void warning(String message) {
 		SystemLogger.logAMessage(message, Level.WARNING);
 	}
-	
+
 	/**
 	 * Logs a message with a SEVERE level
 	 * 
@@ -194,9 +199,9 @@ public class SystemLogger {
 		SystemLogger.LOGGER.addHandler(handler);
 	}
 
-	
-	
-	
+
+
+
 	/*******************************************************************************************/
 	/*******************************************************************************************/
 	/*******************************************************************************************/

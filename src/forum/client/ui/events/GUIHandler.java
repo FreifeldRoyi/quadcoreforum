@@ -1,10 +1,10 @@
-package forum.client.ui;
+package forum.client.ui.events;
 
 /**
  * @author Tomer Heber
  *
  */
-public interface ForumTreeHandler {
+public interface GUIHandler {
 	
 	/**
 	 * Refreshes the forum. Meaning it retrieves from the controller the forum data.<br>
@@ -22,6 +22,7 @@ public interface ForumTreeHandler {
 	 * 
 	 * @param errorMessage The error message to appear.
 	 */
-	public void NotifyError(String errorMessage);
+	public void notifyError(String errorMessage);
 
+	
 }

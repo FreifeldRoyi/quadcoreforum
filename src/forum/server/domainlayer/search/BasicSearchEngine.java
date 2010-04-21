@@ -15,11 +15,11 @@ import forum.server.persistentlayer.DatabaseUpdateException;
  * This class is the one responsible for searched data mining.
  * Will search on volatile memory and data base.
  */
-public class SearchAgent implements SearchEngine
+public class BasicSearchEngine implements SearchEngine
 {
 	private SearchIndex indexer;
 	
-	public SearchAgent() throws DatabaseRetrievalException, DatabaseUpdateException
+	public BasicSearchEngine() throws DatabaseRetrievalException, DatabaseUpdateException
 	{
 		this.indexer = SearchIndex.getInstance();
 	}

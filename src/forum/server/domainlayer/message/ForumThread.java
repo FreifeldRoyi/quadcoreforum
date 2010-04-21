@@ -78,8 +78,8 @@ public class ForumThread implements UIThread {
 
 	/**
 	 * 
-	 * @return
-	 * 		The id of the thread's root message
+	 * @see
+	 * 		UIThread#getRootMessageID()
 	 */
 	public long getRootMessageID() {
 		return this.rootMessageID;

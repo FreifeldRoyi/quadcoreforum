@@ -12,31 +12,31 @@ public class ForumCell {
 	/**
 	 * A unique identifier of a message. 
 	 */
-	private long m_id;
+	private long id;
 	
-	private String m_userName;
-	private String m_content;
+	private String username;
+	private String content;
 	
 	/**
 	 * The sons of this ForumCell.
 	 */
-	private Vector<ForumCell> m_sons;
+	private Vector<ForumCell> sons;
 	
 	public ForumCell(long id, String userName, String content) {
-		m_id = id;
-		m_userName = userName;
-		m_content = content;
+		this.id = id;
+		username = userName;
+		this.content = content;
 		
-		m_sons = new Vector<ForumCell>();
+		sons = new Vector<ForumCell>();
 	}
 
 	public Vector<ForumCell> getSons() {
-		return m_sons;
+		return sons;
 	}
 	
 	@Override
 	public String toString() {
-		return m_userName+"  --  "+m_content.substring(0,Math.min(45,m_content.length()));
+		return username+ "  --  " +content.substring(0,Math.min(45,content.length()));
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ForumCell {
 	 * @param cell The cell to be added as a son to this cell.
 	 */
 	public void add(ForumCell cell) {
-		m_sons.add(cell);
+		sons.add(cell);
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ForumCell {
 	 * @return The id of this ForumCell(Message).
 	 */
 	public long getId() {
-		return m_id;
+		return id;
 	}
 
 }

@@ -10,8 +10,6 @@ import java.util.concurrent.Executors;
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
 

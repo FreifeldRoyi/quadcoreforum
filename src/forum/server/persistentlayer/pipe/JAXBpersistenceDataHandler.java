@@ -13,7 +13,6 @@ import javax.xml.bind.*;
 import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
-
 import forum.server.Settings;
 
 import forum.server.domainlayer.message.*;
@@ -72,7 +71,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		In case a JAXB xml database retrieval error has occurred
 	 */
 	private JAXBpersistenceDataHandler() throws JAXBException, SAXException {
-		this.jaxbContent = JAXBContext.newInstance("forum.server.persistentlayer");		
+		this.jaxbContent = JAXBContext.newInstance("forum.server.persistentlayer");
 		this.unmarshaller = this.jaxbContent.createUnmarshaller();
 		this.unmarshaller.setSchema(SchemaFactory.newInstance(
 				XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(

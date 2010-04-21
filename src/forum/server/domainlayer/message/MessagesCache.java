@@ -92,7 +92,7 @@ public class MessagesCache {
 	 */
 	public Collection<ForumSubject> getTopLevelSubjects() throws DatabaseRetrievalException {
 		Collection<ForumSubject> toReturn = this.pipe.getTopLevelSubjects();
-		for (ForumSubject tCurrentSubject : toReturn) 
+		for (ForumSubject tCurrentSubject : toReturn)
 			this.idsToSubjectsMapping.put(tCurrentSubject.getID(), tCurrentSubject);
 		return toReturn;
 	}

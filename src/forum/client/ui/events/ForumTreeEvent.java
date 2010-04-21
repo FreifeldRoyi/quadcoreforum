@@ -1,6 +1,7 @@
 package forum.client.ui.events;
 
-import forum.client.ui.ForumTreeHandler;
+import forum.client.panels.UserChangeObserver;
+import forum.client.ui.GUIHandler;
 
 /**
  * Classes that implement this interface are events related to the ForumTree.
@@ -12,6 +13,6 @@ public interface ForumTreeEvent {
 	/**	 	 	 
 	 * @param handler The handler for the forum tree GUI.
 	 */
-	public void respondToEvent(ForumTreeHandler handler);
-
+	public void respondToEvent(GUIHandler handler);
+	
 }

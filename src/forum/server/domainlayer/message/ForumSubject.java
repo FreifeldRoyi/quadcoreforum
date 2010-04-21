@@ -144,7 +144,7 @@ public class ForumSubject implements UISubject {
 	 * 		UISubject#toString()
 	 */
 	public String toString() {
-		return this.getName() + " " + this.getDescription();
+		return this.getID() + "\t" + this.getName() + "\t" + this.getDescription();
 	}
 
 	/**

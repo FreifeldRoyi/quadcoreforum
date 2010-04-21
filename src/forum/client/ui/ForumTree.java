@@ -3,6 +3,7 @@ package forum.client.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,12 +24,13 @@ import javax.swing.tree.DefaultTreeModel;
 
 import forum.client.controllerlayer.ControllerHandler;
 import forum.client.controllerlayer.ControllerHandlerFactory;
+import forum.client.ui.events.GUIHandler;
 
 /**
  * @author Tomer Heber
  *
  */
-public class ForumTree implements ForumTreeHandler {
+public class ForumTree implements GUIHandler {
 	
 	/**
 	 * The JTree GUI component.
@@ -54,9 +56,14 @@ public class ForumTree implements ForumTreeHandler {
 		UIManager.put("Tree.collapsedIcon", new ImageIcon("./images/plus-8.png"));
 		UIManager.put("Tree.expandedIcon", new ImageIcon("./images/minus-8.png"));
 		
-		m_pipe = ControllerHandlerFactory.getPipe();
+		try {
+			m_pipe = ControllerHandlerFactory.getPipe();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		/* Add an observer to the controller (The observable). */
-		m_pipe.addObserver(new ForumTreeObserver(this));
+		//m_pipe.addObserver(new ForumTreeObserver(this));
 		
 		m_tree = new JTree();
 		m_tree.putClientProperty("JTree.lineStyle", "None");		
@@ -122,7 +129,7 @@ public class ForumTree implements ForumTreeHandler {
 	}
 	
 	@Override
-	public void NotifyError(String errorMessage) {
+	public void notifyError(String errorMessage) {
 		JFrame frame = new JFrame();
 		JOptionPane.showMessageDialog(frame,
 			    errorMessage,
