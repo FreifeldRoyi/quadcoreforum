@@ -33,10 +33,10 @@ public class SearchByAuthorMessage extends ClientMessage {
 			userID = forum.getMemberIdByUsername(this.authorUsername);
 			forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
 		} catch (NotRegisteredException e) {
-			// TODO Vitali please add your handling here
+			// TODO please add your handling here
 			e.printStackTrace();
 		} catch (DatabaseRetrievalException e) {
-			// TODO Vitali please add your handling here.
+			// TODO please add your handling here.
 			e.printStackTrace();
 		}
 		
