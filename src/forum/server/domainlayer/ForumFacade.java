@@ -275,9 +275,9 @@ public interface ForumFacade { //extends SearchEngine {
 	
 	/**
 	 * @see
-	 * 		SearchEngine#searchByAuthor(String, int, int)
+	 * 		SearchEngine#searchByAuthor(long, int, int)
 	 */
-	public SearchHit[] searchByAuthor(String username, int from, int to);
+	public SearchHit[] searchByAuthor(long usrID, int from, int to);
 	
 	/**
 	 * @see

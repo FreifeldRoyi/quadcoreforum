@@ -217,10 +217,10 @@ public class MainForumLogic implements ForumFacade {
 
 	/**
 	 * @see
-	 * 		ForumFacade#searchByAuthor(String, int, int)
+	 * 		ForumFacade#searchByAuthor(long, int, int)
 	 */
-	public SearchHit[] searchByAuthor(String username, int from, int to) {
-		return this.searchController.searchByAuthor(username, from, to);
+	public SearchHit[] searchByAuthor(long usrID, int from, int to) {
+		return this.searchController.searchByAuthor(usrID, from, to);
 	}
 
 	/**

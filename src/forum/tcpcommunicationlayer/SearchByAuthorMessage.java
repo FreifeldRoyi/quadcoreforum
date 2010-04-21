@@ -5,6 +5,8 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.search.SearchHit;
+import forum.server.persistentlayer.DatabaseRetrievalException;
+import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author sepetnit
@@ -25,7 +27,19 @@ public class SearchByAuthorMessage extends ClientMessage {
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse("", true); 
-		SearchHit[] tHits = forum.searchByAuthor(this.authorUsername, 0, Integer.MAX_VALUE);
+		long userID = -1;
+		SearchHit[] tHits = null;
+		try {
+			userID = forum.getMemberIdByUsername(this.authorUsername);
+			forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
+		} catch (NotRegisteredException e) {
+			// TODO Vitali please add your handling here
+			e.printStackTrace();
+		} catch (DatabaseRetrievalException e) {
+			// TODO Vitali please add your handling here.
+			e.printStackTrace();
+		}
+		
 		if (tHits == null) {
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("for some reason the search can't be performed");

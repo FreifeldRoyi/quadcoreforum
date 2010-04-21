@@ -31,7 +31,7 @@ public interface SearchEngine {
 	 * 
 	 * @return The search hits from index from till index to - 1
 	 */
-	public SearchHit[] searchByAuthor(String username, int from, int to);
+	public SearchHit[] searchByAuthor(long usrID, int from, int to);
 	
 	/**
 	 * Search for all the messages(SearchHit) which contain the phrase.<br><br>

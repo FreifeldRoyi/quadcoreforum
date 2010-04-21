@@ -112,9 +112,9 @@ public class SearchIndexTest {
 				tSHCol9.elementAt(1).getScore() == tSHCol9.elementAt(2).getScore() &&
 				tSHCol9.elementAt(1).getScore() == tSHCol9.elementAt(3).getScore()); 
 				
-			this test actually works, there only problem is the different location the 
+			this test actually works, the only problem is the different location the 
 			element is being put at
-			but it's all good!*/
+			but it's all good! - REALLY*/
 		
 		/* Test get by author */
 		Vector<SearchHit> tSHCol10 = (Vector<SearchHit>) this.se.getDataByAuthor(new Long(0)); //should contain tMsg1 tMsg2 tMsg3
@@ -132,7 +132,7 @@ public class SearchIndexTest {
 		assertTrue(tMSGCol11.contains(tMsg4));
 	}
 	
-	// I used this test to check if my algorithm works... AND IT DOE'S =)
+	// I used this code to validate my algorithm... AND IT WORKS =)
 	/*
 	public void testDivide()
 	{
