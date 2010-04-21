@@ -31,6 +31,32 @@
         <privileges>VIEW_ALL</privileges>
         <privileges>DELETE_SUBJECT</privileges>
     </members>
+    <members>
+        <userID>1</userID>
+        <username>username1</username>
+        <e-mail>email@gmail.com</e-mail>
+        <password>c4ca4238a0b923820dcc509a6f75849b</password>
+        <lastName>f1</lastName>
+        <firstName>r1</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>EDIT_MESSAGE</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>2</userID>
+        <username>username2</username>
+        <e-mail>email2@gmail.com</e-mail>
+        <password>c81e728d9d4c2f636f067f89cc14862c</password>
+        <lastName>f2</lastName>
+        <firstName>r2</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>EDIT_MESSAGE</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+    </members>
     <subjects>
         <name>name</name>
         <description>description</description>

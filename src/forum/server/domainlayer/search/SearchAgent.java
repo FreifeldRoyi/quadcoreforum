@@ -6,12 +6,9 @@ package forum.server.domainlayer.search;
 import java.util.Arrays;
 import java.util.Collection;
 
-import forum.server.domainlayer.ForumFacade;
-import forum.server.domainlayer.MainForumLogic;
 import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author Royi Freifeld <br></br>
@@ -21,12 +18,10 @@ import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 public class SearchAgent implements SearchEngine
 {
 	private SearchIndex indexer;
-	//private ForumFacade facade;
 	
 	public SearchAgent() throws DatabaseRetrievalException, DatabaseUpdateException
 	{
 		this.indexer = SearchIndex.getInstance();
-	//	this.facade = MainForumLogic.getInstance();
 	}
 
 	
@@ -43,27 +38,14 @@ public class SearchAgent implements SearchEngine
 	 * @see SearchEngine#searchByAuthor(String, int, int)
 	 */
 	@Override
-	public SearchHit[] searchByAuthor(String username, int from, int to) 
+	public SearchHit[] searchByAuthor(long usrID, int from, int to) 
 	{
 		SearchHit[] toReturn = null;
-		Long tUsrID = null;
-		
-		/*try 
+				
+		if (usrID >= 0)
 		{
-			tUsrID = new Long(this.facade.getMemberIdByUsername(username));
-		} 
-		catch (NotRegisteredException e) 
-		{
-			toReturn = new SearchHit[0];
-		} 
-		catch (DatabaseRetrievalException e) 
-		{
-			toReturn = new SearchHit[0];
-		}*/
-		
-	
-		if (toReturn == null & tUsrID != null) //was used when the code in try-catch block wasn't a comment
-		{
+			Long tUsrID = new Long (usrID);
+				
 			Collection<SearchHit> tVolatileHits = this.indexer.getDataByAuthor(tUsrID);
 			if (-1 < from && from < to && from < tVolatileHits.size())
 			{
@@ -80,8 +62,11 @@ public class SearchAgent implements SearchEngine
 					++tIndex;
 				}
 			}
+			else
+			{
+				toReturn = new SearchHit[0];
+			}
 		}
-		
 		else
 		{
 			toReturn = new SearchHit[0];
@@ -97,21 +82,30 @@ public class SearchAgent implements SearchEngine
 	public SearchHit[] searchByContent(String phrase, int from, int to) 
 	{
 		SearchHit[] toReturn = null;
-		Collection<SearchHit> tSearchHitUnsorted = this.indexer.getDataByContent(phrase.split(" "));
-		SearchHit[] tSearchHitSorted = this.sortByHitScore(tSearchHitUnsorted);
 		
-		if (-1 < from && from < to && from < tSearchHitSorted.length)
+		if (phrase != null && !phrase.equals(""))
 		{
-			if (tSearchHitSorted.length < to)
-				to = tSearchHitSorted.length;
+			Collection<SearchHit> tSearchHitUnsorted = this.indexer.getDataByContent(phrase.split(" "));
+			SearchHit[] tSearchHitSorted = this.sortByHitScore(tSearchHitUnsorted);
 			
-			toReturn = new SearchHit[to];
-			
-			int tIndex = from;
-			while (tIndex != to)
+			if (-1 < from && from < to && from < tSearchHitSorted.length)
 			{
-				toReturn[tIndex - from] = tSearchHitSorted[tIndex];
-				++tIndex;
+				if (tSearchHitSorted.length < to)
+					to = tSearchHitSorted.length;
+				
+				toReturn = new SearchHit[to];
+				
+				int tIndex = 0;
+				int newFrom = tSearchHitSorted.length - from - 1;
+				while (tIndex != to)
+				{
+					toReturn[newFrom - tIndex] = tSearchHitSorted[tIndex];
+					++tIndex;
+				}
+			}
+			else
+			{
+				toReturn = new SearchHit[0];
 			}
 		}
 		else
@@ -131,6 +125,3 @@ public class SearchAgent implements SearchEngine
 		return toReturn;
 	}
 }
-
-// TODO check for empty phrases! the indexer doe's not accept empty phrases for a search phrase
-// TODO remove unneeded comments
