@@ -30,24 +30,28 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 
 		ServerResponse returnObj = new ServerResponse("", true); 
 		try {
-			Collection<UIMessage> tRepliesResponse = forum.getReplies(this.messageID);
-			String tResponse = "";
-			if (tRepliesResponse.isEmpty())
-				tResponse = "There are no replies under the root message with id " + this.messageID + " to view.";
-			else {
-				Iterator<UIMessage> iter = tRepliesResponse.iterator();
-				while(iter.hasNext())
-					tResponse += iter.next().toString() + "\n";
+			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
+			Collection<UIMessage> tReplies = forum.getReplies(this.messageID);
+			String tResponse = tCurrentMessage.toString();
+
+			Iterator<UIMessage> iter = tReplies.iterator();
+			while (iter.hasNext()) {
+				UIMessage tCurrentReply = iter.next();
+				// TODO: reply the usernames of the authors
+				tResponse += tCurrentReply.toString() + "\n";
+				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getID());
+				for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
+					tResponse += "\t" + tNextLevelCurrentReply.toString();
 			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(tResponse);
 		}
 		catch (MessageNotFoundException e) {
-			returnObj.setHasExecuted(true);
+			returnObj.setHasExecuted(false);
 			returnObj.setResponse(e.getMessage());
 		} 
 		catch (DatabaseRetrievalException e) {
-			returnObj.setHasExecuted(true);
+			returnObj.setHasExecuted(false);
 			returnObj.setResponse(e.getMessage());
 		}
 		return returnObj;

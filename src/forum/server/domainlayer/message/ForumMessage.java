@@ -217,10 +217,7 @@ public class ForumMessage implements UIMessage {
 	 * 		UIMessage#toString()
 	 */
 	public String toString() {
-		return "title: " + this.getTitle() + "\n" +
-		"author: " + this.getAuthorID() + "\n" +
-		"content: " + this.getContent() + "\n" +
-		"posting date: " + this.getDate() + "\n" +
-		"posting time: " + this.getTime();
+		return this.getID() + "\t" + this.getAuthorID() + "\t" + this.getTitle() + "\t" + 
+		this.getContent();
 	}
 }

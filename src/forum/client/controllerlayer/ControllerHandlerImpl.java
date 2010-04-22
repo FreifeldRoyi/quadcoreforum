@@ -11,15 +11,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.FileHandler;
 
-import forum.client.panels.UserChangeObserver;
 import forum.client.ui.events.*;
 import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 import forum.tcpcommunicationlayer.AddNewGuestMessage;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
+import forum.tcpcommunicationlayer.ViewMessageAndRepliesMessage;
 import forum.tcpcommunicationlayer.ViewSubjectContentMessage;
 import forum.tcpcommunicationlayer.ViewSubjectsMessage;
+import forum.tcpcommunicationlayer.ViewThreadsMessage;
 
 /**
  * You need to delete all the code in here and implement it yourself.<br>
@@ -48,6 +49,9 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		/* delete old log files. */
 		for (int i = 0; i < 1000; i++) {
 			File tNewFile = new File("clientLog" + i + ".log");
+			if (tNewFile.exists())
+				tNewFile.delete();
+			tNewFile = new File("clientLog" + i + ".log.lck");
 			if (tNewFile.exists())
 				tNewFile.delete();
 		}
@@ -188,7 +192,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					ServerResponse tResponse = responses.take();
 					if (tResponse == null)
 						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve subjects",
-								EventType.USER_CHANGED));
+								EventType.SUBJECTS_UPDATED));
 					else {
 						notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(),
 								EventType.SUBJECTS_UPDATED));
@@ -201,6 +205,55 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}	
+	
+	public void getThreads(long subjectID, final Component comp) {
+		final ClientMessage toSend = new ViewThreadsMessage(subjectID);
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				try {
+					connectionController.handleQuery(toSend);
+					ServerResponse tResponse = responses.take();
+					if (tResponse == null)
+						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
+								EventType.THREADS_UPDATED));
+					else {
+						notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(),
+								EventType.THREADS_UPDATED));
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);
+	}
+	
+	public void getNestedMessages(long rootID, final Component comp) {
+		final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
+		System.out.println("ddddddddddddddddddddddddddddddddddddddd");
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				try {
+					connectionController.handleQuery(toSend);
+					ServerResponse tResponse = responses.take();
+					if (tResponse == null)
+						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
+								EventType.MESSAGES_UPDATED));
+					else {
+						System.out.println(tResponse.getResponse());
+					//	notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(),
+					//			EventType.MESSAGES_UPDATED));
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);		
+	}
+
 	
 	private boolean removeMeAsGuest() throws IOException, ClassNotFoundException {
 		/*out.writeObject(new RemoveGuestMessage(this.me));

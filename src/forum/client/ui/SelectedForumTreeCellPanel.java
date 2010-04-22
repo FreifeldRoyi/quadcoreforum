@@ -41,7 +41,6 @@ public class SelectedForumTreeCellPanel extends JPanel {
 		m_area.setText("");
 		m_area.addKeyListener(new KeyListener() {
 			
-			@Override
 			public void keyTyped(KeyEvent e) {
 				if (!m_modifyButton.isEnabled()) {
 					m_modifyButton.setEnabled(true);
