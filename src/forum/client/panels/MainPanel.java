@@ -54,13 +54,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	private SubjectsPanel subjectsPanel;	
 	private ThreadsPanel threadsPanel;	
+	private ForumTree tree;
 	
 	private JButton homeButton;
 	
 	private int activeGuestsNumber;
 	private long activeMembersNumber;
 
-	public static ControllerHandler controller;
+	public ControllerHandler controller;
 
 	public void refreshForum(String encodedView) {
 		// simulates a press on the home button
@@ -70,7 +71,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.statusLabel.setText(encodedView);
 		
 		
-		MainPanel.controller.getSubjects(-1, this.subjectsPanel);
+		controller.getSubjects(-1, this.subjectsPanel);
 		
 		
 	}
@@ -86,17 +87,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 	}
 	
 	public static void main(String[] args) {
-
-
-		try {
-			MainPanel.controller = ControllerHandlerFactory.getPipe();	
-		}
-		catch (IOException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "initialization error", 
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
+	
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
@@ -105,6 +96,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 			" look and feel style.");
 		}
 
+		try {
 		MainPanel tMainPanel = new MainPanel();
 		
 		
@@ -114,14 +106,20 @@ public class MainPanel extends JFrame implements GUIHandler {
 		int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
 		tMainPanel.setLocation(X, Y);
 
-		MainPanel.controller.addObserver(new GUIObserver(tMainPanel), EventType.USER_CHANGED);
-		MainPanel.controller.registerAsNewGuest(tMainPanel);
-		tMainPanel.setVisible(true);
+				}
+		catch (IOException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "initialization error", 
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 
 	}
 
-	public MainPanel() {
+	public MainPanel() throws IOException {
 		super("QuadCoreForum Client Application");
+		controller = ControllerHandlerFactory.getPipe();			
+
 		initGUIComponents();
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setJMenuBar(mainPanelMenu);
@@ -150,6 +148,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		this.setEnabled(false);
 		this.startWorkingAnimation("Connecting as a guest ...");		
+		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
+		controller.registerAsNewGuest(this);
+		this.setVisible(true);
+
 	}
 
 	private void initGUIComponents() {
@@ -179,7 +181,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 			public void actionPerformed(ActionEvent e) {
 				startWorkingAnimation("loading root subjects ...");
-				threadsPanel.setVisible(false);
+				switchToRootSubjectsView();
 				controller.getSubjects(-1, mainPanel);
 			}
 			
@@ -222,16 +224,18 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		//MessagesTree tMessagesViewPanel = new MessagesTree("thread1", -1);
 		
-		ForumTree tree = new ForumTree(-1);
+		tree = new ForumTree(this);
 
+		
+		
 		
 		
 		this.threadsPanel = new ThreadsPanel(this, tree);
 		this.threadsPanel.setVisible(false);
 		this.subjectsPanel = new SubjectsPanel(this, this.threadsPanel);
 		
-		MainPanel.controller.addObserver(new GUIObserver(this.subjectsPanel) , EventType.SUBJECTS_UPDATED);
-		MainPanel.controller.addObserver(new GUIObserver(this.threadsPanel) , EventType.THREADS_UPDATED);
+		controller.addObserver(new GUIObserver(this.subjectsPanel) , EventType.SUBJECTS_UPDATED);
+		controller.addObserver(new GUIObserver(this.threadsPanel) , EventType.THREADS_UPDATED);
 
 		
 //		this.threadsPanel.setVisible(false);
@@ -442,12 +446,29 @@ public class MainPanel extends JFrame implements GUIHandler {
 				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
 			}
 		});
-
 		this.busyIconTimer.setRepeats(true);
-
-
+		//this.switchToMessagesView();
 	}
 
+	public void switchToMessagesView() {
+		this.subjectsPanel.setVisible(false);
+		this.threadsPanel.setVisible(false);
+		this.tree.getForumTreeUI().setVisible(true);
+	}
+
+	public void switchToRootSubjectsView() {
+		this.subjectsPanel.setVisible(true);
+		this.threadsPanel.setVisible(false);
+		this.tree.getForumTreeUI().setVisible(false);
+	}
+	
+	public void switchToSubjectsAndThreadsView() {
+		this.subjectsPanel.setVisible(true);
+		this.threadsPanel.setVisible(true);
+		this.tree.getForumTreeUI().setVisible(false);
+	}
+	
+	
 	public void startWorkingAnimation(String message) {
 		statusLabel.setText(message);
 

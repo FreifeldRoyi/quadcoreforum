@@ -1,5 +1,6 @@
 package forum.client.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,14 +28,16 @@ import javax.swing.tree.DefaultTreeModel;
 import forum.client.controllerlayer.ControllerHandler;
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.controllerlayer.GUIObserver;
+import forum.client.panels.MainPanel;
 import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
+import forum.server.domainlayer.SystemLogger;
 
 /**
  * @author Tomer Heber
  *
  */
-public class ForumTree implements GUIHandler {
+public class ForumTree {
 
 	/**
 	 * The JTree GUI component.
@@ -52,6 +55,7 @@ public class ForumTree implements GUIHandler {
 	private ControllerHandler pipe;
 
 
+	private MainPanel container;
 	private long fatherMessageID;
 
 
@@ -61,7 +65,7 @@ public class ForumTree implements GUIHandler {
 	 */
 	private ExecutorService m_pool = Executors.newCachedThreadPool();
 
-	public ForumTree(long fatherMessageID) {				
+	public ForumTree(MainPanel container) {				
 		UIManager.put("Tree.collapsedIcon", new ImageIcon("./images/plus-8.png"));
 		UIManager.put("Tree.expandedIcon", new ImageIcon("./images/minus-8.png"));
 
@@ -75,11 +79,10 @@ public class ForumTree implements GUIHandler {
 		/* Add an observer to the controller (The observable). */
 		//m_pipe.addObserver(new ForumTreeObserver(this));
 
+		this.container = container;
 		m_tree = new JTree();
-
 		m_tree.putClientProperty("JTree.lineStyle", "None");		
 
-		refreshForum(pipe.getForumView());
 		SelectedForumTreeCellPanel selected = new SelectedForumTreeCellPanel(this);
 
 		ForumTreeCellRenderer renderer = new ForumTreeCellRenderer(this, selected);
@@ -87,6 +90,8 @@ public class ForumTree implements GUIHandler {
 		m_tree.setCellEditor(new ForumTreeCellEditor(renderer));
 		m_tree.setEditable(false);
 
+		m_tree.setRowHeight(50);
+		
 		m_tree.addTreeSelectionListener(new TreeSelectionListener() {			
 			public void valueChanged(TreeSelectionEvent e) {
 				BasicTreeUI ui = (BasicTreeUI) m_tree.getUI();
@@ -94,15 +99,15 @@ public class ForumTree implements GUIHandler {
 				ui.setRightChildIndent(ui.getRightChildIndent());
 			}
 		});
-
+		
 		m_panel = new JPanel();
 		m_panel.setBackground(Color.WHITE);
 
-		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.Y_AXIS));
-		JScrollPane pane = new JScrollPane(m_tree);
-		//pane.setPreferredSize(new Dimension(610,435));
-		//m_panel.add(pane);
+		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.PAGE_AXIS));
 
+		JScrollPane pane = new JScrollPane(m_tree);
+		pane.setPreferredSize(new Dimension(610,635));
+		
 
 		// Adds the scroll panes to a split pane.
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -114,36 +119,32 @@ public class ForumTree implements GUIHandler {
 
 
 		splitPane.setDividerLocation(150); 
-		splitPane.setPreferredSize(new Dimension(500, 300));
+		splitPane.setPreferredSize(new Dimension(500, 600));
 
 		m_panel.add(splitPane);
-
-
-		this.setRootMessage(fatherMessageID);
-
-
-		//		m_panel.setPreferredSize(new Dimension(620,460));
-	}
-
-	public void setRootMessage(final long fatherMessageID) {
-		this.fatherMessageID = fatherMessageID;
-		MessageTreeNode rootNode = new MessageTreeNode(null, this.fatherMessageID);
-
-		if (this.fatherMessageID != -1) {
-			System.out.println(fatherMessageID);
-			this.pipe.addObserver(new GUIObserver(rootNode), EventType.MESSAGES_UPDATED);
-			this.pipe.getNestedMessages(this.fatherMessageID, this.m_panel);
-		}
-		DefaultTreeModel model = new DefaultTreeModel(rootNode);
-		m_tree.setModel(model);	
-	
-		for (int i = 0; i < m_tree.getRowCount(); i++) {
-			m_tree.expandRow(i);
-		}
+		
+		m_tree.setModel(new DefaultTreeModel(null));
+		
 		
 
 	}
 
+	public void setRootMessage(final long fatherMessageID) {
+		this.fatherMessageID = fatherMessageID;
+
+		if (this.fatherMessageID != -1) {
+
+			MessageTreeNode rootNode = new MessageTreeNode(null, this.fatherMessageID);
+
+			DefaultTreeModel model = new DefaultTreeModel(rootNode);
+			m_tree.setModel(model);
+
+			this.pipe.getNestedMessages(this.fatherMessageID, this.m_panel);
+		}
+		else {
+			m_tree.setModel(new DefaultTreeModel(null));
+		}		
+	}
 
 	/**
 	 * 
@@ -168,19 +169,26 @@ public class ForumTree implements GUIHandler {
 			try {
 				ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(this), EventType.MESSAGES_UPDATED);
 			} 
-			catch (IOException e)  {			}
+			catch (IOException e)  {
+			}
 		}
 
 		public void notifyError(String errorMessage) {
-
+			System.out.println("error");
 		}
 
 		public void refreshForum(String encodedView) {
-			System.out.println(encodedView);
+
 			ForumCell rootCell = decodeView(encodedView);
+
+			if (rootCell == null)
+				return;
+			System.out.println("root id = " + rootCell.getId() + "my id " + id);
+
 			if (rootCell.getId() != id) return;
 			//			MessageTreeNode rootNode = new MessageTreeNode(rootCell); 
 
+			
 			this.setUserObject(rootCell);
 			Stack<MessageTreeNode> stack = new Stack<MessageTreeNode>();
 			stack.add(this);
@@ -192,8 +200,17 @@ public class ForumTree implements GUIHandler {
 					MessageTreeNode sonNode = new MessageTreeNode(sonCell, sonCell.getId());
 					node.add(sonNode);
 					stack.add(sonNode);
+					System.out.println("uuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+
 				}		
+				System.out.println("dddddddddddddddddddddddddddddddddd");
 			}
+
+			for (int i = 0; i < m_tree.getRowCount(); i++) {
+				m_tree.expandRow(i);
+			}
+
+			container.switchToMessagesView();
 		}
 	}	
 
@@ -207,7 +224,7 @@ public class ForumTree implements GUIHandler {
 
 
 
-
+	/*
 
 
 	public void refreshForum(String encodedView) {	
@@ -242,7 +259,7 @@ public class ForumTree implements GUIHandler {
 				errorMessage,
 				"Operation failed.",
 				JOptionPane.WARNING_MESSAGE);
-	}
+	}*/
 
 	/**
 	 * Receives an encoding describing the forum tree.<br>
@@ -251,21 +268,32 @@ public class ForumTree implements GUIHandler {
 	 * @return The tree representing the forum.
 	 */
 	private ForumCell decodeView(String encodedView) {
-		// TODO implement the decoder (based on the encoding your write.
-		//return null;
-		// Delete the below line codes.
-		ForumCell fc1 = new ForumCell(2,"fsdf","d","fsdfsd");
-		ForumCell fc2 = new ForumCell(1,"fsdf","dd","fsdfsd");
-		ForumCell fc3 = new ForumCell(5,"fsfsdfsddf","dd","fsdvccxvfsd");
-		ForumCell fc4 = new ForumCell(7,"fsfsdfsddf","dd","fsdvccxvfsd");
-		ForumCell fc5= new ForumCell(0,"bcvfsddf","dd","fsdvccxvfsdcxvcx");
-
-		fc3.add(fc4);
-		fc2.add(fc3);
-		fc1.add(fc2);
-		//	fc1.add(fc5);
-
-		return fc1;
+		System.out.println(encodedView);
+		try {
+			String[] tSplitted = encodedView.split("\n");
+			String[] tRootAsStringArray = tSplitted[0].split("\t");
+			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
+					tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
+			for (int i = 1; i < tSplitted.length; i++) {
+				String[] tCurrentReplyAsStringArray = tSplitted[i].split("\t");
+				ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
+						tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
+				for (int j = ++i; j < tSplitted.length && tSplitted[j].startsWith("\t"); j++) {
+					tCurrentReplyAsStringArray = tSplitted[j].split("\t");
+					ForumCell tCurrentReplyToReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[1]),
+							tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3], tCurrentReplyAsStringArray[4]);
+					tCurrentReply.add(tCurrentReplyToReply);
+					i++;
+				}
+				tRoot.add(tCurrentReply);
+			}
+			return tRoot;
+		}
+		catch (Exception e) { // any parsing exception
+			e.printStackTrace();
+			SystemLogger.warning("Error while parsing messages view response");
+			return null;
+		}
 	}
 
 	/**
@@ -293,7 +321,6 @@ public class ForumTree implements GUIHandler {
 		button.setEnabled(false);
 		m_pool.execute(new Runnable() {
 
-			@Override
 			public void run() {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)m_tree.getSelectionPath().getLastPathComponent();
 				ForumCell cell = (ForumCell) node.getUserObject();				

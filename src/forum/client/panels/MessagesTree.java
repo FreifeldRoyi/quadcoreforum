@@ -180,9 +180,10 @@ public class MessagesTree extends JPanel implements TreeSelectionListener {
 
 		}
 
-		@SuppressWarnings("unchecked")
 		public void refreshForum(String encodedView) {
 			ForumCell rootCell = decodeView(encodedView);
+			System.out.println("root id = " + rootCell.getId());
+
 			if (rootCell.getId() != id) return;
 			//			MessageTreeNode rootNode = new MessageTreeNode(rootCell); 
 

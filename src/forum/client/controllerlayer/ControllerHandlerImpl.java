@@ -231,7 +231,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 	
 	public void getNestedMessages(long rootID, final Component comp) {
 		final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
-		System.out.println("ddddddddddddddddddddddddddddddddddddddd");
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
 				try {
@@ -241,9 +240,8 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
 								EventType.MESSAGES_UPDATED));
 					else {
-						System.out.println(tResponse.getResponse());
-					//	notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(),
-					//			EventType.MESSAGES_UPDATED));
+						notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(),
+								EventType.MESSAGES_UPDATED));
 					}
 				}
 				catch (InterruptedException e) {

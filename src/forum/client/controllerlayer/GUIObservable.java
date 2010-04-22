@@ -4,6 +4,7 @@
 package forum.client.controllerlayer;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Vector;
 
@@ -26,25 +27,32 @@ public class GUIObservable extends Observable {
 		this.threadsObservers = new Vector<GUIObserver>();
 		this.messagesTreeObservers = new Vector<GUIObserver>();
 	}
-	
-	public void addObserver(GUIObserver toAdd, EventType event) {
+
+	public synchronized void addObserver(GUIObserver toAdd, EventType event) {
 		switch (event) {
-			case USER_CHANGED:
+		case USER_CHANGED:
+			synchronized (userObservers) {
 				userObservers.add(toAdd);
-				break;
-			case SUBJECTS_UPDATED:
+				break;					
+			}
+		case SUBJECTS_UPDATED:
+			synchronized (subjectObservers) {
 				subjectObservers.add(toAdd);
 				break;
-			case THREADS_UPDATED:
+			}
+		case THREADS_UPDATED:
+			synchronized (threadsObservers) {
 				threadsObservers.add(toAdd);
 				break;
-			case MESSAGES_UPDATED:
+			}
+		case MESSAGES_UPDATED:
+			synchronized (messagesTreeObservers) {
 				messagesTreeObservers.add(toAdd);
-				break;
+			}
 		}
 	}
-	
-	public void notifyObservers(GUIEvent event) {
+
+	public synchronized void notifyObservers(GUIEvent event) {
 		if (this.hasChanged()) {
 			Collection<GUIObserver> toUpdate;
 			switch (event.getEventType()) {
@@ -62,8 +70,13 @@ public class GUIObservable extends Observable {
 				break;
 			default: return;
 			}
-			for (GUIObserver tCurrentObserver : toUpdate)
-				tCurrentObserver.update(this, event);
+			Collection<GUIObserver> tObserversToUpdate = new Vector<GUIObserver>();
+			tObserversToUpdate.addAll(toUpdate);
+			synchronized (toUpdate) {
+				Iterator<GUIObserver> tObserversIter = tObserversToUpdate.iterator();
+				while (tObserversIter.hasNext())
+					tObserversIter.next().update(this, event);
+			}
 			this.clearChanged();
 		}
 	}
