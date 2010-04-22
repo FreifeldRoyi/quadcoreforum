@@ -19,7 +19,7 @@ public class BasicSearchEngine implements SearchEngine
 {
 	private SearchIndex indexer;
 	
-	public BasicSearchEngine() throws DatabaseRetrievalException, DatabaseUpdateException
+	public BasicSearchEngine()
 	{
 		this.indexer = SearchIndex.getInstance();
 	}
