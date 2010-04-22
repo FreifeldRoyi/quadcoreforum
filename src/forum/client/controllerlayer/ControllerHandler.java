@@ -47,7 +47,13 @@ public abstract class ControllerHandler extends GUIObservable {
 	 */
 	public abstract String getForumView();
 
+	
+	public abstract void getNestedMessages(long rootID, final Component comp);
+	
+	
 	public abstract void getSubjects(long fatherID, final Component comp);
+	
+	public abstract void getThreads(long subjectID, final Component comp);
 	
 	/**
 	 * Tries to modify a message.

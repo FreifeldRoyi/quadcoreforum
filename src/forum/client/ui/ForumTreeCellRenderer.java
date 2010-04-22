@@ -1,5 +1,6 @@
 package forum.client.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JTree;
@@ -17,9 +18,10 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 	private SelectedForumTreeCellPanel m_selectedPanel;
 	private ForumTreeRootPanel m_rootPanel;
 	
-	public ForumTreeCellRenderer(ForumTree forumTree) {
+	public ForumTreeCellRenderer(ForumTree forumTree, SelectedForumTreeCellPanel selected) {
 		m_nonselectedPanel = new NonSelectedForumTreeCellPanel();
-		m_selectedPanel = new SelectedForumTreeCellPanel(forumTree);
+		//m_selectedPanel = new SelectedForumTreeCellPanel(forumTree);
+		m_selectedPanel = selected;
 		m_rootPanel = new ForumTreeRootPanel(forumTree);
 	}
 
@@ -33,10 +35,10 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 		if (row == 0) {
 			return m_rootPanel;
 		}
-		
 		if (selected) {
+			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
 			m_selectedPanel.updatePanel((ForumCell)node.getUserObject());
-			return m_selectedPanel;			
+			return m_nonselectedPanel;			
 		}
 		else {
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());

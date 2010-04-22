@@ -13,8 +13,8 @@ public class ForumCell {
 	 * A unique identifier of a message. 
 	 */
 	private long id;
-	
 	private String username;
+	private String title;
 	private String content;
 	
 	/**
@@ -22,9 +22,10 @@ public class ForumCell {
 	 */
 	private Vector<ForumCell> sons;
 	
-	public ForumCell(long id, String userName, String content) {
+	public ForumCell(long id, String userName, String title, String content) {
 		this.id = id;
-		username = userName;
+		this.username = userName;
+		this.title = title;
 		this.content = content;
 		
 		sons = new Vector<ForumCell>();
@@ -36,7 +37,7 @@ public class ForumCell {
 	
 	@Override
 	public String toString() {
-		return username+ "  --  " +content.substring(0,Math.min(45,content.length()));
+		return username+ "  --  " + title.substring(0, Math.min(1,content.length()));
 	}
 
 	/**

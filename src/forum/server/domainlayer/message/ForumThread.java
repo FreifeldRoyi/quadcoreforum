@@ -106,9 +106,10 @@ public class ForumThread implements UIThread {
 	 * 		UIThread#toString()
 	 */
 	public String toString() {
-		return this.getID() + " " + this.getTopic();
+		return this.getID() + "\t" + this.getRootMessageID() + "\t" + this.getTopic() + "\t" +
+		this.getNumOfResponses() + "\t" + this.getNumOfViews();
 	}
-	
+
 	// methods	
 
 	/**
