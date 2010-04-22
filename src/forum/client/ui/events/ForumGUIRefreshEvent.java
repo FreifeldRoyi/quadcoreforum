@@ -33,7 +33,7 @@ public class ForumGUIRefreshEvent extends GUIEvent {
 		if (comp != null) {
 			comp.setEnabled(true);
 		}
-		
+	
 		handler.refreshForum(forumUpdatedData);
 
 	}

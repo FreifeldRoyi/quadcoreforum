@@ -32,7 +32,7 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 		try {
 			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
 			Collection<UIMessage> tReplies = forum.getReplies(this.messageID);
-			String tResponse = tCurrentMessage.toString();
+			String tResponse = tCurrentMessage.toString() + "\n";
 
 			Iterator<UIMessage> iter = tReplies.iterator();
 			while (iter.hasNext()) {
@@ -41,7 +41,7 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 				tResponse += tCurrentReply.toString() + "\n";
 				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getID());
 				for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
-					tResponse += "\t" + tNextLevelCurrentReply.toString();
+					tResponse += "\t" + tNextLevelCurrentReply.toString() + "\n";
 			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(tResponse);

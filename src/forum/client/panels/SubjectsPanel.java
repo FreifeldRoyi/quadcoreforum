@@ -5,9 +5,11 @@ package forum.client.panels;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import javax.swing.*;
 
+import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.ui.events.GUIHandler;
 import forum.server.domainlayer.SystemLogger;
 
@@ -48,8 +50,14 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 								subjectsTableModel.getNameOfSubjectInRow(rowSelected) 
 								+ " content...");
 						final long subjectToLoad = subjectsTableModel.getIDofSubjectInRow(rowSelected);
-						MainPanel.controller.getSubjects(subjectToLoad, container);
-						MainPanel.controller.getThreads(subjectToLoad, container);
+						try {
+							ControllerHandlerFactory.getPipe().getSubjects(subjectToLoad, container);
+						
+						ControllerHandlerFactory.getPipe().getThreads(subjectToLoad, container);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 				}
 			}
@@ -69,6 +77,8 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
+		System.out.println("subjects refresh : ");
+		System.out.println(encodedView);
 		this.subjectsTableModel.clearData();
 		if (!encodedView.startsWith("There")) {
 		/*	JOptionPane.showMessageDialog(container, "There are no subjects under the subject " + 
@@ -94,6 +104,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 				catch (NumberFormatException e) {
 					SystemLogger.warning("The server response related to subject's update is invalid");
+					this.subjectsTableModel.clearData();
 					break;
 				}
 			}

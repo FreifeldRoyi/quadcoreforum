@@ -3,6 +3,7 @@ package forum.client.ui;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.BoxLayout;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
@@ -32,9 +33,6 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 	public Component getTreeCellRendererComponent(
 			JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-		if (row == 0) {
-			return m_rootPanel;
-		}
 		if (selected) {
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
 			m_selectedPanel.updatePanel((ForumCell)node.getUserObject());

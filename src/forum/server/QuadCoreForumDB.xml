@@ -147,5 +147,29 @@
         <title>title2</title>
         <content>content2</content>
         <postTime>2001-12-31T12:00:00</postTime>
+		<repliesIDs>3</repliesIDs>
+    </messages>
+	<messages>
+        <messageID>3</messageID>
+        <author>1</author>
+        <title>title3</title>
+        <content>content3</content>
+        <postTime>2001-12-31T12:00:00</postTime>
+		<repliesIDs>4</repliesIDs>
+    </messages>
+	<messages>
+        <messageID>4</messageID>
+        <author>1</author>
+        <title>title4</title>
+        <content>content4</content>
+        <postTime>2001-12-31T12:00:00</postTime>
+		<repliesIDs>5</repliesIDs>
+    </messages>
+	<messages>
+        <messageID>5</messageID>
+        <author>1</author>
+        <title>title5</title>
+        <content>content5</content>
+        <postTime>2001-12-31T12:00:00</postTime>
     </messages>
 </ForumType>

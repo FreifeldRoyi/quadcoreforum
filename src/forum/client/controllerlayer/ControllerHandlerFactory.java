@@ -8,18 +8,22 @@ import java.io.IOException;
  *
  */
 public class ControllerHandlerFactory {
-	
+
+	private static ControllerHandler PIPE;
+
 	/**
 	 * 
 	 * @return An implementation of the ControllerHandler pipe.
 	 */
 	public static ControllerHandler getPipe() throws IOException {
-		try {
-			return new ControllerHandlerImpl();
+		if (PIPE == null) {
+			try {
+				PIPE = new ControllerHandlerImpl();
+			}
+			catch (IOException e) {
+				throw new IOException("Can't Initialize a connection with the forum server. Sorry!!!");
+			}
 		}
-		catch (IOException e) {
-			throw new IOException("Can't Initialize a connection with the forum server. Sorry!!!");
-		}
+		return PIPE;
 	}
-
 }
