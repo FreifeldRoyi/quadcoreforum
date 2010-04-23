@@ -19,13 +19,6 @@ public class SearchAgent implements SearchEngine {
 	
 	/**
 	 * Constructs new search agent
-	 * 
-	 * @throws DatabaseRetrievalException
-	 * 		In case a connection to the search database isn't successful,
-	 * 		a retrieval of information failed.
-	 * @throws DatabaseUpdateException
-	 * 		In case a connection to the search database isn't successful,
-	 * 		an updating of information failed.
 	 */
 	public SearchAgent() {
 		this.searchEngine = new BasicSearchEngine();
