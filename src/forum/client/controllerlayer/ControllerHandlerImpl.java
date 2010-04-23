@@ -290,6 +290,13 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			return false;
 		}*/
 		return true;
+	}
+
+	@Override
+	public void registerToForum(String username, String password, String email,
+			String firstName, String lastName) {
+		// TODO Auto-generated method stub
+		
 	}	
 
 }
