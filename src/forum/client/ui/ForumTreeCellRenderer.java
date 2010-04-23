@@ -17,13 +17,14 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 
 	private NonSelectedForumTreeCellPanel m_nonselectedPanel;
 	private SelectedForumTreeCellPanel m_selectedPanel;
-	private ForumTreeRootPanel m_rootPanel;
+	private ForumTree forumTree;
+	
 	
 	public ForumTreeCellRenderer(ForumTree forumTree, SelectedForumTreeCellPanel selected) {
 		m_nonselectedPanel = new NonSelectedForumTreeCellPanel();
 		//m_selectedPanel = new SelectedForumTreeCellPanel(forumTree);
 		m_selectedPanel = selected;
-		m_rootPanel = new ForumTreeRootPanel(forumTree);
+		this.forumTree = forumTree;		
 	}
 
 	/* (non-Javadoc)
@@ -35,10 +36,12 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
 		if (selected) {
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
-			m_selectedPanel.updatePanel((ForumCell)node.getUserObject());
+			m_nonselectedPanel.select(new Color(198, 214, 253));
+			m_selectedPanel.updatePanel((ForumCell)node.getUserObject(), forumTree.getConnectedUser());
 			return m_nonselectedPanel;			
 		}
 		else {
+			m_nonselectedPanel.unselect(new Color(198, 214, 253));
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
 			return m_nonselectedPanel;
 		}

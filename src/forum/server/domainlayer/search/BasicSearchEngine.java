@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import forum.server.domainlayer.interfaces.UIMessage;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
 
 /**
  * @author Royi Freifeld <br></br>

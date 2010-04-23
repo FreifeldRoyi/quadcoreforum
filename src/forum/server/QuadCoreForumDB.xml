@@ -31,7 +31,6 @@
         <privileges>EDIT_MESSAGE</privileges>
         <privileges>OPEN_THREAD</privileges>
         <privileges>VIEW_ALL</privileges>
-        <privileges>REPLY_TO_MESSAGE</privileges>
     </members>
     <members>
         <userID>2</userID>
@@ -59,6 +58,18 @@
         <privileges>OPEN_THREAD</privileges>
         <privileges>EDIT_MESSAGE</privileges>
     </members>
+    <members>
+        <userID>4</userID>
+        <username>sepetnit</username>
+        <e-mail>sepetnit@webmail.bgu.ac.il</e-mail>
+        <password>d253b2f2ef402e4dcb412d7556d1321c</password>
+        <lastName>Vitali</lastName>
+        <firstName>Sepetnitsky</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
     <subjects>
         <name>name</name>
         <description>description</description>
@@ -81,21 +92,20 @@
         <description>i</description>
         <numOfMessages>0</numOfMessages>
         <subjectID>2</subjectID>
-		<subSubjectsIDs>3</subSubjectsIDs>
-		<subSubjectsIDs>4</subSubjectsIDs>
-		<threadsIDs>1</threadsIDs>
+        <subSubjectsIDs>3</subSubjectsIDs>
+        <subSubjectsIDs>4</subSubjectsIDs>
+        <threadsIDs>1</threadsIDs>
         <threadsIDs>2</threadsIDs>
         <isToLevel>true</isToLevel>
     </subjects>
-	<subjects>
+    <subjects>
         <name>i</name>
         <description>z</description>
         <numOfMessages>0</numOfMessages>
         <subjectID>3</subjectID>
-		
         <isToLevel>false</isToLevel>
     </subjects>
-		<subjects>
+    <subjects>
         <name>j</name>
         <description>k</description>
         <numOfMessages>0</numOfMessages>
@@ -110,7 +120,7 @@
         <numOfViews>0</numOfViews>
         <numOfResponses>0</numOfResponses>
     </threads>
-	    <threads>
+    <threads>
         <threadID>1</threadID>
         <topic>topic1</topic>
         <startMessageID>1</startMessageID>
@@ -134,42 +144,99 @@
         <postTime>2001-12-31T12:00:00</postTime>
         <repliesIDs>0</repliesIDs>
     </messages>
-	<messages>
+    <messages>
         <messageID>1</messageID>
         <author>1</author>
         <title>title1</title>
         <content>content1</content>
         <postTime>2001-12-31T12:00:00</postTime>
     </messages>
-	<messages>
+    <messages>
         <messageID>2</messageID>
         <author>1</author>
         <title>title2</title>
         <content>content2</content>
         <postTime>2001-12-31T12:00:00</postTime>
-		<repliesIDs>3</repliesIDs>
+        <repliesIDs>3</repliesIDs>
+        <repliesIDs>6</repliesIDs>
     </messages>
-	<messages>
+    <messages>
         <messageID>3</messageID>
         <author>1</author>
         <title>title3</title>
         <content>content3</content>
         <postTime>2001-12-31T12:00:00</postTime>
-		<repliesIDs>4</repliesIDs>
+        <repliesIDs>4</repliesIDs>
     </messages>
-	<messages>
+    <messages>
         <messageID>4</messageID>
-        <author>1</author>
+        <author>0</author>
         <title>title4</title>
         <content>content4</content>
         <postTime>2001-12-31T12:00:00</postTime>
-		<repliesIDs>5</repliesIDs>
+        <repliesIDs>5</repliesIDs>
     </messages>
-	<messages>
+    <messages>
         <messageID>5</messageID>
         <author>1</author>
         <title>title5</title>
         <content>content5</content>
         <postTime>2001-12-31T12:00:00</postTime>
+    </messages>
+    <messages>
+        <messageID>6</messageID>
+        <author>1</author>
+        <title>title6</title>
+        <content>content6</content>
+        <postTime>2001-12-31T12:00:00</postTime>
+    </messages>
+    <messages>
+        <messageID>7</messageID>
+        <author>0</author>
+        <title>v</title>
+        <content>ccccc</content>
+        <postTime>2010-04-23T17:33:34.531+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>8</messageID>
+        <author>0</author>
+        <title>dcc</title>
+        <content>cxcx</content>
+        <postTime>2010-04-23T17:35:03.593+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>9</messageID>
+        <author>0</author>
+        <title>abc</title>
+        <content>def</content>
+        <postTime>2010-04-23T17:42:39.218+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>10</messageID>
+        <author>0</author>
+        <title>def</title>
+        <content>ghj</content>
+        <postTime>2010-04-23T17:43:54.953+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>11</messageID>
+        <author>0</author>
+        <title>test reply message</title>
+        <content>test content</content>
+        <postTime>2010-04-23T17:56:36.453+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>12</messageID>
+        <author>0</author>
+        <title>hello</title>
+        <content>hello</content>
+        <postTime>2010-04-23T17:58:09.515+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>13</messageID>
+        <author>0</author>
+        <title>hello</title>
+        <content>y</content>
+        <postTime>2010-04-23T17:59:28.281+03:00</postTime>
     </messages>
 </ForumType>

@@ -15,7 +15,9 @@ import forum.client.ui.events.*;
 import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 import forum.tcpcommunicationlayer.AddNewGuestMessage;
+import forum.tcpcommunicationlayer.AddReplyMessage;
 import forum.tcpcommunicationlayer.ClientMessage;
+import forum.tcpcommunicationlayer.LoginMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
 import forum.tcpcommunicationlayer.ViewMessageAndRepliesMessage;
 import forum.tcpcommunicationlayer.ViewSubjectContentMessage;
@@ -108,27 +110,25 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		}
 	}
 
-	@Override
-	public void addReplyToMessage(final long id, final String string, final Component comp) {
+	public void addReplyToMessage(final long author, final long replyTo, 
+			final String title, final String content, final Component comp) {
+		System.out.println("got her                 e");
+		final ClientMessage toSend = new AddReplyMessage(author, replyTo, title, content);
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
 				try {
+					connectionController.handleQuery(toSend);
 					ServerResponse tResponse = responses.take();
-					setChanged();
 					if (tResponse == null)
-						notifyObservers(null);
+						notifyObservers(new ForumGUIErrorEvent("Can't add the reply", EventType.MESSAGES_UPDATED));
 					else {
-						//						notifyObservers(new ForumGUIRefreshEvent(comp,getForumView()));
-						if (Math.random() > 0.5) {	
-							//			notifyObservers(new ForumGUIErrorEvent("Failed to reply to a message"));
-						}
+						notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(), EventType.MESSAGES_UPDATED));
 					}
-				} 
+				}
 				catch (InterruptedException e) {
 					SystemLogger.warning("The program was interrupted while waiting");
 				}
 			}
-
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}
@@ -183,6 +183,30 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		return true;		
 	}
 
+	public boolean login(String username, String password, final Component comp) {
+		final ClientMessage toSend = new LoginMessage(username, password);
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				try {
+					connectionController.handleQuery(toSend);
+					ServerResponse tResponse = responses.take();
+					if (tResponse == null || !tResponse.hasExecuted())
+						notifyObservers(new ForumGUIErrorEvent("Can't login" + 
+								(tResponse != null? (": " + tResponse.getResponse()) : "!"),
+								EventType.USER_CHANGED));
+					else {
+						notifyObservers(new ForumGUIRefreshEvent(comp, tResponse.getResponse(), EventType.USER_CHANGED));
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);
+		return true;		
+	}	
+
 	public void getSubjects(long fatherID, final Component comp) {
 		final ClientMessage toSend = new ViewSubjectsMessage(fatherID);
 		Runnable tResponseHandler = new Runnable() {
@@ -205,7 +229,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}	
-	
+
 	public void getThreads(long subjectID, final Component comp) {
 		final ClientMessage toSend = new ViewThreadsMessage(subjectID);
 		Runnable tResponseHandler = new Runnable() {
@@ -228,7 +252,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}
-	
+
 	public void getNestedMessages(long rootID, final Component comp) {
 		final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
 		Runnable tResponseHandler = new Runnable() {
@@ -252,7 +276,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		this.responsesHandlersPool.execute(tResponseHandler);		
 	}
 
-	
+
 	private boolean removeMeAsGuest() throws IOException, ClassNotFoundException {
 		/*out.writeObject(new RemoveGuestMessage(this.me));
 		/* receive response from the server. 

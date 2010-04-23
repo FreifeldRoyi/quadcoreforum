@@ -65,9 +65,9 @@ public class ForumUser implements UIUser {
 	}
 
 	/**
-	 * 
-	 * @return
-	 * 		The collections of permissions which are assigned to this user
+	 * @see
+	 * 		UIUser#getPermissions()
+	 *
 	 */
 	public Collection<Permission> getPermissions() {
 		return this.permissions;
