@@ -29,11 +29,14 @@ public abstract class ControllerHandler extends GUIObservable {
 		}
 	}
 	
+	public abstract void registerToForum(String username, String password, 
+			String email, String firstName, String lastName);
+	
 	public abstract boolean registerAsNewGuest(Component comp);
 	
 	/**
 	 * 
-	 * @return and encoded view of the forum.<br>
+	 * @return an encoded view of the forum.<br>
 	 * An example of such an encoding can be some sort of XML string.<br>
 	 * For example:<br>
 	 * <message> id: user: sdfsdf content: fsdfsd
