@@ -19,6 +19,18 @@ public class GUIObserver implements Observer {
 		this.eventHandler = handler;
 	}
 
+	public GUIHandler getHandler() {
+		return this.eventHandler;
+	}
+	
+	public boolean equals(Object obj) {
+		System.out.println("use equals");
+		if (obj != null && (obj instanceof GUIObserver) &&
+				((GUIObserver)obj).eventHandler == this.eventHandler)
+				return true;
+		return false;
+	}
+	
 	//	public void update
 
 

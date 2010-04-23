@@ -37,7 +37,7 @@ public class ForumCell {
 	
 	@Override
 	public String toString() {
-		return username+ "  --  " + title.substring(0, Math.min(1,content.length()));
+		return title + "  -- by " + this.username;
 	}
 
 	/**
@@ -57,4 +57,7 @@ public class ForumCell {
 		return id;
 	}
 
+	public String getAuthorUsername() {
+		return this.username;
+	}
 }

@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Vector;
 
 import forum.client.ui.events.GUIEvent;
+import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
 
 /**
@@ -16,10 +17,10 @@ import forum.client.ui.events.GUIEvent.EventType;
  *
  */
 public class GUIObservable extends Observable {
-	public Collection<GUIObserver> userObservers;
-	public Collection<GUIObserver> subjectObservers;
-	public Collection<GUIObserver> threadsObservers;
-	public Collection<GUIObserver> messagesTreeObservers;
+	private Collection<GUIObserver> userObservers;
+	private Collection<GUIObserver> subjectObservers;
+	private Collection<GUIObserver> threadsObservers;
+	private Collection<GUIObserver> messagesTreeObservers;
 
 	public GUIObservable() {
 		this.userObservers = new Vector<GUIObserver>();
@@ -52,6 +53,59 @@ public class GUIObservable extends Observable {
 		}
 	}
 
+	public void deleteObserver(GUIHandler handler) {
+		GUIObserver toDelete = null;
+		EventType tDeleteFrom = EventType.MESSAGES_UPDATED;
+		for (GUIObserver tCurrentObserver : messagesTreeObservers)
+			if (tCurrentObserver.getHandler() == handler) {
+				toDelete = tCurrentObserver;
+				break;
+			}
+		if (toDelete == null)
+			for (GUIObserver tCurrentObserver : subjectObservers)
+				if (tCurrentObserver.getHandler() == handler) {
+					toDelete = tCurrentObserver;
+					tDeleteFrom  = EventType.SUBJECTS_UPDATED;
+					break;
+				}
+		if (toDelete == null)
+
+			for (GUIObserver tCurrentObserver : threadsObservers)
+				if (tCurrentObserver.getHandler() == handler) {
+					toDelete = tCurrentObserver;
+					tDeleteFrom  = EventType.THREADS_UPDATED;
+					break;
+				}
+		if (toDelete == null)
+
+			for (GUIObserver tCurrentObserver : userObservers)
+				if (tCurrentObserver.getHandler() == handler) {
+					toDelete = tCurrentObserver;
+					tDeleteFrom  = EventType.USER_CHANGED;
+					break;
+				}
+
+		if (toDelete != null){
+			switch (tDeleteFrom) {
+			case MESSAGES_UPDATED: {
+				messagesTreeObservers.remove(toDelete);
+				break;
+			}
+			case SUBJECTS_UPDATED: {
+				subjectObservers.remove(toDelete);
+				break;
+			}
+			case THREADS_UPDATED: {
+				threadsObservers.remove(toDelete);
+				break;
+			}
+			case USER_CHANGED: {
+				userObservers.remove(toDelete);
+				break;
+			}}
+		}
+	}
+
 	public synchronized void notifyObservers(GUIEvent event) {
 		if (this.hasChanged()) {
 			Collection<GUIObserver> toUpdate;
@@ -64,9 +118,11 @@ public class GUIObservable extends Observable {
 				break;
 			case THREADS_UPDATED:
 				toUpdate = threadsObservers;
+				System.out.println("threads");
 				break;
 			case SUBJECTS_UPDATED:
 				toUpdate = subjectObservers;
+				System.out.println("subjects");
 				break;
 			default: return;
 			}

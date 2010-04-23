@@ -55,6 +55,9 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	public abstract void getThreads(long subjectID, final Component comp);
 	
+	public abstract boolean login(String username, String password, final Component comp);
+	
+	
 	/**
 	 * Tries to modify a message.
 	 * 
@@ -65,12 +68,9 @@ public abstract class ControllerHandler extends GUIObservable {
 
 	/**
 	 * Adds a reply message.
-	 * 
-	 * @param id The id of the message to which we reply.
-	 * @param string The content of the new message.
-	 */
-	public abstract void addReplyToMessage(long id, String string, Component comp);
-
+	 * */
+	public abstract void addReplyToMessage(final long author, final long replyTo, 
+			final String title, final String content, final Component comp);
 	/**
 	 * Deletes recursively the message id and all his sons.
 	 * 

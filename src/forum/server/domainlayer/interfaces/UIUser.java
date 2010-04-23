@@ -1,5 +1,7 @@
 package forum.server.domainlayer.interfaces;
 
+import java.util.Collection;
+
 import forum.server.domainlayer.user.Permission;
 
 /**
@@ -26,4 +28,11 @@ public interface UIUser {
 	 * 
 	 */
 	public boolean isAllowed(final Permission permissionToCheck);
+	
+	/**
+	 * 
+	 * @return
+	 * 		The collections of permissions which are assigned to this user
+	 */
+	public Collection<Permission> getPermissions();
 }

@@ -2,6 +2,7 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIMember;
+import forum.server.domainlayer.user.Permission;
 import forum.server.persistentlayer.DatabaseRetrievalException;
 import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
 import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;
@@ -30,16 +31,21 @@ public class LoginMessage extends ClientMessage {
 	public ServerResponse doOperation(ForumFacade forum) {
 		//TODO - again ot is not clear what the return value is in case of a failure - I assumed it is null.
 		// response (Vitali) --> No! exception will be thrown.
-				
+
 		ServerResponse returnObj = new ServerResponse("", true); 
 		try {
-			UIMember tResponse = forum.login(this.username, this.password);
+			UIMember tResponseUser = forum.login(this.username, this.password);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("Welcome " + "\t" + tResponse.getID() + "\t" + 
-					tResponse.getUsername() + "\t" +
-					tResponse.getLastName() + " " +
-					tResponse.getFirstName());
-		} 
+			String tResponse = tResponseUser.getID() + "\t" + tResponseUser.getUsername() + "\t" + tResponseUser.getLastName() + "\t" +
+			tResponseUser.getFirstName() + "\n";
+
+			for (Permission tCurrentPermission : tResponseUser.getPermissions())
+				tResponse += tCurrentPermission.toString() + "\n";
+
+			returnObj.setResponse(tResponse);
+
+
+		}
 		catch (NotRegisteredException e) {
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse(e.getMessage());

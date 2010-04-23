@@ -1,8 +1,10 @@
 package forum.client.panels;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.*;
 
+import forum.client.controllerlayer.ConnectedUserData;
 import forum.client.controllerlayer.ControllerHandler;
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.controllerlayer.GUIObserver;
@@ -10,17 +12,23 @@ import forum.client.ui.ForumTree;
 import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.user.Permission;
 
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Vector;
 
 /**
  * The application's main frame.
@@ -33,6 +41,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private JMenuBar mainPanelMenu;
 	private JButton loginButton;
 	private JButton registerButton;
+	private JButton logoutButton;
+
 	private JLabel welcomeLabel;
 	private JButton fastLoginButton;
 	private JLabel fastLoginUsernameLabel;
@@ -41,8 +51,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private JPasswordField fastLoginPasswordInput;
 	private JLabel connectedStatisticsLabel;
 	private JPanel navigatePanel;
-	private JPanel fastLoginPanel;
+
+	private JNavigatePanel linksPanel;
 	
+	private JPanel fastLoginPanel;
+
 
 	private Timer busyIconTimer;
 	private static Icon[] busyIcons;
@@ -55,39 +68,85 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private SubjectsPanel subjectsPanel;	
 	private ThreadsPanel threadsPanel;	
 	private ForumTree tree;
-	
+
 	private JButton homeButton;
-	
+
 	private int activeGuestsNumber;
 	private long activeMembersNumber;
 
 	public ControllerHandler controller;
 
+
+	private ConnectedUserData connectedUser;
+
+
+	public ConnectedUserData getConnectedUser() {		
+		return this.connectedUser;
+	}
+
 	public void refreshForum(String encodedView) {
 		// simulates a press on the home button
+
+		System.out.println(encodedView + " kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+		String[] tSplitted = encodedView.split("\n");
+		String[] tUserDetails = tSplitted[0].split("\t");
+
+		long connectedUserID = Long.parseLong(tUserDetails[0]);
+
+		Collection<Permission> tPermissions = new Vector<Permission>();
+		for (int i = 1; i < tSplitted.length; i++)
+			tPermissions.add(Permission.valueOf(tSplitted[i]));
+
+		if (connectedUserID < 0) // guest
+			this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
+		else
+			this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
+					tUserDetails[2], tUserDetails[3], tPermissions);
+
 		this.homeButtonPress();
 		this.setEnabled(true);
+
+		if (!this.connectedUser.isGuest()) {
+			this.welcomeLabel.setText("Hello " + this.connectedUser.getLastAndFirstName() + "!");
+			this.loginButton.setVisible(false);
+			this.logoutButton.setVisible(true);			
+			this.registerButton.setVisible(false);
+			this.fastLoginUsernameInput.setEnabled(false);
+			this.fastLoginPasswordInput.setEnabled(false);
+			this.fastLoginButton.setEnabled(false);
+		}
+		else {
+			this.welcomeLabel.setText("Hello Guest!");
+			this.loginButton.setVisible(true);
+			this.logoutButton.setVisible(false);			
+			this.registerButton.setVisible(true);
+			this.fastLoginUsernameInput.setEnabled(true);
+			this.fastLoginPasswordInput.setEnabled(true);
+			this.fastLoginButton.setEnabled(true);
+
+		}
+
+		this.fastLoginPasswordInput.setText("");
+		this.fastLoginUsernameInput.setText("");
+
 		this.stopWorkingAnimation();
-		this.statusLabel.setText(encodedView);
-		
-		
+
 		controller.getSubjects(-1, this.subjectsPanel);
-		
-		
+
+
 	}
 
 	public void notifyError(String error) {
-		
-		
-		
+		JOptionPane.showMessageDialog(this, error, 
+				"User identification error", JOptionPane.ERROR_MESSAGE);
 	}
-	
+
 	private void homeButtonPress() {
-		
+
 	}
-	
+
 	public static void main(String[] args) {
-	
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
@@ -97,16 +156,16 @@ public class MainPanel extends JFrame implements GUIHandler {
 		}
 
 		try {
-		MainPanel tMainPanel = new MainPanel();
-		
-		
-		tMainPanel.pack();
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
-		int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
-		tMainPanel.setLocation(X, Y);
+			MainPanel tMainPanel = new MainPanel();
+			
 
-				}
+			tMainPanel.pack();
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
+			int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
+			tMainPanel.setLocation(X, Y);
+
+		}
 		catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "initialization error", 
 					JOptionPane.ERROR_MESSAGE);
@@ -154,6 +213,21 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	}
 
+	private void fastLoginTextChanged() {
+		System.out.println("fastlogin");
+		if (!fastLoginUsernameInput.getText().isEmpty() &&
+				fastLoginPasswordInput.getPassword().length > 0) {
+			fastLoginButton.setEnabled(true);
+System.out.println(fastLoginUsernameInput.getText());
+System.out.println(fastLoginPasswordInput.getPassword().length);
+		}
+		else {
+			System.out.println("ddd");
+			fastLoginButton.setEnabled(false);
+		}
+	}
+
+
 	private void initGUIComponents() {
 
 
@@ -162,6 +236,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 		loginButton = new JButton();
 		registerButton = new JButton();
 		welcomeLabel = new JLabel();
+
+		logoutButton = new JButton();
+		logoutButton.setText("logout");
+		logoutButton.setVisible(false);
+
 
 		loginButton.setText("login");
 		registerButton.setText("register");
@@ -174,18 +253,22 @@ public class MainPanel extends JFrame implements GUIHandler {
 		navigatePanel.setLayout(tNavigatePanelLayout);
 		JSeparator tNavigatePanelSeparator = new JSeparator();
 
-		JButton tShowRootSubjects = new JButton();
-		tShowRootSubjects.setText("Show root subjects");	
-		
+		JLinkButton tShowRootSubjects = new JLinkButton("Show root subjects");
+
 		tShowRootSubjects.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 				startWorkingAnimation("loading root subjects ...");
-				switchToRootSubjectsView();
+				subjectsPanel.updateFields(-1, "");
 				controller.getSubjects(-1, mainPanel);
 			}
-			
+
 		});
+
+		
+		linksPanel = new JNavigatePanel(tShowRootSubjects);
+				
+		//tMainLinkButton.setPreferredSize(new Dimension(20, 10));
 		
 		tNavigatePanelLayout.setHorizontalGroup(
 				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
@@ -193,27 +276,30 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addContainerGap()
 						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)	
 								.addComponent(tNavigatePanelSeparator, GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
-								.addComponent(tShowRootSubjects, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
+								.addComponent(linksPanel, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
 								.addGroup(tNavigatePanelLayout.createSequentialGroup()
-										.addComponent(welcomeLabel, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 797, Short.MAX_VALUE)
-										.addComponent(registerButton)
-										.addGap(18, 18, 18)
+										.addComponent(welcomeLabel, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
+										.addComponent(registerButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+										.addGap(18, 18, 18)										
 										.addComponent(loginButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)))
+										.addGap(18, 18, 18)
+										.addComponent(logoutButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
 										.addContainerGap())
 		);
 		tNavigatePanelLayout.setVerticalGroup(
 				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(tNavigatePanelLayout.createSequentialGroup()
-						.addGap(16, 16, 16)
-						.addComponent(tShowRootSubjects, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-						.addGap(16, 16, 16)
+						.addGap(5, 5, 5)
+						.addComponent(linksPanel, GroupLayout.PREFERRED_SIZE, 35, 35)
+						.addGap(5, 5, 5)
 						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(welcomeLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-								.addComponent(loginButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-								.addComponent(registerButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
+								.addComponent(logoutButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+								.addComponent(registerButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+								.addComponent(loginButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
 								.addContainerGap())
 		);
 
@@ -223,26 +309,22 @@ public class MainPanel extends JFrame implements GUIHandler {
 		connectedStatisticsLabel = new JLabel();
 
 		//MessagesTree tMessagesViewPanel = new MessagesTree("thread1", -1);
-		
+
 		tree = new ForumTree(this);
 
-		
-		
-		
-		
 		this.threadsPanel = new ThreadsPanel(this, tree);
 		this.threadsPanel.setVisible(false);
 		this.subjectsPanel = new SubjectsPanel(this, this.threadsPanel);
-		
+
 		controller.addObserver(new GUIObserver(this.subjectsPanel) , EventType.SUBJECTS_UPDATED);
 		controller.addObserver(new GUIObserver(this.threadsPanel) , EventType.THREADS_UPDATED);
 
-		
-//		this.threadsPanel.setVisible(false);
+
+		//		this.threadsPanel.setVisible(false);
 		this.subjectsPanel.setVisible(true);
 		tree.getForumTreeUI().setVisible(false);
-		
-		
+
+
 		mainPanelMenu = new JMenuBar();
 
 		JMenu tFileMenu= new JMenu();
@@ -270,6 +352,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 		fastLoginPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Fast Login"));
 		fastLoginButton.setText("Login");
 
+		fastLoginButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.login(fastLoginUsernameInput.getText(), 
+						new String(fastLoginPasswordInput.getPassword()), mainPanel);
+			}
+		});
+
+
 		fastLoginUsernameLabel.setFont(welcomeLabel.getFont());
 		fastLoginUsernameLabel.setText("Username");
 		fastLoginUsernameInput.setText("");
@@ -277,6 +367,30 @@ public class MainPanel extends JFrame implements GUIHandler {
 		fastLoginPasswordLabel.setFont(welcomeLabel.getFont());
 		fastLoginPasswordLabel.setText("Password");
 		fastLoginPasswordInput.setText("");
+
+
+		this.fastLoginUsernameInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {}
+
+			public void keyTyped(KeyEvent e) {
+				fastLoginTextChanged();
+			}
+		});
+
+		this.fastLoginPasswordInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {}
+
+			public void keyTyped(KeyEvent e) {
+				fastLoginTextChanged();
+			}			
+		});
+
+
+
+
+
 
 		GroupLayout jFastLoginPanelLayout = new GroupLayout(fastLoginPanel);
 		fastLoginPanel.setLayout(jFastLoginPanelLayout);
@@ -307,6 +421,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addContainerGap())
 		);
 
+		
 		tStatisticsPanel.setBorder(BorderFactory.createTitledBorder("Currently Connected")); // NOI18N
 
 		connectedStatisticsLabel.setFont(welcomeLabel.getFont()); // NOI18N
@@ -327,23 +442,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGap(29, 29, 29))
 		);
 
-
-		//jTable2.setModel(null
-
-
-		/*new AbstractTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        rootMessagesTable.setRowHeight(40);
-        jScrollPane2.setViewportView(rootMessagesTable);
-		 */
 
 
 		// prepares the layout of the status panel 
@@ -380,9 +478,12 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		// prepares the layout of the main panel
 
+
+
+
 		this.mainPanel = new JPanel();
 		mainPanel.setPreferredSize(new Dimension(1159, 600));
-		
+
 		JSeparator tMainPanelSeparator = new JSeparator();
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
@@ -398,7 +499,12 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(tStatisticsPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(fastLoginPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.subjectsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
+
+
 								.addComponent(this.threadsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)								
+
+
+
 								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)																
 								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE))
 
@@ -413,8 +519,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGap(11, 11, 11)
 						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+
 
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 
@@ -430,9 +538,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addContainerGap())
 		);
 
-//		this.threadsPanel.setVisible(true);
-//		this.subjectsPanel.setVisible(true);
-		
+		//		this.threadsPanel.setVisible(true);
+		//		this.subjectsPanel.setVisible(true);
+
 
 		busyIcons = new ImageIcon[15];
 		for (int i = 0; i < busyIcons.length; i++)
@@ -446,6 +554,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
 			}
 		});
+
+		
 		this.busyIconTimer.setRepeats(true);
 		//this.switchToMessagesView();
 	}
@@ -461,14 +571,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.threadsPanel.setVisible(false);
 		this.tree.getForumTreeUI().setVisible(false);
 	}
-	
+
 	public void switchToSubjectsAndThreadsView() {
 		this.subjectsPanel.setVisible(true);
 		this.threadsPanel.setVisible(true);
 		this.tree.getForumTreeUI().setVisible(false);
 	}
-	
-	
+
+
 	public void startWorkingAnimation(String message) {
 		statusLabel.setText(message);
 
@@ -476,6 +586,16 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	}
 
+	public void addToNavigate(String text, ActionListener action) {
+		this.linksPanel.insertLink(text, action);
+		this.linksPanel.setVisible(false);
+		this.linksPanel.setVisible(true);
+	}
+	
+	public void removeFromNavigateUntil(String name) {
+		this.linksPanel.removeAllBeforeAction(name);
+	}
+	
 	public void stopWorkingAnimation() {
 		try {
 			Thread.sleep(100);
