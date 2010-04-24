@@ -3,13 +3,15 @@
  */ 
 package testing.domain.search; 
 
-import static org.junit.Assert.*; 
-
 import java.util.Vector; 
 
+import junit.framework.TestCase;
+
+import org.junit.After;
 import org.junit.Before; 
 import org.junit.Test; 
 
+import forum.server.Settings;
 import forum.server.domainlayer.ForumFacade; 
 import forum.server.domainlayer.interfaces.UIMessage; 
 import forum.server.domainlayer.message.ForumMessage; 
@@ -22,7 +24,7 @@ import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsExce
  * @author Freifeld Royi 
  * 
  */ 
-public class SearchAgentTest  
+public class SearchAgentTest extends TestCase 
 { 
 	SearchAgent sa; 
 	ForumFacade facade; 
@@ -33,7 +35,17 @@ public class SearchAgentTest
 	@Before 
 	public void setUp() throws Exception  
 	{ 
+		Settings.switchToTestMode();
 		this.sa = new SearchAgent(); 
+	} 
+	
+	/** 
+	 * @throws java.lang.Exception 
+	 */ 
+	@After 
+	public void tearDown() throws Exception  
+	{ 
+		Settings.switchToRegularMode();
 	} 
 
 	@Test 
@@ -60,6 +72,7 @@ public class SearchAgentTest
 		SearchHit[] tSHAuthor3 = this.sa.searchByAuthor(1, 0, 1); //should get the only message 
 		SearchHit[] tSHAuthor4 = this.sa.searchByAuthor(1, 4, 10); //should get no messages 
 
+		
 		for (SearchHit tSh : tSHAuthor1) 
 			tMSGCol1.add(tSh.getMessage()); 
 		for (SearchHit tSh : tSHAuthor2) 
@@ -72,8 +85,8 @@ public class SearchAgentTest
 		assertTrue(tMSGCol1.contains(tMsg1) && tMSGCol1.contains(tMsg2) && tMSGCol1.contains(tMsg3) && tMSGCol1.size() == 3); 
 		assertTrue(tMSGCol2.size() == 1 && (tMSGCol2.contains(tMsg1) || tMSGCol2.contains(tMsg2) || tMSGCol2.contains(tMsg3))); 
 		assertTrue(tMSGCol3.size() == 1 && tMSGCol3.contains(tMsg4)); 
-		assertTrue(tMSGCol4.size() == 0); 
-
+		assertTrue(tMSGCol4.size() == 0);
+		
 		/* 
 		 * Search by content 
 		 *  
