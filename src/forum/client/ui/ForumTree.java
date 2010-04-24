@@ -147,15 +147,18 @@ public class ForumTree {
 		JPanel tCurrentPanel = new JPanel();
 		
 		GroupLayout tLayout = new GroupLayout(tCurrentPanel);
-		tCurrentPanel.setLayout(tLayout);
-		/*
+		
 		tLayout.setHorizontalGroup(tLayout.createSequentialGroup()
 				.addGap(10, 10, 10)
-				.addComponent(tCurrentPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-		*/
-//		tCurrentPanel.setAlignmentX(BorderLayout.CENTER);
-		tCurrentPanel.add(m_tree);
+				.addComponent(m_tree, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
+
+		tLayout.setVerticalGroup(tLayout.createSequentialGroup()
+				.addGap(20, 20, 20)
+				.addComponent(m_tree, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
 		
+		tCurrentPanel.setBackground(Color.white);
+		
+		tCurrentPanel.setLayout(tLayout);
 		
 		JScrollPane pane = new JScrollPane(tCurrentPanel);
 

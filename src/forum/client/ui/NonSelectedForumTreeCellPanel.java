@@ -60,8 +60,9 @@ public class NonSelectedForumTreeCellPanel extends JPanel {
 
 	//	this.setPreferredSize(new Dimension(800,200));
 
-
-
+		msgPanel.setBackground(Color.white);
+		this.setBackground(Color.white);
+		
 		msgPanel.add(area);		
 
 
@@ -97,13 +98,17 @@ public class NonSelectedForumTreeCellPanel extends JPanel {
 	}
 
 	public void select(Color color) {
-				this.setBackground(color);
 		this.m_area.setBackground(color);
+		Component[] tComponents = this.getComponents();
+		for (int i = 0; i < tComponents.length; i++)
+			tComponents[i].setBackground(color);
 	}
 
 	public void unselect(Color color) {
-			this.setBackground(Color.white);
 		this.m_area.setBackground(Color.white);
+		Component[] tComponents = this.getComponents();
+		for (int i = 0; i < tComponents.length; i++)
+			tComponents[i].setBackground(Color.white);
 	}
 
 }
