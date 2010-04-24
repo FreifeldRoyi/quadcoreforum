@@ -3,9 +3,9 @@ package testing.domain.user;
 
 import junit.framework.*;
 
-public class AllUserTests {
+public class AllUserTests extends TestCase {
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(
 				"Test for forum.testing.domainlayer.user");
 		//$JUnit-BEGIN$

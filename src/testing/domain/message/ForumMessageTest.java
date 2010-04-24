@@ -87,10 +87,9 @@ public class ForumMessageTest extends TestCase {
 	@Test
 	public void testMsgToString() {
 		assertEquals(this.messageUnderTest.toString(), 
-				"title: " + ForumMessageTest.DEFAULT_MESSAGE_TITLE + "\n" +
-				"author: " + ForumMessageTest.DEFAULT_MESSAGE_AUTHOR + "\n" +
-				"content: " + ForumMessageTest.DEFAULT_MESSAGE_CONTENT + "\n" +
-				"posting date: " + this.messageUnderTest.getDate() + "\n" +
-				"posting time: " + this.messageUnderTest.getTime());
+				56 + "\t" + ForumMessageTest.DEFAULT_MESSAGE_AUTHOR + "\t" +
+				ForumMessageTest.DEFAULT_MESSAGE_TITLE + "\t" +
+				ForumMessageTest.DEFAULT_MESSAGE_CONTENT);
+
 	}
 }

@@ -89,7 +89,7 @@ public class ForumSubjectTest extends TestCase {
 	 */
 	@Test
 	public void testSubjToString() {
-		assertEquals(this.subjectUnderTest.toString(), ForumSubjectTest.DEFAULT_SUBJECT_NAME + " " +
+		assertEquals(this.subjectUnderTest.toString(), 34 + "\t" + ForumSubjectTest.DEFAULT_SUBJECT_NAME + "\t" +
 				ForumSubjectTest.DEFAULT_SUBJECT_DESCRIPTION);
 	}
 }
