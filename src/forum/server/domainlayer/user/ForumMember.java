@@ -198,6 +198,6 @@ public class ForumMember extends ForumUser implements UIMember {
 	 * 		UIMember#toString()
 	 */
 	public String toString() {
-		return this.username + " " + this.lastName + " " + this.firstName;
+		return this.username + "\t" + this.lastName + "\t" + this.firstName;
 	}
 }

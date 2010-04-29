@@ -21,15 +21,17 @@ public class GUIObservable extends Observable {
 	private Collection<GUIObserver> subjectObservers;
 	private Collection<GUIObserver> threadsObservers;
 	private Collection<GUIObserver> messagesTreeObservers;
+	private Collection<GUIObserver> searchObservers;
 
 	public GUIObservable() {
 		this.userObservers = new Vector<GUIObserver>();
 		this.subjectObservers = new Vector<GUIObserver>();
 		this.threadsObservers = new Vector<GUIObserver>();
 		this.messagesTreeObservers = new Vector<GUIObserver>();
+		this.searchObservers = new Vector<GUIObserver>();
 	}
 
-	public synchronized void addObserver(GUIObserver toAdd, EventType event) {
+	public void addObserver(GUIObserver toAdd, EventType event) {
 		switch (event) {
 		case USER_CHANGED:
 			synchronized (userObservers) {
@@ -50,12 +52,19 @@ public class GUIObservable extends Observable {
 			synchronized (messagesTreeObservers) {
 				messagesTreeObservers.add(toAdd);
 			}
+
+		case SEARCH_UPDATED:
+			synchronized (searchObservers) {
+				searchObservers.add(toAdd);
+			}
 		}
 	}
 
-	public void deleteObserver(GUIHandler handler) {
+	public synchronized void deleteObserver(GUIHandler handler) {
+		System.out.println("deleteRequested");
 		GUIObserver toDelete = null;
 		EventType tDeleteFrom = EventType.MESSAGES_UPDATED;
+
 		for (GUIObserver tCurrentObserver : messagesTreeObservers)
 			if (tCurrentObserver.getHandler() == handler) {
 				toDelete = tCurrentObserver;
@@ -84,6 +93,15 @@ public class GUIObservable extends Observable {
 					tDeleteFrom  = EventType.USER_CHANGED;
 					break;
 				}
+		if (toDelete == null)
+
+			for (GUIObserver tCurrentObserver : searchObservers)
+				if (tCurrentObserver.getHandler() == handler) {
+					toDelete = tCurrentObserver;
+					tDeleteFrom  = EventType.SEARCH_UPDATED;
+					break;
+				}
+
 
 		if (toDelete != null){
 			switch (tDeleteFrom) {
@@ -102,11 +120,18 @@ public class GUIObservable extends Observable {
 			case USER_CHANGED: {
 				userObservers.remove(toDelete);
 				break;
-			}}
+			}
+			case SEARCH_UPDATED: {
+				searchObservers.remove(toDelete);
+				System.out.println("Deleted");
+				break;
+			}
+			
+			}
 		}
 	}
 
-	public synchronized void notifyObservers(GUIEvent event) {
+	public void notifyObservers(GUIEvent event) {
 		if (this.hasChanged()) {
 			Collection<GUIObserver> toUpdate;
 			switch (event.getEventType()) {
@@ -118,22 +143,32 @@ public class GUIObservable extends Observable {
 				break;
 			case THREADS_UPDATED:
 				toUpdate = threadsObservers;
-				System.out.println("threads");
 				break;
 			case SUBJECTS_UPDATED:
 				toUpdate = subjectObservers;
-				System.out.println("subjects");
 				break;
-			default: return;
+			case SEARCH_UPDATED:
+				toUpdate = searchObservers;
+				break;
+			default: {
+				System.out.println("got end of notifying because of invalid...");
+				this.clearChanged();
+				return;
+			}
 			}
 			Collection<GUIObserver> tObserversToUpdate = new Vector<GUIObserver>();
 			tObserversToUpdate.addAll(toUpdate);
-			synchronized (toUpdate) {
+			synchronized (tObserversToUpdate) {
 				Iterator<GUIObserver> tObserversIter = tObserversToUpdate.iterator();
-				while (tObserversIter.hasNext())
+				System.out.println("has next? " + tObserversIter.hasNext());
+				while (tObserversIter.hasNext()) {
+					System.out.println("one gui obs updating ...");
 					tObserversIter.next().update(this, event);
+				System.out.println("one gui obs updating ...");
+				}
 			}
 			this.clearChanged();
 		}
+		System.out.println("got end of notifying ...");
 	}
 }

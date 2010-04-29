@@ -28,7 +28,7 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 		// TODO - I consider failure only in the case of an exception. Is it o.k???
 		// Response (Vitali) --> Yes
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
 			Collection<UIMessage> tReplies = forum.getReplies(this.messageID);

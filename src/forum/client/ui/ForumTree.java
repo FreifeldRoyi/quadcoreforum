@@ -227,7 +227,8 @@ public class ForumTree {
 			super(info);
 			this.id = id;
 			try {
-				ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(this), EventType.MESSAGES_UPDATED);
+				ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(this),
+						EventType.MESSAGES_UPDATED);
 			} 
 			catch (IOException e)  {
 			}

@@ -262,6 +262,18 @@ public class MessagesCache {
 			return toReturn;
 		}
 	}
+	
+	/**
+	 * 
+	 * @return
+	 * 		A collection of all the messages contained in the forum database
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved from the database due to a database connection error
+	 */
+	public Collection<ForumMessage> getAllMessages() throws DatabaseRetrievalException {
+		return this.pipe.getAllMessages();
+	}
 
 	/**
 	 * 

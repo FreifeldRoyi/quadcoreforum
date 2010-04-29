@@ -329,6 +329,15 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 
 	/**
 	 * @see
+	 * 		PersistenceDataHandler#getAllMessages()
+	 */
+	public Collection<ForumMessage> getAllMessages() throws DatabaseRetrievalException {
+		ForumType tForum = this.unmarshalDatabase();
+		return this.messagesHandler.getAllMessages(tForum);
+	}
+	
+	/**
+	 * @see
 	 * 		PersistenceDataHandler#getMessageByID(long)
 	 */
 	public ForumMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {

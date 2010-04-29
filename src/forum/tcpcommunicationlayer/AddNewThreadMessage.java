@@ -46,7 +46,7 @@ public class AddNewThreadMessage extends ClientMessage {
 		//TODO : the UIThread object should include a method which will announce if the operation did well.
 		// response (Vitali) --> made!!!
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 
 		try {
 			forum.openNewThread(this.userID, this.subjectId, this.topic, this.title, this.content);

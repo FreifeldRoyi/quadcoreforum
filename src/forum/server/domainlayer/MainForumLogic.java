@@ -63,7 +63,11 @@ public class MainForumLogic implements ForumFacade {
 			ForumDataHandler tDataHandler = new ForumDataHandler();
 			this.searchController = new SearchAgent();
 			this.usersController = new UsersController(tDataHandler);
-			this.messagesController = new MessagesController(tDataHandler);	
+			this.messagesController = new MessagesController(tDataHandler);
+			
+			for (ForumMessage tCurrent : tDataHandler.getMessagesCache().getAllMessages())
+				this.searchController.addData(tCurrent);
+			
 		}
 		catch (DatabaseUpdateException e) {
 			SystemLogger.severe(e.getMessage());
@@ -110,6 +114,14 @@ public class MainForumLogic implements ForumFacade {
 	 */
 	public Collection<String> getActiveMemberUserNames() {
 		return this.usersController.getActiveMemberNames();
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#getAllMembers()
+	 */
+	public Collection<UIMember> getAllMembers() throws DatabaseRetrievalException {
+		return this.usersController.getAllMembers();
 	}
 
 	/**
@@ -268,9 +280,7 @@ public class MainForumLogic implements ForumFacade {
 			final String content) throws NotRegisteredException, NotPermittedException, MessageNotFoundException,
 			DatabaseUpdateException {
 		UIMessage toReturn = this.messagesController.addNewReply(authorID, fatherID, title, content);
-		
-		this.searchController.addData(toReturn);
-		
+		this.searchController.addData(toReturn);		
 		return toReturn;
 	}
 

@@ -289,6 +289,17 @@ s	 */
 	public long getFirstFreeMessageID() throws DatabaseRetrievalException;
 
 	/**
+	 * Returns a collection of all the messages of the forum
+	 *  
+	 * @return
+	 * 		A collection of all the messages the forum have right now
+	 * 
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved due to a database connection error
+	 */	
+	public Collection<ForumMessage> getAllMessages() throws DatabaseRetrievalException;
+	
+	/**
 	 * Finds and returns a message whose id equals to the given one
 	 * 
 	 * @param messageID

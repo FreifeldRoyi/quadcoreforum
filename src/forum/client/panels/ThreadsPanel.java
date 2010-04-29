@@ -74,7 +74,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 		deleteThreadbButton.setText("delete");
 		modifyThreadButton.setText("modify");
 
-		Dimension tSubjectsButtonsDimension = new Dimension(80, 30);
+		Dimension tSubjectsButtonsDimension = new Dimension(85, 35);
 		addNewThreadButton.setPreferredSize(tSubjectsButtonsDimension);
 
 		deleteThreadbButton.setPreferredSize(tSubjectsButtonsDimension);

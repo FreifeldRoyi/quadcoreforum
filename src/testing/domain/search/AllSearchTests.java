@@ -1,8 +1,6 @@
 package testing.domain.search;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.*;
 
 public class AllSearchTests extends TestCase {
 
@@ -10,9 +8,8 @@ public class AllSearchTests extends TestCase {
 		TestSuite suite = new TestSuite(
 				"Test for forum.testing.domainlayer.search");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(SearchIndexTest.class);
 		suite.addTestSuite(SearchAgentTest.class);
-		
+		suite.addTestSuite(SearchIndexTest.class);
 		//$JUnit-END$
 		return suite;
 	}

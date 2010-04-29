@@ -39,7 +39,7 @@ public class ModifyMessageMessage extends ClientMessage {
 		// TODO: I assumed failure only in case of exception. Is it o.k??
 		// Response (Vitali) ---> Yes!!!
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			forum.updateAMessage(userID, messageID, newTitle, newContent);
 			returnObj.setHasExecuted(true);

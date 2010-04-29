@@ -36,7 +36,7 @@ public class AddReplyMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
 			forum.addNewReply(this.authorID, this.fatherID, this.title, this.content);
 			returnObj.setHasExecuted(true);

@@ -57,12 +57,15 @@ public class ClientConnectionController extends Observable {
 					/* sends the message to the server. */
 					synchronized (out) {
 						out.writeObject(messageToSend);
-						/* receive responses from the server. */
+
 					}
+					System.out.println(messageToSend.getID() + " sended");
+					/* receive responses from the server. */
 					Object o = null; // the server response
 					synchronized (in) {
 						o = in.readObject();
 					}
+					System.out.println("Read");
 					if (o == null) {
 						SystemLogger.severe("Lost connection to server.");
 						setChanged();

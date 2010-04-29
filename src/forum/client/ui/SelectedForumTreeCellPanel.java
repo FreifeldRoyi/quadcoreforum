@@ -156,6 +156,13 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	public void notifyError(String errorMessage) {}
 
 	public void refreshForum(String encodedView) {
+		
+		if (encodedView.startsWith("register") ||
+				encodedView.startsWith("loggedout") ||
+				encodedView.startsWith("activenumbers\t") ||
+				encodedView.startsWith("activeusernames\t") ||
+				encodedView.startsWith("promoted\t") ||
+				encodedView.startsWith("The")) return;
 		String[] tSplitted = encodedView.split("\n");
 		
 		Collection<Permission> tPermissions = new Vector<Permission>();

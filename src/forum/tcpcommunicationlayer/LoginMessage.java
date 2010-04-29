@@ -14,15 +14,20 @@ import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;
 public class LoginMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -2723317717299435031L;
-
+	
+	/* The id of the previous guest - to be removed from the forum. */
+	private long guestID;
+	
 	/* The user-name of the user. */
 	private String username;
 	/* The password of the user. */
 	private String password;
 
-	public LoginMessage(String username, String password) {
+	public LoginMessage(long guestID, String username, String password) {
+		this.guestID = guestID;
 		this.username = username;
-		this.password = password; 
+		this.password = password;
+		
 	}
 
 	/* (non-Javadoc)
@@ -32,19 +37,19 @@ public class LoginMessage extends ClientMessage {
 		//TODO - again ot is not clear what the return value is in case of a failure - I assumed it is null.
 		// response (Vitali) --> No! exception will be thrown.
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
 			UIMember tResponseUser = forum.login(this.username, this.password);
 			returnObj.setHasExecuted(true);
 			String tResponse = tResponseUser.getID() + "\t" + tResponseUser.getUsername() + "\t" + tResponseUser.getLastName() + "\t" +
 			tResponseUser.getFirstName() + "\n";
-
+			
 			for (Permission tCurrentPermission : tResponseUser.getPermissions())
 				tResponse += tCurrentPermission.toString() + "\n";
-
+			forum.removeGuest(guestID);
 			returnObj.setResponse(tResponse);
-
-
+			returnObj.setMemberUsernameChanged();
+			returnObj.setMemberUsername(tResponseUser.getUsername());
 		}
 		catch (NotRegisteredException e) {
 			returnObj.setHasExecuted(false);

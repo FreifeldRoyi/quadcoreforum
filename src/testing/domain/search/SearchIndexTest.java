@@ -5,9 +5,7 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.junit.After;
-import org.junit.Before; 
-import org.junit.Test; 
+import org.junit.*;
 
 import forum.server.Settings;
 import forum.server.domainlayer.interfaces.UIMessage; 
@@ -17,12 +15,13 @@ import forum.server.domainlayer.search.SearchIndex;
 
 public class SearchIndexTest extends TestCase { 
 
-	SearchIndex se; 
+	private SearchIndex se;
 	
 	@Before 
 	public void setUp() throws Exception {
 		Settings.switchToTestMode();
 		this.se = SearchIndex.getInstance(); 
+		this.se.clear();
 	} 
 
 	@After 
@@ -62,6 +61,7 @@ public class SearchIndexTest extends TestCase {
 		Vector<SearchHit> tSHCol5 = (Vector<SearchHit>) this.se.getDataByContent(words5); //should hold tMsg1 
 		Vector<SearchHit> tSHCol6 = (Vector<SearchHit>) this.se.getDataByContent(words6); //should hold tMsg1 tMsg2 tMsg3 
 
+		
 		//logic 
 		Vector<SearchHit> tSHCol7 = (Vector<SearchHit>) this.se.getDataByContent(words7); //should hold tMsg3 tMsg2 tMsg1 
 		Vector<SearchHit> tSHCol8 = (Vector<SearchHit>) this.se.getDataByContent(words8); //should hold tMsg3 and tMsg4 with similar scores 
@@ -79,6 +79,8 @@ public class SearchIndexTest extends TestCase {
 		Vector<UIMessage> tMSGCol8 = new Vector<UIMessage>(); 
 		Vector<UIMessage> tMSGCol9 = new Vector<UIMessage>(); 
 
+		
+		
 		for (SearchHit tSh : tSHCol1) 
 			tMSGCol1.add(tSh.getMessage()); 
 		for (SearchHit tSh : tSHCol2) 

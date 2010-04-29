@@ -26,34 +26,38 @@ public class SearchByAuthorMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		long userID = -1;
 		SearchHit[] tHits = null;
 		try {
 			userID = forum.getMemberIdByUsername(this.authorUsername);
-			forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
-		} catch (NotRegisteredException e) {
-			// TODO please add your handling here
-			e.printStackTrace();
-		} catch (DatabaseRetrievalException e) {
-			// TODO please add your handling here.
-			e.printStackTrace();
+			System.out.println("UserID = " + userID + " username = " + this.authorUsername);
+			tHits = forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
+
+			if (tHits == null) {
+				returnObj.setHasExecuted(false);
+				returnObj.setResponse("for some reason the search can't be performed");
+			}
+			else if (tHits.length == 0) {
+				returnObj.setHasExecuted(true);
+				System.out.println("No Hits!!!!!");
+				returnObj.setResponse("searchnotmessages");
+			}
+			else {
+				returnObj.setHasExecuted(true);
+				String tResponse = "";
+				for (int i = 0; i < tHits.length; i++)
+					tResponse += tHits[i].getMessage().toString() + "\n";
+				returnObj.setResponse(tResponse);
+			}
 		}
-		
-		if (tHits == null) {
+		catch (NotRegisteredException e) {
+			returnObj.setHasExecuted(true);
+			returnObj.setResponse("searchnotmessages");
+		}
+		catch (DatabaseRetrievalException e) {
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("for some reason the search can't be performed");
-		}
-		else if (tHits.length == 0) {
-			returnObj.setHasExecuted(true);
-			returnObj.setResponse("no messages were found");
-		}
-		else {
-			returnObj.setHasExecuted(true);
-			String tResponse = "The found messages IDs are:" + "\n";
-			for (int i = 0; i < tHits.length; i++)
-				tResponse += tHits[i].getMessage().getID() + "\n";
-			returnObj.setResponse(tResponse);
 		}
 		return returnObj;
 	}

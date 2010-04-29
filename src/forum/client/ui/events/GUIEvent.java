@@ -7,7 +7,7 @@ package forum.client.ui.events;
 public abstract class GUIEvent {
 
 	public static enum EventType {
-		USER_CHANGED, THREADS_UPDATED, SUBJECTS_UPDATED, MESSAGES_UPDATED;
+		USER_CHANGED, THREADS_UPDATED, SUBJECTS_UPDATED, MESSAGES_UPDATED, SEARCH_UPDATED
 	}
 
 	protected EventType eventType;

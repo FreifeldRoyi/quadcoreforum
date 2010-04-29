@@ -34,6 +34,7 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 	public Component getTreeCellRendererComponent(
 			JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+		if (node.getUserObject() instanceof String) return m_nonselectedPanel;
 		if (selected) {
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
 			m_nonselectedPanel.select(new Color(198, 214, 253));
