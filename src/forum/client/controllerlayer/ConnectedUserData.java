@@ -48,4 +48,8 @@ public class ConnectedUserData {
 	public String getLastAndFirstName() {
 		return this.lastName + " " + this.firstName;
 	}
+	
+	public String getUsername() {
+		return this.username;
+	}
 }

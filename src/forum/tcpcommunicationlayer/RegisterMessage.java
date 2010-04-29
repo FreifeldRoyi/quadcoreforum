@@ -41,19 +41,19 @@ public class RegisterMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			forum.registerNewMember(this.username, this.password, this.lastname, this.firstname, this.email);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("you successfuly registered the forum");
+			returnObj.setResponse("registersuccess\t" + "you successfuly registered the forum");
 		}
 		catch (MemberAlreadyExistsException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("registererror\t" + "The following data already exists: " + e.getMessage());
 		} 
 		catch (DatabaseUpdateException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("registererror\t" + e.getMessage());
 		}
 		return returnObj;
 	}

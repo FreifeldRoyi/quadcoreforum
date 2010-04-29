@@ -40,10 +40,13 @@
         <lastName>f2</lastName>
         <firstName>r2</firstName>
         <numOfPostedMessages>0</numOfPostedMessages>
-        <privileges>EDIT_MESSAGE</privileges>
-        <privileges>OPEN_THREAD</privileges>
         <privileges>VIEW_ALL</privileges>
         <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>SET_MODERATOR</privileges>
+        <privileges>DELETE_MESSAGE</privileges>
+        <privileges>DELETE_THREAD</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
     </members>
     <members>
         <userID>3</userID>
@@ -53,8 +56,11 @@
         <lastName>b</lastName>
         <firstName>c</firstName>
         <numOfPostedMessages>0</numOfPostedMessages>
-        <privileges>REPLY_TO_MESSAGE</privileges>
         <privileges>VIEW_ALL</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>SET_MODERATOR</privileges>
+        <privileges>DELETE_MESSAGE</privileges>
+        <privileges>DELETE_THREAD</privileges>
         <privileges>OPEN_THREAD</privileges>
         <privileges>EDIT_MESSAGE</privileges>
     </members>
@@ -67,8 +73,80 @@
         <firstName>Sepetnitsky</firstName>
         <numOfPostedMessages>0</numOfPostedMessages>
         <privileges>VIEW_ALL</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>SET_MODERATOR</privileges>
+        <privileges>DELETE_MESSAGE</privileges>
+        <privileges>DELETE_THREAD</privileges>
         <privileges>OPEN_THREAD</privileges>
         <privileges>EDIT_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>5</userID>
+        <username>yakird</username>
+        <e-mail>a@b.c</e-mail>
+        <password>690df92e12c64676197a2d8c5676174a</password>
+        <lastName>dahan</lastName>
+        <firstName>yakir</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>6</userID>
+        <username>yakirda</username>
+        <e-mail>a@b.cd</e-mail>
+        <password>e10adc3949ba59abbe56e057f20f883e</password>
+        <lastName>Dahan</lastName>
+        <firstName>Yakir</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>SET_MODERATOR</privileges>
+        <privileges>DELETE_MESSAGE</privileges>
+        <privileges>DELETE_THREAD</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>7</userID>
+        <username>dahany</username>
+        <e-mail>sepetnit@bgu.ac.il</e-mail>
+        <password>e10adc3949ba59abbe56e057f20f883e</password>
+        <lastName>Dahan</lastName>
+        <firstName>Yakir</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>8</userID>
+        <username>yakirddd</username>
+        <e-mail>a@b.cdefg</e-mail>
+        <password>e10adc3949ba59abbe56e057f20f883e</password>
+        <lastName>Dahan</lastName>
+        <firstName>Yakir</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>OPEN_THREAD</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+    </members>
+    <members>
+        <userID>9</userID>
+        <username>idan</username>
+        <e-mail>i@i.com</e-mail>
+        <password>6d2fe1d6f097816949a2f54ed3d986a8</password>
+        <lastName>i</lastName>
+        <firstName>i</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+        <privileges>VIEW_ALL</privileges>
+        <privileges>EDIT_MESSAGE</privileges>
+        <privileges>REPLY_TO_MESSAGE</privileges>
+        <privileges>OPEN_THREAD</privileges>
     </members>
     <subjects>
         <name>name</name>
@@ -252,5 +330,26 @@
         <title>kkkkkkkkkkkkkkkkkk</title>
         <content>gggggggggggggggggggguuuuuuuuuuuuuuuuuuuuuurrrrrrrrrr</content>
         <postTime>2010-04-23T19:30:24.171+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>16</messageID>
+        <author>0</author>
+        <title>jkjj</title>
+        <content>dsdsd</content>
+        <postTime>2010-04-25T14:53:59.765+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>17</messageID>
+        <author>9</author>
+        <title>my reply</title>
+        <content>aaa aaa</content>
+        <postTime>2010-04-27T13:13:34.015+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>18</messageID>
+        <author>9</author>
+        <title>idan 2</title>
+        <content>idan 2</content>
+        <postTime>2010-04-27T13:14:56.890+03:00</postTime>
     </messages>
 </ForumType>

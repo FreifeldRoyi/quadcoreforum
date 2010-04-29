@@ -41,6 +41,13 @@ public class SearchIndex
 		return SearchIndex.INDEXER;
 	}
 	
+	public void clear() {
+		this.words.clear();
+		this.relations.clear();
+		this.items.clear();
+		this.users.clear();
+	}
+	
 	private SearchIndex()
 	{
 		this.reserved_words = new Vector<String>();
@@ -195,7 +202,7 @@ public class SearchIndex
 	{
 		Vector<SearchHit> toReturn = new Vector<SearchHit>();
 		Collection<Long> tValues = this.users.get(usrID);
-		
+		if (tValues == null) return toReturn;
 		for (Long tVal : tValues)
 		{
 			toReturn.add(new SearchHit(this.items.get(tVal),1));

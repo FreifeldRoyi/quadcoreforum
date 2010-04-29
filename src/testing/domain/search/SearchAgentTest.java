@@ -7,12 +7,9 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.junit.After;
-import org.junit.Before; 
-import org.junit.Test; 
+import org.junit.*;
 
 import forum.server.Settings;
-import forum.server.domainlayer.ForumFacade; 
 import forum.server.domainlayer.interfaces.UIMessage; 
 import forum.server.domainlayer.message.ForumMessage; 
 import forum.server.domainlayer.search.SearchAgent; 
@@ -26,15 +23,13 @@ import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsExce
  */ 
 public class SearchAgentTest extends TestCase 
 { 
-	SearchAgent sa; 
-	ForumFacade facade; 
+	private SearchAgent sa; 
 
 	/** 
 	 * @throws java.lang.Exception 
 	 */ 
 	@Before 
-	public void setUp() throws Exception  
-	{ 
+	public void setUp() throws Exception { 
 		Settings.switchToTestMode();
 		this.sa = new SearchAgent(); 
 	} 

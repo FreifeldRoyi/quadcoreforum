@@ -1,6 +1,7 @@
 package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIUser;
 import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
 
 /**
@@ -28,15 +29,20 @@ public class LogoffMessage extends ClientMessage {
 
 		// Response (Vitali) ---> Again, Exception will be thrown!!!!
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			forum.logout(this.username);
+			/* register the user as guest again */
+			UIUser tNewGuest = forum.addGuest();
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The user is logged out.");
+			returnObj.setGuestIDChanged();
+			returnObj.setConnectedGuestID(tNewGuest.getID());
+
+			returnObj.setResponse("loggedout\t" + tNewGuest.getID());
 		} 
 		catch (NotConnectedException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("You aren't connected!");
+			returnObj.setResponse("notconnected");
 		}
 		return returnObj;
 	}

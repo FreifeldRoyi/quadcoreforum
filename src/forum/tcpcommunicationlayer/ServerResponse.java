@@ -9,17 +9,32 @@ import java.io.Serializable;
  * @author Tomer Heber
  */
 public class ServerResponse implements Serializable {
-	
+
 	private static final long serialVersionUID = -736273246091582824L;
-	
+
 	private String m_response;
 	private boolean m_hasExecuted;
+
+	private long id;
 	
-	public ServerResponse(String response, boolean hasExecuted) {
+	private boolean guestIDChanged;
+	private boolean memberUsernameChanged;
+
+	private long connectedGuestID;
+	private String loggedInUsername;
+
+	public ServerResponse(long id, String response, boolean hasExecuted) {
+		this.id = id;
 		m_response = response;
 		m_hasExecuted = hasExecuted;
+
+		guestIDChanged = false;
+		memberUsernameChanged = false;
+
+		connectedGuestID = -1;
+		loggedInUsername = "";
 	}
-	
+
 	/**
 	 * @return Returns the response message sent by the server.
 	 */
@@ -27,6 +42,10 @@ public class ServerResponse implements Serializable {
 		return m_response;
 	}
 	
+	public long getID() {
+		return this.id;
+	}
+
 	/**
 	 * The response also tells us if a message that we sent to the server was indeed successfully
 	 * executed by the server.
@@ -43,7 +62,7 @@ public class ServerResponse implements Serializable {
 	public void setHasExecuted(boolean execflag){
 		m_hasExecuted = execflag;
 	}
-	
+
 	/**
 	 * setter to the m_response class member
 	 * @param response -value for the response class member.
@@ -51,13 +70,37 @@ public class ServerResponse implements Serializable {
 	public void setResponse(String response){
 		m_response = response;
 	}
-	
-/*	public Object getResponseObject() {
-		return this.responseObj;
+
+	public boolean guestIDChanged() {
+		return this.guestIDChanged;
+	}
+
+	public void setGuestIDChanged() {
+		this.guestIDChanged = true;
+	}
+
+	public long getConnectedGuestID() {
+		return this.connectedGuestID;
+	}
+
+	public void setConnectedGuestID(long id) {
+		this.connectedGuestID = id;
+	}
+
+
+	public boolean memberUsernameChanged() {
+		return this.memberUsernameChanged;
+	}
+
+	public void setMemberUsernameChanged() {
+		this.memberUsernameChanged = true;
+	}
+
+	public String getConnectedMemberUsername() {
+		return this.loggedInUsername;
 	}
 	
-	public void setResponseObject(Object obj) {
-		responseObj = obj;
+	public void setMemberUsername(String username) {
+		this.loggedInUsername = username;
 	}
-*/
 }

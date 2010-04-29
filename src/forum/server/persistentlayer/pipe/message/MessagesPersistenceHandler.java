@@ -218,12 +218,27 @@ public class MessagesPersistenceHandler {
 
 	/**
 	 * @param data
-	 * 		The forum data from which the required thread should be deleted
+	 * 		The forum data from which the required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getAllMessages()
+	 */
+	public Collection<ForumMessage> getAllMessages(ForumType data) {
+		Collection<ForumMessage> toReturn = new Vector<ForumMessage>();
+		for (MessageType tCurrentMessage : data.getMessages())
+			toReturn.add(
+					PersistentToDomainConverter.convertMessageTypeToForumMessage(tCurrentMessage));
+		return toReturn;
+	}
+	
+	/**
+	 * @param data
+	 * 		The forum data from which the required data should be retrieved
 	 * 
 	 * @see
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */
-	public ForumMessage getMessageByID(ForumType data, long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
+	public ForumMessage getMessageByID(ForumType data, long messageID) throws MessageNotFoundException {
 		MessageType tMessageType = this.getMessageTypeByID(data, messageID);
 		return PersistentToDomainConverter.convertMessageTypeToForumMessage(tMessageType);	
 	}

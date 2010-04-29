@@ -40,7 +40,7 @@ public class AddNewSubjectMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
 			forum.addNewSubject(this.userID, this.fatherID, this.subjectName, this.subjectDescription);
 			returnObj.setHasExecuted(true);

@@ -102,6 +102,19 @@ public class UsersController {
 	}
 
 	/**
+	 * 
+	 * @see
+	 * 		ForumFacade#getAllMembers()
+	 */
+	public Collection<UIMember> getAllMembers() throws DatabaseRetrievalException {
+		SystemLogger.info("A User requests to view all the forum members.");
+		Collection<UIMember> toReturn = new Vector<UIMember>();
+		toReturn.addAll(this.dataHandler.getUsersCache().getAllMembers());
+		SystemLogger.info("A forum members were retrieved and returned.");
+		return toReturn;
+	}
+	
+	/**
 	 * @see
 	 * 		ForumFacade#getMemberIdByUsername(String)
 	 */
@@ -206,9 +219,11 @@ public class UsersController {
 	 */
 	public void logout(final String username) throws NotConnectedException {
 		SystemLogger.fine("A user with username " + username + " requests to log-out the forum");
-		if (this.activeMembersUserNames.contains(username))
+		if (this.activeMembersUserNames.contains(username)) {
 			this.removeActiveMemberUsername(username);
-		else throw new NotConnectedException(username);		
+			SystemLogger.info("The member with username " + username + " has logged-out from the forum");
+		}
+		else throw new NotConnectedException(username);
 	}
 
 	/**
@@ -238,6 +253,7 @@ public class UsersController {
 			if (tApplicant.isAllowed(Permission.SET_MODERATOR)) {
 				SystemLogger.info("Permission granted for user " + applicantID + ".");
 				final ForumUser tForumUser = this.dataHandler.getUsersCache().getMemberByUsername(username);
+				System.out.println(this.getDefaultModeratorPermissions());
 				tForumUser.setPermissions(this.getDefaultModeratorPermissions());
 				this.dataHandler.getUsersCache().updateInDatabase(tForumUser);
 				SystemLogger.info("The user with " + username + " has been successfully promoted to be a " +

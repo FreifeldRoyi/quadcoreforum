@@ -147,10 +147,21 @@ public class UsersCache {
 	public Collection<ForumUser> getAllUsers() throws DatabaseRetrievalException {
 		final Set<ForumUser> toReturn = new HashSet<ForumUser>();
 		toReturn.addAll(this.idsToUsersMapping.values());
-		toReturn.addAll(this.pipe.getAllMembers());
+		toReturn.addAll(this.getAllMembers());
 		return toReturn;
 	}
 
+	/**
+	 * 
+	 * @return
+	 * 		A collection of all the members of the forum
+	 * @throws DatabaseRetrievalException
+	 * 		In case the required data can't be retrieved from the forum database due to a database connection error
+	 */
+	public Collection<ForumMember> getAllMembers() throws DatabaseRetrievalException {
+		return this.pipe.getAllMembers();
+	}
+	
 	/**
 	 * Returns whether the cache contains an already loaded user with the given id
 	 * 
@@ -226,8 +237,10 @@ public class UsersCache {
 			final String firstName, final String email, final Collection<Permission> permissions) throws 
 			MemberAlreadyExistsException, DatabaseUpdateException {
 		try {
-			if ((this.getMemberByUsername(username) != null) || (this.getMemberByEmail(email) != null))
+			if ((this.getMemberByUsername(username) != null))
 				throw new MemberAlreadyExistsException(username);
+			else if (this.getMemberByEmail(email) != null)
+				throw new MemberAlreadyExistsException(email); // TODO: throw e-mail already exists exception
 		}
 		catch (DatabaseRetrievalException e) {
 			throw new DatabaseUpdateException();

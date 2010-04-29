@@ -25,7 +25,7 @@ public class ViewSubjectContentMessage extends ClientMessage {
 		//TODO - I consider failure only in the case of an exception. Is it o.k??? s 
 		// Response (Vitali) --> Yes!!!
 
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			Collection<UISubject> tSubSubjects = forum.getSubjects(this.subjectID);
 			Collection<UIThread> tThreads = forum.getThreads(this.subjectID);

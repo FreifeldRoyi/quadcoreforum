@@ -1,6 +1,5 @@
 package testing.domain.user;
 
-
 import junit.framework.*;
 
 public class AllUserTests extends TestCase {

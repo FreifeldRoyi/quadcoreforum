@@ -108,7 +108,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 		deleteSubjectButton.setText("delete");
 		modifySubjectButton.setText("modify");
 
-		Dimension tSubjectsButtonsDimension = new Dimension(80, 30);
+		Dimension tSubjectsButtonsDimension = new Dimension(85, 35);
 		addNewSubjectButton.setPreferredSize(tSubjectsButtonsDimension);
 
 		deleteSubjectButton.setPreferredSize(tSubjectsButtonsDimension);

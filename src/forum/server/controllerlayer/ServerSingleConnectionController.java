@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;
+import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
 
@@ -21,13 +22,19 @@ import forum.tcpcommunicationlayer.ServerResponse;
 public class ServerSingleConnectionController implements Runnable {
 
 	private static final ExecutorService pool = Executors.newCachedThreadPool();
-	
+
 	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	private ForumFacade forum;
-	
+
+	private long connectedUserID;
+	private String connectedUserUsername;
+	private boolean userConnected;
+
 	private ServerSingleConnectionController(Socket socket) throws IOException {
+		this.userConnected = false;
+		this.connectedUserID = -1;
 		try {
 			this.forum = MainForumLogic.getInstance();
 		}
@@ -39,7 +46,7 @@ public class ServerSingleConnectionController implements Runnable {
 		this.out.flush();
 		this.in = new ObjectInputStream(this.socket.getInputStream());		
 	}
-	
+
 	/**
 	 * This method is in charge of starting the communication between the server
 	 * and the client.
@@ -57,13 +64,12 @@ public class ServerSingleConnectionController implements Runnable {
 		}
 		pool.execute(sscc);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {		
 		SystemLogger.info("Communication has started between " + this.socket.getInetAddress() + " and the server.");
-		
 		try {
 			while (true) {
 				/* Receive a message from the client */
@@ -78,24 +84,53 @@ public class ServerSingleConnectionController implements Runnable {
 				}	
 				SystemLogger.info("Received a message from client " + this.socket.getInetAddress() + ".");
 				ClientMessage message = (ClientMessage)tReceivedObject;
-			
+
 				/* Operate on the message */				
 				ServerResponse response = message.doOperation(this.forum);
+				if (response.guestIDChanged()) {
+					this.userConnected = true;
+					this.connectedUserID = response.getConnectedGuestID();
+					this.connectedUserUsername = "";
+				}
+				else if (response.memberUsernameChanged()) {
+					this.userConnected = true;
+					this.connectedUserUsername = response.getConnectedMemberUsername();
+				}				
+
+				System.out.println(response.getResponse() + " server response");
 				/* Send response back to the client */
 				SystemLogger.info("Sending a response back to client " + this.socket.getInetAddress() + ".");
 				this.out.writeObject(response);
-			} 
+			}
 		}
 		catch (IOException e) {
 			SystemLogger.severe("A readObject operation failed with client " + this.socket.getInetAddress() + ".");
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			SystemLogger.severe("A bad  operation failed with client " + this.socket.getInetAddress() + ".");			
-		} finally {
+		}
+		finally {
 			SystemLogger.info("Closing connection with client "+ this.socket.getInetAddress() + ".");
 			try {
 				this.in.close();
 				this.out.close();
 				this.socket.close();
+				if (this.userConnected) {
+					if (!this.connectedUserUsername.isEmpty()) {
+						try {
+							this.forum.logout(this.connectedUserUsername);
+							System.out.println("logout");
+						}
+						catch (NotConnectedException e) {
+							SystemLogger.warning("The user requested to log-out isn't connected to the forum");
+						}
+					}
+					else {
+						this.forum.removeGuest(this.connectedUserID);
+						System.out.println("logoutguest");
+
+					}
+				}
 			} catch (IOException e) {
 				SystemLogger.severe("Failed to close I/O streams with some client.");
 				e.printStackTrace();

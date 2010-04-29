@@ -30,11 +30,11 @@ public class PromoteToModeratorMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true);
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true);
 		try {
 			forum.promoteToBeModerator(this.appicantID, this.username);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse(this.username + " has been successfully promoted to be a moderator");
+			returnObj.setResponse("promoted\t" + this.username + " has been successfully promoted to be a moderator");
 		} 
 		catch (NotPermittedException e) {
 			returnObj.setHasExecuted(false);

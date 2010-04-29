@@ -15,8 +15,10 @@ public class AddNewGuestMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		UIUser tNewGuest = forum.addGuest();
+		returnObj.setGuestIDChanged();
+		returnObj.setConnectedGuestID(tNewGuest.getID());
 		returnObj.setHasExecuted(true);
 		returnObj.setResponse(tNewGuest.getID() + "");
 		return returnObj;

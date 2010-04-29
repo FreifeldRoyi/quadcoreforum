@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.io.IOException;
 
 import forum.client.ui.events.GUIEvent;
+import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 
 /**
@@ -16,8 +17,10 @@ public abstract class ControllerHandler extends GUIObservable {
 	protected ClientConnectionController connectionController;
 	
 	public synchronized void notifyObservers(GUIEvent event) {
+		System.out.println("starts notifiing ...");
 		setChanged();
 		super.notifyObservers(event);
+		System.out.println("ends notifiing ...");
 	}
 	
 	public void closeConnection() {
@@ -29,11 +32,14 @@ public abstract class ControllerHandler extends GUIObservable {
 		}
 	}
 	
-	public abstract void registerToForum(String username, String password, 
+	public abstract void registerToForum(final Component comp, String username, String password, 
 			String email, String firstName, String lastName);
 	
 	public abstract boolean registerAsNewGuest(Component comp);
 	
+	
+//	public abstract void removeMeAsGuest(long guestID);
+
 	/**
 	 * 
 	 * @return an encoded view of the forum.<br>
@@ -50,6 +56,8 @@ public abstract class ControllerHandler extends GUIObservable {
 	 */
 	public abstract String getForumView();
 
+	public abstract boolean logout(final Component comp, String username);
+
 	
 	public abstract void getNestedMessages(long rootID, final Component comp);
 	
@@ -58,7 +66,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	public abstract void getThreads(long subjectID, final Component comp);
 	
-	public abstract boolean login(String username, String password, final Component comp);
+	public abstract boolean login(long guestID, String username, String password, final Component comp);
 	
 	
 	/**
@@ -87,5 +95,15 @@ public abstract class ControllerHandler extends GUIObservable {
 	public abstract void addNewMessage(Component comp);
 
 	
+	public abstract void getActiveUsersNumber();
 	
+	public abstract void searchByAuthor(Component comp, String username);
+	
+	public abstract void searchByContent(Component comp, String phrase);	
+	
+	public abstract void getAllMembers(Component comp);
+	
+	public abstract void promoteToModerator(Component comp, String username);
+
+
 }

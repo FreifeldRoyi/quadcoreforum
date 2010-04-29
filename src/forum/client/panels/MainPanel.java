@@ -1,7 +1,6 @@
 package forum.client.panels;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.*;
 
 import forum.client.controllerlayer.ConnectedUserData;
@@ -17,7 +16,6 @@ import forum.server.domainlayer.user.Permission;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -37,24 +35,26 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	private static final long serialVersionUID = -5251318786616475794L;	
 
+	private JButton btn_show_members;
+
 	private JPanel mainPanel;
 	private JMenuBar mainPanelMenu;
-	private JButton loginButton;
-	private JButton registerButton;
-	private JButton logoutButton;
+	private JButton btn_login;
+	private JButton btn_register;
+	private JButton btn_logout;
+	private JButton btn_search;
 
-	private JLabel welcomeLabel;
+	private JLabel lbl_welcome;
 	private JButton fastLoginButton;
 	private JLabel fastLoginUsernameLabel;
 	private JTextField fastLoginUsernameInput;
 	private JLabel fastLoginPasswordLabel;
 	private JPasswordField fastLoginPasswordInput;
-	private JLabel connectedStatisticsLabel;
-	private JPanel navigatePanel;
+	private JPanel pnl_navigate;
 
-	private JNavigatePanel linksPanel;
-	
-	private JPanel fastLoginPanel;
+	private JNavigatePanel pnl_links;
+
+	private JPanel pnl_fastLogin;
 
 
 	private Timer busyIconTimer;
@@ -87,43 +87,70 @@ public class MainPanel extends JFrame implements GUIHandler {
 	public void refreshForum(String encodedView) {
 		// simulates a press on the home button
 
-		System.out.println(encodedView + " kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-		String[] tSplitted = encodedView.split("\n");
-		String[] tUserDetails = tSplitted[0].split("\t");
+		if (encodedView.startsWith("register") || 
+				encodedView.startsWith("activenumbers\t") ||
+				encodedView.startsWith("activeusernames\t") ||
+				encodedView.startsWith("promoted\t")) return;
 
-		long connectedUserID = Long.parseLong(tUserDetails[0]);
 
-		Collection<Permission> tPermissions = new Vector<Permission>();
-		for (int i = 1; i < tSplitted.length; i++)
-			tPermissions.add(Permission.valueOf(tSplitted[i]));
+		this.pnl_navigate.setVisible(false);
 
-		if (connectedUserID < 0) // guest
+
+		if (!encodedView.startsWith("loggedout\t")) {
+
+
+			String[] tSplitted = encodedView.split("\n");
+			String[] tUserDetails = tSplitted[0].split("\t");
+
+			long connectedUserID = Long.parseLong(tUserDetails[0]);
+
+			Collection<Permission> tPermissions = new Vector<Permission>();
+			for (int i = 1; i < tSplitted.length; i++)
+				tPermissions.add(Permission.valueOf(tSplitted[i]));
+
+			if (connectedUserID < 0) // guest
+				this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
+			else
+				this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
+						tUserDetails[2], tUserDetails[3], tPermissions);
+
+
+
+		}
+		else {
+
+			String[] tSplitted = encodedView.split("\n");
+			String[] tUserDetails = tSplitted[0].split("\t");
+
+			long connectedUserID = Long.parseLong(tUserDetails[1]);
+
+			Collection<Permission> tPermissions = new Vector<Permission>();
+			for (int i = 1; i < tSplitted.length; i++)
+				tPermissions.add(Permission.valueOf(tSplitted[i]));
+
 			this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
-		else
-			this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
-					tUserDetails[2], tUserDetails[3], tPermissions);
+
+		}		
+
 
 		this.homeButtonPress();
 		this.setEnabled(true);
 
 		if (!this.connectedUser.isGuest()) {
-			this.welcomeLabel.setText("Hello " + this.connectedUser.getLastAndFirstName() + "!");
-			this.loginButton.setVisible(false);
-			this.logoutButton.setVisible(true);			
-			this.registerButton.setVisible(false);
-			this.fastLoginUsernameInput.setEnabled(false);
-			this.fastLoginPasswordInput.setEnabled(false);
-			this.fastLoginButton.setEnabled(false);
+			this.lbl_welcome.setText("Hello " + this.connectedUser.getLastAndFirstName() + "!");
+			this.btn_login.setVisible(false);
+			this.btn_logout.setVisible(true);			
+			this.btn_register.setVisible(false);
+			this.pnl_fastLogin.setVisible(false);
 		}
 		else {
-			this.welcomeLabel.setText("Hello Guest!");
-			this.loginButton.setVisible(true);
-			this.logoutButton.setVisible(false);			
-			this.registerButton.setVisible(true);
-			this.fastLoginUsernameInput.setEnabled(true);
-			this.fastLoginPasswordInput.setEnabled(true);
-			this.fastLoginButton.setEnabled(true);
+			this.lbl_welcome.setText("Hello Guest!");
+			this.btn_login.setVisible(true);
+			this.btn_logout.setVisible(false);			
+			this.btn_register.setVisible(true);
 
+			this.pnl_fastLogin.setVisible(true);
+			this.fastLoginButton.setEnabled(false);
 		}
 
 		this.fastLoginPasswordInput.setText("");
@@ -133,6 +160,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		controller.getSubjects(-1, this.subjectsPanel);
 
+		if (this.connectedUser.getID() == 0)
+			btn_show_members.setVisible(true);
+		else
+			btn_show_members.setVisible(false);
+		this.pnl_navigate.setVisible(true);
 
 	}
 
@@ -148,7 +180,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 	public static void main(String[] args) {
 
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+
 		}
 		catch (Exception e) {
 			SystemLogger.warning("Can't use default system look and feel, will use java default" +
@@ -157,9 +191,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		try {
 			MainPanel tMainPanel = new MainPanel();
-			
+
 
 			tMainPanel.pack();
+
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
 			int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
@@ -197,6 +232,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 
 			public void windowClosing(WindowEvent e) {
+
 				SystemLogger.info("The client requested to stop the application.");
 				SystemLogger.info("Closing connections");
 				controller.closeConnection();
@@ -209,48 +245,83 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.startWorkingAnimation("Connecting as a guest ...");		
 		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		controller.registerAsNewGuest(this);
+		//		controller.getActiveUsersNumber(this);
 		this.setVisible(true);
 
 	}
 
-	private void fastLoginTextChanged() {
-		System.out.println("fastlogin");
-		if (!fastLoginUsernameInput.getText().isEmpty() &&
-				fastLoginPasswordInput.getPassword().length > 0) {
-			fastLoginButton.setEnabled(true);
-System.out.println(fastLoginUsernameInput.getText());
-System.out.println(fastLoginPasswordInput.getPassword().length);
-		}
-		else {
-			System.out.println("ddd");
-			fastLoginButton.setEnabled(false);
-		}
-	}
 
 
 	private void initGUIComponents() {
 
 
 		// prepares the navigate panel
-		navigatePanel = new JPanel();
-		loginButton = new JButton();
-		registerButton = new JButton();
-		welcomeLabel = new JLabel();
+		pnl_navigate = new JPanel();
+		btn_login = new JButton("login");
+		btn_register = new JButton("register");
+		lbl_welcome = new JLabel();
 
-		logoutButton = new JButton();
-		logoutButton.setText("logout");
-		logoutButton.setVisible(false);
+		btn_logout = new JButton("logout");
+		btn_logout.setVisible(false);
 
 
-		loginButton.setText("login");
-		registerButton.setText("register");
-		welcomeLabel.setFont(new Font("Tahoma", Font.BOLD, 14)); // NOI18N
-		welcomeLabel.setText("Hello guest!"); // NOI18N
+		this.btn_logout.addActionListener(new ActionListener() {
 
-		navigatePanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+			public void actionPerformed(ActionEvent arg0) {
+				MainPanel.this.setEnabled(false);
+				controller.logout(MainPanel.this, connectedUser.getUsername());
+			}
+		});
 
-		GroupLayout tNavigatePanelLayout = new GroupLayout(navigatePanel);
-		navigatePanel.setLayout(tNavigatePanelLayout);
+
+		lbl_welcome.setFont(new Font("Tahoma", Font.BOLD, 14)); // NOI18N
+		lbl_welcome.setText("Hello guest!"); // NOI18N
+
+		this.btn_register.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					RegistrationDialog tRegister = new RegistrationDialog();
+					tRegister.setVisible(true);
+				} 
+				catch (IOException e) {
+					SystemLogger.warning("Error while connection to the server!");
+					btn_register.setEnabled(false);
+				}
+
+			}
+
+		});
+
+		btn_search = new JButton("search");
+
+		btn_search.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						SearchDialog tNewSearchDialog = new SearchDialog();
+						tNewSearchDialog.setVisible(true);
+					}
+				}
+				);
+			}
+		});
+
+
+		btn_show_members = new JButton("show members");
+		btn_show_members.setPreferredSize(new Dimension(100, 35));
+		btn_show_members.setVisible(false);
+
+		btn_show_members.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new MembersDialog(connectedUser.getID() == 0).setVisible(true);
+			}
+		});
+
+		pnl_navigate.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+
+		GroupLayout tNavigatePanelLayout = new GroupLayout(pnl_navigate);
+		pnl_navigate.setLayout(tNavigatePanelLayout);
 		JSeparator tNavigatePanelSeparator = new JSeparator();
 
 		JLinkButton tShowRootSubjects = new JLinkButton("Show root subjects");
@@ -265,48 +336,58 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 
 		});
 
-		
-		linksPanel = new JNavigatePanel(tShowRootSubjects);
-				
+
+		pnl_links = new JNavigatePanel(tShowRootSubjects);
+
 		//tMainLinkButton.setPreferredSize(new Dimension(20, 10));
-		
+
+		JSeparator tVerticalSeparator = new JSeparator(SwingConstants.VERTICAL);
+
 		tNavigatePanelLayout.setHorizontalGroup(
 				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
 				.addGroup(GroupLayout.Alignment.TRAILING, tNavigatePanelLayout.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)	
 								.addComponent(tNavigatePanelSeparator, GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
-								.addComponent(linksPanel, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
+								.addComponent(pnl_links, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
 								.addGroup(tNavigatePanelLayout.createSequentialGroup()
-										.addComponent(welcomeLabel, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lbl_welcome, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
-										.addComponent(registerButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)										
-										.addComponent(loginButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)))
+										.addComponent(btn_show_members, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
 										.addGap(18, 18, 18)
-										.addComponent(logoutButton, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+										.addComponent(btn_search, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+										.addGap(18, 18, 18)
+										.addComponent(tVerticalSeparator, 1, 1, 1)
+										.addGap(18, 18, 18)
+										.addComponent(btn_register, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+										.addGap(18, 18, 18)
+										.addComponent(btn_login, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
+										.addGap(18, 18, 18)
+										.addComponent(btn_logout, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
 										.addContainerGap())
 		);
 		tNavigatePanelLayout.setVerticalGroup(
 				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(tNavigatePanelLayout.createSequentialGroup()
 						.addGap(5, 5, 5)
-						.addComponent(linksPanel, GroupLayout.PREFERRED_SIZE, 35, 35)
+						.addComponent(pnl_links, GroupLayout.PREFERRED_SIZE, 35, 35)
 						.addGap(5, 5, 5)
 						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(welcomeLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-								.addComponent(logoutButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-								.addComponent(registerButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
-								.addComponent(loginButton, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
+								.addComponent(lbl_welcome, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+								.addComponent(btn_logout, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+								.addComponent(btn_search, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+								.addComponent(btn_show_members, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+
+								.addComponent(btn_register, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+								.addComponent(tVerticalSeparator, 35, 35, 35)
+								.addComponent(btn_login, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
 								.addContainerGap())
 		);
 
 
 
-		JPanel tStatisticsPanel = new JPanel();
-		connectedStatisticsLabel = new JLabel();
 
 		//MessagesTree tMessagesViewPanel = new MessagesTree("thread1", -1);
 
@@ -341,7 +422,7 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 
 		// prepares the fast login panel
 
-		fastLoginPanel = new JPanel();
+		pnl_fastLogin = new JPanel();
 		fastLoginButton = new JButton();
 		fastLoginUsernameLabel = new JLabel();
 		fastLoginUsernameInput = new JTextField();
@@ -349,51 +430,49 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 		fastLoginPasswordInput = new JPasswordField();
 
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		fastLoginPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Fast Login"));
+		pnl_fastLogin.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Fast Login"));
 		fastLoginButton.setText("Login");
 
 		fastLoginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.login(fastLoginUsernameInput.getText(), 
+				controller.login(connectedUser.getID(), fastLoginUsernameInput.getText(), 
 						new String(fastLoginPasswordInput.getPassword()), mainPanel);
 			}
 		});
 
 
-		fastLoginUsernameLabel.setFont(welcomeLabel.getFont());
+		fastLoginUsernameLabel.setFont(lbl_welcome.getFont());
 		fastLoginUsernameLabel.setText("Username");
 		fastLoginUsernameInput.setText("");
 
-		fastLoginPasswordLabel.setFont(welcomeLabel.getFont());
+		fastLoginPasswordLabel.setFont(lbl_welcome.getFont());
 		fastLoginPasswordLabel.setText("Password");
 		fastLoginPasswordInput.setText("");
 
 
 		this.fastLoginUsernameInput.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {}
-			public void keyReleased(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				fastLoginTextChanged();
+
+			}
 
 			public void keyTyped(KeyEvent e) {
-				fastLoginTextChanged();
 			}
 		});
 
 		this.fastLoginPasswordInput.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {}
-			public void keyReleased(KeyEvent e) {}
+			public void keyReleased(KeyEvent e) {
+				fastLoginTextChanged();
+			}
 
 			public void keyTyped(KeyEvent e) {
-				fastLoginTextChanged();
 			}			
 		});
 
-
-
-
-
-
-		GroupLayout jFastLoginPanelLayout = new GroupLayout(fastLoginPanel);
-		fastLoginPanel.setLayout(jFastLoginPanelLayout);
+		GroupLayout jFastLoginPanelLayout = new GroupLayout(pnl_fastLogin);
+		pnl_fastLogin.setLayout(jFastLoginPanelLayout);
 		jFastLoginPanelLayout.setHorizontalGroup(
 				jFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(jFastLoginPanelLayout.createSequentialGroup()
@@ -421,30 +500,17 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 								.addContainerGap())
 		);
 
-		
-		tStatisticsPanel.setBorder(BorderFactory.createTitledBorder("Currently Connected")); // NOI18N
 
-		connectedStatisticsLabel.setFont(welcomeLabel.getFont()); // NOI18N
-		connectedStatisticsLabel.setText("Total: x are connected, y are registered users and z are guests"); // NOI18N
 
-		GroupLayout tStatisticsPanelLayout = new GroupLayout(tStatisticsPanel);
-		tStatisticsPanel.setLayout(tStatisticsPanelLayout);
-		tStatisticsPanelLayout.setHorizontalGroup(
-				tStatisticsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tStatisticsPanelLayout.createSequentialGroup()
-						.addComponent(connectedStatisticsLabel, GroupLayout.PREFERRED_SIZE, 502, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(621, Short.MAX_VALUE))
-		);
-		tStatisticsPanelLayout.setVerticalGroup(
-				tStatisticsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tStatisticsPanelLayout.createSequentialGroup()
-						.addComponent(connectedStatisticsLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-						.addGap(29, 29, 29))
-		);
+
+
+
+
 
 
 
 		// prepares the layout of the status panel 
+
 
 		this.statusPanel = new JPanel();
 		JSeparator tStatusPanelSeparator = new JSeparator();
@@ -479,12 +545,20 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 		// prepares the layout of the main panel
 
 
-
+		StatisticsPanel tStatisticsPanel = null;
+		try {
+			tStatisticsPanel = new StatisticsPanel();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		this.mainPanel = new JPanel();
 		mainPanel.setPreferredSize(new Dimension(1159, 600));
 
 		JSeparator tMainPanelSeparator = new JSeparator();
+
+
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
@@ -494,10 +568,10 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 						.addContainerGap()
 						.addGroup(tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 
-								.addComponent(navigatePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(pnl_navigate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(statusPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(tStatisticsPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(fastLoginPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(pnl_fastLogin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.subjectsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
 
 
@@ -515,12 +589,12 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(tMainPanelLayout.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(navigatePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(pnl_navigate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGap(11, 11, 11)
 						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+						.addGap(0, 0, Short.MAX_VALUE)
+						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
 						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 
 
@@ -530,7 +604,7 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 						//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 						//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-						.addComponent(fastLoginPanel, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+						.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
 						.addGap(11, 11, 11)
 
@@ -555,9 +629,11 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 			}
 		});
 
-		
+
 		this.busyIconTimer.setRepeats(true);
 		//this.switchToMessagesView();
+
+		this.fastLoginButton.setEnabled(false);
 	}
 
 	public void switchToMessagesView() {
@@ -587,15 +663,15 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 	}
 
 	public void addToNavigate(String text, ActionListener action) {
-		this.linksPanel.insertLink(text, action);
-		this.linksPanel.setVisible(false);
-		this.linksPanel.setVisible(true);
+		this.pnl_links.insertLink(text, action);
+		this.pnl_links.setVisible(false);
+		this.pnl_links.setVisible(true);
 	}
-	
+
 	public void removeFromNavigateUntil(String name) {
-		this.linksPanel.removeAllBeforeAction(name);
+		this.pnl_links.removeAllBeforeAction(name);
 	}
-	
+
 	public void stopWorkingAnimation() {
 		try {
 			Thread.sleep(100);
@@ -607,4 +683,14 @@ System.out.println(fastLoginPasswordInput.getPassword().length);
 		statusAnimationLabel.setIcon(MainPanel.idleIcon);
 		statusLabel.setText("");
 	}
+
+	private void fastLoginTextChanged() {
+		if (!fastLoginUsernameInput.getText().isEmpty() &&
+				fastLoginPasswordInput.getPassword().length > 0) {
+			fastLoginButton.setEnabled(true);
+		}
+		else
+			fastLoginButton.setEnabled(false);
+	}
+
 }

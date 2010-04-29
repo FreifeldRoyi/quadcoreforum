@@ -4,7 +4,10 @@
 package forum.tcpcommunicationlayer;
 
 
+import javax.swing.UIManager;
+
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.search.SearchHit;
 
 /**
@@ -25,21 +28,23 @@ public class SearchByContentMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		SearchHit[] tHits = forum.searchByContent(this.phraseToSearch, 0, Integer.MAX_VALUE);
 		if (tHits == null) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("for some reason the search can't be performed");
+			returnObj.setResponse("for some reason the search can't be performed.");
 		}
 		else if (tHits.length == 0) {
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("no messages were found");
+			returnObj.setResponse("searchnotmessages");
 		}
 		else {
 			returnObj.setHasExecuted(true);
-			String tResponse = "The found messages IDs are:" + "\n";
-			for (int i = 0; i < tHits.length; i++)
-				tResponse += tHits[i].getMessage().getID() + "\n";
+			String tResponse = "searchresult\n";
+			for (int i = 0; i < tHits.length; i++) {
+				UIMessage tCurrentMessage = tHits[i].getMessage();
+				tResponse += tCurrentMessage.toString() + "\n";
+			}
 			returnObj.setResponse(tResponse);
 		}
 		return returnObj;

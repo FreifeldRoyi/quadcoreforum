@@ -18,7 +18,7 @@ public class RemoveGuestMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		forum.removeGuest(guestID);
 		returnObj.setHasExecuted(true);
 		returnObj.setResponse("removed");

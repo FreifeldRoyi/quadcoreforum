@@ -238,7 +238,7 @@ public class CLIForum extends Thread {
 			String command = tStringTokenizer.nextToken();
 			/** adding a new thread with a new first message **/ 
 			if (command.equals("login"))
-				return new LoginMessage(tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
+				return new LoginMessage(this.loggedID, tStringTokenizer.nextToken(), tStringTokenizer.nextToken());
 			if (command.equals("logoff")) {
 				String tUserName = this.loggedUsername != null? this.loggedUsername : "";
 				return new LogoffMessage(tUserName);

@@ -27,7 +27,7 @@ public class ViewThreadsMessage extends ClientMessage {
 	}
 
 	public ServerResponse doOperation(ForumFacade forum) {
-		ServerResponse returnObj = new ServerResponse("", true); 
+		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			Collection<UIThread> tThreads = forum.getThreads(this.subjectID);
 

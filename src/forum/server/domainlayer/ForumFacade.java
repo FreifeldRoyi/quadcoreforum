@@ -57,6 +57,15 @@ public interface ForumFacade { //extends SearchEngine {
 	public Collection<String> getActiveMemberUserNames();
 
 	/**
+	 * 
+	 * @return
+	 *		A collection of all the forum members
+	 * @throws DatabaseRetrievalException
+	 * 	    If a problem has occurred while trying to retrieve the required data from the database
+	 */
+	public Collection<UIMember> getAllMembers() throws DatabaseRetrievalException;
+	
+	/**
 	 * Returns the unique id of the forum member whose user-name equals to the given one
 	 * 
 	 * @param username
