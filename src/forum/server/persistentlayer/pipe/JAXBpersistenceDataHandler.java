@@ -365,11 +365,11 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#updateMessage(long, String, String)
 	 */
-	public void updateMessage(final long messageID, final String newTitle, final String newContent) throws MessageNotFoundException, 
+	public void updateMessage(final long messageID, final String newTitle, final String newContent, final Collection<Long> replies) throws MessageNotFoundException, 
 	DatabaseUpdateException {
 		try {
 			ForumType tForum = this.unmarshalDatabase();
-			this.messagesHandler.updateMessage(tForum, messageID, newTitle, newContent);
+			this.messagesHandler.updateMessage(tForum, messageID, newTitle, newContent, replies);
 			this.marshalDatabase(tForum);
 		}
 		catch (DatabaseRetrievalException e) {

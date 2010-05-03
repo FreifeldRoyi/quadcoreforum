@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.io.IOException;
 
 import forum.client.ui.events.GUIEvent;
-import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 
 /**
@@ -17,10 +16,8 @@ public abstract class ControllerHandler extends GUIObservable {
 	protected ClientConnectionController connectionController;
 	
 	public synchronized void notifyObservers(GUIEvent event) {
-		System.out.println("starts notifiing ...");
 		setChanged();
 		super.notifyObservers(event);
-		System.out.println("ends notifiing ...");
 	}
 	
 	public void closeConnection() {

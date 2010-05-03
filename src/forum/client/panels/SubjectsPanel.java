@@ -63,8 +63,6 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 			public void mouseClicked(MouseEvent e) {
 				// handle double click
 				if (e.getClickCount() == 2) {
-					System.out.println("clicked");
-
 					int rowSelected = subjectsTable.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
 						subjectsTable.setVisible(false);
@@ -92,9 +90,6 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		});
-		
-		
-		
 		
 		subjectsTableModel = new SubjectsTableModel();
 		this.subjectsTable.setModel(subjectsTableModel);
@@ -163,8 +158,6 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
-		System.out.println("subjects refresh : ");
-		System.out.println(encodedView);
 		this.subjectsTable.setVisible(false);
 		this.subjectsTableModel.clearData();
 		if (!encodedView.startsWith("There")) {
@@ -204,9 +197,10 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 		this.subjectsTable.setVisible(true);
 		if (showingSubjectsOfID > -1)
 			container.switchToSubjectsAndThreadsView();
-		else
+		else {
 			container.switchToRootSubjectsView();
-		container.stopWorkingAnimation();
+			container.stopWorkingAnimation();
+		}
 	}
 	
 	private ActionListener linkPressListener() {

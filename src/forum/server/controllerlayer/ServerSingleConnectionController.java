@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Collection;
+import java.util.Queue;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,7 +15,9 @@ import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;
 import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
 import forum.tcpcommunicationlayer.ClientMessage;
+import forum.tcpcommunicationlayer.GuestsAndMembersNumberMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
+import forum.tcpcommunicationlayer.ViewAllMembersMessage;
 
 /**
  * This class handles a single TCP connection between a client and the server.
@@ -22,6 +27,10 @@ import forum.tcpcommunicationlayer.ServerResponse;
 public class ServerSingleConnectionController implements Runnable {
 
 	private static final ExecutorService pool = Executors.newCachedThreadPool();
+	// this collection stores all the open connections to the clients in order to inform them about
+	// the connected clients
+//	private static final Collection<ServerSingleConnectionController> openConnections =
+//		new Vector<ServerSingleConnectionController>();
 
 	private Socket socket;
 	private ObjectInputStream in;
@@ -65,6 +74,15 @@ public class ServerSingleConnectionController implements Runnable {
 		pool.execute(sscc);
 	}
 
+	private void updateConnectedUsersInfo() {
+/*		ServerResponse tUsersNumbers = new GuestsAndMembersNumberMessage().doOperation(this.forum);
+		ServerResponse tConnectedUsers = new ViewAllMembersMessage().doOperation(this.forum);
+		SystemLogger.info("Updating all clients about connected users.");
+		synchronized (openConnections) {
+			for (String )
+		}	*/
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */

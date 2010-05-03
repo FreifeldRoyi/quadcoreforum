@@ -40,7 +40,7 @@ public class AddReplyMessage extends ClientMessage {
 		try {
 			forum.addNewReply(this.authorID, this.fatherID, this.title, this.content);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The Forum added a new reply successfuly");
+			returnObj.setResponse("replysuccess");
 		}
 		catch (MessageNotFoundException e) {
 			returnObj.setHasExecuted(false);

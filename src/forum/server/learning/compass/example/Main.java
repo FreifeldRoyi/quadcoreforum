@@ -19,6 +19,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
     	File file = new File("src/forum/server/learning/compass/compassSettings.xml");
         /* The genData directory is where the search engine will save its data */
         CompassConfiguration conf = CompassConfigurationFactory

@@ -35,8 +35,8 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 	private JButton deleteThreadbButton;
 	private JButton modifyThreadButton;	
 	
-	public ThreadsPanel(final MainPanel container, final ForumTree messages) {
-		this.container = container;
+	public ThreadsPanel(final MainPanel cont, final ForumTree messages) {
+		this.container = cont;
 		this.messages = messages;
 		//		this.messages.getForumTreeUI().setVisible(false);
 		this.threadsTable = new JTable();
@@ -51,10 +51,12 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 				if (e.getClickCount() == 2) {
 					int rowSelected = threadsTable.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
+						
+						final long tMessageIDToLoad = threadsTableModel.getIDofRootMessageInRow(rowSelected);
 						container.startWorkingAnimation("retreiving thread " + 
 								threadsTableModel.getTitleOfThreadInRow(rowSelected) 
 								+ " content...");
-						final long tMessageIDToLoad = threadsTableModel.getIDofRootMessageInRow(rowSelected);
+
 						messages.setRootMessage(tMessageIDToLoad);
 					}
 				}
@@ -114,10 +116,16 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 
 	}	
 
+		
+	
 	public void changeTableVisible() {
 		this.threadsTable.setVisible(!this.threadsTable.isVisible());
 	}
 
+	public boolean showsMessages() {
+		return this.messages.getForumTreeUI().isVisible();
+	}
+	
 	/* (non-Javadoc)
 	 * @see forum.client.ui.events.GUIHandler#notifyError(java.lang.String)
 	 */
@@ -156,7 +164,6 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 		}	
 		this.threadsTableModel.fireTableDataChanged();
 		this.threadsTable.setVisible(true);
-
 		container.stopWorkingAnimation();
 	}
 }

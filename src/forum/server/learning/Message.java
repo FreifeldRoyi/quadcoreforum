@@ -7,6 +7,7 @@ public class Message {
 	
 	public Message(){
 	}	
+	
 	public int getNumber() {
 		return number;
 	}

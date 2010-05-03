@@ -31,7 +31,8 @@ public class TestMessage {
 			tx = session.beginTransaction();
 			session.delete(msg);
 			tx.commit();
-		} catch (RuntimeException e) {
+		} 
+		catch (RuntimeException e) {
 			if (tx != null && tx.isActive()) {
 				try {
 					// Second try catch as the rollback could fail as well

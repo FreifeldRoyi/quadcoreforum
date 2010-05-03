@@ -73,9 +73,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		try {
 			if (response != null) {
 				this.responses.put((ServerResponse)response);
-				System.out.println("updated  " + ((ServerResponse)response).getID());
-				System.out.println("updated  " + ((ServerResponse)response).getResponse());
-				System.out.println(this.responses.size());
 			}
 		}
 		catch (InterruptedException e) {
@@ -126,9 +123,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					while (true) {
 						try {
 							ClientMessage toSend = messages.take();
-							System.out.println("sending " + toSend.getID());
 							connectionController.handleQuery(toSend);
-							System.out.println("end of sending " + toSend.getID());
 
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -141,9 +136,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 				public void run() {
 					while (true) {
 						try {
-							System.out.println("waiting");
 							ServerResponse tResponse = responses.take();
-							System.out.println("tresponse = " + tResponse.getID());
 							if (tResponse != null) {
 								long id = tResponse.getID();
 								ClientRequestData tCRequest = sended.get(id);
@@ -155,12 +148,11 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 									sended.remove(id);
 									if (tResponse.hasExecuted())
 										notifyObservers(new ForumGUIRefreshEvent(tCRequest.getComponent(),
-											tResponse.getResponse(), tCRequest.getEventType()));
+												tResponse.getResponse(), tCRequest.getEventType()));
 									else
 										notifyObservers(new ForumGUIErrorEvent(
 												tResponse.getResponse(), tCRequest.getEventType()));
 								}
-								System.out.println("response handling end ...");
 							}		
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -205,22 +197,17 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 
 	public void addReplyToMessage(final long author, final long replyTo, 
 			final String title, final String content, final Component comp) {
-		Runnable tResponseHandler = new Runnable() {	
-			public void run() {
-				getActiveUsersNumber();
-				final ClientMessage toSend = new AddReplyMessage(author, replyTo, title, content);
-				try {
-					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
-					synchronized (messages) {
-						messages.put(toSend);
-					}
-				}
-				catch (InterruptedException e) {
-					SystemLogger.warning("The program was interrupted while waiting");
-				}
+		getActiveUsersNumber();
+		final ClientMessage toSend = new AddReplyMessage(author, replyTo, title, content);
+		try {
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
 			}
-		};
-		this.responsesHandlersPool.execute(tResponseHandler);
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}
 	}
 
 	@Override
@@ -379,25 +366,20 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 	}
 
 	public void getNestedMessages(final long rootID, final Component comp) {
-		Runnable tResponseHandler = new Runnable() {
-			public void run() {
-				try {
-					final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
-					getActiveUsersNumber();
+		try {
+			final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
+			getActiveUsersNumber();
 
-					//						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
-					//							EventType.MESSAGES_UPDATED));
-					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
-					synchronized (messages) {
-						messages.put(toSend);
-					}
-				}
-				catch (InterruptedException e) {
-					SystemLogger.warning("The program was interrupted while waiting");
-				}
+			//						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
+			//							EventType.MESSAGES_UPDATED));
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
 			}
-		};
-		this.responsesHandlersPool.execute(tResponseHandler);		
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}
 	}
 
 	public void registerToForum(final Component comp, final String username, final String password, final String email,
@@ -410,7 +392,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 				try {
 					//							notifyObservers(new ForumGUIErrorEvent("registererror\tError while connecting to the server!",
 					//								EventType.USER_CHANGED));
-					//					System.out.println("controller register error");
+					//					.println("controller register error");
 
 					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
 					synchronized (messages) {
@@ -423,28 +405,22 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			}
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);	
-	}		
-
+	}
 
 
 	public void searchByAuthor(final Component comp, final String username) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
-				System.out.println("requested to " + username);
-//				getActiveUsersNumber();
+				getActiveUsersNumber();
 				final ClientMessage toSend = new SearchByAuthorMessage(username);
 				try {
-					//							notifyObservers(new ForumGUIErrorEvent("registererror\tError while connecting to the server!",
-					//								EventType.USER_CHANGED));
-					//					System.out.println("controller register error");
 
-						
-						sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
+
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
 
 					synchronized (messages) {
 						messages.put(toSend);
 					}
-					System.out.println("end execution");
 				}
 				catch (InterruptedException e) {
 					SystemLogger.warning("The program was interrupted while waiting");
@@ -453,7 +429,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);	
 	}
-	
+
 	public void searchByContent(final Component comp, final String phrase) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
@@ -462,9 +438,9 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 				try {
 					//							notifyObservers(new ForumGUIErrorEvent("registererror\tError while connecting to the server!",
 					//								EventType.USER_CHANGED));
-					//					System.out.println("controller register error");
+					//					"".println("controller register error");
 
-						sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
 
 					synchronized (messages) {
 						messages.put(toSend);
@@ -477,7 +453,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);	
 	}
-	
+
 
 	/*
 	private synchronized void handleQuery(ClientMessage toSend) {
@@ -512,7 +488,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			public void run() {
 				final ClientMessage toSend = new GuestsAndMembersNumberMessage();
 				try {
-							
+
 					sended.put(toSend.getID(), new ClientRequestData(null, EventType.USER_CHANGED));
 					synchronized (messages) {
 						messages.put(toSend);

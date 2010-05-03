@@ -15,7 +15,7 @@ public class Message {
    @SearchableProperty (name = "title")   
    private String title; // The name of the user who created this message
 
-   @SearchableProperty (name = "body")
+   @SearchableProperty (name = "content")
    private String body;
 
    public void setId(long id) {

@@ -61,7 +61,6 @@ public class GUIObservable extends Observable {
 	}
 
 	public synchronized void deleteObserver(GUIHandler handler) {
-		System.out.println("deleteRequested");
 		GUIObserver toDelete = null;
 		EventType tDeleteFrom = EventType.MESSAGES_UPDATED;
 
@@ -123,7 +122,6 @@ public class GUIObservable extends Observable {
 			}
 			case SEARCH_UPDATED: {
 				searchObservers.remove(toDelete);
-				System.out.println("Deleted");
 				break;
 			}
 			
@@ -151,7 +149,6 @@ public class GUIObservable extends Observable {
 				toUpdate = searchObservers;
 				break;
 			default: {
-				System.out.println("got end of notifying because of invalid...");
 				this.clearChanged();
 				return;
 			}
@@ -160,15 +157,11 @@ public class GUIObservable extends Observable {
 			tObserversToUpdate.addAll(toUpdate);
 			synchronized (tObserversToUpdate) {
 				Iterator<GUIObserver> tObserversIter = tObserversToUpdate.iterator();
-				System.out.println("has next? " + tObserversIter.hasNext());
 				while (tObserversIter.hasNext()) {
-					System.out.println("one gui obs updating ...");
 					tObserversIter.next().update(this, event);
-				System.out.println("one gui obs updating ...");
 				}
 			}
 			this.clearChanged();
 		}
-		System.out.println("got end of notifying ...");
 	}
 }
