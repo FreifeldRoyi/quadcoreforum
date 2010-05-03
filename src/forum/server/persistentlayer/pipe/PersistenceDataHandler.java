@@ -343,13 +343,15 @@ s	 */
 	 * 		The updated title of the message
 	 * @param newContent
 	 * 		The updated content of the message
+	 * @param replies
+	 * 		The updated replies ids of the message
 	 * 
 	 * @throws MessageNotFoundException
 	 * 		In case the message which should be updated wasn't found
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	public void updateMessage(final long messageID, final String newTitle, final String newContent) throws MessageNotFoundException, 
+	public void updateMessage(final long messageID, final String newTitle, final String newContent, final Collection<Long> replies) throws MessageNotFoundException, 
 	DatabaseUpdateException;
 
 	/**

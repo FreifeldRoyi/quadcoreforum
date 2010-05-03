@@ -283,10 +283,12 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */
-	public void updateMessage(ForumType data, long messageID, String newTitle, String newContent) throws MessageNotFoundException {
+	public void updateMessage(ForumType data, long messageID, String newTitle, String newContent, Collection<Long> replies) throws MessageNotFoundException {
 			MessageType tMsgToEdit = this.getMessageTypeByID(data, messageID);
 			tMsgToEdit.setTitle(newTitle);
 			tMsgToEdit.setContent(newContent);
+			tMsgToEdit.getRepliesIDs().clear();
+			tMsgToEdit.getRepliesIDs().addAll(replies);
 	}
 
 	/**

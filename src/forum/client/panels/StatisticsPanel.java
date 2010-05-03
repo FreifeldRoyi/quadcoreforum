@@ -36,16 +36,17 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 	private JLabel connectedStatisticsLabel;
 	private JButton btn_showConnected;
 	private String connectedData;
-
+	
 	private ControllerHandler controller;
-
+	private boolean viewActiveRequested;
+	
+	
 	public void notifyError(String errorMessage) {
 		System.out.println(errorMessage);
 
 	}
 
 	public void refreshForum(String encodedView) {
-		System.out.println("refffffffffffffffffffffffffffffffffff " + encodedView);
 		if (!encodedView.startsWith("activenumbers\t"))
 			return;
 		String[] tSplitted = encodedView.split("\t");
@@ -65,18 +66,23 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 			for (int i = 3; i < tSplitted.length; i++)
 				connectedData += (i - 2) + ") " + tSplitted[i] + "\n";
 		}
+		if (this.viewActiveRequested) {
+			JOptionPane.showMessageDialog(StatisticsPanel.this, 
+					connectedData, "connected usernames", JOptionPane.INFORMATION_MESSAGE);
+			this.viewActiveRequested = false;
+		}
 	}
 
 	public StatisticsPanel() throws IOException {
+		viewActiveRequested = false;
 		btn_showConnected = new JButton("show connected");
 		btn_showConnected.setPreferredSize(new Dimension(200, 20));
 	
 		btn_showConnected.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(StatisticsPanel.this, 
-						connectedData, "connected usernames", JOptionPane.INFORMATION_MESSAGE);				
-			}
-			
+				viewActiveRequested = true;
+				controller.getActiveUsersNumber();
+			}			
 		});
 		
 		connectedData = "";

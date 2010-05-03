@@ -25,6 +25,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -69,13 +70,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private ThreadsPanel threadsPanel;	
 	private ForumTree tree;
 
-	private JButton homeButton;
-
-	private int activeGuestsNumber;
-	private long activeMembersNumber;
-
 	public ControllerHandler controller;
-
 
 	private ConnectedUserData connectedUser;
 
@@ -133,7 +128,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 		}		
 
 
-		this.homeButtonPress();
 		this.setEnabled(true);
 
 		if (!this.connectedUser.isGuest()) {
@@ -158,7 +152,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		this.stopWorkingAnimation();
 
-		controller.getSubjects(-1, this.subjectsPanel);
+
+		if (!this.threadsPanel.isVisible() && !this.threadsPanel.showsMessages())
+			controller.getSubjects(-1, this.subjectsPanel);
 
 		if (this.connectedUser.getID() == 0)
 			btn_show_members.setVisible(true);
@@ -173,16 +169,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 				"User identification error", JOptionPane.ERROR_MESSAGE);
 	}
 
-	private void homeButtonPress() {
-
-	}
 
 	public static void main(String[] args) {
 
 		try {
-			//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-
 		}
 		catch (Exception e) {
 			SystemLogger.warning("Can't use default system look and feel, will use java default" +
@@ -193,12 +184,18 @@ public class MainPanel extends JFrame implements GUIHandler {
 			MainPanel tMainPanel = new MainPanel();
 
 
+						
 			tMainPanel.pack();
+			tMainPanel.setSize(new Dimension(450, 500));
+			//			tMainPanel.setPreferredSize(new Dimension(450, 500));
 
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
 			int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
 			tMainPanel.setLocation(X, Y);
+			tMainPanel.setExtendedState(MAXIMIZED_BOTH);
+			tMainPanel.setVisible(true);
+			
 
 		}
 		catch (IOException e) {
@@ -219,7 +216,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.setJMenuBar(mainPanelMenu);
 
 		this.getContentPane().add(mainPanel);
-		this.setMinimumSize(new Dimension(700, 560));
+		this.setMinimumSize(new Dimension(850, 560));
 
 		this.addWindowListener(new WindowListener() {
 
@@ -245,16 +242,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.startWorkingAnimation("Connecting as a guest ...");		
 		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		controller.registerAsNewGuest(this);
-		//		controller.getActiveUsersNumber(this);
-		this.setVisible(true);
-
 	}
 
-
-
 	private void initGUIComponents() {
-
-
 		// prepares the navigate panel
 		pnl_navigate = new JPanel();
 		btn_login = new JButton("login");
@@ -471,11 +461,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 			}			
 		});
 
-		GroupLayout jFastLoginPanelLayout = new GroupLayout(pnl_fastLogin);
-		pnl_fastLogin.setLayout(jFastLoginPanelLayout);
-		jFastLoginPanelLayout.setHorizontalGroup(
-				jFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(jFastLoginPanelLayout.createSequentialGroup()
+		GroupLayout tFastLoginPanelLayout = new GroupLayout(pnl_fastLogin);
+		pnl_fastLogin.setLayout(tFastLoginPanelLayout);
+		tFastLoginPanelLayout.setHorizontalGroup(
+				tFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(tFastLoginPanelLayout.createSequentialGroup()
 						.addContainerGap()
 						.addComponent(fastLoginUsernameLabel, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -488,10 +478,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addComponent(fastLoginButton, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)
 						.addContainerGap(468, Short.MAX_VALUE))
 		);
-		jFastLoginPanelLayout.setVerticalGroup(
-				jFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(jFastLoginPanelLayout.createSequentialGroup()
-						.addGroup(jFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+		tFastLoginPanelLayout.setVerticalGroup(
+				tFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(tFastLoginPanelLayout.createSequentialGroup()
+						.addGroup(tFastLoginPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 								.addComponent(fastLoginUsernameLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
 								.addComponent(fastLoginUsernameInput, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
 								.addComponent(fastLoginPasswordLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
@@ -516,6 +506,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		JSeparator tStatusPanelSeparator = new JSeparator();
 		this.statusLabel = new JLabel();
 		this.statusLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+		this.statusLabel.setPreferredSize(new Dimension(700, 35));
 		this.statusAnimationLabel = new JLabel();
 		this.statusAnimationLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -526,7 +517,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 				.addComponent(tStatusPanelSeparator, javax.swing.GroupLayout.DEFAULT_SIZE, 1159, Short.MAX_VALUE)
 				.addGroup(statusPanelLayout.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(statusLabel)
+						.addComponent(statusLabel, 0, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1139, Short.MAX_VALUE)
 						.addComponent(statusAnimationLabel)
 						.addContainerGap())
@@ -554,11 +545,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 		}
 
 		this.mainPanel = new JPanel();
-		mainPanel.setPreferredSize(new Dimension(1159, 600));
+//		mainPanel.setPreferredSize(new Dimension(1159, 600));
 
 		JSeparator tMainPanelSeparator = new JSeparator();
-
-
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
@@ -574,123 +563,111 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(pnl_fastLogin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.subjectsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
 
-
 								.addComponent(this.threadsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)								
-
-
 
 								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)																
 								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE))
-
 								.addContainerGap())
-		);
+								);
 
-		tMainPanelLayout.setVerticalGroup(
-				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tMainPanelLayout.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(pnl_navigate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(11, 11, 11)
-						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-						.addGap(0, 0, Short.MAX_VALUE)
-						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
-						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+								tMainPanelLayout.setVerticalGroup(
+										tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+										.addGroup(tMainPanelLayout.createSequentialGroup()
+												.addContainerGap()
+												.addComponent(pnl_navigate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addGap(11, 11, 11)
+												.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+												.addGap(0, 0, Short.MAX_VALUE)
+												//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+												.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 
+												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+												//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+												//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+												.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+												.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+												.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+												.addGap(11, 11, 11)
 
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-						//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-						.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
-						.addGap(11, 11, 11)
+												.addComponent(statusPanel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+												.addContainerGap())
+								);
 
-						.addComponent(statusPanel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap())
-		);
+								busyIcons = new ImageIcon[15];
+								for (int i = 0; i < busyIcons.length; i++)
+									busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");
+								MainPanel.idleIcon = new ImageIcon("images/busyicons/idle-icon.png");
 
-		//		this.threadsPanel.setVisible(true);
-		//		this.subjectsPanel.setVisible(true);
+								this.busyIconTimer = new Timer(30, new ActionListener() {
+									int busyIconIndex = 0;
+									public void actionPerformed(ActionEvent e) {
+										busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
+										statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+									}
+								});
 
+								this.fastLoginButton.setEnabled(false);
+		}
 
-		busyIcons = new ImageIcon[15];
-		for (int i = 0; i < busyIcons.length; i++)
-			busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");
-		MainPanel.idleIcon = new ImageIcon("images/busyicons/idle-icon.png");
-
-		this.busyIconTimer = new Timer(30, new ActionListener() {
-			int busyIconIndex = 0;
-			public void actionPerformed(ActionEvent e) {
-				busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+		public void switchToMessagesView() {
+			this.subjectsPanel.setVisible(false);
+			this.threadsPanel.setVisible(false);
+			if (!this.tree.getForumTreeUI().isVisible()) {
+				this.tree.selectFirstRow();
+				this.tree.getForumTreeUI().setVisible(true);
 			}
-		});
-
-
-		this.busyIconTimer.setRepeats(true);
-		//this.switchToMessagesView();
-
-		this.fastLoginButton.setEnabled(false);
-	}
-
-	public void switchToMessagesView() {
-		this.subjectsPanel.setVisible(false);
-		this.threadsPanel.setVisible(false);
-		this.tree.getForumTreeUI().setVisible(true);
-	}
-
-	public void switchToRootSubjectsView() {
-		this.subjectsPanel.setVisible(true);
-		this.threadsPanel.setVisible(false);
-		this.tree.getForumTreeUI().setVisible(false);
-	}
-
-	public void switchToSubjectsAndThreadsView() {
-		this.subjectsPanel.setVisible(true);
-		this.threadsPanel.setVisible(true);
-		this.tree.getForumTreeUI().setVisible(false);
-	}
-
-
-	public void startWorkingAnimation(String message) {
-		statusLabel.setText(message);
-
-		busyIconTimer.start();
-
-	}
-
-	public void addToNavigate(String text, ActionListener action) {
-		this.pnl_links.insertLink(text, action);
-		this.pnl_links.setVisible(false);
-		this.pnl_links.setVisible(true);
-	}
-
-	public void removeFromNavigateUntil(String name) {
-		this.pnl_links.removeAllBeforeAction(name);
-	}
-
-	public void stopWorkingAnimation() {
-		try {
-			Thread.sleep(100);
-		} 
-		catch (InterruptedException e) { 
-			// Do nothing - continue to stop the animation
 		}
-		busyIconTimer.stop();
-		statusAnimationLabel.setIcon(MainPanel.idleIcon);
-		statusLabel.setText("");
-	}
 
-	private void fastLoginTextChanged() {
-		if (!fastLoginUsernameInput.getText().isEmpty() &&
-				fastLoginPasswordInput.getPassword().length > 0) {
-			fastLoginButton.setEnabled(true);
+		public void switchToRootSubjectsView() {
+			this.subjectsPanel.setVisible(true);
+			this.threadsPanel.setVisible(false);
+			this.tree.getForumTreeUI().setVisible(false);
 		}
-		else
-			fastLoginButton.setEnabled(false);
-	}
 
-}
+		public void switchToSubjectsAndThreadsView() {
+			this.subjectsPanel.setVisible(true);
+			this.threadsPanel.setVisible(true);
+			this.tree.getForumTreeUI().setVisible(false);
+		}
+
+
+		public void addToNavigate(String text, ActionListener action) {
+			this.pnl_links.insertLink(text, action);
+			this.pnl_links.setVisible(false);
+			this.pnl_links.setVisible(true);
+		}
+
+		public void removeFromNavigateUntil(String name) {
+			this.pnl_links.removeAllBeforeAction(name);
+		}
+
+		public void startWorkingAnimation(final String message) {
+			statusLabel.setText(message);
+			busyIconTimer.start();
+		}
+
+		public void stopWorkingAnimation() {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			busyIconTimer.stop();
+			statusAnimationLabel.setIcon(MainPanel.idleIcon);
+			statusLabel.setText("");
+		}
+
+		private void fastLoginTextChanged() {
+			if (!fastLoginUsernameInput.getText().isEmpty() &&
+					fastLoginPasswordInput.getPassword().length > 0) {
+				fastLoginButton.setEnabled(true);
+			}
+			else
+				fastLoginButton.setEnabled(false);
+		}
+
+	}

@@ -35,7 +35,7 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 	private JButton cancel;
 
 	private JButton replyButton;
-	
+
 	public AddReplyDialog(long authorID, long replyTo, JButton replyButton) {
 		super();
 		this.authorID = authorID;
@@ -50,8 +50,8 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 		this.content.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setPreferredSize(new Dimension(400, 300));
 		this.setMinimumSize(new Dimension(400, 300));
-		
-		
+
+
 		this.title.setPreferredSize(new Dimension(200, 30));
 		this.content.setPreferredSize(new Dimension(200, 200));
 		this.ok.setPreferredSize(new Dimension(100, 40));
@@ -66,30 +66,29 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 		JLabel tTitle = new JLabel("title:");
 		JLabel tContent = new JLabel("content:");
 
-		
+
 		this.cancel.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
 			}
-			
+
 		});
-		
+
 		this.ok.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					
 					ControllerHandlerFactory.getPipe().addReplyToMessage(AddReplyDialog.this.authorID,
 							replyToID, title.getText(), content.getText(), AddReplyDialog.this.replyButton);
 				} catch (IOException e) {
-					
 					// TODO: handle the exception
 				}
-				
 			}
-			
+
 		});
-		
+
 
 		this.getContentPane().setLayout(tLayout);
 		tLayout.setHorizontalGroup(tLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -103,27 +102,27 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 
 								.addComponent(this.title, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 								.addGap(10, 10, 10))
-								
-									.addGroup(tLayout.createSequentialGroup()
-						.addGap(10, 10, 10)
 
-						.addComponent(tContent, 100, 100, 100)
-						.addGap(10, 10, 10))
-				
-								.addGroup(tLayout.createSequentialGroup() 
-										.addGap(10, 10, 10)
-										.addComponent(this.content, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-										.addGap(10, 10, 10)
-
-								)
 								.addGroup(tLayout.createSequentialGroup()
 										.addGap(10, 10, 10)
-										.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addGap(5, 10, Short.MAX_VALUE)
-										.addComponent(this.ok, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addGap(10, 10, 10)
 
-								));
+										.addComponent(tContent, 100, 100, 100)
+										.addGap(10, 10, 10))
+
+										.addGroup(tLayout.createSequentialGroup() 
+												.addGap(10, 10, 10)
+												.addComponent(this.content, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+												.addGap(10, 10, 10)
+
+										)
+										.addGroup(tLayout.createSequentialGroup()
+												.addGap(10, 10, 10)
+												.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addGap(5, 10, Short.MAX_VALUE)
+												.addComponent(this.ok, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addGap(10, 10, 10)
+
+										));
 		tLayout.setVerticalGroup(tLayout.createSequentialGroup()
 				.addContainerGap(5, 5)
 				.addComponent(tTitle, 10, 10, 10)
@@ -148,8 +147,8 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 		int X = (screen.width / 2) - (this.getWidth() / 2); // Center horizontally.
 		int Y = (screen.height / 2) - (this.getHeight() / 2); // Center vertically.
 		this.setLocation(X, Y);
-		
-		
+
+
 		this.setModal(true);
 
 	}
@@ -160,15 +159,15 @@ public class AddReplyDialog extends JDialog implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
-		JOptionPane.showMessageDialog(this, "Your reply has been successfully added!", "success", JOptionPane.INFORMATION_MESSAGE);
-		try {
-			ControllerHandlerFactory.getPipe().deleteObserver(this);
-			ControllerHandlerFactory.getPipe().getNestedMessages(this.replyToID, this);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (encodedView.equals("replysuccess")) {
+			JOptionPane.showMessageDialog(this, "Your reply has been successfully added!", "success", JOptionPane.INFORMATION_MESSAGE);
+			try {
+				ControllerHandlerFactory.getPipe().deleteObserver(this);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.dispose();
 		}
-		this.dispose();
 	}
-
 }

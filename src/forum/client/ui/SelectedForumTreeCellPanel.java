@@ -55,13 +55,13 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 			m_deleteButton.setEnabled(false);
 		}
 	}
-	
+
 	public SelectedForumTreeCellPanel(ForumTree forumTree) {
 		super();
 		try {
 			ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		} catch (IOException e1) {
-			
+
 		}
 		this.allowModify = false;
 		this.currentCellUsername = "";
@@ -156,31 +156,41 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	public void notifyError(String errorMessage) {}
 
 	public void refreshForum(String encodedView) {
-		
-		if (encodedView.startsWith("register") ||
-				encodedView.startsWith("loggedout") ||
+
+		if (encodedView.startsWith("register")  ||
 				encodedView.startsWith("activenumbers\t") ||
 				encodedView.startsWith("activeusernames\t") ||
 				encodedView.startsWith("promoted\t") ||
 				encodedView.startsWith("The")) return;
-		String[] tSplitted = encodedView.split("\n");
-		
-		Collection<Permission> tPermissions = new Vector<Permission>();
-		for (int i = 1; i < tSplitted.length; i++)
-			tPermissions.add(Permission.valueOf(tSplitted[i]));
-		
-		
-		long tNewUserID = Long.parseLong(encodedView.split("\t")[0]);
-		if (currentCellUsername.equals(tNewUserID + ""))
-			this.allowModify = true;
-		else
+
+
+
+		if (encodedView.startsWith("loggedout")) {
 			this.allowModify = false;
+			this.m_replyButton.setEnabled(false);			
+		}
+		else {
 
-		if (tPermissions.contains(Permission.REPLY_TO_MESSAGE))
-			this.m_replyButton.setEnabled(true);
-		else
-			this.m_replyButton.setEnabled(false);
+
+			String[] tSplitted = encodedView.split("\n");
+
+			Collection<Permission> tPermissions = new Vector<Permission>();
+			for (int i = 1; i < tSplitted.length; i++)
+				tPermissions.add(Permission.valueOf(tSplitted[i]));
+
+
+			long tNewUserID = Long.parseLong(encodedView.split("\t")[0]);
+			if (currentCellUsername.equals(tNewUserID + ""))
+				this.allowModify = true;
+			else
+				this.allowModify = false;
+
+			if (tPermissions.contains(Permission.REPLY_TO_MESSAGE))
+				this.m_replyButton.setEnabled(true);
+			else
+				this.m_replyButton.setEnabled(false);
+		}
 		this.keyTypedEventFunction();
-	}
 
+	}
 }

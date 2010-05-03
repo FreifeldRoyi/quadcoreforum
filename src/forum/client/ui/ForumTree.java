@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.IOException;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
@@ -69,7 +70,6 @@ public class ForumTree {
 	private long fatherMessageID;
 
 
-
 	/**
 	 * A thread pool that is used to initiate operations in the controller layer.
 	 */
@@ -78,10 +78,20 @@ public class ForumTree {
 	public ConnectedUserData getConnectedUser() {
 		return this.container.getConnectedUser();
 	}
-	
+
+	public void selectFirstRow() {
+		//try {
+		//if (m_tree.getRowCount() > 0)
+		//	m_tree.setSelectionRow(0);
+		//}
+		//catch (Exception e) {}
+	}
+
+
 	public ForumTree(final MainPanel container) {
-		
-		
+
+
+
 		UIManager.put("Tree.collapsedIcon", new ImageIcon("./images/plus-8.png"));
 		UIManager.put("Tree.expandedIcon", new ImageIcon("./images/minus-8.png"));
 
@@ -98,11 +108,9 @@ public class ForumTree {
 		this.container = container;
 		m_tree = new JTree();
 		m_tree.putClientProperty("JTree.lineStyle", "Angled");
-		
+
 		m_tree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
-		
-
 
 		SelectedForumTreeCellPanel selected = new SelectedForumTreeCellPanel(this);
 
@@ -118,8 +126,18 @@ public class ForumTree {
 				BasicTreeUI ui = (BasicTreeUI)m_tree.getUI();
 				ui.setLeftChildIndent(ui.getLeftChildIndent());
 				ui.setRightChildIndent(ui.getRightChildIndent());
+
 			}
 		});
+		/*
+		for (TreeWillExpandListener a : m_tree.getTreeWillExpandListeners()) {
+			m_tree.removeTreeWillExpandListener(a);
+		}
+
+		for (TreeExpansionListener a : m_tree.getTreeExpansionListeners()) {
+			m_tree.removeTreeExpansionListener(a);
+		}
+		 */
 
 		m_tree.addTreeWillExpandListener(new TreeWillExpandListener() {
 
@@ -127,14 +145,50 @@ public class ForumTree {
 
 			public void treeWillExpand(TreeExpansionEvent event)
 			throws ExpandVetoException {
+				
+
+				new Thread(new Runnable() {
+					public void run() {
+						container.startWorkingAnimation("Retrieving replies ...");
+					}
+				}).start();
+
+				
 				TreePath path = (TreePath)event.getPath();
 				MessageTreeNode node = (MessageTreeNode)path.getPathComponent(path.getPathCount() - 1);
-				container.startWorkingAnimation("Retrieving replies ...");
-				pipe.getNestedMessages(((ForumCell)node.getUserObject()).getId(), m_panel);
-				try {
-					Thread.sleep(100);
+
+				synchronized (node) {
+					try {
+						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(node),
+								EventType.MESSAGES_UPDATED);
+
+					} 
+					catch (IOException e)  {
+					}
+
+					pipe.getNestedMessages(((ForumCell)node.getUserObject()).getId(), m_panel);
+
+
+					try {
+						node.wait();
+						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
+						m_tree.getSelectionModel().setSelectionPath(new TreePath(
+								((DefaultTreeModel)m_tree.getModel()).getPathToRoot(node)));
+
+						new Thread(new Runnable() {
+							public void run() {
+								container.stopWorkingAnimation();							
+							}
+						}).start();
+
+					}
+
+					catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
 				}
-				catch (InterruptedException e) {}
 			}
 		});
 
@@ -143,11 +197,11 @@ public class ForumTree {
 
 		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.PAGE_AXIS));
 
-		
+
 		JPanel tCurrentPanel = new JPanel();
-		
+
 		GroupLayout tLayout = new GroupLayout(tCurrentPanel);
-		
+
 		tLayout.setHorizontalGroup(tLayout.createSequentialGroup()
 				.addGap(10, 10, 10)
 				.addComponent(m_tree, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
@@ -155,30 +209,23 @@ public class ForumTree {
 		tLayout.setVerticalGroup(tLayout.createSequentialGroup()
 				.addGap(20, 20, 20)
 				.addComponent(m_tree, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
-		
+
 		tCurrentPanel.setBackground(Color.white);
-		
+
 		tCurrentPanel.setLayout(tLayout);
-		
+
 		JScrollPane pane = new JScrollPane(tCurrentPanel);
 
-		
-		
-		
-		
 		pane.setPreferredSize(new Dimension(610,635));
-
 
 		// Adds the scroll panes to a split pane.
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
 		splitPane.setTopComponent(pane);
 
-
 		splitPane.setBottomComponent(selected);
 
-
-		splitPane.setDividerLocation(150); 
+		splitPane.setDividerLocation(310); 
 		splitPane.setPreferredSize(new Dimension(500, 600));
 
 		m_panel.add(splitPane);
@@ -199,7 +246,31 @@ public class ForumTree {
 			DefaultTreeModel model = new DefaultTreeModel(rootNode);
 			m_tree.setModel(model);
 
-			this.pipe.getNestedMessages(this.fatherMessageID, this.m_panel);
+			try {
+				ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(rootNode),
+						EventType.MESSAGES_UPDATED);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			synchronized (rootNode) {
+				try {
+					this.pipe.getNestedMessages(this.fatherMessageID, this.m_panel);			
+					rootNode.wait();
+					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(rootNode);
+					this.m_tree.setSelectionRow(0);
+					new Thread(new Runnable() {
+						public void run() {
+							container.stopWorkingAnimation();							
+						}
+					}).start();
+				}
+				catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		else {
 			m_tree.setModel(new DefaultTreeModel(null));
@@ -226,12 +297,14 @@ public class ForumTree {
 		public MessageTreeNode(ForumCell info, long id) {
 			super(info);
 			this.id = id;
-			try {
+			/*			try {
 				ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(this),
 						EventType.MESSAGES_UPDATED);
+
 			} 
 			catch (IOException e)  {
 			}
+			 */			
 		}
 
 		public void notifyError(String errorMessage) {
@@ -239,16 +312,12 @@ public class ForumTree {
 		}
 
 		public void refreshForum(String encodedView) {
-
 			ForumCell rootCell = decodeView(encodedView);
 
 
-			//		container.switchToMessagesView();
-
-			//			if (rootCell == null)
-			//			return;
 
 			if (rootCell == null || rootCell.getId() != id) return;
+
 
 			this.removeAllChildren();
 
@@ -268,52 +337,50 @@ public class ForumTree {
 			}
 
 
-			for (int i = 0; i < this.getChildCount(); i++  ) { 
+
+			for (int i = 0; i < this.getChildCount(); i++) { 
 				DefaultMutableTreeNode n = (DefaultMutableTreeNode)this.getChildAt(i); 
 				((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(n);
-
 			}
+
+
+
+
+			//			System.out.println("ffffffffffffffffffff");
+			//		m_tree.setVisible(true);
+			//				((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(this);
+
+
+
 			container.switchToMessagesView();
-			container.stopWorkingAnimation();
+
+
+			synchronized (this) {
+				this.notifyAll();
+
+				try {
+					ControllerHandlerFactory.getPipe().deleteObserver(this);
+
+					
+					
+				} 
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+
+
+			//				m_tree.expandPath();
+
+
+			//	if (this.getChildCount() != tPrevChildrenNum)
+			//					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(this);
+
+
 		}
-	}	
-
-	/*
-
-
-	public void refreshForum(String encodedView) {	
-		ForumCell rootCell = decodeView(encodedView);
-		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootCell); 
-
-		Stack<DefaultMutableTreeNode> stack = new Stack<DefaultMutableTreeNode>();
-		stack.add(rootNode);
-
-		while (!stack.isEmpty()) {
-			DefaultMutableTreeNode node = stack.pop();
-			ForumCell cell = (ForumCell)(node.getUserObject());
-			for (ForumCell sonCell : cell.getSons()) {
-				DefaultMutableTreeNode sonNode = new DefaultMutableTreeNode(sonCell);
-				node.add(sonNode);
-				stack.add(sonNode);
-			}		
-		}
-
-		DefaultTreeModel model = new DefaultTreeModel(rootNode);
-		m_tree.setModel(model);	
-		for (int i = 0; i < m_tree.getRowCount(); i++) {
-			m_tree.expandRow(i);
-		}
-
 	}
-
-
-	public void notifyError(String errorMessage) {
-		JFrame frame = new JFrame();
-		JOptionPane.showMessageDialog(frame,
-				errorMessage,
-				"Operation failed.",
-				JOptionPane.WARNING_MESSAGE);
-	}*/
 
 	/**
 	 * Receives an encoding describing the forum tree.<br>
@@ -322,7 +389,7 @@ public class ForumTree {
 	 * @return The tree representing the forum.
 	 */
 	private ForumCell decodeView(String encodedView) {
-		if (encodedView.startsWith("The"))
+		if (encodedView.startsWith("replysuccess"))
 			return null;
 		try {
 			String[] tSplitted = encodedView.split("\n");
@@ -379,20 +446,31 @@ public class ForumTree {
 		pool.execute(new Runnable() {
 
 			public void run() {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+				MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
 				ForumCell cell = (ForumCell) node.getUserObject();				
 				AddReplyDialog tReplyDialog = 
 					new AddReplyDialog(container.getConnectedUser().getID(), cell.getId(), button);
 				try {
 					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tReplyDialog), EventType.MESSAGES_UPDATED);
 					tReplyDialog.setVisible(true);
+
+					synchronized (node) {
+						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(node),
+								EventType.MESSAGES_UPDATED);
+						ControllerHandlerFactory.getPipe().getNestedMessages(cell.getId(), m_tree);
+						try {
+							node.wait();
+							((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
+						} catch (InterruptedException e) {
+						}
+					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
-//				pipe.addReplyToMessage(container.getConnectedUser().getID(), cell.getId(),"",button);					
+
+
+				//				pipe.addReplyToMessage(container.getConnectedUser().getID(), cell.getId(),"",button);					
 			}
 		});			
 	}

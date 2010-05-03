@@ -24,7 +24,6 @@ public class GUIObserver implements Observer {
 	}
 	
 	public boolean equals(Object obj) {
-		System.out.println("use equals");
 		if (obj != null && (obj instanceof GUIObserver) &&
 				((GUIObserver)obj).eventHandler == this.eventHandler)
 				return true;
