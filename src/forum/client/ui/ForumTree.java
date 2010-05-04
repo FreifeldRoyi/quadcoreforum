@@ -400,30 +400,117 @@ public class ForumTree {
 				encodedView.startsWith("modifysuccess") || 
 				encodedView.startsWith("deletesuccess") ||
 				encodedView.startsWith("searchresult"))
-			
+
 			return null;
 		try {
-			String[] tSplitted = encodedView.split("\n");
+			///	\t	////////////\t/// f
+			///////////////// s1
+			//////////////////////////s11
+			///////////////// s2
+			/////////////////////////s21
+			/////////////////////////s22
+
+
+			System.out.println("encodedview = " + encodedView);
+
+			String[] tSplitted = encodedView.split("\n\tAREPLYMESSAGE: ");
+
+			System.out.println("***********splitted: ");
+			for (int i = 0; i <tSplitted.length;i++)
+				System.out.println("splitted [" + i + "] = " + tSplitted[i]);
+
 			String[] tRootAsStringArray = tSplitted[0].split("\t");
+			if (tRootAsStringArray.length > 4) {
+				for (int i = 4; i < tRootAsStringArray.length; i++) {
+					tRootAsStringArray[3] += ("\t" + tRootAsStringArray[i]);  
+				}
+			}
+			/*			int index = 1;
+			while (index < tSplitted.length && !tSplitted[index].startsWith("\t\tASUBREPLYMESSAGE: ") &&
+					!tSplitted[index].startsWith("\tAREPLYMESSAGE: ")) {
+				tRootAsStringArray[3] += tSplitted[index];  
+				index++;
+			}
+			 */
+
+
+
 			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
 					tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
-			for (int i = 1; i < tSplitted.length; i++) {
 
-				String[] tCurrentReplyAsStringArray = tSplitted[i].split("\t");
-				ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
-						tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
-				int j = ++i;
-				while (j < tSplitted.length && tSplitted[j].startsWith("\t")) {
+			for (int i = 1/*index*/; i < tSplitted.length; i++) {
+				String[] tCurrentReplies = tSplitted[i].split("\n\t\tASUBREPLYMESSAGE: ");
+				System.out.println("***********replies: ");
+				for (int t = 0; t <tCurrentReplies.length;t++)
+					System.out.println("replies [" + t + "] = " + tCurrentReplies[t]);
+
+				String[] tCurrReply = tCurrentReplies[0].split("\t");
+				if (tCurrReply.length > 4) {
+					for (int j = 4; j < tCurrReply.length; j++) {
+						tCurrReply[3] += ("\t" + tCurrReply[j]);  
+					}
+				}
+				ForumCell tReply = new ForumCell(Long.parseLong(tCurrReply[0]),
+						tCurrReply[1], tCurrReply[2], tCurrReply[3]);
+				for (int j = 1; j < tCurrentReplies.length; j++) {
+					String[] tCurrentReplyAsStringArray = tCurrentReplies[j].split("\t");
+					if (tCurrentReplyAsStringArray.length > 4) {
+						for (int k = 4; k < tCurrentReplyAsStringArray.length; k++) {
+							tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
+						}
+					}
+
+					//				int j = ++i;
+
+					//				while (j < tSplitted.length && !tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ") &&
+					//						!tSplitted[j].startsWith("\tAREPLYMESSAGE: ")) {
+					//					tCurrentReplyAsStringArray[3] += tSplitted[j];  
+					//					j = ++i;
+					//				}		
+
+					System.out.println("reply[0] = " + tCurrentReplyAsStringArray[0] + "reply[1] = " + tCurrentReplyAsStringArray[1] + 
+							"reply[2] = " + tCurrentReplyAsStringArray[2] + "reply[3] = " + tCurrentReplyAsStringArray[3]);
+
+
+					ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
+							tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
+					tReply.add(tCurrentReply);
+				}
+
+				/*				while (j < tSplitted.length && tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ")) {
 					tCurrentReplyAsStringArray = tSplitted[j].split("\t");
+
+					if (tCurrentReplyAsStringArray.length > 4) {
+						for (int k = 4; k < tCurrentReplyAsStringArray.length; k++) {
+							tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
+						}
+					}
+
+					j = ++i;
+
+					while (j < tSplitted.length && !tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ") &&
+							!tSplitted[j].startsWith("\tAREPLYMESSAGE: ")) {
+						tCurrentReplyAsStringArray[3] += tSplitted[j];  
+						j = ++i;
+					}		
+
+
+
 					ForumCell tCurrentReplyToReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[1]),
 							tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3], tCurrentReplyAsStringArray[4]);
 					tCurrentReply.add(tCurrentReplyToReply);
 					j++;
 				}
 				i = j - 1;
-				tRoot.add(tCurrentReply);
+				 */				
+
+				tRoot.add(tReply);
 			}
 			return tRoot;
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			SystemLogger.warning("Error while parsing messages view response");
+			return null;
 		}
 		catch (Exception e) { // any parsing exception
 			e.printStackTrace();
@@ -438,7 +525,7 @@ public class ForumTree {
 	 * @param newContent The new content of the message.
 	 */
 	public void modifyMessage(final JButton button) {
-//		button.setEnabled(false);
+		//		button.setEnabled(false);
 		MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
 		ForumCell cell = (ForumCell) node.getUserObject();				
 		ReplyModifyDialog tModifyDialog = 
@@ -462,7 +549,7 @@ public class ForumTree {
 				}
 			}
 			tModifyDialog.dispose();
-			
+
 
 
 		} catch (IOException e) {
@@ -475,7 +562,7 @@ public class ForumTree {
 	 * Replies to the selected message.
 	 */
 	public void replyToMessage(final JButton button) {
-//		button.setEnabled(false);
+		//		button.setEnabled(false);
 		MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
 		ForumCell cell = (ForumCell) node.getUserObject();				
 		ReplyModifyDialog tReplyDialog = 
@@ -503,14 +590,14 @@ public class ForumTree {
 	 * Deletes the selected message.
 	 */
 	public void deleteMessage(final JButton button) {
-//		button.setEnabled(false);
+		//		button.setEnabled(false);
 		if (JOptionPane.showConfirmDialog(this.m_panel, "Are you sure you want to delete the message?", "delete",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
-			JOptionPane.NO_OPTION) {
+					JOptionPane.NO_OPTION) {
 			button.setEnabled(true);
 			return;			
 		}
-		
+
 		final MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
 		final MessageTreeNode parent = (MessageTreeNode) node.getParent();
 
