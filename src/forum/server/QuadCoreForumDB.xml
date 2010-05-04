@@ -411,7 +411,8 @@
         <messageID>42</messageID>
         <author>0</author>
         <title>defkgkg</title>
-        <content>abc</content>
+        <content>abc	defgh
+	ad</content>
         <postTime>2010-05-04T15:27:01.015+03:00</postTime>
         <repliesIDs>43</repliesIDs>
     </messages>
@@ -419,9 +420,11 @@
         <messageID>43</messageID>
         <author>0</author>
         <title>da</title>
-        <content>gjgk</content>
+        <content>gjgkdfg	12345	6789</content>
         <postTime>2010-05-04T15:27:18.203+03:00</postTime>
         <repliesIDs>44</repliesIDs>
+        <repliesIDs>46</repliesIDs>
+        <repliesIDs>45</repliesIDs>
     </messages>
     <messages>
         <messageID>44</messageID>
@@ -429,5 +432,12 @@
         <title>yaysk</title>
         <content>sal</content>
         <postTime>2010-05-04T16:33:35.390+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>45</messageID>
+        <author>0</author>
+        <title>dh</title>
+        <content>abc def ghi</content>
+        <postTime>2010-05-04T23:12:01.151+03:00</postTime>
     </messages>
 </ForumType>

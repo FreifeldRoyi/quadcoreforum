@@ -9,15 +9,14 @@ import javax.swing.table.AbstractTableModel;
  * @author sepetnit
  *
  */
-public class SubjectsTableModel extends AbstractTableModel {
+public class TableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -2017616938246653051L;
 
 	private long[] subjectsIDs;
 	private String[][] rowData;
 
-	private final String[] columnNames = {"Subject",  "Description", "Sub-Subjects#", 
-			"Messages#", "Last Message Info" };
+	private String[] columnNames;
 
 	public void updateData(final long[] subjectsIDs, final String[][] rowData) {
 		this.subjectsIDs = subjectsIDs;
@@ -29,8 +28,9 @@ public class SubjectsTableModel extends AbstractTableModel {
 		rowData = new String[0][0];		
 	}
 
-	public SubjectsTableModel() {
+	public TableModel(String[] columns) {
 		super();
+		columnNames = columns;
 		this.clearData();
 	}
 
@@ -39,7 +39,7 @@ public class SubjectsTableModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		return 5;
+		return columnNames.length;
 	}
 
 	public String getNameOfSubjectInRow(int row) {
