@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ForumType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="QuadCoreForumDB.xsd">
+  <members>
+    <userID>0</userID>
+    <username>username</username>
+    <e-mail>test@test</e-mail>
+    <password>password</password>
+    <lastName>lastName</lastName>
+    <firstName>firstName</firstName>
+    <numOfPostedMessages>0</numOfPostedMessages>
+    <postedMessagesIDs>0</postedMessagesIDs>
+    <privileges>ADD_SUBJECT</privileges>
+  </members>
+  <subjects>
+    <name>name</name>
+    <description>description</description>
+    <numOfMessages>0</numOfMessages>
+    <subjectID>0</subjectID>
+    <subSubjectsIDs>0</subSubjectsIDs>
+    <threadsIDs>0</threadsIDs>
+    <lastAddedMessageID>0</lastAddedMessageID>
+    <isToLevel>false</isToLevel>
+  </subjects>
+  <threads>
+    <threadID>0</threadID>
+    <topic>topic</topic>
+    <startMessageID>0</startMessageID>
+    <lastMessageID>0</lastMessageID>
+    <numOfViews>0</numOfViews>
+    <numOfResponses>0</numOfResponses>
+  </threads>
+  <messages>
+    <messageID>0</messageID>
+    <author>0</author>
+    <title>title</title>
+    <content>content</content>
+    <postTime>2001-12-31T12:00:00</postTime>
+    <repliesIDs>0</repliesIDs>
+  </messages>
+</ForumType>
