@@ -170,7 +170,7 @@ public class SubjectType
      * Gets the value of the isToLevel property.
      * 
      */
-    public boolean isIsToLevel() {
+    public boolean isIsTopLevel() {
         return isTopLevel;
     }
 
@@ -178,7 +178,7 @@ public class SubjectType
      * Sets the value of the isToLevel property.
      * 
      */
-    public void setIsToLevel(boolean value) {
+    public void setIsTopLevel(boolean value) {
         this.isTopLevel = value;
     }
 

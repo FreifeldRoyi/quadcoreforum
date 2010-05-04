@@ -2,15 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="forum.server.learning">
-  <class name="Message" table="message">
-
-  <id name="number" column="number" >
-    <generator class="increment"/>
-  </id>
-  <property name="title" column="title" ></property>
-  <property name="body" column="body" ></property>
-  </class>
+<hibernate-mapping package="forum.server.updatedpersistentlayer">
     <class name="ThreadType" table="Threads">
 
   <id name="threadID" column="threadID" >
@@ -22,7 +14,7 @@
     <property name="numOfViews" column="numOfViews" ></property>
     <property name="numOfResponses" column="numOfResponses" ></property>
   </class>
-    <class name="ThreadType" table="Threads">
+    <class name="SubjectType" table="subjects">
 
   <id name="subjectID" column="SubjectID" >
     <generator class="increment"/>
@@ -44,11 +36,25 @@
         <property name="threadID" column="ThreadID" ></property>
   </class>
   
+   <class name="MemberType" table="members">
+
+  <id name="userID" column="UserID" >
+    <generator class="increment"/>
+  </id>
+  <property name="username" column="Username" ></property>
+   <property name="Email" column="Email" ></property>
+     <property name="password" column="UserPassword" ></property>
+       <property name="lastName" column="LastName" ></property>
+        <property name="firstName" column="FirstName" ></property>
+        <property name="userType" column="UserType" ></property>
+  </class>
+  
   
 </hibernate-mapping>
 
  
  
+   <!--  belongs to the members : protected List<Long> postedMessagesIDs;-->
     
    
   

@@ -55,7 +55,7 @@ public class MessageType {
      * Gets the value of the author property.
      * 
      */
-    public long getAuthor() {
+    public long getAuthorID() {
         return authorID;
     }
 
@@ -63,7 +63,7 @@ public class MessageType {
      * Sets the value of the author property.
      * 
      */
-    public void setAuthor(long value) {
+    public void setAuthorID(long value) {
         this.authorID = value;
     }
 

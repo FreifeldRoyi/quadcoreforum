@@ -10,7 +10,7 @@ import java.util.*;
 import forum.server.domainlayer.user.*;
 import forum.server.domainlayer.message.*;
 
-import forum.server.persistentlayer.*;
+import forum.server.updatedpersistentlayer.*;
 
 
 /**
@@ -55,7 +55,7 @@ public class PersistentToDomainConverter {
 	public static ForumMember convertMemberTypeToForumMember(MemberType toConvert) {
 		return new ForumMember(toConvert.getUserID(), toConvert.getUsername(), 
 				toConvert.getPassword(), toConvert.getLastName(), toConvert.getFirstName(),
-				toConvert.getEMail(), PersistentToDomainConverter.parseStringPermissions(toConvert.getPrivileges()));
+				toConvert.getEmail(), PersistentToDomainConverter.parseStringPermissions(toConvert.getPrivileges()));
 	}
 
 	/**

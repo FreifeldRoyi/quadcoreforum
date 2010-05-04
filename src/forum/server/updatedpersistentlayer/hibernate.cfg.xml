@@ -12,6 +12,6 @@
 	
  	<property name="current_session_context_class">thread</property>
        <property name="hibernate.show_sql">true</property>
- <mapping resource="forum/server/learning/Message.hbm.xml" />
+ <mapping resource="forum/server/updatedpersistentlayer/ObjectsMappings.hbm.xml" />
     </session-factory>
 </hibernate-configuration>
