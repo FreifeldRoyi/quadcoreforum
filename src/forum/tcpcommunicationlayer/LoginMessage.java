@@ -41,8 +41,18 @@ public class LoginMessage extends ClientMessage {
 		try {
 			UIMember tResponseUser = forum.login(this.username, this.password);
 			returnObj.setHasExecuted(true);
+
+			String type = null;
+			if (tResponseUser.isAllowed(Permission.SET_MODERATOR))
+				type = "ADMIN";
+			else
+				if (tResponseUser.isAllowed(Permission.DELETE_MESSAGE))
+					type = "MODERATOR";
+				else
+					type = "MEMBER";
+			
 			String tResponse = tResponseUser.getID() + "\t" + tResponseUser.getUsername() + "\t" + tResponseUser.getLastName() + "\t" +
-			tResponseUser.getFirstName() + "\n";
+			tResponseUser.getFirstName() + "\t" + type + "\n";
 			
 			for (Permission tCurrentPermission : tResponseUser.getPermissions())
 				tResponse += tCurrentPermission.toString() + "\n";

@@ -90,7 +90,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		this.pnl_navigate.setVisible(false);
 
-
 		if (!encodedView.startsWith("loggedout\t")) {
 
 
@@ -107,9 +106,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 				this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
 			else
 				this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
-						tUserDetails[2], tUserDetails[3], tPermissions);
-
-
+						tUserDetails[2], tUserDetails[3], tUserDetails[4], tPermissions);
 
 		}
 		else {
@@ -184,7 +181,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 			MainPanel tMainPanel = new MainPanel();
 
 
-						
+
 			tMainPanel.pack();
 			tMainPanel.setSize(new Dimension(450, 500));
 			//			tMainPanel.setPreferredSize(new Dimension(450, 500));
@@ -195,7 +192,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 			tMainPanel.setLocation(X, Y);
 			tMainPanel.setExtendedState(MAXIMIZED_BOTH);
 			tMainPanel.setVisible(true);
-			
+
 
 		}
 		catch (IOException e) {
@@ -282,7 +279,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 			}
 
 		});
-
+		
 		btn_search = new JButton("search");
 
 		btn_search.addActionListener(new ActionListener() {
@@ -545,7 +542,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		}
 
 		this.mainPanel = new JPanel();
-//		mainPanel.setPreferredSize(new Dimension(1159, 600));
+		//		mainPanel.setPreferredSize(new Dimension(1159, 600));
 
 		JSeparator tMainPanelSeparator = new JSeparator();
 
@@ -568,106 +565,126 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)																
 								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE))
 								.addContainerGap())
-								);
+		);
 
-								tMainPanelLayout.setVerticalGroup(
-										tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-										.addGroup(tMainPanelLayout.createSequentialGroup()
-												.addContainerGap()
-												.addComponent(pnl_navigate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addGap(11, 11, 11)
-												.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-												.addGap(0, 0, Short.MAX_VALUE)
-												//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
-												.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+		tMainPanelLayout.setVerticalGroup(
+				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(tMainPanelLayout.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(pnl_navigate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGap(11, 11, 11)
+						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
+						.addGap(0, 0, Short.MAX_VALUE)
+						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 
-												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 
-												.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-												//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-												//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-												.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-												.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-												.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
-												.addGap(11, 11, 11)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+						//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+						//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+						.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+						.addGap(11, 11, 11)
 
-												.addComponent(statusPanel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-												.addContainerGap())
-								);
+						.addComponent(statusPanel, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap())
+		);
 
-								busyIcons = new ImageIcon[15];
-								for (int i = 0; i < busyIcons.length; i++)
-									busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");
-								MainPanel.idleIcon = new ImageIcon("images/busyicons/idle-icon.png");
+		busyIcons = new ImageIcon[15];
+		for (int i = 0; i < busyIcons.length; i++)
+			busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");
+		MainPanel.idleIcon = new ImageIcon("images/busyicons/idle-icon.png");
 
-								this.busyIconTimer = new Timer(30, new ActionListener() {
-									int busyIconIndex = 0;
-									public void actionPerformed(ActionEvent e) {
-										busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-										statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
-									}
-								});
-
-								this.fastLoginButton.setEnabled(false);
-		}
-
-		public void switchToMessagesView() {
-			this.subjectsPanel.setVisible(false);
-			this.threadsPanel.setVisible(false);
-			if (!this.tree.getForumTreeUI().isVisible()) {
-				this.tree.selectFirstRow();
-				this.tree.getForumTreeUI().setVisible(true);
+		this.busyIconTimer = new Timer(30, new ActionListener() {
+			int busyIconIndex = 0;
+			public void actionPerformed(ActionEvent e) {
+				busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
+				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
 			}
-		}
+		});
 
-		public void switchToRootSubjectsView() {
-			this.subjectsPanel.setVisible(true);
-			this.threadsPanel.setVisible(false);
-			this.tree.getForumTreeUI().setVisible(false);
-		}
-
-		public void switchToSubjectsAndThreadsView() {
-			this.subjectsPanel.setVisible(true);
-			this.threadsPanel.setVisible(true);
-			this.tree.getForumTreeUI().setVisible(false);
-		}
+		this.fastLoginButton.setEnabled(false);
 
 
-		public void addToNavigate(String text, ActionListener action) {
-			this.pnl_links.insertLink(text, action);
-			this.pnl_links.setVisible(false);
-			this.pnl_links.setVisible(true);
-		}
-
-		public void removeFromNavigateUntil(String name) {
-			this.pnl_links.removeAllBeforeAction(name);
-		}
-
-		public void startWorkingAnimation(final String message) {
-			statusLabel.setText(message);
-			busyIconTimer.start();
-		}
-
-		public void stopWorkingAnimation() {
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		this.fastLoginPasswordInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					fastLoginButton.doClick();
 			}
-			busyIconTimer.stop();
-			statusAnimationLabel.setIcon(MainPanel.idleIcon);
-			statusLabel.setText("");
-		}
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
+		});
 
-		private void fastLoginTextChanged() {
-			if (!fastLoginUsernameInput.getText().isEmpty() &&
-					fastLoginPasswordInput.getPassword().length > 0) {
-				fastLoginButton.setEnabled(true);
+		this.fastLoginUsernameInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					fastLoginButton.doClick();
 			}
-			else
-				fastLoginButton.setEnabled(false);
-		}
-
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
+		});
+		
 	}
+
+	public void switchToMessagesView() {
+		this.subjectsPanel.setVisible(false);
+		this.threadsPanel.setVisible(false);
+		if (!this.tree.getForumTreeUI().isVisible()) {
+			this.tree.selectFirstRow();
+			this.tree.getForumTreeUI().setVisible(true);
+		}
+	}
+
+	public void switchToRootSubjectsView() {
+		this.subjectsPanel.setVisible(true);
+		this.threadsPanel.setVisible(false);
+		this.tree.getForumTreeUI().setVisible(false);
+	}
+
+	public void switchToSubjectsAndThreadsView() {
+		this.subjectsPanel.setVisible(true);
+		this.threadsPanel.setVisible(true);
+		this.tree.getForumTreeUI().setVisible(false);
+	}
+
+
+	public void addToNavigate(String text, ActionListener action) {
+		this.pnl_links.insertLink(text, action);
+		this.pnl_links.setVisible(false);
+		this.pnl_links.setVisible(true);
+	}
+
+	public void removeFromNavigateUntil(String name) {
+		this.pnl_links.removeAllBeforeAction(name);
+	}
+
+	public void startWorkingAnimation(final String message) {
+		statusLabel.setText(message);
+		busyIconTimer.start();
+	}
+
+	public void stopWorkingAnimation() {
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		busyIconTimer.stop();
+		statusAnimationLabel.setIcon(MainPanel.idleIcon);
+		statusLabel.setText("");
+	}
+
+	private void fastLoginTextChanged() {
+		if (!fastLoginUsernameInput.getText().isEmpty() &&
+				fastLoginPasswordInput.getPassword().length > 0) {
+			fastLoginButton.setEnabled(true);
+		}
+		else
+			fastLoginButton.setEnabled(false);
+	}
+
+}

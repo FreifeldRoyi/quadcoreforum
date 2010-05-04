@@ -1,4 +1,4 @@
-package forum.server.persistentlayer.pipe.message;
+package forum.server.updatedpersistentlayer.pipe.message;
 
 import java.util.Collection;
 import java.util.Vector;

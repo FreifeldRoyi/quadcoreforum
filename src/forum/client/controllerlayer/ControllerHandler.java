@@ -72,7 +72,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	 * @param id The id of the message to be modified.
 	 * @param newContent The new content of the message.
 	 */
-	public abstract void modifyMessage(long id, String newContent, Component comp);
+	public abstract void modifyMessage(final long athorID, long messageID, String newTitle, String newContent, Component comp);
 
 	/**
 	 * Adds a reply message.
@@ -84,7 +84,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	 * 
 	 * @param id The id of the message to delete.
 	 */
-	public abstract void deleteMessage(long id, Component comp);
+	public abstract void deleteMessage(long userID, long fatherID, long messageID, Component comp);
 
 	/**
 	 * Adds a new message to the forum.

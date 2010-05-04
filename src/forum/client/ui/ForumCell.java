@@ -34,8 +34,16 @@ public class ForumCell {
 	public Vector<ForumCell> getSons() {
 		return sons;
 	}
+
 	
-	@Override
+	public String getTitle() {
+		return this.title;
+	}
+
+	public String getContent() {
+		return this.content;
+	}
+	
 	public String toString() {
 		return title + "  -- by " + this.username;
 	}

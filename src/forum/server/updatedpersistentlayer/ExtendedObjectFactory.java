@@ -5,7 +5,7 @@
  * 
  * The purpose of this class is adding more functionality to the ObjectsFactory class, without changing it.
  */
-package forum.server.persistentlayer;
+package forum.server.updatedpersistentlayer;
 
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -81,7 +81,7 @@ public class ExtendedObjectFactory {
 		tMsgType.setAuthor(authorID);
 		tMsgType.setTitle(title);
 		tMsgType.setContent(content);
-		tMsgType.setPostTime(new XMLGregorianCalendarImpl(tCurrDateTime));
+		tMsgType.setPostTime(null);
 		return tMsgType;
 	}
 	

@@ -3,7 +3,7 @@
  * 
  * The interface is intended to the programmers who write the higher layers
  */
-package forum.server.persistentlayer.pipe;
+package forum.server.updatedpersistentlayer.pipe;
 
 import java.util.*;
 import java.io.File;

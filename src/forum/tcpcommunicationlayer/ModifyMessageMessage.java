@@ -43,7 +43,7 @@ public class ModifyMessageMessage extends ClientMessage {
 		try {
 			forum.updateAMessage(userID, messageID, newTitle, newContent);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The Forum changed the specified message data successfuly");
+			returnObj.setResponse("modifysuccess");
 		}
 		catch (MessageNotFoundException e) {
 			returnObj.setHasExecuted(false);

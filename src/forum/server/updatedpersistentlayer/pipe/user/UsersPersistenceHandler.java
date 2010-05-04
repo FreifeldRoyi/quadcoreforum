@@ -1,4 +1,4 @@
-package forum.server.persistentlayer.pipe.user;
+package forum.server.updatedpersistentlayer.pipe.user;
 
 import java.util.*;
 

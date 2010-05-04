@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.persistentlayer;
+package forum.server.updatedpersistentlayer;
 
 /**
  * @author sepetnit

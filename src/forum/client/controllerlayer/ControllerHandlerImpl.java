@@ -20,9 +20,11 @@ import forum.server.domainlayer.SystemLogger;
 import forum.tcpcommunicationlayer.AddNewGuestMessage;
 import forum.tcpcommunicationlayer.AddReplyMessage;
 import forum.tcpcommunicationlayer.ClientMessage;
+import forum.tcpcommunicationlayer.DeleteMessageMessage;
 import forum.tcpcommunicationlayer.GuestsAndMembersNumberMessage;
 import forum.tcpcommunicationlayer.LoginMessage;
 import forum.tcpcommunicationlayer.LogoffMessage;
+import forum.tcpcommunicationlayer.ModifyMessageMessage;
 import forum.tcpcommunicationlayer.PromoteToModeratorMessage;
 import forum.tcpcommunicationlayer.RegisterMessage;
 import forum.tcpcommunicationlayer.RemoveGuestMessage;
@@ -123,6 +125,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					while (true) {
 						try {
 							ClientMessage toSend = messages.take();
+							System.out.println(toSend.getID() + "id sended");
 							connectionController.handleQuery(toSend);
 
 						} catch (InterruptedException e) {
@@ -146,6 +149,8 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 								}
 								else {
 									sended.remove(id);
+									System.out.println();
+									System.out.println(tResponse.getResponse());
 									if (tResponse.hasExecuted())
 										notifyObservers(new ForumGUIRefreshEvent(tCRequest.getComponent(),
 												tResponse.getResponse(), tCRequest.getEventType()));
@@ -181,17 +186,19 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		return "";
 	}
 
-	@Override
-	public void modifyMessage(long id, String newContent, Component comp) {		
+	public void modifyMessage(final long authorID, long messageID, String newTitle,
+			String newContent, Component comp) {		
+		getActiveUsersNumber();
+		final ClientMessage toSend = new ModifyMessageMessage(authorID, 
+				messageID, newTitle, newContent);
 		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
 		}
-
-		//	notifyObservers(new ForumGUIRefreshEvent(comp,getForumView()));
-		if (Math.random() > 0.5) {	
-			//notifyObservers(new ForumGUIErrorEvent("Failed to modify a message"));
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
 		}
 	}
 
@@ -210,17 +217,17 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		}
 	}
 
-	@Override
-	public void deleteMessage(long id, Component comp) {
+	public void deleteMessage(long userID, long fatherID, long messageID, Component comp) {
+		getActiveUsersNumber();
+		final ClientMessage toSend = new DeleteMessageMessage(userID, fatherID, messageID);
 		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.MESSAGES_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
 		}
-
-		//		notifyObservers(new ForumGUIRefreshEvent(comp,getForumView()));
-		if (Math.random() > 0.5) {	
-			//notifyObservers(new ForumGUIErrorEvent("Failed to delete message"));
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
 		}
 	}
 
@@ -366,6 +373,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 	}
 
 	public void getNestedMessages(final long rootID, final Component comp) {
+		System.out.println(rootID + " nested req");
 		try {
 			final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
 			getActiveUsersNumber();

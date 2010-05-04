@@ -6,7 +6,7 @@
 //
 
 
-package forum.server.persistentlayer;
+package forum.server.updatedpersistentlayer;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -76,12 +76,6 @@ public class ObjectFactory {
         return new ForumType();
     }
 
-    /**
-     * Create an instance of {@link NamedComponentType }
-     * 
-     */
-    public NamedComponentType createNamedComponentType() {
-        return new NamedComponentType();
-    }
+    
 
 }

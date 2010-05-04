@@ -3,7 +3,7 @@
  * upper layers in order to update the forum database
  */
 
-package forum.server.persistentlayer.pipe;
+package forum.server.updatedpersistentlayer.pipe;
 
 
 import java.util.*;
