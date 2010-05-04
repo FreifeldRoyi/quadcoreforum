@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.persistentlayer.pipe.user.exceptions;
+package forum.server.updatedpersistentlayer.pipe.user.exceptions;
 
 /**
  * @author Sepetnitsky Vitali

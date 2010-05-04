@@ -12,8 +12,8 @@ import forum.server.domainlayer.user.Permission;
  *
  */
 public class ConnectedUserData {
-	private enum UserType {
-		MEMBER, MODERATOR, ADMIN
+	public enum UserType {
+		GUEST, MEMBER, MODERATOR, ADMIN
 	}
 	
 	private long userID;
@@ -24,17 +24,17 @@ public class ConnectedUserData {
 	private UserType type;
 	
 	public ConnectedUserData(long userID, String username, String lastName, String firstName,
-			Collection<Permission> permissions, UserType type) {
+			String type, Collection<Permission> permissions) {
 		this.userID = userID;
 		this.username = username;
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.permissions = permissions;
-		this.type = type;
+		this.type = UserType.valueOf(type);
 	}
 	
-	public ConnectedUserData(long userID, Collection<Permission> permissions, UserType type) {
-		this(userID, null, null, null, permissions, type);
+	public ConnectedUserData(long userID, Collection<Permission> permissions) {
+		this(userID, null, null, null, "GUEST", permissions);
 	}
 
 	public boolean isAllowed(final Permission permissionToCheck) {
@@ -55,5 +55,9 @@ public class ConnectedUserData {
 	
 	public String getUsername() {
 		return this.username;
+	}
+	
+	public UserType getType() {
+		return this.type;
 	}
 }

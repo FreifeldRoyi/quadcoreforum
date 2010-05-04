@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Vector;
 
+import javax.jws.soap.SOAPBinding.Use;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -22,6 +23,7 @@ import javax.swing.JTextArea;
 import forum.client.controllerlayer.ConnectedUserData;
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.controllerlayer.GUIObserver;
+import forum.client.controllerlayer.ConnectedUserData.UserType;
 import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.user.Permission;
@@ -43,19 +45,17 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	private String currentCellUsername;
 	private boolean allowModify;	
 
-	private void keyTypedEventFunction() {
+/*	private void keyTypedEventFunction() {
 		if (!m_area.getText().isEmpty() && allowModify) {
 			m_area.setEditable(true);
 			m_modifyButton.setEnabled(true);
-			m_deleteButton.setEnabled(true);
 		}
 		else {
 			m_area.setEditable(false);
 			m_modifyButton.setEnabled(false);
-			m_deleteButton.setEnabled(false);
 		}
 	}
-
+*/
 	public SelectedForumTreeCellPanel(ForumTree forumTree) {
 		super();
 		try {
@@ -73,6 +73,9 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 		m_area = new JTextArea();
 		m_area.setFont(new Font("Tahoma", 0, 14));
 		m_area.setText("");
+		m_area.setEditable(false);
+		
+		/*
 		m_area.addKeyListener(new KeyListener() {
 
 			public void keyTyped(KeyEvent e) {
@@ -84,7 +87,7 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 			@Override
 			public void keyPressed(KeyEvent e) {}
-		});
+		});*/
 
 		JScrollPane scroll = new JScrollPane(m_area);		
 		scroll.setPreferredSize(new Dimension(350,90));
@@ -97,26 +100,22 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 		m_modifyButton = new JButton("Modify");
 		m_modifyButton.setEnabled(false);
 		m_modifyButton.addActionListener(new ActionListener() {
-
-			@Override
 			public void actionPerformed(ActionEvent e) {				
-				m_forumTree.modifyMessage(m_area.getText(),m_modifyButton);
+				m_forumTree.modifyMessage(m_modifyButton);
 			}
 		});
 
 		m_replyButton = new JButton("Reply");
+		
 		m_replyButton.addActionListener(new ActionListener() {
-
-			@Override
 			public void actionPerformed(ActionEvent e) {				
 				m_forumTree.replyToMessage(m_replyButton);
 			}
 		});
 
 		m_deleteButton = new JButton("Delete");
+		m_deleteButton.setEnabled(false);
 		m_deleteButton.addActionListener(new ActionListener() {
-
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_forumTree.deleteMessage(m_deleteButton);
 
@@ -139,19 +138,22 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 	public void updatePanel(ForumCell cell, ConnectedUserData connectedUser) {
 		currentCellUsername = cell.getAuthorUsername();;
-		if (currentCellUsername.equals(connectedUser.getID() + ""))
-			this.allowModify = true;
+		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
+				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
+				this.m_modifyButton.setEnabled(true);
+				this.m_deleteButton.setEnabled(true);
+		}
+		else if (currentCellUsername.equals(connectedUser.getID() + ""))
+			this.m_modifyButton.setEnabled(true);
 		else
-			this.allowModify = false;
+			this.m_modifyButton.setEnabled(false);
+		
 		if (connectedUser.isAllowed(Permission.REPLY_TO_MESSAGE))
 			this.m_replyButton.setEnabled(true);
 		else
 			this.m_replyButton.setEnabled(false);
-		m_area.setText(cell.toString());
-		this.keyTypedEventFunction();
+		m_area.setText(cell.getContent());
 	}
-
-
 
 	public void notifyError(String errorMessage) {}
 
@@ -168,10 +170,10 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 		if (encodedView.startsWith("loggedout")) {
 			this.allowModify = false;
 			this.m_replyButton.setEnabled(false);			
+			this.m_deleteButton.setEnabled(false);
+			this.m_modifyButton.setEnabled(false);
 		}
 		else {
-
-
 			String[] tSplitted = encodedView.split("\n");
 
 			Collection<Permission> tPermissions = new Vector<Permission>();
@@ -190,7 +192,5 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 			else
 				this.m_replyButton.setEnabled(false);
 		}
-		this.keyTypedEventFunction();
-
 	}
 }

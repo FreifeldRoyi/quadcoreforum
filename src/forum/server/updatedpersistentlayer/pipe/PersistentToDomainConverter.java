@@ -3,7 +3,7 @@
  * 
  * All the methods of this class are static methods since this class is a general utility used by few classes
  */
-package forum.server.persistentlayer.pipe;
+package forum.server.updatedpersistentlayer.pipe;
 
 import java.util.*;
 

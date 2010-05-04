@@ -15,9 +15,14 @@ import forum.server.domainlayer.interfaces.UIUser;
  *
  */
 public class ForumUser implements UIUser {
-
+/*	public enum UserType {
+		GUEST, MEMBER, ADMIN, MODERATOR
+	}
+*/	
+	
 	private long id;
 	private Collection<Permission> permissions;
+//	private UserType type;
 	
 	/**
 	 * The class constructor

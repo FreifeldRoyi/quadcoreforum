@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.persistentlayer.pipe;
+package forum.server.updatedpersistentlayer.pipe;
 
 import javax.xml.bind.JAXBException;
 

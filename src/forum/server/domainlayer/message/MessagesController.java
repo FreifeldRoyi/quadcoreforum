@@ -262,7 +262,8 @@ public class MessagesController {
 					messageID + ".");
 			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 			final ForumMessage tMessageToEdit = this.dataHandler.getMessagesCache().getMessageByID(messageID);
-			if (tApplicant.isAllowed(Permission.EDIT_MESSAGE) && tMessageToEdit.getAuthorID() == tApplicant.getID()) {
+			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE) ||
+					(tApplicant.isAllowed(Permission.EDIT_MESSAGE) && tMessageToEdit.getAuthorID() == tApplicant.getID())) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				tMessageToEdit.updateMe(newTitle, newContent);
 				this.dataHandler.getMessagesCache().updateInDatabase(tMessageToEdit);

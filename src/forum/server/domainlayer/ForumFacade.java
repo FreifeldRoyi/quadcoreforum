@@ -412,7 +412,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @param userID
 	 * 		The id of the user who requests to delete the message
 	 * @param fatherID
-	 * 		The id of the subject in which the message should be deleted
+	 * 		The id of the message father
 	 * @param messageID
 	 * 		The id of the message to be deleted
 	 * 
@@ -426,9 +426,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @throws DatabaseUpdateException
 	 * 		In case the message can't be deleted from the database due to a database connection error 
 	 */
-	public void deleteAMessage(final long userID, final long fatherID, 
-			final long messageID) throws NotRegisteredException, NotPermittedException,
-			MessageNotFoundException, DatabaseUpdateException;
+	public void deleteAMessage(final long userID, final long fatherID, final long messageID)
+	throws NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException;
 		
 }
 	// Update related messages:

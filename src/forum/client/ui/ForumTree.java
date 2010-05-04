@@ -34,11 +34,13 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.sun.org.apache.xerces.internal.dom.ParentNode;
+
 import forum.client.controllerlayer.ConnectedUserData;
 import forum.client.controllerlayer.ControllerHandler;
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.controllerlayer.GUIObserver;
-import forum.client.panels.AddReplyDialog;
+import forum.client.panels.ReplyModifyDialog;
 import forum.client.panels.MainPanel;
 import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
@@ -145,7 +147,7 @@ public class ForumTree {
 
 			public void treeWillExpand(TreeExpansionEvent event)
 			throws ExpandVetoException {
-				
+
 
 				new Thread(new Runnable() {
 					public void run() {
@@ -153,7 +155,7 @@ public class ForumTree {
 					}
 				}).start();
 
-				
+
 				TreePath path = (TreePath)event.getPath();
 				MessageTreeNode node = (MessageTreeNode)path.getPathComponent(path.getPathCount() - 1);
 
@@ -309,14 +311,15 @@ public class ForumTree {
 
 		public void notifyError(String errorMessage) {
 			System.out.println("error");
+
+			System.out.println(errorMessage);
 		}
 
 		public void refreshForum(String encodedView) {
 			ForumCell rootCell = decodeView(encodedView);
 
-
-
 			if (rootCell == null || rootCell.getId() != id) return;
+			System.out.println("ddddddddddddddddddddd");
 
 
 			this.removeAllChildren();
@@ -356,18 +359,21 @@ public class ForumTree {
 
 
 			synchronized (this) {
-				this.notifyAll();
 
 				try {
 					ControllerHandlerFactory.getPipe().deleteObserver(this);
 
-					
-					
+
+
 				} 
 				catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
+				System.out.println("noyif" + id);
+				this.notifyAll();
+
 			}
 
 
@@ -389,7 +395,12 @@ public class ForumTree {
 	 * @return The tree representing the forum.
 	 */
 	private ForumCell decodeView(String encodedView) {
-		if (encodedView.startsWith("replysuccess"))
+		System.out.println(encodedView);
+		if (encodedView.startsWith("replysuccess") || 
+				encodedView.startsWith("modifysuccess") || 
+				encodedView.startsWith("deletesuccess") ||
+				encodedView.startsWith("searchresult"))
+			
 			return null;
 		try {
 			String[] tSplitted = encodedView.split("\n");
@@ -426,69 +437,130 @@ public class ForumTree {
 	 * 
 	 * @param newContent The new content of the message.
 	 */
-	public void modifyMessage(final String newContent, final JButton button) {
-		button.setEnabled(false);
-		pool.execute(new Runnable() {
+	public void modifyMessage(final JButton button) {
+//		button.setEnabled(false);
+		MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+		ForumCell cell = (ForumCell) node.getUserObject();				
+		ReplyModifyDialog tModifyDialog = 
+			new ReplyModifyDialog(container.getConnectedUser().getID(), cell.getId(), cell.getTitle(),
+					cell.getContent(), button);
+		try {
+			tModifyDialog.setVisible(true);
 
-			public void run() {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)m_tree.getSelectionPath().getLastPathComponent();
-				ForumCell cell = (ForumCell) node.getUserObject();				
-				pipe.modifyMessage(cell.getId(),newContent,button);				
+			if (tModifyDialog.shouldUpdateGUI()) {
+				synchronized (node) {
+					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(node),
+							EventType.MESSAGES_UPDATED);
+					ControllerHandlerFactory.getPipe().getNestedMessages(cell.getId(), m_tree);
+					try {
+						node.wait();
+						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
+					} 
+					catch (InterruptedException e) {
+					}
+					m_tree.setSelectionRow(0);
+				}
 			}
-		});
+			tModifyDialog.dispose();
+			
+
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * Replies to the selected message.
 	 */
 	public void replyToMessage(final JButton button) {
-		button.setEnabled(false);
-		pool.execute(new Runnable() {
-
-			public void run() {
-				MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
-				ForumCell cell = (ForumCell) node.getUserObject();				
-				AddReplyDialog tReplyDialog = 
-					new AddReplyDialog(container.getConnectedUser().getID(), cell.getId(), button);
+//		button.setEnabled(false);
+		MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+		ForumCell cell = (ForumCell) node.getUserObject();				
+		ReplyModifyDialog tReplyDialog = 
+			new ReplyModifyDialog(container.getConnectedUser().getID(), cell.getId(), button);
+		tReplyDialog.setVisible(true);
+		if (tReplyDialog.shouldUpdateGUI()) {
+			synchronized (node) {
+				pipe.addObserver(new GUIObserver(node),
+						EventType.MESSAGES_UPDATED);
+				pipe.getNestedMessages(cell.getId(), m_tree);
 				try {
-					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tReplyDialog), EventType.MESSAGES_UPDATED);
-					tReplyDialog.setVisible(true);
+					node.wait();
+					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
+					m_tree.expandPath(new TreePath(((DefaultTreeModel)m_tree.getModel()).getPathToRoot(node)));
 
-					synchronized (node) {
-						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(node),
-								EventType.MESSAGES_UPDATED);
-						ControllerHandlerFactory.getPipe().getNestedMessages(cell.getId(), m_tree);
-						try {
-							node.wait();
-							((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
-						} catch (InterruptedException e) {
-						}
-					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (InterruptedException e) {
 				}
-
-
-				//				pipe.addReplyToMessage(container.getConnectedUser().getID(), cell.getId(),"",button);					
 			}
-		});			
+			m_tree.setSelectionRow(0);
+		}
+		tReplyDialog.dispose();
 	}
 
 	/**
 	 * Deletes the selected message.
 	 */
 	public void deleteMessage(final JButton button) {
-		button.setEnabled(false);
-		pool.execute(new Runnable() {
+//		button.setEnabled(false);
+		if (JOptionPane.showConfirmDialog(this.m_panel, "Are you sure you want to delete the message?", "delete",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
+			JOptionPane.NO_OPTION) {
+			button.setEnabled(true);
+			return;			
+		}
+		
+		final MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+		final MessageTreeNode parent = (MessageTreeNode) node.getParent();
 
-			@Override
-			public void run() {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)m_tree.getSelectionPath().getLastPathComponent();
-				ForumCell cell = (ForumCell) node.getUserObject();
-				pipe.deleteMessage(cell.getId(),button);			
+		final ForumCell cell = (ForumCell) node.getUserObject();
+		final ForumCell parentCell = parent != null? (ForumCell) ((MessageTreeNode)parent).getUserObject() : null; 
+
+
+		System.out.println(cell.getTitle());
+		System.out.println(parentCell.getTitle());
+
+		pipe.addObserver(new GUIObserver(new GUIHandler() {
+			public void notifyError(String errorMessage) {
+				pipe.deleteObserver(this);
+				JOptionPane.showMessageDialog(ForumTree.this.m_panel, 
+						"cannot delete the message!", "error", JOptionPane.ERROR_MESSAGE);
 			}
-		});		
+
+			public void refreshForum(final String encodedView) {
+
+
+				if (encodedView.startsWith("deletesuccess")) {
+					pipe.deleteObserver(this);
+					new Thread(new Runnable() {
+						public void run() {
+							synchronized (parent) {
+								pipe.addObserver(new GUIObserver(parent), EventType.MESSAGES_UPDATED);
+
+								System.out.println("id " + parentCell.getId());
+								System.out.println(parent.id);
+								pipe.getNestedMessages(parentCell.getId(), m_tree);
+								try {
+									System.out.println("waiting");
+									parent.wait();
+									System.out.println("wait end");
+									((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(parent);
+									JOptionPane.showMessageDialog(ForumTree.this.m_panel, 
+											"the message was deleted successfully!", "success",
+											JOptionPane.INFORMATION_MESSAGE);
+								} 
+								catch (InterruptedException e) {
+									/// TODO Auto-generated catch block
+								}
+							}
+
+						}}).start();
+				}
+			}
+		}), EventType.MESSAGES_UPDATED);
+		pipe.deleteMessage(container.getConnectedUser().getID(), parentCell == null? -1 : parentCell.getId(), cell.getId(), button);
+		m_tree.setSelectionRow(0);
 	}
 
 	/**
