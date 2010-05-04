@@ -36,7 +36,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	private static final long serialVersionUID = -5210803978059150523L;
 
 	private JTable subjectsTable;
-	private SubjectsTableModel subjectsTableModel;
+	private TableModel subjectsTableModel;
 	private MainPanel container;	
 	private ThreadsPanel threadsPanel;
 
@@ -90,8 +90,9 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		});
-		
-		subjectsTableModel = new SubjectsTableModel();
+		String[] columns = {"Subject",  "Description", "Sub-Subjects#", 
+				"Messages#", "Last Message Info" };
+		subjectsTableModel = new TableModel(columns);
 		this.subjectsTable.setModel(subjectsTableModel);
 
 

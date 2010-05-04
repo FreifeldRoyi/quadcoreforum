@@ -44,7 +44,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 	private JPanel pnl_searchOptionHolder;
 	
 	private JTable resultsTable;
-	private SubjectsTableModel resultsTableModel;
+	private TableModel resultsTableModel;
 
 	
 	private JTextField txtFld_searchField;
@@ -95,6 +95,8 @@ public class SearchDialog extends JDialog implements GUIHandler
 			
 /* ******************************************************/
 			
+			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
+			
 			searchResultsContent = encodedView.split("\n");
 			// remove all the previous listeners
 			for (ActionListener tAL : btn_nextPage.getActionListeners())
@@ -103,7 +105,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 				btn_prevPage.removeActionListener(tAL);
 
 
-
+/*
 
 			// this is the data which will be presented in the subjects table
 			String[][] tData = new String[searchResultsContent.length][5];
@@ -138,10 +140,6 @@ public class SearchDialog extends JDialog implements GUIHandler
 				container.stopWorkingAnimation();
 			}
 			 */
-
-
-
-
 
 
 
@@ -258,8 +256,8 @@ public class SearchDialog extends JDialog implements GUIHandler
 				}
 			}
 		});
-		
-		resultsTableModel = new SubjectsTableModel();
+		String[] columns = {"Message ID", "Author", "Title", "Content" };
+		resultsTableModel = new TableModel(columns);
 		this.resultsTable.setModel(resultsTableModel);
 		
 		
