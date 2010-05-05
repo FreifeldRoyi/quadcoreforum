@@ -6,6 +6,7 @@ package forum.client.panels;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -143,24 +144,26 @@ public class SearchDialog extends JDialog implements GUIHandler
 			 */
 			
 			
-
+			
 			for (index = 0; index < searchResultsContent.length && index < selectedNumberOfResults; index++)
 				this.txt_area_resultsView.setText(txt_area_resultsView.getText() + searchResultsContent[index] + "\n");
 			
-			long[] tMessagesIDs = new long[searchResultsContent.length]; 
-			String[][] tResultsTable = new String[searchResultsContent.length][3];
-			for (int i = 1; i < searchResultsContent.length; i++) {
-				tMessagesIDs[i] = Long.parseLong(searchResultsContent[i].
-						substring(0, searchResultsContent[i].indexOf('\t')));
-				tResultsTable[i] = searchResultsContent[i].
-				substring(searchResultsContent[i].indexOf('\t') + 1).split("\t");
-
+			
+			long[] tMessagesIDs = new long[searchResultsContent.length - 1];
+			String[][] tResultsTable = new String[searchResultsContent.length - 1][3];
+			for (int i = 0; i < searchResultsContent.length - 1; i++) {
+				tMessagesIDs[i] = Long.parseLong(searchResultsContent[i + 1].
+						substring(0, searchResultsContent[i + 1].indexOf('\t')));
+				tResultsTable[i] = searchResultsContent[i + 1].
+				substring(searchResultsContent[i + 1].indexOf('\t') + 1).split("\t");
 				if (tResultsTable[i].length > 3) {
 					for (int j = 3; j < tResultsTable[i].length; j++) {
 						tResultsTable[i][2] += ("\t" + tResultsTable[i][j]);
 					}
 				}
 			}
+			System.out.println("resultssssssssssssssssssssssss:");
+			Arrays.toString(tResultsTable);
 			resultsTableModel.updateData(tMessagesIDs, tResultsTable);
 			resultsTable.tableChanged(new TableModelEvent(resultsTableModel));
 			
@@ -275,7 +278,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 				}
 			}
 		});
-		String[] columns = {"Message ID", "Author", "Title", "Content" };
+		String[] columns = {"Author", "Title", "Content" };
 		resultsTableModel = new TableModel(columns);
 		this.resultsTable.setModel(resultsTableModel);
 		
