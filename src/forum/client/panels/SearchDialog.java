@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.TableModelEvent;
 
 import com.sun.org.apache.bcel.internal.generic.NEW;
 
@@ -97,7 +98,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 			
 			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
 			
-			searchResultsContent = encodedView.split("\n");
+			searchResultsContent = encodedView.split("\n\tARESULTMESSAGE: ");
 			// remove all the previous listeners
 			for (ActionListener tAL : btn_nextPage.getActionListeners())
 				btn_nextPage.removeActionListener(tAL);
@@ -140,14 +141,32 @@ public class SearchDialog extends JDialog implements GUIHandler
 				container.stopWorkingAnimation();
 			}
 			 */
-
-
-
-
+			
+			
 
 			for (index = 0; index < searchResultsContent.length && index < selectedNumberOfResults; index++)
 				this.txt_area_resultsView.setText(txt_area_resultsView.getText() + searchResultsContent[index] + "\n");
+			
+			long[] tMessagesIDs = new long[searchResultsContent.length]; 
+			String[][] tResultsTable = new String[searchResultsContent.length][3];
+			for (int i = 1; i < searchResultsContent.length; i++) {
+				tMessagesIDs[i] = Long.parseLong(searchResultsContent[i].
+						substring(0, searchResultsContent[i].indexOf('\t')));
+				tResultsTable[i] = searchResultsContent[i].
+				substring(searchResultsContent[i].indexOf('\t') + 1).split("\t");
 
+				if (tResultsTable[i].length > 3) {
+					for (int j = 3; j < tResultsTable[i].length; j++) {
+						tResultsTable[i][2] += ("\t" + tResultsTable[i][j]);
+					}
+				}
+			}
+			resultsTableModel.updateData(tMessagesIDs, tResultsTable);
+			resultsTable.tableChanged(new TableModelEvent(resultsTableModel));
+			
+			
+			
+			
 			this.currentPageResNum = index;
 
 			if (index < searchResultsContent.length)
@@ -275,11 +294,11 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.txt_area_resultsView.setPreferredSize(new Dimension(224, 39));
 		this.txt_area_resultsView.setBorder(BorderFactory.createLineBorder(Color.black));
 		
-		JScrollPane tScroll = new JScrollPane(this.txt_area_resultsView);
+//		JScrollPane tScroll = new JScrollPane(this.txt_area_resultsView);
 		
 /* **********************************************************************/
 		
-//		JScrollPane tScroll = new JScrollPane(this.resultsTable);
+		JScrollPane tScroll = new JScrollPane(this.resultsTable);
 		
 /* **********************************************************************/	
 		

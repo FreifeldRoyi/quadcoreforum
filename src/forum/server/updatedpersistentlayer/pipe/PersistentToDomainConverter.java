@@ -55,7 +55,7 @@ public class PersistentToDomainConverter {
 	public static ForumMember convertMemberTypeToForumMember(MemberType toConvert) {
 		return new ForumMember(toConvert.getUserID(), toConvert.getUsername(), 
 				toConvert.getPassword(), toConvert.getLastName(), toConvert.getFirstName(),
-				toConvert.getEmail(), PersistentToDomainConverter.parseStringPermissions(toConvert.getPrivileges()));
+				toConvert.getEmail(), PersistentToDomainConverter.parseStringPermissions(toConvert.getPermissions()));
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class PersistentToDomainConverter {
 	public static ForumSubject convertSubjectTypeToForumSubject(SubjectType toConvert) {
 		return new ForumSubject(toConvert.getSubjectID(), 
 				toConvert.getName(), toConvert.getDescription(), toConvert.getSubSubjectsIDs(),
-				toConvert.getThreadsIDs(), toConvert.isIsToLevel());
+				toConvert.getThreadsIDs(), toConvert.isIsTopLevel());
 	}
 
 	/**
@@ -100,9 +100,8 @@ public class PersistentToDomainConverter {
 	 * 		{@link MessageMessage} instance
 	 */
 	public static ForumMessage convertMessageTypeToForumMessage(MessageType toConvert) {
-		return new ForumMessage(toConvert.getMessageID(), toConvert.getAuthor(), 
+		return new ForumMessage(toConvert.getMessageID(), toConvert.getAuthorID(), 
 				toConvert.getTitle(), toConvert.getContent(), 
-				toConvert.getPostTime().toGregorianCalendar(), 
-				toConvert.getRepliesIDs());	
+				toConvert.getPostTime(), toConvert.getRepliesIDs());	
 	}
 }
