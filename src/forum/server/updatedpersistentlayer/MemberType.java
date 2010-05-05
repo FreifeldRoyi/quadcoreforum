@@ -1,9 +1,6 @@
-
-
 package forum.server.updatedpersistentlayer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class MemberType {
@@ -16,15 +13,15 @@ public class MemberType {
  
     protected String username;
  
-    protected String Email; 
+    protected String email; 
     protected String password; 
     protected String lastName;
-
     protected String firstName;
-  
-  
-    protected List<Long> postedMessagesIDs;
     protected UserType userType;
+    protected Set<String> permissions;
+    
+    protected List<Long> postedMessagesIDs;
+  
 
     /**
      * Gets the value of the userID property.
@@ -93,7 +90,7 @@ public class MemberType {
      *     
      */
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     /**
@@ -105,7 +102,7 @@ public class MemberType {
      *     
      */
     public void setEmail(String value) {
-        this.Email = value;
+        this.email = value;
     }
 
     /**
@@ -179,7 +176,15 @@ public class MemberType {
     public void setFirstName(String value) {
         this.firstName = value;
     }
-
+    
+    public Set<String> getPermissions() {
+        return this.permissions;
+    }
+    
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
+    }
+    
     /**
      * Gets the value of the postedMessagesIDs property.
      * 

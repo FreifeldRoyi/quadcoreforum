@@ -415,6 +415,7 @@
 	ad</content>
         <postTime>2010-05-04T15:27:01.015+03:00</postTime>
         <repliesIDs>43</repliesIDs>
+        <repliesIDs>46</repliesIDs>
     </messages>
     <messages>
         <messageID>43</messageID>
@@ -439,5 +440,33 @@
         <title>dh</title>
         <content>abc def ghi</content>
         <postTime>2010-05-04T23:12:01.151+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>46</messageID>
+        <author>0</author>
+        <title>title12   s</title>
+        <content>adn
+dsaln	b.	
+kjbblk	nmkn
+njlds kalk a;k	k
+k dak k	 k ksa ak
+
+sa kas
+
+savk k aks
+
+ask kas '
+as,d
+
+m avs m
+v
+ldsnmlfs
+fl,sanla
+asflnlaf
+anfllnanl
+
+
+asnfl</content>
+        <postTime>2010-05-05T16:14:28.750+03:00</postTime>
     </messages>
 </ForumType>

@@ -43,7 +43,7 @@ public class SearchByContentMessage extends ClientMessage {
 			String tResponse = "searchresult\n";
 			for (int i = 0; i < tHits.length; i++) {
 				UIMessage tCurrentMessage = tHits[i].getMessage();
-				tResponse += tCurrentMessage.toString() + "\n";
+				tResponse += "\tARESULTMESSAGE: " + tCurrentMessage.toString() + "\n";
 			}
 			returnObj.setResponse(tResponse);
 		}

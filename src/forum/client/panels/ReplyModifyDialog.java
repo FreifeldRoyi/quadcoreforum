@@ -37,6 +37,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 //	private long authorID;
 //	private long replyModifiedID;
+	private JScrollPane contentPane;
 	private JTextField title;
 	private JTextArea content;
 
@@ -53,7 +54,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		initializeGUIContent(authorID, modifiedID, replyModifyButton);
 		this.succeeded = false;
 		this.title.setText(currentTitle);	
-		this.content.setText(currentContent);		
+		this.content.setText(currentContent);
 		this.ok.setEnabled(false);
 		
 		this.title.addKeyListener(new KeyListener() {
@@ -127,17 +128,18 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	private void initializeGUIContent(long authorID, long replyModifiedID, JButton replyModifyButton) {
 		this.title = new JTextField();
 		this.content = new JTextArea();
-		this.content.setAutoscrolls(true);
+//		this.content.setAutoscrolls(true);
+		this.contentPane = new JScrollPane(content);
 		this.ok = new JButton();
 		this.cancel = new JButton();
-
+		
 		this.content.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setPreferredSize(new Dimension(400, 300));
 		this.setMinimumSize(new Dimension(400, 300));
 
 
 		this.title.setPreferredSize(new Dimension(200, 30));
-		this.content.setPreferredSize(new Dimension(200, 200));
+		this.contentPane.setPreferredSize(new Dimension(200, 200));
 		this.ok.setPreferredSize(new Dimension(100, 40));
 		this.cancel.setPreferredSize(new Dimension(100, 40));
 
@@ -171,7 +173,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 										.addGroup(tLayout.createSequentialGroup() 
 												.addGap(10, 10, 10)
-												.addComponent(this.content, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+												.addComponent(this.contentPane, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 												.addGap(10, 10, 10)
 
 										)
@@ -193,7 +195,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 				.addComponent(tContent, 20, 20, 20)
 				.addGap(10, 10, 10)
 
-				.addComponent(this.content, 50, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+				.addComponent(this.contentPane, 50, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 				.addGap(10, 10, 10)
 				.addGroup(tLayout.createParallelGroup()
 						.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)

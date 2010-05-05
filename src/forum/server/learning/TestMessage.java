@@ -10,10 +10,9 @@ import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
 
 import forum.server.domainlayer.user.ForumMember;
-import forum.server.domainlayer.user.ForumUser;
-import forum.server.persistentlayer.MemberType;
-import forum.server.persistentlayer.pipe.PersistentToDomainConverter;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
+
 
 public class TestMessage {
 	public static void main(String[] args) {
@@ -38,31 +37,83 @@ public class TestMessage {
 		
 		//getFirstFreeMemberID(SessionFactoryUtil.getInstance());
 		try {
-			System.out.println(getUserByID(SessionFactoryUtil.getInstance(), 1));
-		} 
-		catch (NotRegisteredException e) {
+			System.out.println(getFirstFreeMemberID(SessionFactoryUtil.getInstance()));
+			System.out.println(getAllMembers(SessionFactoryUtil.getInstance()));
+		} catch (DatabaseRetrievalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	@SuppressWarnings("unchecked")
+	public static Collection<ForumMember> getAllMembers(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		Collection<ForumMember> toReturn = new Vector<ForumMember>();
+		Session session = getSessionAndBeginTransaction(ssFactory);
+		String query = "from MemberType";
+		List tResult = session.createQuery(query).list();
+		for (MemberType tCurrentMemberType : (List<MemberType>)tResult) 
+			toReturn.add(PersistentToDomainConverter.convertMemberTypeToForumMember(tCurrentMemberType));
+		try {
+			commitTransaction(session);
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
+		return toReturn;
 	}
 
-	public static void getFirstFreeMemberID(SessionFactory data) {
-		Collection<ForumMember> toReturn = new Vector<ForumMember>();
-		Session session = data.getCurrentSession();
-		String query = "from MemberType";
-		List tResult = executeQuery(session, query);		
-		System.out.println((List<MemberType>)tResult);
+	private static Session getSessionAndBeginTransaction(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		try {
+			Session toReturn = ssFactory.getCurrentSession();
+			toReturn.beginTransaction();
+			return toReturn;
+		}
+		catch (RuntimeException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	private static void commitTransaction(Session session) throws DatabaseUpdateException {
+		try {
+			session.getTransaction().commit();
+		}
+		catch (RuntimeException e) {
+			if (session.getTransaction() != null && session.getTransaction().isActive()) {
+				try {
+					// Second try catch as the roll-back could fail as well
+					session.getTransaction().rollback();
+				}
+				catch (HibernateException e1) {
+					// add logging
+				}
+			}
+			throw new DatabaseUpdateException();
+		}
+	}
+
+	/**
+	 * @param data
+	 * 		The forum data from required data should be retrieved
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getFirstFreeMemberID()
+	 */
+	@SuppressWarnings("unchecked")
+	public static long getFirstFreeMemberID(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		long toReturn = -1;
+		Session session = getSessionAndBeginTransaction(ssFactory);
+		String query = "select max(userID) from MemberType";
+		List<Long> tResult = (List<Long>)session.createQuery(query).list();
+		toReturn = tResult.get(0).longValue();
+		try {
+			commitTransaction(session);
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
+		return ++toReturn;
 	}
 	
-	public static ForumUser getUserByID(SessionFactory data, long userID) throws NotRegisteredException {
-		Collection<ForumMember> toReturn = new Vector<ForumMember>();
-		Session session = data.getCurrentSession();
-		String query = "from MemberType where userID = " + userID;
-		List tResult = executeQuery(session, query);
-		if (tResult.isEmpty())
-			throw new NotRegisteredException(userID);
-		return PersistentToDomainConverter.convertMemberTypeToForumMember((MemberType) tResult.get(0));
-	}
 	
 	@SuppressWarnings("unchecked")
 	private static List executeQuery(Session session, String query) {

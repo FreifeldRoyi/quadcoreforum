@@ -42,11 +42,18 @@
     <generator class="increment"/>
   </id>
   <property name="username" column="Username" ></property>
-   <property name="Email" column="Email" ></property>
+   <property name="email" column="Email" ></property>
      <property name="password" column="UserPassword" ></property>
        <property name="lastName" column="LastName" ></property>
         <property name="firstName" column="FirstName" ></property>
         <property name="userType" column="UserType" ></property>
+        
+      <set name="permissions" table="UsersPermissions">
+            <key column="UserID"></key>
+            <element type="string" column="Permission"/>
+        </set>      
+        
+        
   </class>
   
   
