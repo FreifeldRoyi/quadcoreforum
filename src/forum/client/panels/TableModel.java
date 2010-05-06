@@ -15,7 +15,6 @@ public class TableModel extends AbstractTableModel {
 
 	private long[] subjectsIDs;
 	private String[][] rowData;
-
 	private String[] columnNames;
 
 	public void updateData(final long[] subjectsIDs, final String[][] rowData) {
@@ -56,9 +55,8 @@ public class TableModel extends AbstractTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
-		if (row >= 0 && row < rowData.length && col < 2)
+		if (row >= 0 && row < rowData.length && col >= 0 && col < columnNames.length)
 				return rowData[row][col];
 		return "";
-
 	}
 }

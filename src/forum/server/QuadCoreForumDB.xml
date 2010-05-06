@@ -228,6 +228,7 @@
         <title>title1</title>
         <content>content1</content>
         <postTime>2001-12-31T12:00:00</postTime>
+        <repliesIDs>51</repliesIDs>
     </messages>
     <messages>
         <messageID>8</messageID>
@@ -368,7 +369,7 @@
         <messageID>27</messageID>
         <author>0</author>
         <title>asasasasa</title>
-        <content></content>
+        <content>ffsd</content>
         <postTime>2010-05-02T14:21:31.656+03:00</postTime>
     </messages>
     <messages>
@@ -426,6 +427,7 @@
         <repliesIDs>44</repliesIDs>
         <repliesIDs>46</repliesIDs>
         <repliesIDs>45</repliesIDs>
+        <repliesIDs>47</repliesIDs>
     </messages>
     <messages>
         <messageID>44</messageID>
@@ -468,5 +470,63 @@ anfllnanl
 
 asnfl</content>
         <postTime>2010-05-05T16:14:28.750+03:00</postTime>
+        <repliesIDs>48</repliesIDs>
+        <repliesIDs>50</repliesIDs>
+    </messages>
+    <messages>
+        <messageID>47</messageID>
+        <author>0</author>
+        <title>title</title>
+        <content>njav a s
+aasd abc
+a	as</content>
+        <postTime>2010-05-05T20:23:09.450+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>48</messageID>
+        <author>0</author>
+        <title>asd</title>
+        <content>abc
+adx</content>
+        <postTime>2010-05-05T20:23:25.793+03:00</postTime>
+        <repliesIDs>49</repliesIDs>
+    </messages>
+    <messages>
+        <messageID>49</messageID>
+        <author>0</author>
+        <title>affasdf</title>
+        <content>assad
+abc adaf</content>
+        <postTime>2010-05-05T20:23:47.606+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>50</messageID>
+        <author>0</author>
+        <title>adas</title>
+        <content>amz  abc</content>
+        <postTime>2010-05-05T20:25:15.700+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>51</messageID>
+        <author>0</author>
+        <title>abc</title>
+        <content>a;amf</content>
+        <postTime>2010-05-05T20:27:02.903+03:00</postTime>
+        <repliesIDs>52</repliesIDs>
+        <repliesIDs>53</repliesIDs>
+    </messages>
+    <messages>
+        <messageID>52</messageID>
+        <author>0</author>
+        <title>sf</title>
+        <content>abc sfggs</content>
+        <postTime>2010-05-05T20:27:10.450+03:00</postTime>
+    </messages>
+    <messages>
+        <messageID>53</messageID>
+        <author>0</author>
+        <title>dasagf</title>
+        <content>abc sgf ga</content>
+        <postTime>2010-05-05T20:27:22.231+03:00</postTime>
     </messages>
 </ForumType>
