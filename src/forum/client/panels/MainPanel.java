@@ -124,7 +124,16 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		}		
 
-
+		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
+				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
+				subjectsPanel.setModeratorOrAdminView();
+		}
+		else if (connectedUser.getType() == ConnectedUserData.UserType.MEMBER)
+			subjectsPanel.setMemberView();
+		else
+			subjectsPanel.setGuestView();
+		
+		
 		this.setEnabled(true);
 
 		if (!this.connectedUser.isGuest()) {
@@ -575,13 +584,13 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGap(11, 11, 11)
 						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-						.addGap(0, 0, Short.MAX_VALUE)
+	//					.addGap(0, 0, Short.MAX_VALUE)
 						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
 						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+		//				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			//			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 						//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 						//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
