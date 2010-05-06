@@ -18,6 +18,8 @@ import forum.client.ui.events.*;
 import forum.client.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 import forum.tcpcommunicationlayer.AddNewGuestMessage;
+import forum.tcpcommunicationlayer.AddNewSubjectMessage;
+import forum.tcpcommunicationlayer.AddNewThreadMessage;
 import forum.tcpcommunicationlayer.AddReplyMessage;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.DeleteMessageMessage;
@@ -149,7 +151,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 								}
 								else {
 									sended.remove(id);
-									System.out.println();
+									System.out.println("\n\nserver response = \n\n");
 									System.out.println(tResponse.getResponse());
 									if (tResponse.hasExecuted())
 										notifyObservers(new ForumGUIRefreshEvent(tCRequest.getComponent(),
@@ -348,7 +350,28 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}	
+	
+	public void addNewSubject(final long userID, final long fatherID, final String name, final String description, final Component comp) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new AddNewSubjectMessage(userID, fatherID, name, description);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SUBJECTS_UPDATED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);
+	}	
 
+	
+	
 	public void getThreads(final long subjectID, final Component comp) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
@@ -372,6 +395,28 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}
 
+
+	public void addNewThread (final long userID, final long subjectID, final String topic, final String title,
+			final String content, final Component comp) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new AddNewThreadMessage(userID, subjectID, topic, title, content);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.THREADS_UPDATED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);
+	}
+	
+	
 	public void getNestedMessages(final long rootID, final Component comp) {
 		System.out.println(rootID + " nested req");
 		try {

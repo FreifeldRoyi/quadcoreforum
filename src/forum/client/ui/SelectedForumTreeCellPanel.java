@@ -43,7 +43,6 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	private JButton m_deleteButton;
 
 	private String currentCellUsername;
-	private boolean allowModify;	
 
 /*	private void keyTypedEventFunction() {
 		if (!m_area.getText().isEmpty() && allowModify) {
@@ -63,7 +62,6 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 		} catch (IOException e1) {
 
 		}
-		this.allowModify = false;
 		this.currentCellUsername = "";
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -168,7 +166,6 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 
 		if (encodedView.startsWith("loggedout")) {
-			this.allowModify = false;
 			this.m_replyButton.setEnabled(false);			
 			this.m_deleteButton.setEnabled(false);
 			this.m_modifyButton.setEnabled(false);
@@ -179,13 +176,6 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 			Collection<Permission> tPermissions = new Vector<Permission>();
 			for (int i = 1; i < tSplitted.length; i++)
 				tPermissions.add(Permission.valueOf(tSplitted[i]));
-
-
-			long tNewUserID = Long.parseLong(encodedView.split("\t")[0]);
-			if (currentCellUsername.equals(tNewUserID + ""))
-				this.allowModify = true;
-			else
-				this.allowModify = false;
 
 			if (tPermissions.contains(Permission.REPLY_TO_MESSAGE))
 				this.m_replyButton.setEnabled(true);

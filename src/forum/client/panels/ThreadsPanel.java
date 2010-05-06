@@ -4,16 +4,19 @@
 package forum.client.panels;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
+import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.ui.ForumTree;
 import forum.client.ui.events.GUIHandler;
 import forum.server.domainlayer.SystemLogger;
-import forum.tcpcommunicationlayer.AddNewThreadMessage;
 
 /**
  * @author sepetnit
@@ -27,14 +30,14 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 	private static final long serialVersionUID = -5210803978059150523L;
 
 	private JTable threadsTable;
-	private ThreadsTableModel threadsTableModel;
+	private TableModel threadsTableModel;
 	private MainPanel container;	
 	private ForumTree messages;
 
 	private JButton addNewThreadButton;
-	private JButton deleteThreadbButton;
+	private JButton deleteThreadButton;
 	private JButton modifyThreadButton;	
-	
+		
 	public ThreadsPanel(final MainPanel cont, final ForumTree messages) {
 		this.container = cont;
 		this.messages = messages;
@@ -52,9 +55,9 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 					int rowSelected = threadsTable.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
 						
-						final long tMessageIDToLoad = threadsTableModel.getIDofRootMessageInRow(rowSelected);
+						final long tMessageIDToLoad = threadsTableModel.getIDofContentInRow(rowSelected);
 						container.startWorkingAnimation("retreiving thread " + 
-								threadsTableModel.getTitleOfThreadInRow(rowSelected) 
+								threadsTableModel.getNameOfContentInRow(rowSelected) 
 								+ " content...");
 
 						messages.setRootMessage(tMessageIDToLoad);
@@ -62,24 +65,42 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		});
-
-		this.threadsTableModel = new ThreadsTableModel();
+		
+		String[] columns = {"Thread",  "Messages#", "Views#"};
+		this.threadsTableModel = new TableModel(columns);
 
 		this.threadsTable.setModel(this.threadsTableModel);
 		
 		
 		addNewThreadButton = new JButton();
-		deleteThreadbButton = new JButton();
+		deleteThreadButton = new JButton();
 		modifyThreadButton = new JButton();
 
 		addNewThreadButton.setText("open new");
-		deleteThreadbButton.setText("delete");
+		deleteThreadButton.setText("delete");
 		modifyThreadButton.setText("modify");
 
 		Dimension tSubjectsButtonsDimension = new Dimension(85, 35);
 		addNewThreadButton.setPreferredSize(tSubjectsButtonsDimension);
 
-		deleteThreadbButton.setPreferredSize(tSubjectsButtonsDimension);
+		addNewThreadButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				ReplyModifyDialog tNewThreadDialog =
+					new ReplyModifyDialog(container.getConnectedUser().getID(), threadsTableModel.getFatherID(), "thread", addNewThreadButton);
+				tNewThreadDialog.setVisible(true);
+				if (tNewThreadDialog.shouldUpdateGUI()) {
+					try {
+						ControllerHandlerFactory.getPipe().getThreads(threadsTableModel.getFatherID(), threadsTable);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				tNewThreadDialog.dispose();
+			}});
+		
+		
+		deleteThreadButton.setPreferredSize(tSubjectsButtonsDimension);
 		modifyThreadButton.setPreferredSize(tSubjectsButtonsDimension);		
 
 
@@ -96,7 +117,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
 										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(deleteThreadbButton, GroupLayout.PREFERRED_SIZE,
+										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
 
@@ -110,13 +131,39 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
 										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 										.addGap(16, 16, 16)
-										.addComponent(deleteThreadbButton, GroupLayout.PREFERRED_SIZE,
+										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)));
 
 
 	}	
 
-		
+	public void updateFather(long fatherID) {
+		threadsTableModel.setFatherID(fatherID);
+	}
+	
+	public void setGuestView(){
+		this.addNewThreadButton.setVisible(false);
+		this.modifyThreadButton.setVisible(false);
+		this.deleteThreadButton.setVisible(false);
+	}
+	
+	public void setMemberView(){
+		this.addNewThreadButton.setVisible(true);
+		this.modifyThreadButton.setVisible(false);
+		this.deleteThreadButton.setVisible(false);
+	}
+	
+	public void setAuthorView(){
+		this.addNewThreadButton.setVisible(true);
+		this.modifyThreadButton.setVisible(true);
+		this.deleteThreadButton.setVisible(false);
+	}
+	
+	public void setModeratorOrAdminView(){
+		this.addNewThreadButton.setVisible(true);
+		this.modifyThreadButton.setVisible(true);
+		this.deleteThreadButton.setVisible(true);
+	}
 	
 	public void changeTableVisible() {
 		this.threadsTable.setVisible(!this.threadsTable.isVisible());
@@ -154,7 +201,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 					tRoots[i] = Long.parseLong(tCurrentThreadInfo[1]);
 					for (int j = 2; j < tCurrentThreadInfo.length; j++)
 						tData[i][j - 2] = tCurrentThreadInfo[j];
-					this.threadsTableModel.updateData(tIDs, tRoots, tData);
+					this.threadsTableModel.updateData(tRoots, tData);
 				}
 				catch (NumberFormatException e) {
 					SystemLogger.warning("The server response related to subject's update is invalid");

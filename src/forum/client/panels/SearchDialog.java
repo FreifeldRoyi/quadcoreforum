@@ -51,6 +51,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 	
 	private JTextField txtFld_searchField;
 	private String toSearch;
+	private String searchBy;
 	private JLabel lbl_searchDescription;
 	private JButton btn_search;
 	private JButton btn_cancel;
@@ -88,17 +89,14 @@ public class SearchDialog extends JDialog implements GUIHandler
 		System.out.println("got refresh search");
 		if (encodedView.startsWith("searchnotmessages")) {
 			JOptionPane.showMessageDialog(this, "No messages were found", "empty", JOptionPane.INFORMATION_MESSAGE);
+			this.setMinimumSize(new Dimension(555, 235));
+			this.setSize(new Dimension(555, 235));
 			pnl_results.setVisible(false);
 		}
 		else {			
-//			this.setVisible(false);
 
-			
-/* ******************************************************/			
 			this.resultsTable.setVisible(false);
 			this.resultsTableModel.clearData();
-			
-/* ******************************************************/
 			
 			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
 			
@@ -134,7 +132,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 				tResultsTable[index][2] = tCurrRes[2];
 			}
 			
-
+			
 /*			
 			System.out.println("tMessagesIDs:");
 			for (int i = 0; i < tMessagesIDs.length; i++)
@@ -154,7 +152,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 			this.currentPageResNum = index;
 
-			if (index < searchResultsContent.length)
+			if (index < searchResultsContent.length - 1)
 				btn_nextPage.setEnabled(true);
 			else
 				btn_nextPage.setEnabled(false);
@@ -257,11 +255,12 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 	private void initComponents()
 	{
+		this.setMinimumSize(new Dimension(555, 235));
 		this.toSearch = "";
+		this.searchBy = "";
 		this.resultsTable = new JTable();
 		this.resultsTable.setSelectionModel(new DefaultListSelectionModel());
 		this.resultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
 		this.resultsTable.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent e) {
@@ -281,7 +280,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 //								showingSubjectsOfName
 //								+ " content...");
 
-						final long subjectToLoad = resultsTableModel.getIDofSubjectInRow(rowSelected);
+						final long subjectToLoad = resultsTableModel.getIDofContentInRow(rowSelected);
 /*						showingSubjectsOfID = subjectToLoad;
 						try {
 							ControllerHandlerFactory.getPipe().getSubjects(subjectToLoad, container);
@@ -312,13 +311,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 		
 		this.resultsTable.setBorder(BorderFactory.createLineBorder(Color.black));
 		
-//		JScrollPane tScroll = new JScrollPane(this.txt_area_resultsView);
-		
-/* **********************************************************************/
-		
 		JScrollPane tScroll = new JScrollPane(this.resultsTable);
-		
-/* **********************************************************************/	
 		
 		tScroll.setPreferredSize(new Dimension(224, 100));
 		this.pnl_results = new JPanel();
@@ -424,11 +417,6 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.pnl_resultRadBtnHolder.add(this.radBtn_20);
 
 		
-		
-		
-		
-		
-		
 		/* search type option handling */
 		this.btnGrp_searchOption = new ButtonGroup();
 		this.radBtn_author = new JRadioButton("Search By Author");
@@ -447,7 +435,17 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 		/* searching area handling */
 		this.txtFld_searchField = new JTextField("enter search phrase here");
-
+		
+		this.txtFld_searchField.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					btn_search.doClick();
+			}
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
+		});
+		
+		
 		this.txtFld_searchField.setPreferredSize(new Dimension(200, 30));
 		this.txtFld_searchField.setForeground(Color.GRAY);
 
@@ -488,19 +486,13 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.lbl_searchDescription.setPreferredSize(new Dimension(175, 30));
 
 
-
 		this.btn_search = new JButton("Search");
 		this.btn_search.setPreferredSize(new Dimension(85, 35));
-
-
 
 
 		this.btn_cancel = new JButton("Cancel");
 
 		this.btn_cancel.setPreferredSize(new Dimension(85, 35));
-
-
-
 
 
 		GroupLayout tLayout = new GroupLayout(this.getContentPane());
@@ -610,6 +602,10 @@ public class SearchDialog extends JDialog implements GUIHandler
 			this.btn_search.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					toSearch = txtFld_searchField.getText();
+					if (radBtn_author.isSelected())
+						searchBy = "Author";
+					else
+						searchBy = "Content";
 					btn_search.setEnabled(false);
 					search();
 				}
@@ -644,10 +640,11 @@ public class SearchDialog extends JDialog implements GUIHandler
 			
 		});
 		
-
+		this.setSize(new Dimension(555, 235));
+		
 	}
 	private void search() {
-		if (radBtn_author.isSelected()) {
+		if (searchBy.equals("Author")) {
 			resultsTable.setVisible(false);
 			resultsTableModel.clearData();
 			resultsTableModel.fireTableDataChanged();

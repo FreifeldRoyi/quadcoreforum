@@ -61,6 +61,8 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 	}
 	 */	
 
+
+	
 	private static final long serialVersionUID = -5251318786616475794L;	
 
 	private JPanel mainPanel;
