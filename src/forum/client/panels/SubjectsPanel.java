@@ -9,12 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.ui.events.GUIHandler;
 import forum.server.domainlayer.SystemLogger;
@@ -28,7 +24,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	/**
 	 * A thread pool that is used to initiate operations in the controller layer.
 	 */
-	private ExecutorService pool = Executors.newCachedThreadPool();
+//	private ExecutorService pool = Executors.newCachedThreadPool();
 
 	/**
 	 * 
@@ -68,12 +64,14 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 						subjectsTable.setVisible(false);
 						threadsPanel.changeTableVisible();
 						threadsPanel.setVisible(true);
-						showingSubjectsOfName = subjectsTableModel.getNameOfSubjectInRow(rowSelected) ;
+						showingSubjectsOfName = subjectsTableModel.getNameOfContentInRow(rowSelected) ;
 						container.startWorkingAnimation("retreiving subject " + 
 								showingSubjectsOfName
 								+ " content...");
 
-						final long subjectToLoad = subjectsTableModel.getIDofSubjectInRow(rowSelected);
+						final long subjectToLoad = subjectsTableModel.getIDofContentInRow(rowSelected);
+						subjectsTableModel.setFatherID(subjectToLoad);
+						threadsPanel.updateFather(subjectToLoad);
 						showingSubjectsOfID = subjectToLoad;
 						try {
 							ControllerHandlerFactory.getPipe().getSubjects(subjectToLoad, container);
@@ -106,6 +104,25 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 		Dimension tSubjectsButtonsDimension = new Dimension(85, 35);
 		addNewSubjectButton.setPreferredSize(tSubjectsButtonsDimension);
+
+		addNewSubjectButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				ReplyModifyDialog tNewSubjectDialog =
+					new ReplyModifyDialog(container.getConnectedUser().getID(), subjectsTableModel.getFatherID(), "subject", addNewSubjectButton);
+				tNewSubjectDialog.setVisible(true);
+				if (tNewSubjectDialog.shouldUpdateGUI()) {
+					try {
+						ControllerHandlerFactory.getPipe().getSubjects(subjectsTableModel.getFatherID(), subjectsTable);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				tNewSubjectDialog.dispose();
+			}});
+
+
+
 
 		deleteSubjectButton.setPreferredSize(tSubjectsButtonsDimension);
 		modifySubjectButton.setPreferredSize(tSubjectsButtonsDimension);		
@@ -142,14 +159,42 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)));
 
 
-	}	
+	}
 
-	
+	public void setGuestView(){
+		this.addNewSubjectButton.setVisible(false);
+		this.modifySubjectButton.setVisible(false);
+		this.deleteSubjectButton.setVisible(false);
+		this.threadsPanel.setGuestView();
+	}
+
+	public void setMemberView(){
+		//		this.addNewSubjectButton.setVisible(false);
+		//		this.modifySubjectButton.setVisible(false);
+		//		this.deleteSubjectButton.setVisible(false);
+		this.threadsPanel.setMemberView();
+	}
+
+	/*	public void setAuthorView(){
+		this.addNewSubjectButton.setVisible(false);
+		this.modifySubjectButton.setVisible(false);
+		this.deleteSubjectButton.setVisible(false);
+		this.threadsPanel.setAuthorView();
+	}
+	 */	
+	public void setModeratorOrAdminView(){
+		this.addNewSubjectButton.setVisible(true);
+		this.modifySubjectButton.setVisible(true);
+		this.deleteSubjectButton.setVisible(true);
+		this.threadsPanel.setModeratorOrAdminView();
+	}
+
+
 	public void updateFields(long id, String name) {
 		this.showingSubjectsOfID = id;
 		this.showingSubjectsOfName = name;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see forum.client.ui.events.GUIHandler#notifyError(java.lang.String)
 	 */
@@ -159,9 +204,10 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
-		this.subjectsTable.setVisible(false);
 		this.subjectsTableModel.clearData();
-		if (!encodedView.startsWith("There")) {
+		if (!encodedView.startsWith("There") && !encodedView.startsWith("addsubjectsuccess")) {
+		
+
 			/*	JOptionPane.showMessageDialog(container, "There are no subjects under the subject " + 
 					this.subjectsTableModel.getNameOfSubject(subjectsTable.getSelectionModel().getMinSelectionIndex()), 
 					"no subjects", JOptionPane.INFORMATION_MESSAGE);
@@ -194,6 +240,8 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		}
+				
+		this.subjectsTable.setVisible(false);
 		subjectsTableModel.fireTableDataChanged();
 		this.subjectsTable.setVisible(true);
 		if (showingSubjectsOfID > -1)
@@ -203,7 +251,11 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 			container.stopWorkingAnimation();
 		}
 	}
-	
+
+	public void showActionButtons() {
+
+	}
+
 	private ActionListener linkPressListener() {
 		final String name = showingSubjectsOfName;
 		final long id = showingSubjectsOfID;
@@ -227,6 +279,6 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 			}
 		};	
 	}
-	
+
 
 }

@@ -15,6 +15,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	protected ClientConnectionController connectionController;
 	
+	
 	public synchronized void notifyObservers(GUIEvent event) {
 		setChanged();
 		super.notifyObservers(event);
@@ -90,8 +91,11 @@ public abstract class ControllerHandler extends GUIObservable {
 	 * Adds a new message to the forum.
 	 */
 	public abstract void addNewMessage(Component comp);
-
 	
+	public abstract void addNewSubject(final long userID, final long fatherID, final String name, final String description, final Component comp);
+	
+	public abstract void addNewThread (final long userID, final long subjectID, final String topic, final String title,
+			final String content, final Component comp);
 	public abstract void getActiveUsersNumber();
 	
 	public abstract void searchByAuthor(Component comp, String username);

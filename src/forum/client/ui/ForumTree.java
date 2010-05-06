@@ -527,7 +527,7 @@ public class ForumTree {
 	public void modifyMessage(final JButton button) {
 		//		button.setEnabled(false);
 		MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
-		ForumCell cell = (ForumCell) node.getUserObject();				
+		ForumCell cell = (ForumCell) node.getUserObject();
 		ReplyModifyDialog tModifyDialog = 
 			new ReplyModifyDialog(container.getConnectedUser().getID(), cell.getId(), cell.getTitle(),
 					cell.getContent(), button);

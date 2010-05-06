@@ -44,7 +44,7 @@ public class AddNewSubjectMessage extends ClientMessage {
 		try {
 			forum.addNewSubject(this.userID, this.fatherID, this.subjectName, this.subjectDescription);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The new subject was added successfuly to the forum");
+			returnObj.setResponse("addsubjectsuccess");
 		} 
 		catch (SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);
