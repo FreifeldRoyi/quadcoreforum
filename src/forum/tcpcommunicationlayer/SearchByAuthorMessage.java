@@ -45,9 +45,9 @@ public class SearchByAuthorMessage extends ClientMessage {
 			}
 			else {
 				returnObj.setHasExecuted(true);
-				String tResponse = "";
+				String tResponse = "searchresult\n";
 				for (int i = 0; i < tHits.length; i++)
-					tResponse += tHits[i].getMessage().toString() + "\n";
+					tResponse += "\tARESULTMESSAGE: " + tHits[i].getMessage().toString() + "\n";
 				returnObj.setResponse(tResponse);
 			}
 		}
