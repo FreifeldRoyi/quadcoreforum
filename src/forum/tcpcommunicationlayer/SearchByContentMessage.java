@@ -4,8 +4,6 @@
 package forum.tcpcommunicationlayer;
 
 
-import javax.swing.UIManager;
-
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.search.SearchHit;

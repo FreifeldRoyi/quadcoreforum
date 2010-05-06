@@ -51,7 +51,7 @@ public class AddNewThreadMessage extends ClientMessage {
 		try {
 			forum.openNewThread(this.userID, this.subjectId, this.topic, this.title, this.content);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("The Forum added a new thread with a started message successfuly");
+			returnObj.setResponse("addthreadsuccess");
 		}
 		catch (SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);
