@@ -6,8 +6,8 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.message.NotPermittedException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author sepetnit

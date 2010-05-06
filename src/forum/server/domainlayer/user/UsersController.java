@@ -10,13 +10,13 @@ import java.util.*;
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.ForumDataHandler;
 import forum.server.domainlayer.ForumFacade;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 
 import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.message.NotPermittedException;
 
-import forum.server.persistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 public class UsersController {
 	// the handler through which the class accesses the cache instances through which the operations

@@ -10,11 +10,10 @@ package forum.server.domainlayer.user;
 
 import java.util.*;
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.PersistenceDataHandler;
-import forum.server.persistentlayer.pipe.PersistenceFactory;
-import forum.server.persistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
+import forum.server.updatedpersistentlayer.pipe.PersistenceFactory;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 /**
  * @author Sepetnitsky Vitali
@@ -243,6 +242,7 @@ public class UsersCache {
 				throw new MemberAlreadyExistsException(email); // TODO: throw e-mail already exists exception
 		}
 		catch (DatabaseRetrievalException e) {
+			e.printStackTrace();
 			throw new DatabaseUpdateException();
 		}		
 		final long id = this.getNextFreeMemberID();

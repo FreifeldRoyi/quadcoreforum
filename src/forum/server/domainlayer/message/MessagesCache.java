@@ -11,10 +11,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
 public class MessagesCache {	
 	private final PersistenceDataHandler pipe; // A pipe to the persistence layer
@@ -330,7 +330,7 @@ public class MessagesCache {
 	 * 		In case the database can't be updated due to a database connection error
 	 */
 	public void updateInDatabase(ForumMessage updatedMessage) throws MessageNotFoundException, DatabaseUpdateException {
-		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies());
+		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies(), -1);
 		if (!this.idsToMessagesMapping.containsKey(updatedMessage.getID()))
 			this.idsToMessagesMapping.put(updatedMessage.getID(), updatedMessage);
 	}

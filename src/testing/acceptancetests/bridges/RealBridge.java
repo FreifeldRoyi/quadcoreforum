@@ -10,7 +10,7 @@ import java.util.Vector;
 import forum.server.domainlayer.*;
 import forum.server.domainlayer.interfaces.UIMember;
 import forum.server.domainlayer.interfaces.UIMessage;
-import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
 
 public class RealBridge implements GeneralForumBridge {
 

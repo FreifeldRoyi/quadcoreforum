@@ -15,11 +15,9 @@ import forum.server.domainlayer.message.*;
 import forum.server.domainlayer.search.*;
 
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-
-import forum.server.persistentlayer.pipe.user.exceptions.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
 /**
  * @author Vitali Sepetnitsky

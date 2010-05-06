@@ -8,24 +8,18 @@ package forum.server.updatedpersistentlayer.pipe;
 import java.util.*;
 import java.io.File;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.*;
-import javax.xml.validation.SchemaFactory;
-
 import org.hibernate.SessionFactory;
-import org.xml.sax.SAXException;
+
 import forum.server.Settings;
 
 import forum.server.domainlayer.message.*;
 import forum.server.domainlayer.user.*;
-import forum.server.learning.SessionFactoryUtil;
-import forum.server.persistentlayer.*;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.user.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
-import forum.server.persistentlayer.pipe.user.*;
-import forum.server.persistentlayer.pipe.message.*;
-
-import forum.server.persistentlayer.pipe.user.exceptions.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
 
 /**
  * @author Sepetnitsky Vitali
@@ -52,7 +46,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @throws SAXException
 	 * 		In case a JAXB xml database retrieval error has occurred
 	 */
-	public static JAXBpersistenceDataHandler getInstance() throws JAXBException, SAXException {
+	public static JAXBpersistenceDataHandler getInstance() {
 		JAXBpersistenceDataHandler toReturn = new JAXBpersistenceDataHandler();
 		toReturn.setInternalHandlers(toReturn);
 		return toReturn;
@@ -96,7 +90,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#getUserByID(long)
 	 */
 	public ForumUser getUserByID(final long memberID) throws NotRegisteredException, DatabaseRetrievalException {
-		return this.usersHandler.getUserByID(factory, memberID);
+		return this.usersHandler.getMemberByID(factory, memberID);
 	}
 
 	/**
@@ -122,12 +116,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	public void addNewMember(final long id, final String username, final String password,
 			final String lastName, final String firstName, final String email,
 			final Collection<Permission> permissions) throws DatabaseUpdateException {
-		try {
 			this.usersHandler.addNewMember(factory, id, username, password, lastName, firstName, email, permissions);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
 	}
 
 	/**
@@ -136,12 +125,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 */
 	public void updateUser(final long userID, final Collection<Permission> permissions) throws
 	NotRegisteredException, DatabaseUpdateException {
-		try {
 			this.usersHandler.updateUser(factory, userID, permissions);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
 	}
 
 	// Subject related methods
@@ -175,13 +159,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#addNewSubject(long, String, String, boolean)
 	 */
 	public void addNewSubject(long subjectID, String name, String description, boolean isTopLevel) throws DatabaseUpdateException {
-		try {
 			this.messagesHandler.addNewSubject(factory, subjectID, name, description, isTopLevel);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
-
 	}
 
 	/**
@@ -190,12 +168,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 */
 	public void updateSubject(long id, Collection<Long> subSubjects,
 			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
-		try {
 			this.messagesHandler.updateSubject(factory, id, subSubjects, threads);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
 	}
 
 	// Thread related methods
@@ -221,12 +194,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#openNewThread(long, String, long)
 	 */
 	public void openNewThread(long threadID, String topic, long rootID) throws DatabaseUpdateException {
-		try {
 			this.messagesHandler.openNewThread(factory, threadID, topic, rootID);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
 	}
 
 	/**
@@ -234,13 +202,7 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#deleteAThread(long)
 	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
-		try {
-			Collection<Long> toReturn = this.messagesHandler.deleteAThread(factory, threadID);
-			return toReturn;
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
+			return this.messagesHandler.deleteAThread(factory, threadID);
 	}
 
 	// Message related methods	
@@ -275,26 +237,16 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 */
 	public void addNewMessage(final long messageID, final long userID, final String title, final String content) 
 	throws DatabaseUpdateException {
-		try {
 			this.messagesHandler.addNewMessage(factory, messageID, userID, title, content);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
 	}
 
 	/**
 	 * @see
 	 * 		PersistenceDataHandler#updateMessage(long, String, String)
 	 */
-	public void updateMessage(final long messageID, final String newTitle, final String newContent, final Collection<Long> replies) throws MessageNotFoundException, 
+	public void updateMessage(final long messageID, final String newTitle, final String newContent, final Collection<Long> replies, long threadID) throws MessageNotFoundException, 
 	DatabaseUpdateException {
-		try {
-			this.messagesHandler.updateMessage(factory, messageID, newTitle, newContent, replies);
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
+			this.messagesHandler.updateMessage(factory, messageID, newTitle, newContent, replies, threadID);
 	}
 
 	/**
@@ -302,12 +254,6 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */
 	public Collection<Long> deleteAMessage(final long messageID) throws MessageNotFoundException, DatabaseUpdateException {
-		try {
-			Collection<Long> toReturn = this.messagesHandler.deleteAMessage(factory, messageID);
-			return toReturn;
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
+			return this.messagesHandler.deleteAMessage(factory, messageID);
 	}
 }

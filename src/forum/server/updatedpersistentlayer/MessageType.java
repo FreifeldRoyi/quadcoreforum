@@ -6,6 +6,7 @@ package forum.server.updatedpersistentlayer;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Set;
 
 public class MessageType {
 
@@ -16,7 +17,7 @@ public class MessageType {
   
     protected String content;
    
-    protected List<Long> repliesIDs;
+    protected Set<Long> repliesIDs;
     protected GregorianCalendar postTime;
     protected long threadID; 
 
@@ -142,30 +143,17 @@ public class MessageType {
     /**
      * Gets the value of the repliesIDs property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the repliesIDs property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getRepliesIDs().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Long }
-     * 
+     */
+    public Set<Long> getRepliesIDs() {
+        return this.repliesIDs;
+    }
+
+    /**
+     * Gets the value of the repliesIDs property.
      * 
      */
-    public List<Long> getRepliesIDs() {
-        if (repliesIDs == null) {
-            repliesIDs = new ArrayList<Long>();
-        }
-        return this.repliesIDs;
+    public void setRepliesIDs(Set<Long> repliesIDs) {
+        this.repliesIDs = repliesIDs;
     }
 
 }

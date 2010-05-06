@@ -1,12 +1,15 @@
 package forum.server.updatedpersistentlayer.pipe.message;
 
-import java.util.Collection;
-import java.util.Vector;
+import java.util.*;
 
-import forum.server.persistentlayer.*;
-import forum.server.persistentlayer.pipe.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import org.hibernate.*;
+import org.hibernate.classic.Session;
+
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 import forum.server.domainlayer.message.*;
+import forum.server.learning.TestMessage;
 
 /**
  * This class is responsible of performing the operations of reading from and writing to the database
@@ -21,8 +24,39 @@ import forum.server.domainlayer.message.*;
 
 public class MessagesPersistenceHandler {
 
+	// TODO: The next two methods are common to the users and messages handler, consider to make one class with static methods
+
+	private Session getSessionAndBeginTransaction(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		try {
+			Session toReturn = ssFactory.getCurrentSession();
+			toReturn.beginTransaction();
+			return toReturn;
+		}
+		catch (RuntimeException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	private void commitTransaction(Session session) throws DatabaseUpdateException {
+		try {
+			session.getTransaction().commit();
+		}
+		catch (RuntimeException e) {
+			if (session.getTransaction() != null && session.getTransaction().isActive()) {
+				try {
+					// Second try catch as the roll-back could fail as well
+					session.getTransaction().rollback();
+				}
+				catch (HibernateException e1) {
+					// add logging
+				}
+			}
+			throw new DatabaseUpdateException();
+		}
+	}
+
 	// subject related methods
-	
+
 	/**
 	 * @param data
 	 * 		The forum data from required data should be retrieved
@@ -30,11 +64,20 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeSubjectID()
 	 */
-	public long getFirstFreeSubjectID(ForumType forum) {
+	@SuppressWarnings("unchecked")
+	public long getFirstFreeSubjectID(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		long toReturn = -1;
-		for (SubjectType tCurrentSubject : forum.getSubjects())
-			if (tCurrentSubject.getSubjectID() > toReturn)
-				toReturn = tCurrentSubject.getSubjectID();
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select max(subjectID) from SubjectType";
+		List<Long> tResult = (List<Long>)session.createQuery(query).list();
+		if (tResult.get(0) != null)
+			toReturn = tResult.get(0).longValue();
+		try {
+			this.commitTransaction(session);
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 		return ++toReturn;
 	}
 
@@ -42,27 +85,26 @@ public class MessagesPersistenceHandler {
 	 * @param data
 	 * 		The forum type from which the data should be read
 	 * 
+	 * @throws DatabaseRetrievalException 
+	 * 
 	 * @see
 	 * 		PersistenceDataHandler#getTopLevelSubjects()
 	 */
-	public Collection<ForumSubject> getTopLevelSubjects(ForumType data) {
+	@SuppressWarnings("unchecked")
+	public Collection<ForumSubject> getTopLevelSubjects(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		Collection<ForumSubject> toReturn = new Vector<ForumSubject>();
-		for (SubjectType tCurrentSubjectType : data.getSubjects())
-			if (tCurrentSubjectType.isIsToLevel() && tCurrentSubjectType.getSubjectID() != 0)
-				toReturn.add(PersistentToDomainConverter.convertSubjectTypeToForumSubject(tCurrentSubjectType));
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "from SubjectType where SubjectID != -1 AND isTopLevel = true";
+		List tResult = session.createQuery(query).list();
+		for (SubjectType tCurrentSubjectType : (List<SubjectType>)tResult) 
+			toReturn.add(PersistentToDomainConverter.convertSubjectTypeToForumSubject(tCurrentSubjectType));
+		try {
+			this.commitTransaction(session);
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 		return toReturn;
-	}
-
-	/**
-	 * @param data
-	 * 		The forum type from which the data should be read
-	 * 
-	 * @see
-	 * 		PersistenceDataHandler#getSubjectByID(long)
-	 */
-	public ForumSubject getSubjectByID(ForumType data, long subjectID) throws SubjectNotFoundException {
-		SubjectType tSubjectType = this.getSubjectTypeByID(data, subjectID);		
-		return PersistentToDomainConverter.convertSubjectTypeToForumSubject(tSubjectType);
 	}
 
 	/**
@@ -79,42 +121,89 @@ public class MessagesPersistenceHandler {
 	 * @throws SubjectNotFoundException
 	 * 		In case a subject with the given id doesn't exist in the database
 	 */
-	private SubjectType getSubjectTypeByID(ForumType data, long subjectID) throws SubjectNotFoundException {
-		for (SubjectType tCurrentSubject : data.getSubjects())
-			if (tCurrentSubject.getSubjectID() == subjectID)
-				return tCurrentSubject;
-		throw new SubjectNotFoundException(subjectID);
+	public SubjectType getSubjectTypeByID(Session session, 
+			long subjectID) throws DatabaseRetrievalException {
+		try {
+			return (SubjectType)session.get(SubjectType.class, subjectID);
+		}
+		catch (HibernateException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	/**
+	 * @param data
+	 * 		The forum type from which the data should be read
+	 * 
+	 * @see
+	 * 		PersistenceDataHandler#getSubjectByID(long)
+	 */
+	public ForumSubject getSubjectByID(SessionFactory ssFactory,
+			long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			SubjectType toConvert = this.getSubjectTypeByID(session, subjectID);
+			if (toConvert == null) {
+				this.commitTransaction(session);
+				throw new SubjectNotFoundException(subjectID);
+			}
+			else {
+				ForumSubject toReturn = PersistentToDomainConverter.convertSubjectTypeToForumSubject(toConvert);
+				this.commitTransaction(session);
+				return toReturn;
+			}
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}
 
 	/**
 	 * @param data
 	 * 		The forum data to which the new created subject should be added
+	 * @throws DatabaseUpdateException 
 	 * 
 	 * @see
 	 * 		PersistenceDataHandler#addNewSubject(long, String, String, boolean)
 	 */
-	public void addNewSubject(ForumType data, long subjectID, String name, String description, 
-			boolean isTopLevel) {
-			SubjectType tNewSubject = ExtendedObjectFactory.createSubject(subjectID, name, description, isTopLevel);
-			data.getSubjects().add(tNewSubject);
+	public void addNewSubject(SessionFactory ssFactory, long subjectID, String name, String description, 
+			boolean isTopLevel) throws DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			SubjectType tNewSubjectType = ExtendedObjectFactory.createSubject(subjectID, name, description, isTopLevel);
+			session.save(tNewSubjectType);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
 	 * @param data
 	 * 		The forum data in which the required subject should be updated
+	 * @throws DatabaseUpdateException 
 	 * 
 	 * @see
 	 * 		PersistenceDataHandler#updateSubject(long, Collection, Collection)
 	 */
-	public void updateSubject(ForumType data, long id, Collection<Long> subSubjects,
-			Collection<Long> threads) throws SubjectNotFoundException {
-			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(data, id);
+	public void updateSubject(SessionFactory ssFactory, long id, Collection<Long> subSubjects,
+			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(session, id);
 			// update the sub-subjects
 			tSubjectToUpdate.getSubSubjectsIDs().clear();
 			tSubjectToUpdate.getSubSubjectsIDs().addAll(subSubjects);
 			// update the threads
 			tSubjectToUpdate.getThreadsIDs().clear();
 			tSubjectToUpdate.getThreadsIDs().addAll(threads);
+			session.update(tSubjectToUpdate);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Thread related methods
@@ -122,15 +211,25 @@ public class MessagesPersistenceHandler {
 	/**
 	 * @param data
 	 * 		The forum data from required data should be retrieved
+	 * @throws DatabaseRetrievalException 
 	 * 
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeThreadID()
 	 */
-	public long getFirstFreeThreadID(ForumType forum) {
+	@SuppressWarnings("unchecked")
+	public long getFirstFreeThreadID(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		long toReturn = -1;
-		for (ThreadType tCurrentThread : forum.getThreads())
-			if (tCurrentThread.getThreadID() > toReturn)
-				toReturn = tCurrentThread.getThreadID();
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select max(threadID) from ThreadType";
+		List<Long> tResult = (List<Long>)session.createQuery(query).list();
+		if (tResult.get(0) != null)
+			toReturn = tResult.get(0).longValue();
+		try {
+			this.commitTransaction(session);
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}		
 		return ++toReturn;
 	}
 
@@ -141,9 +240,23 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getThreadByID(long)
 	 */
-	public ForumThread getThreadByID(ForumType data, long threadID) throws ThreadNotFoundException {
-		ThreadType tThreadType = this.getThreadTypeByID(data, threadID);		
-		return PersistentToDomainConverter.convertThreadTypeToForumThread(tThreadType);
+	public ForumThread getThreadByID(SessionFactory ssFactory, long threadID) throws ThreadNotFoundException, DatabaseRetrievalException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			ThreadType toConvert = this.getThreadTypeByID(session, threadID);
+			if (toConvert == null) {
+				this.commitTransaction(session);
+				throw new ThreadNotFoundException(threadID);
+			}
+			else {
+				ForumThread toReturn = PersistentToDomainConverter.convertThreadTypeToForumThread(toConvert);
+				this.commitTransaction(session);
+				return toReturn;
+			}
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}
 
 	/**
@@ -159,12 +272,16 @@ public class MessagesPersistenceHandler {
 	 * 
 	 * @throws ThreadNotFoundException
 	 * 		In case a thread with the given id doesn't exist in the database
+	 * @throws DatabaseRetrievalException 
 	 */
-	private ThreadType getThreadTypeByID(ForumType forum, long threadID) throws ThreadNotFoundException {
-		for (ThreadType tCurrentThread : forum.getThreads())
-			if (tCurrentThread.getThreadID() == threadID)
-				return tCurrentThread;
-		throw new ThreadNotFoundException(threadID);		
+	private ThreadType getThreadTypeByID(Session session,
+			long threadID) throws DatabaseRetrievalException {
+		try {
+			return (ThreadType)session.get(ThreadType.class, threadID);
+		}
+		catch (HibernateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}
 
 	/**
@@ -174,9 +291,17 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#openNewThread(long, String, long)
 	 */
-	public void openNewThread(ForumType data, long threadID, String topic, long rootID) {
-			ThreadType tNewThread = ExtendedObjectFactory.createThreadType(threadID, topic, rootID);
-			data.getThreads().add(tNewThread);
+	public void openNewThread(SessionFactory ssFactory, long threadID, String topic, 
+			long rootID) throws DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			ThreadType tNewThreadType = ExtendedObjectFactory.createThreadType(threadID, topic, rootID);
+			session.save(tNewThreadType);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -186,17 +311,31 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#deleteAThread(long)
 	 */
-	public Collection<Long> deleteAThread(ForumType data, long threadID) throws ThreadNotFoundException {
-			ThreadType tThreadToDelete = this.getThreadTypeByID(data, threadID);
-			// remove the thread
-			data.getThreads().remove(tThreadToDelete);
-			try {
-				// remove the thread's messages recursively
-				return this.deleteAMessage(data, tThreadToDelete.getStartMessageID());
+	public Collection<Long> deleteAThread(SessionFactory ssFactory, 
+			long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			ThreadType tThreadToDelete = this.getThreadTypeByID(session, threadID);
+			if (tThreadToDelete == null) {
+				this.commitTransaction(session);
+				throw new ThreadNotFoundException(threadID);				
 			}
-			catch (MessageNotFoundException e) {
-				return new Vector<Long>();
+			else {
+				long tRootMessageID = tThreadToDelete.getStartMessageID();
+				Collection<Long> toReturn = this.findMessageAndRepliesIDs(ssFactory, tRootMessageID);
+				session.delete(tThreadToDelete);
+				try {
+					this.deleteAMessage(ssFactory, tRootMessageID);
+				}
+				catch (MessageNotFoundException e) {
+					this.commitTransaction(session);
+				}
+				return toReturn;
 			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Message related methods
@@ -208,11 +347,20 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeMessageID()
 	 */
-	public long getFirstFreeMessageID(ForumType forum) {
+	@SuppressWarnings("unchecked")
+	public long getFirstFreeMessageID(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		long toReturn = -1;
-		for (MessageType tCurrentMessage : forum.getMessages())
-			if (tCurrentMessage.getMessageID() > toReturn)
-				toReturn = tCurrentMessage.getMessageID();
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select max(messageID) from MessageType";
+		List<Long> tResult = (List<Long>)session.createQuery(query).list();
+		if (tResult.get(0) != null)
+			toReturn = tResult.get(0).longValue();
+		try {
+			this.commitTransaction(session);
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 		return ++toReturn;
 	}
 
@@ -223,14 +371,23 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getAllMessages()
 	 */
-	public Collection<ForumMessage> getAllMessages(ForumType data) {
+	@SuppressWarnings("unchecked")
+	public Collection<ForumMessage> getAllMessages(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		Collection<ForumMessage> toReturn = new Vector<ForumMessage>();
-		for (MessageType tCurrentMessage : data.getMessages())
-			toReturn.add(
-					PersistentToDomainConverter.convertMessageTypeToForumMessage(tCurrentMessage));
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "from MessageType where MessageID != -1";
+		List tResult = session.createQuery(query).list();
+		for (MessageType tCurrentMessageType : (List<MessageType>)tResult) 
+			toReturn.add(PersistentToDomainConverter.convertMessageTypeToForumMessage(tCurrentMessageType));
+		try {
+			this.commitTransaction(session);
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 		return toReturn;
 	}
-	
+
 	/**
 	 * @param data
 	 * 		The forum data from which the required data should be retrieved
@@ -238,9 +395,24 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */
-	public ForumMessage getMessageByID(ForumType data, long messageID) throws MessageNotFoundException {
-		MessageType tMessageType = this.getMessageTypeByID(data, messageID);
-		return PersistentToDomainConverter.convertMessageTypeToForumMessage(tMessageType);	
+	public ForumMessage getMessageByID(SessionFactory ssFactory, 
+			long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			MessageType toConvert = this.getMessageTypeByID(session, messageID);
+			if (toConvert == null) {
+				this.commitTransaction(session);
+				throw new MessageNotFoundException(messageID);
+			}
+			else {
+				ForumMessage toReturn = PersistentToDomainConverter.convertMessageTypeToForumMessage(toConvert);
+				this.commitTransaction(session);
+				return toReturn;
+			}
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}
 
 	/**
@@ -257,11 +429,14 @@ public class MessagesPersistenceHandler {
 	 * @throws MessageNotFoundException
 	 * 		In case a message with the given id doesn't exist in the database
 	 */
-	private MessageType getMessageTypeByID(ForumType forum, long messageID) throws MessageNotFoundException {
-		for (MessageType tCurrentMessage : forum.getMessages())
-			if (tCurrentMessage.getMessageID() == messageID)
-				return tCurrentMessage;
-		throw new MessageNotFoundException(messageID);
+	private MessageType getMessageTypeByID(Session session, 
+			long messageID) throws DatabaseRetrievalException {
+		try {
+			return (MessageType)session.get(MessageType.class, messageID);
+		}
+		catch (HibernateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}	
 
 	/**
@@ -271,9 +446,17 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#addNewMessage(long, long, String, String)
 	 */
-	public void addNewMessage(ForumType data, long messageID, long userID, String title, String content) {
-			MessageType tNewMessage = ExtendedObjectFactory.createMessageType(messageID, userID, title, content);
-			data.getMessages().add(tNewMessage);
+	public void addNewMessage(SessionFactory ssFactory, long messageID, long authorID, 
+			String title, String content) throws DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			MessageType tNewMessageType = ExtendedObjectFactory.createMessageType(messageID, authorID, title, content);
+			session.save(tNewMessageType);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -283,12 +466,49 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */
-	public void updateMessage(ForumType data, long messageID, String newTitle, String newContent, Collection<Long> replies) throws MessageNotFoundException {
-			MessageType tMsgToEdit = this.getMessageTypeByID(data, messageID);
+	public void updateMessage(SessionFactory ssFactory, long messageID, 
+			String newTitle, String newContent, 
+			Collection<Long> replies, long threadID) throws MessageNotFoundException, DatabaseUpdateException {		
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			MessageType tMsgToEdit = this.getMessageTypeByID(session, messageID);
+			if (tMsgToEdit == null) {
+				this.commitTransaction(session);
+				throw new MessageNotFoundException(messageID);
+			}
 			tMsgToEdit.setTitle(newTitle);
 			tMsgToEdit.setContent(newContent);
-			tMsgToEdit.getRepliesIDs().clear();
-			tMsgToEdit.getRepliesIDs().addAll(replies);
+			tMsgToEdit.setThreadID(threadID);
+			try {
+				this.updateThreadOfReplies(session, tMsgToEdit, replies, threadID);
+				tMsgToEdit.setRepliesIDs(new HashSet<Long>(replies));
+				session.update(tMsgToEdit);
+
+				this.commitTransaction(session);
+			}
+			catch (DatabaseUpdateException e) {
+				this.commitTransaction(session);
+				throw e;
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
+	private void updateThreadOfReplies(Session session, 
+			MessageType toUpdate, Collection<Long> newReplies, long threadID) throws DatabaseUpdateException {
+		try {
+			for (Long tCurrentReplyID : newReplies)
+				if (!toUpdate.getRepliesIDs().contains(tCurrentReplyID)) {
+					MessageType tCurrentReply = this.getMessageTypeByID(session, tCurrentReplyID);
+					tCurrentReply.setThreadID(threadID);
+					session.update(tCurrentReply);
+				}
+		}
+		catch (Exception e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -298,21 +518,51 @@ public class MessagesPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#deleteAMessage(long)
 	 */	
-	public Collection<Long> deleteAMessage(ForumType data, long messageID) throws MessageNotFoundException {
-			Collection<Long> tDeletedMessagesIDs = new Vector<Long>();
-			MessageType tMessageToDelete = this.getMessageTypeByID(data, messageID);
-			// remove the message
-			data.getMessages().remove(tMessageToDelete);
-			// remove the message replies recursively
-			for (long tReplyID : tMessageToDelete.getRepliesIDs()) {
-				try {
-					tDeletedMessagesIDs.addAll(this.deleteAMessage(data, tReplyID));
+	public Collection<Long> deleteAMessage(SessionFactory ssFactory, 
+			long messageID) throws MessageNotFoundException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			try {
+				Collection<Long> tMessagesIDsToDelete = this.findMessageAndRepliesIDs(ssFactory, messageID);
+				MessageType tMessageType = this.getMessageTypeByID(session, messageID);
+				if (tMessageType == null)
+					throw new MessageNotFoundException(messageID);
+				session.delete(tMessageType);
+				for (Long tReplyIDToDelete : tMessagesIDsToDelete) {
+					if (tReplyIDToDelete != messageID) {
+						MessageType tCurrentReply = this.getMessageTypeByID(session, tReplyIDToDelete);
+						try {
+							session.delete(tCurrentReply);
+						}
+						catch (HibernateException e) {
+							//TODO: add logging
+						}
+					}
 				}
-				catch (MessageNotFoundException e) {
-					continue; // do nothing
-				}
+				this.commitTransaction(session);			
+				return tMessagesIDsToDelete;
 			}
-			tDeletedMessagesIDs.add(tMessageToDelete.getMessageID());
-			return tDeletedMessagesIDs;
+			catch (DatabaseRetrievalException e) {
+				this.commitTransaction(session);
+				throw new DatabaseUpdateException();
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
+
+	/* if the message wasn't found - an empty collection will be returned. */
+	private Collection<Long> findMessageAndRepliesIDs(SessionFactory ssFactory, 
+			long messageID) throws DatabaseRetrievalException {
+		Collection<Long> toReturn = new Vector<Long>();
+		MessageType tFatherMessage = this.getMessageTypeByID(ssFactory.getCurrentSession(), messageID);
+		if (tFatherMessage != null) {
+			for (long tReplyID : tFatherMessage.getRepliesIDs()) {
+				toReturn.addAll(this.findMessageAndRepliesIDs(ssFactory, tReplyID));
+			}
+			toReturn.add(messageID);
+		}
+		return toReturn;
+	}	
 }

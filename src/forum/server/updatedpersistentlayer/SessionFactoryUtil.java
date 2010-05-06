@@ -9,7 +9,7 @@ public class SessionFactoryUtil {
 
 	private static org.hibernate.SessionFactory sessionFactory = new Configuration()
 			.configure("forum/server/updatedpersistentlayer/hibernate.cfg.xml").buildSessionFactory();
-
+	
 	private SessionFactoryUtil() {
 	}
 

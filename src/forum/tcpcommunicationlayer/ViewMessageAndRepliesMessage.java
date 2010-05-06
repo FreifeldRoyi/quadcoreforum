@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIMessage;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.pipe.message.exceptions.MessageNotFoundException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
 
 public class ViewMessageAndRepliesMessage extends ClientMessage {
 

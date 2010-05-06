@@ -3,9 +3,8 @@
  */
 package forum.server.updatedpersistentlayer.pipe;
 
-import javax.xml.bind.JAXBException;
+import forum.server.updatedpersistentlayer.SessionFactoryUtil;
 
-import org.xml.sax.SAXException;
 
 
 /**
@@ -22,28 +21,15 @@ public class PersistenceFactory
 	 * Initializes the forum database (in case it hasn't initialized yet, and returns a pipe which
 	 * handles the database operations)
 	 */
-	public static PersistenceDataHandler getPipe() 
-	{
-		if (PERSISTENCE_DATA_HANDLER == null) 
-		{
-			try
-			{
+	public static PersistenceDataHandler getPipe() {
+		if (PERSISTENCE_DATA_HANDLER == null) {
 				PERSISTENCE_DATA_HANDLER = JAXBpersistenceDataHandler.getInstance();
-			} 
-			catch (JAXBException e) 
-			{
-				System.out.println("An error was encountered while" +
-						"connecting to the database, the program will exit!!!");
-				System.exit(-1);
-			}
-			catch (SAXException e) 
-			{
-				System.out.println("An error was encountered while" +
-				" parsing the database file, the program will exit!!!");
-				System.exit(-1);
-			}
 		}
 		return PERSISTENCE_DATA_HANDLER;
+	}
+	
+	public static void closeDatabaseConnection() {
+		SessionFactoryUtil.close();
 	}
 }
 

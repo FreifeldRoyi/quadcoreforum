@@ -51,7 +51,7 @@ public class ForumMember extends ForumUser implements UIMember {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
-		this.postedMessagesIDs = postedMessagesIDs;
+		this.postedMessagesIDs.addAll(postedMessagesIDs);
 	}
 
 	/**

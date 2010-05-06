@@ -45,6 +45,8 @@ public class MemberType {
      * 
      */
     public String getUserType() {
+    	if (userType == null)
+    		return UserType.MEMBER.toString();
         return userType.toString();
     }
     

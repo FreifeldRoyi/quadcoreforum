@@ -15,12 +15,12 @@ import forum.server.domainlayer.*;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.user.*;
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 
 
-import forum.server.persistentlayer.pipe.message.exceptions.*;
-import forum.server.persistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 public class MessagesController {
 

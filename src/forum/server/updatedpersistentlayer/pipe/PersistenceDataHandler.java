@@ -10,12 +10,10 @@ import java.util.*;
 
 import forum.server.domainlayer.user.*;
 import forum.server.domainlayer.message.*;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-
-import forum.server.persistentlayer.pipe.user.exceptions.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
 
 
 /**
@@ -351,8 +349,8 @@ s	 */
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	public void updateMessage(final long messageID, final String newTitle, final String newContent, final Collection<Long> replies) throws MessageNotFoundException, 
-	DatabaseUpdateException;
+	public void updateMessage(final long messageID, final String newTitle, final String newContent, 
+			final Collection<Long> replies, long threadID) throws MessageNotFoundException, DatabaseUpdateException;
 
 	/**
 	 * Deletes a message whose id equals to the given one, from the database

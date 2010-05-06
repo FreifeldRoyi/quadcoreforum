@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIMember;
-import forum.server.persistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 
 /**
  * @author sepetnit

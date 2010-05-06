@@ -1,22 +1,17 @@
 
 package forum.server.updatedpersistentlayer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+import java.util.Set;
 
 public class SubjectType
     
 {
 
     protected long subjectID;
-    protected List<Long> subSubjectsIDs;
- 
-    protected List<Long> threadsIDs;
+    protected Set<Long> subSubjectsIDs; 
+    protected Set<Long> threadsIDs;
     protected Long lastAddedMessageID;
     protected boolean isTopLevel;
-  
     protected String name;
     protected String description;
   
@@ -86,62 +81,33 @@ public class SubjectType
 
     /**
      * Gets the value of the subSubjectsIDs property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the subSubjectsIDs property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSubSubjectsIDs().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Long }
-     * 
-     * 
-     */
-    public List<Long> getSubSubjectsIDs() {
-        if (subSubjectsIDs == null) {
-            subSubjectsIDs = new ArrayList<Long>();
-        }
+     */ 
+    public Set<Long> getSubSubjectsIDs() {
         return this.subSubjectsIDs;
     }
 
     /**
+     * Sets the value of the subSubjectsIDs property.
+     */ 
+    public void setSubSubjectsIDs(Set<Long> subSubjectsIDs) {
+        this.subSubjectsIDs = subSubjectsIDs;
+    }    
+    
+    /**
      * Gets the value of the threadsIDs property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the threadsIDs property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getThreadsIDs().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Long }
-     * 
-     * 
      */
-    public List<Long> getThreadsIDs() {
-        if (threadsIDs == null) {
-            threadsIDs = new ArrayList<Long>();
-        }
+    public Set<Long> getThreadsIDs() {
         return this.threadsIDs;
     }
 
+    /**
+     * Sets the value of the subSubjectsIDs property.
+     */ 
+    public void setThreadsIDs(Set<Long> threadsIDs) {
+        this.threadsIDs = threadsIDs;
+    }    
+    
     /**
      * Gets the value of the lastAddedMessageID property.
      * 

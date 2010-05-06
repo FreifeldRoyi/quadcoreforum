@@ -8,8 +8,8 @@ import java.util.Iterator;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIThread;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.pipe.message.exceptions.SubjectNotFoundException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 
 /**
  * @author sepetnit

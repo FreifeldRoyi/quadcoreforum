@@ -1,8 +1,8 @@
 package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
 
 /**
  * @author Lital Badash

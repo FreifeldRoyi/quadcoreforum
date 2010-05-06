@@ -13,9 +13,8 @@ import java.util.Set;
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.message.*;
 import forum.server.domainlayer.user.*;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
 
 /**
  * @author Vitali Sepetnitsky

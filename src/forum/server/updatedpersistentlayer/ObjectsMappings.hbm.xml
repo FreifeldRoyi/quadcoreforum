@@ -6,40 +6,52 @@
     <class name="ThreadType" table="Threads">
 
   <id name="threadID" column="threadID" >
-    <generator class="increment"/>
   </id>
   <property name="topic" column="topic" ></property>
-  <property name="startMessageID" column="StartMessageID" ></property>
-   <property name="lastMessageID" column="LastMessageID" ></property>
+  <property name="startMessageID" column="StartMessageID"></property>
+  <property name="lastMessageID" column="LastMessageID" ></property>
     <property name="numOfViews" column="numOfViews" ></property>
     <property name="numOfResponses" column="numOfResponses" ></property>
   </class>
     <class name="SubjectType" table="subjects">
 
   <id name="subjectID" column="SubjectID" >
-    <generator class="increment"/>
   </id>
   <property name="lastAddedMessageID" column="lastAddedMessageID" ></property>
    <property name="isTopLevel" column="isTopLevel" ></property>
      <property name="name" column="Name" ></property>
        <property name="description" column="Description" ></property>
+            <set name="subSubjectsIDs" table="subsubjects">
+            <key column="FatherID"></key>
+            <element type="long" column="SubSubjectID"></element>
+        </set>      
+            <set name="threadsIDs" table="subjectsthreads">
+            <key column="SubjectID"></key>
+            <element type="long" column="ThreadID"></element>
+        </set>      
+       
+       
   </class>
    <class name="MessageType" table="messages">
 
   <id name="messageID" column="MessageID" >
-    <generator class="increment"/>
   </id>
   <property name="authorID" column="AuthorID" ></property>
    <property name="title" column="Title" ></property>
      <property name="content" column="Content" ></property>
        <property name="postTime" column="PostTime" ></property>
         <property name="threadID" column="ThreadID" ></property>
+        
+            <set name="repliesIDs" table="replies">
+            <key column="FatherID"></key>
+            <element type="long" column="ReplyID"></element>
+        </set>      
+  
   </class>
   
    <class name="MemberType" table="members">
 
   <id name="userID" column="UserID" >
-    <generator class="increment"/>
   </id>
   <property name="username" column="Username" ></property>
    <property name="email" column="Email" ></property>
@@ -51,9 +63,7 @@
       <set name="permissions" table="UsersPermissions">
             <key column="UserID"></key>
             <element type="string" column="Permission"/>
-        </set>      
-        
-        
+        </set>        
   </class>
   
   
@@ -67,10 +77,4 @@
   
    
    <!-- belongs to the messages class: protected List<Long> repliesIDs;-->
-  
-
-  
- <!--  belong to the threads table: protected List<Long> subSubjectsIDs; -->
- 
- <!--    belong to the threads table: protected List<Long> threadsIDs; -->
   

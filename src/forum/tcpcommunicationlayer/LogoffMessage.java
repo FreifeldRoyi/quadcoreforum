@@ -2,7 +2,7 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIUser;
-import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
 
 /**
  * @author Tomer Heber

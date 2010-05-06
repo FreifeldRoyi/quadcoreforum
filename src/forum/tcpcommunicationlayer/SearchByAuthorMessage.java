@@ -5,8 +5,8 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.search.SearchHit;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author sepetnit

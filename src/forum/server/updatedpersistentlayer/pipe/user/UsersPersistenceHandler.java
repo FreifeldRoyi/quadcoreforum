@@ -2,17 +2,14 @@ package forum.server.updatedpersistentlayer.pipe.user;
 
 import java.util.*;
 
-import org.apache.commons.collections.Factory;
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.classic.Session;
 
-import forum.server.learning.Message;
-import forum.server.learning.SessionFactoryUtil;
 import forum.server.updatedpersistentlayer.*;
+import forum.server.domainlayer.message.ForumSubject;
 import forum.server.domainlayer.user.*;
 import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 /**
@@ -25,46 +22,7 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
  */
 public class UsersPersistenceHandler {
 
-	private void addMember(Session session, MemberType toAdd) throws DatabaseUpdateException {
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			session.save(toAdd);
-			tx.commit();
-		} catch (RuntimeException e) {
-			if (tx != null && tx.isActive()) {
-				try {
-					// Second try catch as the rollback could fail as well
-					tx.rollback();
-				} catch (HibernateException e1) {
-					// add logging
-				}
-				throw new DatabaseUpdateException();
-			}
-		}
-	}
-
-	private void updateMember(Session session, MemberType toUpdate) 
-	throws DatabaseUpdateException {
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			session.update(toUpdate);
-			tx.commit();
-		} catch (RuntimeException e) {
-			if (tx != null && tx.isActive()) {
-				try {
-					// Second try catch as the rollback could fail as well
-					tx.rollback();
-				} catch (HibernateException e1) {
-					// add logging
-				}
-				throw new DatabaseUpdateException();
-			}
-		}
-	}
-
-	private void deleteMember(Session session, MemberType toDelete) throws DatabaseUpdateException {
+	/*	private void deleteMember(Session session, MemberType toDelete) throws DatabaseUpdateException {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -82,29 +40,6 @@ public class UsersPersistenceHandler {
 				throw new DatabaseUpdateException();
 			}
 		}
-	}
-
-	/*	private static List executeQuery(Session session, String query) {
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			List tResult = session.createQuery(query).list();
-			tx.commit();
-			return tResult;			
-		} 
-		catch (RuntimeException e) {
-			if (tx != null && tx.isActive()) {
-				try {
-					// Second try catch as the rollback could fail as well
-					tx.rollback();
-				} catch (HibernateException e1) {
-				// add logging
-				}
-				// throw again the first exception
-				throw e;
-			}
-		}
-		return null;
 	}
 	 */
 
@@ -171,7 +106,7 @@ public class UsersPersistenceHandler {
 	public Collection<ForumMember> getAllMembers(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		Collection<ForumMember> toReturn = new Vector<ForumMember>();
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
-		String query = "from MemberType";
+		String query = "from MemberType where UserID != -1";
 		List tResult = session.createQuery(query).list();
 		for (MemberType tCurrentMemberType : (List<MemberType>)tResult) 
 			toReturn.add(PersistentToDomainConverter.convertMemberTypeToForumMember(tCurrentMemberType));
@@ -184,6 +119,16 @@ public class UsersPersistenceHandler {
 		return toReturn;
 	}
 
+	private MemberType getMemberTypeByID(final Session session, final long userID) throws 
+	DatabaseRetrievalException {
+		try {
+			return (MemberType)session.get(MemberType.class, userID);
+		}
+		catch (HibernateException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
 	/**
 	 * @param data
 	 * 		The forum data from which the required user should be retrieved
@@ -191,31 +136,26 @@ public class UsersPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getUserByID(long)
 	 */
-	public ForumUser getUserByID(SessionFactory ssFactory, long userID) throws NotRegisteredException, 
+	public ForumMember getMemberByID(SessionFactory ssFactory, long userID) throws NotRegisteredException, 
 	DatabaseRetrievalException {
-		Session session = this.getSessionAndBeginTransaction(ssFactory);		
-		MemberType tResult = (MemberType)session.load(MemberType.class, userID);
-		if (tResult == null) {
-			try {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			MemberType tMemberType = this.getMemberTypeByID(session, userID);
+			if (tMemberType == null) {
 				this.commitTransaction(session);
+				throw new NotRegisteredException(userID);
 			}
-			catch (DatabaseUpdateException e) {
-				throw new DatabaseRetrievalException();
+			else {
+				ForumMember toReturn = PersistentToDomainConverter.convertMemberTypeToForumMember(tMemberType);
+				this.commitTransaction(session);
+				return toReturn;
 			}
-			throw new NotRegisteredException(userID);
 		}
-		else {
-			ForumUser toReturn = PersistentToDomainConverter.convertMemberTypeToForumMember(tResult);
-			try {
-				this.commitTransaction(session);
-			} 
-			catch (DatabaseUpdateException e) {
-				throw new DatabaseRetrievalException();
-			}
-			return toReturn;
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
 		}
 	}
-	
+
 	/**
 	 * @param data
 	 * 		The forum data from which the required member should be retrieved
@@ -223,13 +163,14 @@ public class UsersPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#getMemberByUsername(String)
 	 */
+	@SuppressWarnings("unchecked")
 	private ForumMember getMemberByField(final SessionFactory ssFactory, final String field, 
 			final String value) throws NotRegisteredException, DatabaseRetrievalException {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
-		String query = "from MemberType where " + field  + " = " + value;
+		String query = "from MemberType where " + field  + " like '" + value + "'";
 		List tResult = session.createQuery(query).list();
 		if (tResult.size() != 1)
-			throw new DatabaseRetrievalException();
+			throw new NotRegisteredException(field);
 		else {
 			ForumMember toReturn = 
 				PersistentToDomainConverter.convertMemberTypeToForumMember((MemberType)tResult.get(0));
@@ -242,7 +183,7 @@ public class UsersPersistenceHandler {
 			return toReturn;
 		}
 	}
-	
+
 	/**
 	 * @param data
 	 * 		The forum data from which the required member should be retrieved
@@ -267,7 +208,6 @@ public class UsersPersistenceHandler {
 	NotRegisteredException, DatabaseRetrievalException {
 		return this.getMemberByField(ssFactory, "Email", email);
 	}
-		
 
 	/**
 	 * @param data
@@ -277,34 +217,17 @@ public class UsersPersistenceHandler {
 	 * 		PersistenceDataHandler#addNewMember(long, String, String, String, String, String, Collection)
 	 */
 	public void addNewMember(final SessionFactory ssFactory, final long id, final String username, final String password,
-			final String lastName, final String firstName, final String email, final Collection<Permission> permissions) {
-		this.getSessionAndBeginTransaction(ssFactory);
-		
+			final String lastName, final String firstName, final String email, 
+			final Collection<Permission> permissions) throws DatabaseUpdateException {
 		try {
-			tx = session.beginTransaction();
-			session.save(toAdd);
-			tx.commit();
-		} catch (RuntimeException e) {
-			if (tx != null && tx.isActive()) {
-				try {
-					// Second try catch as the rollback could fail as well
-					tx.rollback();
-				} catch (HibernateException e1) {
-					// add logging
-				}
-				throw new DatabaseUpdateException();
-			}
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, firstName, email, permissions);
+			session.save(tNewMemberType);
+			this.commitTransaction(session);
 		}
-		
-		
-		
-		
-		
-		
-		
-		MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, 
-				firstName, email, permissions);
-		data.getMembers().add(tNewMemberType);
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -330,10 +253,18 @@ public class UsersPersistenceHandler {
 	 * @see
 	 * 		PersistenceDataHandler#updateUser(long, Collection)
 	 */
-	public void updateUser(final SessionFactory data, final long userID, final Collection<Permission> permissions)
-	throws NotRegisteredException {
-		MemberType tMemberToUpdate = this.getMemberTypeByID(data, userID);
-		tMemberToUpdate.getPrivileges().clear();
-		tMemberToUpdate.getPrivileges().addAll(this.parsePermissionsToString(permissions));
+	public void updateUser(final SessionFactory ssFactory, final long userID, final Collection<Permission> permissions)
+	throws NotRegisteredException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			MemberType tMemberToUpdate = this.getMemberTypeByID(session, userID);
+			tMemberToUpdate.getPermissions().clear();
+			tMemberToUpdate.getPermissions().addAll(this.parsePermissionsToString(permissions));
+			session.update(tMemberToUpdate);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 }

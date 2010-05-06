@@ -6,9 +6,9 @@ import java.util.Iterator;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UISubject;
 import forum.server.domainlayer.interfaces.UIThread;
-import forum.server.persistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
 public class ViewSubjectContentMessage extends ClientMessage {
 

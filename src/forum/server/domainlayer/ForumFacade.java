@@ -5,10 +5,10 @@ import forum.server.domainlayer.search.*;
 import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.message.NotPermittedException;
 
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
 /**
  * With this interface the Controller layer of the server communicates with the domain layer.  

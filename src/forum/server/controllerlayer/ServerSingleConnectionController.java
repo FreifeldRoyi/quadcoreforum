@@ -4,20 +4,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Collection;
-import java.util.Queue;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;
-import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
 import forum.tcpcommunicationlayer.ClientMessage;
-import forum.tcpcommunicationlayer.GuestsAndMembersNumberMessage;
 import forum.tcpcommunicationlayer.ServerResponse;
-import forum.tcpcommunicationlayer.ViewAllMembersMessage;
 
 /**
  * This class handles a single TCP connection between a client and the server.

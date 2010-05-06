@@ -6,8 +6,8 @@ import java.net.Socket;
 
 import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.MainForumLogic;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.PersistenceFactory;
 
 /**
  * This class runs the server (currently set to port 1234).
@@ -37,6 +37,7 @@ public class ServerConnectionController extends Thread {
 		catch (DatabaseUpdateException e) {
 			SystemLogger.severe("An error has occurred in the server (DatabaseUpdateException).");	
 		}
+		PersistenceFactory.closeDatabaseConnection();
 		SystemLogger.info("Server has closed.");
 	}
 

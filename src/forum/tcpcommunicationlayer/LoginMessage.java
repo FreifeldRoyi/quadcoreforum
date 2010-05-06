@@ -3,9 +3,9 @@ package forum.tcpcommunicationlayer;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIMember;
 import forum.server.domainlayer.user.Permission;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
-import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.WrongPasswordException;
 
 /**
  * @author Lital Badash
