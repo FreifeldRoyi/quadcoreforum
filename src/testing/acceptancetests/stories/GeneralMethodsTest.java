@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import forum.server.Settings;
 import forum.server.domainlayer.SystemLogger;
+import forum.server.updatedpersistentlayer.SessionFactoryUtil;
 
 import testing.acceptancetests.bridges.*;
 import junit.framework.TestCase;
@@ -18,9 +19,9 @@ import junit.framework.TestCase;
  *
  */
 public class GeneralMethodsTest extends TestCase {
-	
+
 	private GeneralForumBridge implementationBridge;
-	
+
 	/**
 	 * This method is called before the tests execution, it switches the forum
 	 * database to be a new test database used for testing purposes only
@@ -29,8 +30,9 @@ public class GeneralMethodsTest extends TestCase {
 	protected void setUp() throws Exception {
 		SystemLogger.info("Switching to test database ...");
 		Settings.switchToTestMode();
+		this.implementationBridge = new ProxyBridge();
 	}
-	
+
 	/**
 	 * 
 	 * Switches the database to be the regular one.
@@ -40,16 +42,16 @@ public class GeneralMethodsTest extends TestCase {
 	 */
 	protected void tearDown() throws Exception {
 		Settings.switchToRegularMode();
+		SessionFactoryUtil.close();
 		SystemLogger.info("The database was switched back to regular");
 	}
-	
+
 	/**
 	 * The constructor of all the tests, initializes the bridge by a proxy bridge which is common to
 	 * all the tests and is connected to the implementation.
 	 */
 	public GeneralMethodsTest() {
 		super();
-		this.implementationBridge = ProxyBridge.getProxyBridge();
 	}
 
 	/**

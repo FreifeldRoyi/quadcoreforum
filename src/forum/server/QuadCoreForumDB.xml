@@ -148,6 +148,15 @@
         <privileges>REPLY_TO_MESSAGE</privileges>
         <privileges>OPEN_THREAD</privileges>
     </members>
+    <members>
+        <userID>10</userID>
+        <username>user1</username>
+        <e-mail>f1@f</e-mail>
+        <password>abc</password>
+        <lastName>a1</lastName>
+        <firstName>b1</firstName>
+        <numOfPostedMessages>0</numOfPostedMessages>
+    </members>
     <subjects>
         <name>name</name>
         <description>description</description>
