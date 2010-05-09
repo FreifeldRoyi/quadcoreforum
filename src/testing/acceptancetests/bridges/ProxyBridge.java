@@ -25,19 +25,6 @@ public class ProxyBridge implements GeneralForumBridge {
 	private boolean user2LoginInfo; // used for the stub implementation
 	private boolean replyAddedInfo; // used for the stub implementation
 	
-	private static ProxyBridge SINGLE_PROXY_BRIDGE = null;
-
-	/**
-	 * 
-	 * @return
-	 * 		A single instance of a ProxyBridge class
-	 */
-	public static ProxyBridge getProxyBridge() {
-		if (ProxyBridge.SINGLE_PROXY_BRIDGE == null)
-			ProxyBridge.SINGLE_PROXY_BRIDGE = new ProxyBridge();
-		return ProxyBridge.SINGLE_PROXY_BRIDGE;
-	}
-
 	/**
 	 * The ProxyBridge class constructor, initializes the this.realBridge variable by looking for a class
 	 * named RealBridge which implements the {@link GeneralForumBridge} interface.
@@ -47,9 +34,8 @@ public class ProxyBridge implements GeneralForumBridge {
 	 * Otherwise, if the RealBridge class isn't found or is corrupted, the realBridge is set to null and all
 	 * the methods of the ProxyBridge will be stubs - will return stub values needed for passing the tests. 
 	 * 
-	 * The constructor is private and is called by a factory method (Singleton design pattern)
 	 */
-	private ProxyBridge() {
+	public ProxyBridge() {
 		try {
 			SystemLogger.info("Switching to test database ...");
 			Class<?> tRealBridgeClass = 

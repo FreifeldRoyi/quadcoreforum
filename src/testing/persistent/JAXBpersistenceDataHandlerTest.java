@@ -14,9 +14,9 @@ import org.junit.Test;
 import forum.server.Settings;
 import forum.server.domainlayer.user.ForumMember;
 import forum.server.domainlayer.user.Permission;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.*;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.*;
 
 /**
  * @author Sepetnitsky Vitali

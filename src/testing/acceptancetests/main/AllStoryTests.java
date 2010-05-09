@@ -4,8 +4,8 @@
  */
 package testing.acceptancetests.main;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import testing.acceptancetests.stories.*;
 
 /**
@@ -13,7 +13,14 @@ import testing.acceptancetests.stories.*;
  * 		Sepetnitsky Vitali 310106745
  *
  */
-@RunWith(Suite.class)
-// Here the test classes which should be tested, are added
-@Suite.SuiteClasses({LoginLogoutTestStory.class, ReplyToMessageTestStory.class})
-public class AllStoryTests {}
+
+public class AllStoryTests {
+	public static Test suite() {
+		TestSuite suite = new TestSuite("acceptance-tests");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(LoginLogoutTestStory.class);
+		suite.addTestSuite(ReplyToMessageTestStory.class);
+		//$JUnit-END$
+		return suite;
+	}
+}

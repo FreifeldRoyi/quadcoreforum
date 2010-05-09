@@ -7,14 +7,24 @@ import org.hibernate.cfg.Configuration;
 
 public class SessionFactoryUtil {
 
-	private static org.hibernate.SessionFactory sessionFactory = new Configuration()
-			.configure("forum/server/updatedpersistentlayer/hibernate.cfg.xml").buildSessionFactory();
-	
-	private SessionFactoryUtil() {
-	}
+	private static org.hibernate.SessionFactory sessionFactory = null;
 
 	public static SessionFactory getInstance() {
+		if (sessionFactory == null) {
+			sessionFactory = new Configuration()
+			.configure("forum/server/updatedpersistentlayer/hibernate.cfg.xml").buildSessionFactory();
+		
+			
+		}
 		return sessionFactory;
+	}
+	
+	public static void reconnectToOtherDatabase(String databaseName) {
+		SessionFactoryUtil.close();
+		Configuration tConfig = new Configuration()
+		.configure("forum/server/updatedpersistentlayer/hibernate.cfg.xml");
+		tConfig.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/" + databaseName);
+		sessionFactory = tConfig.buildSessionFactory();
 	}
 
 	public Session openSession() {

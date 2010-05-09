@@ -6,8 +6,6 @@ import java.util.logging.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 

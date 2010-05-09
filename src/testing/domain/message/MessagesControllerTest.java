@@ -18,12 +18,9 @@ import forum.server.domainlayer.user.*;
 import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.interfaces.UISubject;
 import forum.server.domainlayer.message.*;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.message.exceptions.MessageNotFoundException;
-import forum.server.persistentlayer.pipe.message.exceptions.SubjectNotFoundException;
-import forum.server.persistentlayer.pipe.message.exceptions.ThreadNotFoundException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author sepetnit

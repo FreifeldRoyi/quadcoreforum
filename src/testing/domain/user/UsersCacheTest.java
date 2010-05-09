@@ -16,10 +16,8 @@ import forum.server.domainlayer.user.ForumMember;
 import forum.server.domainlayer.user.ForumUser;
 import forum.server.domainlayer.user.Permission;
 import forum.server.domainlayer.user.UsersCache;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 /**
  * @author sepetnit
@@ -156,21 +154,13 @@ public class UsersCacheTest extends TestCase {
 		final int tCreatedMembersNumber = 3;
 		final Collection<ForumUser> tCreatedUsers = new HashSet<ForumUser>();
 
+		
 		for (int i = 1; i < tCreatedMembersNumber; i++) {
 			final ForumUser tCurrentUser = this.cache.createNewGuest(UsersCacheTest.DEFAULT_PERMISSIONS);
 			tCreatedUsers.add(tCurrentUser);
 		}
 		try {
 			final Collection<ForumUser> tObtainedUsers = this.cache.getAllUsers();
-			Iterator<ForumUser> tObtainedUsersIter = tObtainedUsers.iterator();
-			ForumUser tCurrentUser = null;
-			while(tObtainedUsersIter.hasNext()) { // remove the default user which is always returned from the database
-				tCurrentUser = tObtainedUsersIter.next();
-				if (tCurrentUser.getID() == 0)
-					break;
-			}
-			if (tCurrentUser != null)
-				tObtainedUsers.remove(tCurrentUser);
 			assertEquals(tCreatedUsers, tObtainedUsers);
 		}
 		catch (DatabaseRetrievalException e) {

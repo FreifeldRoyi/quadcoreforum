@@ -14,12 +14,8 @@ import forum.server.domainlayer.ForumDataHandler;
 import forum.server.domainlayer.interfaces.UIMember;
 import forum.server.domainlayer.interfaces.UIUser;
 import forum.server.domainlayer.user.UsersController;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
-import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotConnectedException;
-import forum.server.persistentlayer.pipe.user.exceptions.NotRegisteredException;
-import forum.server.persistentlayer.pipe.user.exceptions.WrongPasswordException;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 /**
  * @author sepetnit

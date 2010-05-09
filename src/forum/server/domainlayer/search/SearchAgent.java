@@ -5,8 +5,6 @@
 package forum.server.domainlayer.search;
 
 import forum.server.domainlayer.interfaces.UIMessage;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
 
 /**
  * @author sepetnit
@@ -15,7 +13,7 @@ import forum.server.persistentlayer.DatabaseUpdateException;
 public class SearchAgent implements SearchEngine {
 
 	/* An implementation of the search engine which manages the engine internally */
-	private SearchEngine searchEngine;	
+	private SearchEngine searchEngine;
 	
 	/**
 	 * Constructs new search agent
