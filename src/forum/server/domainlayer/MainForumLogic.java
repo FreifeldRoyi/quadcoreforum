@@ -4,7 +4,13 @@
  */
 package forum.server.domainlayer;
 
+import java.io.File;
 import java.util.*;
+
+import org.compass.core.Compass;
+import org.compass.core.config.CompassConfiguration;
+import org.compass.core.config.CompassConfigurationFactory;
+import org.compass.core.engine.SearchEngineIndexManager;
 
 import forum.server.domainlayer.SystemLogger;
 
@@ -13,6 +19,7 @@ import forum.server.domainlayer.interfaces.*;
 import forum.server.domainlayer.user.*;
 import forum.server.domainlayer.message.*;
 import forum.server.domainlayer.search.*;
+import forum.server.domainlayer.search.cmpssearch.CompassAdapter;
 
 
 import forum.server.updatedpersistentlayer.*;
@@ -54,12 +61,21 @@ public class MainForumLogic implements ForumFacade {
 	 * 		In case a connection with the forum database can't be established
 	 * @throws DatabaseUpdateException 
 	 * 		In case a connection error with the forum database has occurred
-	 * @throws  
 	 */
 	private MainForumLogic() throws DatabaseRetrievalException, DatabaseUpdateException {
 		try {
 			ForumDataHandler tDataHandler = new ForumDataHandler();
-			this.searchController = new SearchAgent();
+			
+			File tFile = new File("src/forum/server/domainlayer/search/cmpssearch/compassSettings.xml");
+			CompassConfiguration tConf = CompassConfigurationFactory.newConfiguration().configure(tFile);               
+			Compass compass = tConf.buildCompass();
+			SearchEngineIndexManager tIndexManager = compass.getSearchEngineIndexManager();
+			
+			if (tIndexManager != null)
+				tIndexManager.deleteIndex();
+			
+			this.searchController = new CompassAdapter(compass);
+			
 			this.usersController = new UsersController(tDataHandler);
 			this.messagesController = new MessagesController(tDataHandler);
 			

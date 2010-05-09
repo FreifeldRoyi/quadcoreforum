@@ -5,13 +5,22 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.compass.annotations.Searchable;
+import org.compass.annotations.SearchableId;
+import org.compass.annotations.SearchableProperty;
+
 import forum.server.domainlayer.interfaces.UIMessage;
 
+@Searchable
 public class ForumMessage implements UIMessage {
 	
 	private long messageID;
+	
 	private long authorID;
+	
+	
 	private String title;
+	
 	private String content;
 
 	private GregorianCalendar postTime;

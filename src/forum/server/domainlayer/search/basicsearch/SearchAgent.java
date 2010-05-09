@@ -2,20 +2,21 @@
  * This class is a proxy class, it delegates the calls to the search engine methods,
  * to an implementation class which it holds as a private field.
  */
-package forum.server.domainlayer.search;
+package forum.server.domainlayer.search.basicsearch;
 
 import forum.server.domainlayer.interfaces.UIMessage;
-import forum.server.persistentlayer.DatabaseRetrievalException;
-import forum.server.persistentlayer.DatabaseUpdateException;
+import forum.server.domainlayer.search.SearchEngine;
+import forum.server.domainlayer.search.SearchHit;
+import forum.server.domainlayer.search.basicsearch.BasicSearchEngine;
 
 /**
  * @author sepetnit
  *
  */
-public class SearchAgent implements SearchEngine {
-
+public class SearchAgent implements SearchEngine 
+{
 	/* An implementation of the search engine which manages the engine internally */
-	private SearchEngine searchEngine;	
+	private SearchEngine searchEngine;
 	
 	/**
 	 * Constructs new search agent

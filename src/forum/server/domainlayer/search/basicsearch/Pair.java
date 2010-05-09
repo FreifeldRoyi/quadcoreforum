@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forum.server.domainlayer.search;
+package forum.server.domainlayer.search.basicsearch;
 
 /**
  * @author Freifeld Royi

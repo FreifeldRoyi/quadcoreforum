@@ -1,12 +1,14 @@
 /**
  * 
  */
-package forum.server.domainlayer.search;
+package forum.server.domainlayer.search.basicsearch;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import forum.server.domainlayer.interfaces.UIMessage;
+import forum.server.domainlayer.search.SearchEngine;
+import forum.server.domainlayer.search.SearchHit;
 
 /**
  * @author Royi Freifeld <br></br>

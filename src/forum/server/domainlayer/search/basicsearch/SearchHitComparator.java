@@ -1,9 +1,11 @@
 /** 
   *  
   */ 
- package forum.server.domainlayer.search; 
+ package forum.server.domainlayer.search.basicsearch; 
   
  import java.util.Comparator; 
+
+import forum.server.domainlayer.search.SearchHit;
   
  /** 
   * @author Royi Freifeld 
