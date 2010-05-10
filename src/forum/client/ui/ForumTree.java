@@ -52,6 +52,8 @@ import forum.server.domainlayer.SystemLogger;
  */
 public class ForumTree implements GUIHandler {
 
+	private long fatherSubjectID;
+	
 	/**
 	 * The JTree GUI component.
 	 */
@@ -89,7 +91,9 @@ public class ForumTree implements GUIHandler {
 		//catch (Exception e) {}
 	}
 
-
+	public void setFatherID(final long fatherSubjectID) {
+		this.fatherSubjectID = fatherSubjectID;
+	}
 
 	public ForumTree(final MainPanel container) {
 
@@ -583,22 +587,35 @@ public class ForumTree implements GUIHandler {
 	 */
 	public void deleteMessage(final JButton button) {
 		//		button.setEnabled(false);
-		if (JOptionPane.showConfirmDialog(this.m_panel, "Are you sure you want to delete the message?", "delete",
+		final MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+
+		if (m_tree.getModel().getRoot() == node) {
+			if (JOptionPane.showConfirmDialog(this.m_panel, "Deleting this message will delete the entire thread,\n" +
+					"are you sure you want to continue?", "delete",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
+						JOptionPane.NO_OPTION) {
+				button.setEnabled(true);
+				return;
+			}
+		}
+		else if (JOptionPane.showConfirmDialog(this.m_panel, "Are you sure you want to delete the message?", "delete",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
 					JOptionPane.NO_OPTION) {
 			button.setEnabled(true);
-			return;			
+			return;
 		}
 
-		final MessageTreeNode node = (MessageTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+
 		final MessageTreeNode parent = (MessageTreeNode) node.getParent();
 
 		final ForumCell cell = (ForumCell) node.getUserObject();
 		final ForumCell parentCell = parent != null? (ForumCell) ((MessageTreeNode)parent).getUserObject() : null; 
 
 
-		System.out.println(cell.getTitle());
-		System.out.println(parentCell.getTitle());
+		System.out.println("PARENTCELL = " + parentCell);
+		
+	//	System.out.println(cell.getTitle());
+	//	System.out.println(parentCell.getTitle());
 
 		pipe.addObserver(new GUIObserver(new GUIHandler() {
 			public void notifyError(String errorMessage) {
@@ -609,31 +626,38 @@ public class ForumTree implements GUIHandler {
 
 			public void refreshForum(final String encodedView) {
 
-
 				if (encodedView.startsWith("deletesuccess")) {
 					pipe.deleteObserver(this);
 					new Thread(new Runnable() {
 						public void run() {
-							synchronized (parent) {
-								pipe.addObserver(new GUIObserver(parent), EventType.MESSAGES_UPDATED);
-
-								System.out.println("id " + parentCell.getId());
-								System.out.println(parent.id);
-								pipe.getNestedMessages(parentCell.getId(), m_tree);
-								try {
-									System.out.println("waiting");
-									parent.wait();
-									System.out.println("wait end");
-									((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(parent);
-									JOptionPane.showMessageDialog(ForumTree.this.m_panel, 
-											"the message was deleted successfully!", "success",
-											JOptionPane.INFORMATION_MESSAGE);
-								} 
-								catch (InterruptedException e) {
-									/// TODO Auto-generated catch block
+							if (parentCell != null) {
+								synchronized (parent) {
+									pipe.addObserver(new GUIObserver(parent), EventType.MESSAGES_UPDATED);
+	
+									System.out.println("id " + parentCell.getId());
+									System.out.println(parent.id);
+									pipe.getNestedMessages(parentCell.getId(), m_tree);
+									try {
+										System.out.println("waiting");
+										parent.wait();
+										System.out.println("wait end");
+										((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(parent);
+										
+										JOptionPane.showMessageDialog(ForumTree.this.m_panel, 
+												"the message was deleted successfully!", "success",
+												JOptionPane.INFORMATION_MESSAGE);
+									} 
+									catch (InterruptedException e) {
+										/// TODO Auto-generated catch block
+									}
 								}
 							}
-
+							else { // delete a thread
+								
+								pipe.getSubjects(fatherSubjectID, container);
+								pipe.getThreads(fatherSubjectID, container);
+								container.switchToSubjectsAndThreadsView();
+							}
 						}}).start();
 				}
 			}

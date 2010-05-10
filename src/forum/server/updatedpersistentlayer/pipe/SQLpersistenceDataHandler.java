@@ -205,6 +205,11 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 			return this.messagesHandler.deleteAThread(factory, threadID);
 	}
 
+	public void updateThread(long threadID, String topic)
+			throws ThreadNotFoundException, DatabaseUpdateException {
+		this.messagesHandler.updateThread(factory, threadID, topic);
+	}
+	
 	// Message related methods	
 
 	/**

@@ -262,6 +262,11 @@ public class MainForumLogic implements ForumFacade {
 		
 		return toReturn;
 	}
+	
+	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException,
+	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException {
+		return this.messagesController.updateAThread(userID, threadID, newTopic);
+	}
 
 	// Message related methods
 

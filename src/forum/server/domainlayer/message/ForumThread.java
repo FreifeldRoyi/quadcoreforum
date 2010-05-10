@@ -140,4 +140,8 @@ public class ForumThread implements UIThread {
 	public void incNumOfViews() {
 		this.numOfViews++;
 	}
+	
+	public void updateMe(String newTopic) {
+		this.topic = newTopic;
+	}
 }

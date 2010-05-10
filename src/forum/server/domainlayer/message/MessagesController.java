@@ -44,7 +44,7 @@ public class MessagesController {
 	public UISubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		return this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#getSubjects(long)
@@ -122,7 +122,7 @@ public class MessagesController {
 	public UIThread getThreadByID(long thread) throws ThreadNotFoundException, DatabaseRetrievalException {
 		return this.dataHandler.getMessagesCache().getThreadByID(thread);
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#getThreads(long)
@@ -203,6 +203,29 @@ public class MessagesController {
 			throw new DatabaseUpdateException();
 		}
 
+	}
+	
+	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException,
+	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException {
+		try {
+			SystemLogger.info("A user with id " + userID + " requests to edit a thread with id " +
+					threadID + ".");
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
+			final ForumThread tThreadToEdit = this.dataHandler.getMessagesCache().getThreadByID(threadID);
+			if (tApplicant.isAllowed(Permission.EDIT_SUBJECT)) {
+				SystemLogger.info("Permission granted for user " + userID + ".");
+				tThreadToEdit.updateMe(newTopic);
+				this.dataHandler.getMessagesCache().updateInDatabase(tThreadToEdit);
+				return tThreadToEdit;
+			}
+			else {
+				SystemLogger.info("unpermitted operation for user " + userID + ".");
+				throw new NotPermittedException(userID, Permission.EDIT_MESSAGE);
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	// Message related methods:
@@ -309,12 +332,26 @@ public class MessagesController {
 			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumMessage tMessageToDelete = this.dataHandler.getMessagesCache().getMessageByID(messageID);
-				final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
-				tFatherMessage.deleteReply(tMessageToDelete.getMessageID());
-				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
-				this.dataHandler.getMessagesCache().deleteAMessage(messageID);
-				SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
-						fatherID + " by a user " + userID);
+				if (fatherID != -1) { // root message
+					final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
+					tFatherMessage.deleteReply(tMessageToDelete.getMessageID());
+					this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
+					this.dataHandler.getMessagesCache().deleteAMessage(messageID);
+					SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
+							fatherID + " by a user " + userID);
+				}
+				else {
+					// if the message is a root message its id is same as its thread id
+					try {
+						this.dataHandler.getMessagesCache().deleteATread(tMessageToDelete.getMessageID());
+					}
+					catch (ThreadNotFoundException e) {
+						System.out.println("dddddddddddddddd");
+						throw new MessageNotFoundException(messageID);
+					}
+					SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
+							fatherID + " by a user " + userID);
+				}
 			}
 			else {
 				SystemLogger.info("unpermitted operation for user " + userID + ".");

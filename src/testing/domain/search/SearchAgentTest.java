@@ -14,6 +14,7 @@ import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.message.ForumMessage; 
 import forum.server.domainlayer.search.SearchAgent; 
 import forum.server.domainlayer.search.SearchHit; 
+import forum.server.domainlayer.search.cmpssearch.CompassAdapter;
 import forum.server.persistentlayer.DatabaseUpdateException; 
 import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException; 
 
@@ -23,7 +24,7 @@ import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsExce
  */ 
 public class SearchAgentTest extends TestCase 
 { 
-	private SearchAgent sa; 
+	private CompassAdapter sa; 
 
 	/** 
 	 * @throws java.lang.Exception 
@@ -31,7 +32,7 @@ public class SearchAgentTest extends TestCase
 	@Before 
 	public void setUp() throws Exception { 
 		Settings.switchToTestMode();
-		this.sa = new SearchAgent(); 
+		this.sa = new CompassAdapter(); 
 	} 
 	
 	/** 
