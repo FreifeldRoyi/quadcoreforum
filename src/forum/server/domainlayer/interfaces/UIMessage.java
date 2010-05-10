@@ -11,7 +11,7 @@ import org.compass.annotations.SearchableProperty;
  * without changing the Message state.
  */
 @Searchable
-public interface UIMessage {
+public abstract class UIMessage {
 	
 	/**
 	 * @return
