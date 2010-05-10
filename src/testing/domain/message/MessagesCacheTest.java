@@ -14,8 +14,8 @@ import org.junit.Test;
 
 import forum.server.Settings;
 import forum.server.domainlayer.message.*;
-import forum.server.persistentlayer.*;
-import forum.server.persistentlayer.pipe.message.exceptions.*;
+import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 
 /**
  * @author sepetnit
@@ -131,7 +131,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetThreadByID() {
 		try {
-			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 50);
+			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", -1);
 			final ForumThread tObtainedThread = this.messagesCacheUnderTest.getThreadByID(tNewThread.getID());
 			assertSame(tNewThread, tObtainedThread);
 		}
@@ -175,21 +175,21 @@ public class MessagesCacheTest extends TestCase {
 	public void testDeleteATread() {
 		try {
 			// adds a new thread
-			ForumMessage tRootMessage = this.messagesCacheUnderTest.createNewMessage(130, "title", "content");
+			ForumMessage tRootMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title", "content");
 
 			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tRootMessage.getID());
 
 			final int tNumOfMessages = 5; 
 			final Collection<Long> tCreatedMessagesIDs = new Vector<Long>();			
 
-			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(130, "title0", "content0");
+			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title0", "content0");
 			tRootMessage.addReply(tNewMessage.getID());
 			this.messagesCacheUnderTest.updateInDatabase(tRootMessage);
 
 			tCreatedMessagesIDs.add(tRootMessage.getID());
 
 			for (int i = 1; i < tNumOfMessages; i++) {
-				ForumMessage tNextMessage = this.messagesCacheUnderTest.createNewMessage(130, "title" + i, "content" + i);
+				ForumMessage tNextMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title" + i, "content" + i);
 				tNextMessage.addReply(tNewMessage.getID());
 				tCreatedMessagesIDs.add(tNewMessage.getID());
 				this.messagesCacheUnderTest.updateInDatabase(tNextMessage);
@@ -243,7 +243,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetMessageByID() {
 		try {
-			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(16, "title1", "content1");
+			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
 			ForumMessage tObtainedMessage = this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID());
 			assertSame(tNewMessage, tObtainedMessage);
 		}
@@ -264,8 +264,8 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testCreateNewMessage() {
 		try {
-			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(103, "title1", "content1");
-			assertEquals(tNewMessage.getAuthorID(), 103);
+			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
+			assertEquals(tNewMessage.getAuthorID(), -1);
 			assertEquals(tNewMessage.getTitle(), "title1");
 			assertEquals(tNewMessage.getContent(), "content1");
 			assertSame(tNewMessage, this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID()));
@@ -288,7 +288,7 @@ public class MessagesCacheTest extends TestCase {
 	public void testDeleteAMessage() {
 		// TODO: test recursive deletion
 		try {
-			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(103, "title1", "content1");
+			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
 			final long tMessageID = tNewMessage.getID();
 			try {
 				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID());

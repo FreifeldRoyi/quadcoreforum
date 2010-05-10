@@ -14,7 +14,8 @@
      </connection>
    
       <mappings>
-          <class name="forum.server.domainlayer.message.ForumMessage" ></class>
+          <class name="forum.server.domainlayer.interfaces.UIMessage"></class>
+          <class name="forum.server.domainlayer.message.ForumMessage"></class>
       </mappings>
    
    </compass>

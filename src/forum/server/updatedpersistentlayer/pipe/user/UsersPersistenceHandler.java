@@ -85,7 +85,8 @@ public class UsersPersistenceHandler {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
 		String query = "select max(userID) from MemberType";
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
-		toReturn = tResult.get(0).longValue();
+		if (tResult.get(0) != null)
+			toReturn = tResult.get(0).longValue();
 		try {
 			this.commitTransaction(session);
 		} 
