@@ -18,14 +18,14 @@ public interface UIMessage {
 			The unique id of the message
 	 */
 	@SearchableId
-	public long getID();
+	public abstract long getID();
 
 	/**
 	 * @return
 			The id of the user who wrote the message - the message author
 	 */
 	@SearchableProperty (name = "authorID")
-	public long getAuthorID();
+	public abstract long getAuthorID();
 
 	/**
 	 * 
@@ -33,31 +33,31 @@ public interface UIMessage {
 	 * 		The title of the message
 	 */
 	@SearchableProperty (name = "title")
-	public String getTitle();
+	public abstract String getTitle();
 	
 	/**
 	 * @return
 	 * 		The content of the message
 	 */
 	@SearchableProperty (name = "content")
-	public String getContent();
+	public abstract String getContent();
 
 	/**
 	 * @return
 			The date when this message was created, formatted as dd/mm/yyyy
 	 */
-	public String getDate();
+	public abstract String getDate();
 	
 	/**
 	 * @return
 			The time when this message was created, formatted as hh:mm:ss
 	 */
-	public String getTime();
+	public abstract String getTime();
 	
 	/**
 	 * 
 	 * @return
 	 * 		A string representation of the message
 	 */
-	public String toString();
+	public abstract String toString();
 }

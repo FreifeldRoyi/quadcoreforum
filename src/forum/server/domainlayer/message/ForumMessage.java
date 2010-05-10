@@ -11,13 +11,12 @@ import org.compass.annotations.SearchableProperty;
 
 import forum.server.domainlayer.interfaces.UIMessage;
 
-@Searchable
+@Searchable (extend = "UIMessage")
 public class ForumMessage implements UIMessage {
 	
 	private long messageID;
 	
 	private long authorID;
-	
 	
 	private String title;
 	
@@ -86,6 +85,7 @@ public class ForumMessage implements UIMessage {
 	 * @see
 	 * 		UIMessage#getID()
 	 */
+	//@SearchableId
 	public long getID() {
 		return this.messageID;
 	}
@@ -94,6 +94,7 @@ public class ForumMessage implements UIMessage {
 	 * @see
 	 * 		UIMessage#getAuthorID()
 	 */
+	//@SearchableProperty (name = "authorID")
 	public long getAuthorID() {
 		return this.authorID;
 	}
@@ -102,6 +103,7 @@ public class ForumMessage implements UIMessage {
 	 * @see
 	 * 		UIMessage#getTitle()
 	 */
+	//@SearchableProperty (name = "title")
 	public String getTitle() {
 		return this.title;
 	}
@@ -110,6 +112,7 @@ public class ForumMessage implements UIMessage {
 	 * @see
 	 * 		UIMessage#getContent()
 	 */
+	//@SearchableProperty (name = "content")
 	public String getContent() {
 		return this.content;
 	}

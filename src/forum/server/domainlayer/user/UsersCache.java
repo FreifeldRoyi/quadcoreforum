@@ -38,7 +38,7 @@ public class UsersCache {
 	 */
 	public UsersCache() throws DatabaseRetrievalException {
 		this.pipe = PersistenceFactory.getPipe();
-		this.nextFreeGuestID = -1;
+		this.nextFreeGuestID = -2;
 		this.nextFreeMemberID = this.pipe.getFirstFreeMemberID();
 		this.idsToUsersMapping = new HashMap<Long, ForumUser>();
 	}
