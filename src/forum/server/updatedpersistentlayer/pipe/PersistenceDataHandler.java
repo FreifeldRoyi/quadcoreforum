@@ -187,13 +187,13 @@ s	 */
 	 * 		The name of the new subject
 	 * @param subjectDescription
 	 * 		The description of the new subject
-	 * @param isTopLevel
-	 * 		Whether the new subject is a top-level one or it is a sub-subject of an existing subject
+	 * @param fatherID
+	 * 		The id of the father subject
 	 * 
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	public void addNewSubject(final long subjectID, final String name, final String description, boolean isTopLevel) throws DatabaseUpdateException;
+	public void addNewSubject(final long subjectID, final String name, final String description, long fatherID) throws DatabaseUpdateException;
 
 	/**
 	 * Updates the content of a specific subject to be the content of the given one
@@ -250,11 +250,13 @@ s	 */
 	 * 		The topic of the new thread
 	 * @param rootID
 	 * 		A id of the thread's root message
+	 * @param fatherSubjectID
+	 * 		The id of the father subject 	
 	 *
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	public void openNewThread(final long threadID, final String topic, final long rootID) throws DatabaseUpdateException;
+	public void openNewThread(final long threadID, final String topic, final long rootID, final long fatherSubjectID) throws DatabaseUpdateException;
 
 	/**
 	 * Deletes a thread whose id equals to the given one, from the database
@@ -325,12 +327,14 @@ s	 */
 	 * 		The title of the message
 	 * @param content
 	 * 		The content of the message
+	 * @param fatherID
+	 * 		The id of the father message 
 	 * 
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
 	public void addNewMessage(final long messageID, final long userID, final String title,
-			final String content) throws DatabaseUpdateException;
+			final String content, long fatherID) throws DatabaseUpdateException;
 
 	/**
 	 * Updates the title and the content of a specific message to be the given one
@@ -350,7 +354,7 @@ s	 */
 	 * 		In case there is a problem with the database updating
 	 */
 	public void updateMessage(final long messageID, final String newTitle, final String newContent, 
-			final Collection<Long> replies, long threadID) throws MessageNotFoundException, DatabaseUpdateException;
+			final Collection<Long> replies, long fatherID) throws MessageNotFoundException, DatabaseUpdateException;
 
 	/**
 	 * Deletes a message whose id equals to the given one, from the database

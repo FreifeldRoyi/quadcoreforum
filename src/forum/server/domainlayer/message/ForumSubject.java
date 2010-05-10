@@ -14,8 +14,8 @@ public class ForumSubject implements UISubject {
 	private String description;
 	private Collection<Long> subSubjectsIDs;
 	private Collection<Long> threadsIDs;
-	private boolean isTopLevel;
-
+	private long fatherSubjectID;
+	
 
 	/**
 	 * A full constructor of the forum subject which initializes all its attributes according to the give
@@ -37,8 +37,8 @@ public class ForumSubject implements UISubject {
 	 * 		Whether this subject is a top level one
 	 */
 	public ForumSubject(long id, final String name, final String description, final Collection<Long> subSubjectsIDs,
-			final Collection<Long> threadsIDs, boolean isTopLevel) {
-		this(id, name, description, isTopLevel);
+			final Collection<Long> threadsIDs, long fatherSubjectID) {
+		this(id, name, description, fatherSubjectID);
 		this.subSubjectsIDs.addAll(subSubjectsIDs);
 		this.threadsIDs.addAll(threadsIDs);
 	}	
@@ -57,12 +57,13 @@ public class ForumSubject implements UISubject {
 	 * @param isTopLevel
 	 * 		Whether this subject should be a forum top-level subject
 	 */
-	public ForumSubject(long id, final String name, final String description, boolean isTopLevel) {
+	public ForumSubject(long id, final String name, final String description, long fatherSubjectID) {
 		this.name = name;
 		this.description = description;
 		this.subjectID = id;
 		this.subSubjectsIDs = new Vector<Long>();
 		this.threadsIDs = new Vector<Long>();
+		this.fatherSubjectID = fatherSubjectID;
 	}
 
 	// getters
@@ -125,6 +126,10 @@ public class ForumSubject implements UISubject {
 		return this.threadsIDs;
 	}
 
+	public long getFatherID() {
+		return this.fatherSubjectID;
+	}
+	
 	/**
 	 * 
 	 * This method overrides the standard equals method and 
@@ -153,7 +158,7 @@ public class ForumSubject implements UISubject {
 	 * 		Whether this subject is a top level one
 	 */
 	public boolean isTopLevel() {
-		return this.isTopLevel;
+		return this.fatherSubjectID == -1;
 	}
 
 	// methods

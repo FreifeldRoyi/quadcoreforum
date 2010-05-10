@@ -5,6 +5,7 @@ public class ThreadType {
 
     protected long threadID;
     protected String topic;
+    protected long fatherSubjectID;
     protected long startMessageID;
     protected long lastMessageID;
     protected long numOfViews;
@@ -26,6 +27,23 @@ public class ThreadType {
         this.threadID = value;
     }
 
+    /**
+     * Gets the value of the fatherSubjectID property.
+     * 
+     */
+    public long getFatherSubjectID() {
+        return fatherSubjectID;
+    }
+
+    /**
+     * Sets the value of the fatherSubjectID property.
+     * 
+     */
+    public void setFatherSubjectID(long fatherSubjectID) {
+        this.fatherSubjectID = fatherSubjectID;
+    }
+
+    
     /**
      * Gets the value of the topic property.
      * 

@@ -3,14 +3,17 @@
  */
 package forum.client.panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,11 +39,11 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 	private JLabel connectedStatisticsLabel;
 	private JButton btn_showConnected;
 	private String connectedData;
-	
+
 	private ControllerHandler controller;
 	private boolean viewActiveRequested;
-	
-	
+
+
 	public void notifyError(String errorMessage) {
 		System.out.println(errorMessage);
 
@@ -74,24 +77,25 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 	}
 
 	public StatisticsPanel() throws IOException {
+
 		viewActiveRequested = false;
 		btn_showConnected = new JButton("show connected");
 		btn_showConnected.setPreferredSize(new Dimension(200, 20));
-	
+
 		btn_showConnected.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				viewActiveRequested = true;
 				controller.getActiveUsersNumber();
 			}			
 		});
-		
+
 		connectedData = "";
 
 		controller = ControllerHandlerFactory.getPipe();
 
 		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
-
-		this.setBorder(BorderFactory.createTitledBorder("Currently Connected"));
+		this.setBorder(BorderFactory.createEtchedBorder());
+		this.setBorder(BorderFactory.createTitledBorder(this.getBorder(), "Currently Connected", 0, 0, new Font("Tahoma", Font.BOLD, 12), Color.WHITE));
 		connectedStatisticsLabel = new JLabel();
 
 
@@ -119,8 +123,19 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 								.addGap(10, 10, 10)
 		);
 
+
+		this.connectedStatisticsLabel.setForeground(Color.WHITE);
+		this.connectedStatisticsLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+
 	}
-	
-	
+
+
+	public void paint(Graphics g) {
+		g.drawImage(new ImageIcon("./images/background2.jpg").getImage(), 
+				0, 0, 1680, 1050, null);
+		setOpaque(false);
+		super.paint(g);
+	}
+
 
 }

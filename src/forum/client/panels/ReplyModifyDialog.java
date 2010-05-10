@@ -105,6 +105,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		arrangeLayout();
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("OK WAS KLICKEDDDDDDDDDDDDDDDDDD");
 				try {
 					if (title.getText().equals("")) {
 						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
@@ -326,6 +327,13 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
+		try {
+			ControllerHandlerFactory.getPipe().deleteObserver(this);
+		} 
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		System.out.println("subjects encodedview = \n"+ encodedView);
 		
@@ -335,39 +343,21 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 			tLastMessageWord = "added";
 		else if (encodedView.equals("modifysuccess"))
 			tLastMessageWord = "modified";
-		else {
-			JOptionPane.showMessageDialog(this, "error occurred!!!", "error", JOptionPane.ERROR_MESSAGE);
-			System.out.println(encodedView);
+		else if (!encodedView.startsWith("searchresult")){
+			JOptionPane.showMessageDialog(this, "error occurredd!!", "error", JOptionPane.ERROR_MESSAGE);
+			System.out.println("\n\nencoded:" + encodedView + "\n\n---------------------");
 		}
+		else
+			return;
 
 		if (tLastMessageWord != null) {
 			JOptionPane.showMessageDialog(this, "The " + topicType + " was " +
 					tLastMessageWord + " successfully!", "success", JOptionPane.INFORMATION_MESSAGE);
-			try {
-				ControllerHandlerFactory.getPipe().deleteObserver(this);
-				/*try {
-					this.wait();
-				}
-				catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
-			} 
-			catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
 			this.succeeded = true;
 			setVisible(false);
 		}
 		else {
-			try {
-				ControllerHandlerFactory.getPipe().deleteObserver(this);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			System.out.println("erorrrrrrrrrrrrrrrrrrrrrrrr");
 			// TODO: handle error cases
 		}

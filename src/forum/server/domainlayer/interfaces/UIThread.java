@@ -42,6 +42,8 @@ public interface UIThread {
 	 */
 	public long getNumOfViews();
 	
+	public long getFatherID();
+	
 	/**
 	 * 
 	 * @return

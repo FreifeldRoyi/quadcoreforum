@@ -72,14 +72,14 @@ public class ExtendedObjectFactory {
 	 * 		A new instance of {@link MessageType} class which is initialized with the given parameters		
 	 */
 	public static MessageType createMessageType(final long id, final long authorID,
-			String title, String content) {
+			String title, String content, long fatherID) {
 		MessageType tMsgType = factory.createMessageType();
 		tMsgType.setMessageID(id);
 		tMsgType.setAuthorID(authorID);
 		tMsgType.setTitle(title);
 		tMsgType.setContent(content);
 		tMsgType.setPostTime(new GregorianCalendar());
-		tMsgType.setThreadID(-1);
+		tMsgType.setFatherID(fatherID);
 		return tMsgType;
 	}
 	
@@ -92,7 +92,7 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of {@link ThreadType} class which is initialized with the given parameters
 	 */
-	public static ThreadType createThreadType(final long id, final String topic, final long startMessageID) {
+	public static ThreadType createThreadType(final long id, final String topic, final long startMessageID, final long fatherSubjectID) {
 		ThreadType tThreadType = factory.createThreadType();
 		tThreadType.setThreadID(id);
 		tThreadType.setTopic(topic);
@@ -100,6 +100,7 @@ public class ExtendedObjectFactory {
 		tThreadType.setLastMessageID(startMessageID);
 		tThreadType.setNumOfViews(0);
 		tThreadType.setNumOfResponses(0);
+		tThreadType.setFatherSubjectID(fatherSubjectID);
 		return tThreadType;
 	}
 	
@@ -117,12 +118,12 @@ public class ExtendedObjectFactory {
 	 * @return
 	 * 		A new instance of a {@link SubjectType} which is initialized with the given parameters
 	 */
-	public static SubjectType createSubject(final long subjectID, final String name, final String description, boolean isTopLevel) {
+	public static SubjectType createSubject(final long subjectID, final String name, final String description, long fatherID) {
 		SubjectType tSubjectType = factory.createSubjectType();
 		tSubjectType.setSubjectID(subjectID);
 		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
-		tSubjectType.setIsTopLevel(isTopLevel);
+		tSubjectType.setFatherID(fatherID);
 		return tSubjectType;
 	}		
 }

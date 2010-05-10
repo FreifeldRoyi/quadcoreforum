@@ -19,7 +19,7 @@ public class MessageType {
    
     protected Set<Long> repliesIDs;
     protected GregorianCalendar postTime;
-    protected long threadID; 
+    protected long fatherID; 
 
     /**
      * Gets the value of the messageID property.
@@ -37,19 +37,19 @@ public class MessageType {
         this.messageID = value;
     }
     /**
-     * Gets the value of the threadID property.
+     * Gets the value of the fatherID property.
      * 
      */
-    public long getThreadID() {
-        return threadID;
+    public long getFatherID() {
+        return fatherID;
     }
 
     /**
-     * Sets the value of the threadID property.
+     * Sets the value of the fatherID property.
      * 
      */
-    public void setThreadID(long value) {
-        this.threadID = value;
+    public void setFatherID(long value) {
+        this.fatherID = value;
     }
 
     /**

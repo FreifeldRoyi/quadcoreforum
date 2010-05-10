@@ -4,6 +4,7 @@
 package forum.client.panels;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -105,12 +106,27 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 
 
 		JScrollPane tSubjectsTablePane = new JScrollPane(threadsTable);
+		
+		tSubjectsTablePane.setOpaque(false);
+		threadsTable.setOpaque(false);
+		this.setOpaque(false);
+		tSubjectsTablePane.setBorder(BorderFactory.createEmptyBorder());
+		tSubjectsTablePane.getViewport().setOpaque(false);
+		
+		threadsTable.setFont(new Font("Tahoma", Font.BOLD, 13));
+		threadsTable.setRowHeight(30);
+		
+
+		
 
 		GroupLayout tLayout = new GroupLayout(this);
 		this.setLayout(tLayout);
-		tLayout.setHorizontalGroup(
+		
+		
+		
+/*		tLayout.setHorizontalGroup(
 				tLayout.createSequentialGroup()
-				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
+				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 				.addGap(16, 16, 16)
 				.addGroup(tLayout.createParallelGroup()
 						.addComponent(addNewThreadButton, GroupLayout.PREFERRED_SIZE,
@@ -120,7 +136,26 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
+*/
+		
+		
+		
+		tLayout.setHorizontalGroup(
+				tLayout.createParallelGroup(Alignment.CENTER)
+				.addGroup(tLayout.createSequentialGroup()
+						.addComponent(addNewThreadButton, GroupLayout.PREFERRED_SIZE,
+								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGap(16, 16, 16)
+								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addGap(16, 16, 16)
+										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGap(16, 16, 16)
+												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
 
+		
+/*		
 		tLayout.setVerticalGroup(
 				tLayout.createParallelGroup()
 				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
@@ -133,7 +168,21 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 										.addGap(16, 16, 16)
 										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)));
+*/
+		tLayout.setVerticalGroup(
+				tLayout.createSequentialGroup()
+				.addGroup(tLayout.createParallelGroup()
+						.addComponent(addNewThreadButton, GroupLayout.PREFERRED_SIZE,
+								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGap(16, 16, 16)
+												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
 
+
+		
 
 	}	
 
@@ -165,9 +214,6 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 		this.deleteThreadButton.setVisible(true);
 	}
 	
-	public void changeTableVisible() {
-		this.threadsTable.setVisible(!this.threadsTable.isVisible());
-	}
 
 	public boolean showsMessages() {
 		return this.messages.getForumTreeUI().isVisible();
@@ -211,6 +257,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 		}	
 		this.threadsTableModel.fireTableDataChanged();
 		this.threadsTable.setVisible(true);
+		this.setVisible(true);
 		container.stopWorkingAnimation();
 	}
 }

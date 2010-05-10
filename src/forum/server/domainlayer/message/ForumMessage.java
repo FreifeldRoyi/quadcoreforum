@@ -21,7 +21,8 @@ public class ForumMessage implements UIMessage {
 	private String title;
 	
 	private String content;
-
+	private long fatherID;
+	
 	private GregorianCalendar postTime;
 
 	// the ids of the message replies
@@ -47,8 +48,8 @@ public class ForumMessage implements UIMessage {
 	 * 		A collection of the message replies' ids
 	 */
 	public ForumMessage(final long messageID, final long authorID, String title, String content, 
-			GregorianCalendar postTime, Collection<Long> replies) {
-		this(messageID, authorID, title, content);		
+			GregorianCalendar postTime, Collection<Long> replies, final long fatherID) {
+		this(messageID, authorID, title, content, fatherID);		
 		this.setPostTime(postTime);
 		System.out.println(replies);
 		this.repliesIDs.addAll(replies);
@@ -70,13 +71,14 @@ public class ForumMessage implements UIMessage {
 	 * @param content
 	 * 		The content of the new message
 	 */
-	public ForumMessage(final long messageID, final long authorID, String title, String content) {
+	public ForumMessage(final long messageID, final long authorID, String title, String content, long fatherID) {
 		this.messageID = messageID;
 		this.authorID = authorID;
 		this.setTitle(title);
 		this.setContent(content);
 		this.postTime = new GregorianCalendar();
 		this.repliesIDs = new Vector<Long>();
+		this.fatherID = fatherID;
 	}
 
 	// getters
@@ -148,6 +150,10 @@ public class ForumMessage implements UIMessage {
 		return this.repliesIDs;
 	}	
 
+	public long getFatherID() {
+		return this.fatherID;
+	}
+	
 	// setters
 	
 	/**

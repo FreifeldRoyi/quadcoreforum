@@ -39,6 +39,14 @@ public class MessagesController {
 
 	/**
 	 * @see
+	 * 		ForumFacade#getSubjectByID(long)
+	 */
+	public UISubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
+		return this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
+	}
+	
+	/**
+	 * @see
 	 * 		ForumFacade#getSubjects(long)
 	 */
 	public Collection<UISubject> getSubjects(final long fatherID) throws SubjectNotFoundException, 
@@ -81,15 +89,15 @@ public class MessagesController {
 						throw new SubjectAlreadyExistsException(name);
 				// adds the new subject to the forum
 				if (fatherID == -1) {
-					ForumSubject toReturn = this.dataHandler.getMessagesCache().createNewSubject(name, description, true);
+					ForumSubject toReturn = this.dataHandler.getMessagesCache().createNewSubject(name, description, fatherID);
 					SystemLogger.info("A subject named " + name + " was added to the top level of the forum");
 					return toReturn;
 				}	
 				else {
 					ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
-					ForumSubject tNewSubject = this.dataHandler.getMessagesCache().createNewSubject(name, description, false);
+					ForumSubject tNewSubject = this.dataHandler.getMessagesCache().createNewSubject(name, description, fatherID);
 					tFatherSubject.addSubSubject(tNewSubject.getID());
-					this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);					
+					this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 					SystemLogger.info("A subject named " + name + " was added as a sub-subject of a subject named " + 
 							tFatherSubject.getName());
 					return tNewSubject;
@@ -107,6 +115,14 @@ public class MessagesController {
 
 	// Thread related methods
 
+	/**
+	 * @see
+	 * 		ForumFacade#getThreadByID(long)
+	 */
+	public UIThread getThreadByID(long thread) throws ThreadNotFoundException, DatabaseRetrievalException {
+		return this.dataHandler.getMessagesCache().getThreadByID(thread);
+	}
+	
 	/**
 	 * @see
 	 * 		ForumFacade#getThreads(long)
@@ -141,9 +157,10 @@ public class MessagesController {
 			if (tApplicant.isAllowed(Permission.OPEN_THREAD)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
-				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content);
-				final ForumThread tNewThread = this.dataHandler.getMessagesCache().openNewThread(topic, tNewMessage.getID());		
-				tFatherSubject.addThread(tNewThread.getID());			
+				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content, -1);
+				final ForumThread tNewThread = this.dataHandler.getMessagesCache().openNewThread(topic, 
+						tNewMessage.getID(), tFatherSubject.getID());
+				tFatherSubject.addThread(tNewThread.getID());
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 				return tNewThread;
 			}
@@ -233,7 +250,7 @@ public class MessagesController {
 			final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
 			if (tApplicant.isAllowed(Permission.REPLY_TO_MESSAGE)) {
 				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content);
+				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content, fatherID);
 				// adds the new reply to the replied message
 				tFatherMessage.addReply(tNewMessage.getID());
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);

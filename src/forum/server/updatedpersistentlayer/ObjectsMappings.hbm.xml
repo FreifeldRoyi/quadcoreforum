@@ -8,6 +8,7 @@
   <id name="threadID" column="threadID" >
   </id>
   <property name="topic" column="topic" ></property>
+  <property name="fatherSubjectID" column="FatherSubjectID"></property>
   <property name="startMessageID" column="StartMessageID"></property>
   <property name="lastMessageID" column="LastMessageID" ></property>
     <property name="numOfViews" column="numOfViews" ></property>
@@ -18,10 +19,10 @@
   <id name="subjectID" column="SubjectID" >
   </id>
   <property name="lastAddedMessageID" column="lastAddedMessageID" ></property>
-   <property name="isTopLevel" column="isTopLevel" ></property>
      <property name="name" column="Name" ></property>
        <property name="description" column="Description" ></property>
-            <set name="subSubjectsIDs" table="subsubjects">
+       <property name="fatherID" column="FatherID"></property>
+       <set name="subSubjectsIDs" table="subsubjects">
             <key column="FatherID"></key>
             <element type="long" column="SubSubjectID"></element>
         </set>      
@@ -40,7 +41,7 @@
    <property name="title" column="Title" ></property>
      <property name="content" column="Content" ></property>
        <property name="postTime" column="PostTime" ></property>
-        <property name="threadID" column="ThreadID" ></property>
+        <property name="fatherID" column="FatherID" ></property>
         
             <set name="repliesIDs" table="replies">
             <key column="FatherID"></key>

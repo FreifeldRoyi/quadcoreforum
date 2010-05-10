@@ -10,17 +10,11 @@ import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import forum.client.controllerlayer.ControllerHandler;
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.controllerlayer.GUIObserver;
 import forum.client.ui.events.GUIHandler;
 import forum.client.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.SystemLogger;
 
 /**
  * @author Royi Freifeld
@@ -40,15 +34,16 @@ public class SearchDialog extends JDialog implements GUIHandler
 	private JRadioButton radBtn_15;
 	private JRadioButton radBtn_20;
 	private JPanel pnl_resultRadBtnHolder;
+	private long selectedID;
 
 	private ButtonGroup btnGrp_searchOption;
 	private JRadioButton radBtn_author;
 	private JRadioButton radBtn_content;
 	private JPanel pnl_searchOptionHolder;
-	
+
 	private JTable resultsTable;
 	private TableModel resultsTableModel;
-	
+
 	private JTextField txtFld_searchField;
 	private String toSearch;
 	private String searchBy;
@@ -66,7 +61,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 	private int currentPageResNum;	
 
 	private int selectedNumberOfResults;
-	
+
 	private ControllerHandler controller;
 
 	public SearchDialog()
@@ -97,22 +92,22 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 			this.resultsTable.setVisible(false);
 			this.resultsTableModel.clearData();
-			
+
 			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
-			
+
 			searchResultsContent = encodedView.split("\n\tARESULTMESSAGE: ");
-			
+
 			System.out.println("splitted:");
 			for (int i = 0; i < searchResultsContent.length; i++)
 				System.out.println("splitted[" + i + "] = " + searchResultsContent[i]);
-			
+
 			// remove all the previous listeners
 			for (ActionListener tAL : btn_nextPage.getActionListeners())
 				btn_nextPage.removeActionListener(tAL);
 			for (ActionListener tAL : btn_prevPage.getActionListeners())
 				btn_prevPage.removeActionListener(tAL);
-			
-			
+
+
 			messagesIDs = new long[searchResultsContent.length - 1];
 
 			String[][] tResultsTable = new String[Math.min(searchResultsContent.length - 1, this.selectedNumberOfResults)][3];
@@ -131,24 +126,33 @@ public class SearchDialog extends JDialog implements GUIHandler
 				tResultsTable[index][1] = tCurrRes[1];
 				tResultsTable[index][2] = tCurrRes[2];
 			}
-			
-			
-/*			
+
+
+			/*			
 			System.out.println("tMessagesIDs:");
 			for (int i = 0; i < tMessagesIDs.length; i++)
 				System.out.println("tMessagesIDs[" + i + "] = " + tMessagesIDs[i]);
-	
-			
+
+
 			System.out.println("resultssssssssssssssssssssssss:");
 			for (int i = 0; i < tResultsTable.length; i++)
 				for (int j = 0; j < tResultsTable[i].length; j++)
 					System.out.println("tResultsTable[" + i + "][" + j + "] = " + tResultsTable[i][j]);
-*/
+			 */
 			resultsTable.setVisible(false);
 			resultsTableModel.clearData();
 			resultsTableModel.updateData(messagesIDs, tResultsTable);
 			resultsTableModel.fireTableDataChanged();
 			resultsTable.setVisible(true);
+
+
+
+
+
+
+
+
+
 
 			this.currentPageResNum = index;
 
@@ -180,11 +184,11 @@ public class SearchDialog extends JDialog implements GUIHandler
 						tResultsTable[i][1] = tCurrRes[1];
 						tResultsTable[i][2] = tCurrRes[2];
 					}
-					
+
 					resultsTableModel.updateData(messagesIDs, tResultsTable);
 					resultsTableModel.fireTableDataChanged();
 					resultsTable.setVisible(true);
-					
+
 					currentPageResNum = index % selectedNumberOfResults == 0? selectedNumberOfResults : index % selectedNumberOfResults; 
 					System.out.println("\n\nindex = " + index);
 					System.out.println("\n\nsearchResultsContent = " + searchResultsContent.length);
@@ -219,7 +223,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 						tResultsTable[i][1] = tCurrRes[1];
 						tResultsTable[i][2] = tCurrRes[2];
 					}
-					
+
 					resultsTableModel.updateData(messagesIDs, tResultsTable);
 					resultsTableModel.fireTableDataChanged();
 					resultsTable.setVisible(true);
@@ -245,85 +249,65 @@ public class SearchDialog extends JDialog implements GUIHandler
 			int YY = (screen.height / 2) - (this.getHeight() / 2); // Center vertically.
 			this.setLocation(X, YY);
 
-//			this.setVisible(true);
+			//			this.setVisible(true);
 			System.out.println("visible true ...");
 
 		}
 		System.out.println("end search updating ...");
 
 	}
+	
+	public long getSelectedID() {
+		return this.selectedID;
+	}
 
 	private void initComponents()
 	{
 		this.setMinimumSize(new Dimension(555, 235));
+		this.selectedID = -1;
 		this.toSearch = "";
 		this.searchBy = "";
 		this.resultsTable = new JTable();
 		this.resultsTable.setSelectionModel(new DefaultListSelectionModel());
 		this.resultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.resultsTable.addMouseListener(new MouseAdapter() {
-
 			public void mouseClicked(MouseEvent e) {
 				// handle double click
 				if (e.getClickCount() == 2) {
 					int rowSelected = resultsTable.getSelectionModel().getMinSelectionIndex();
-					if (rowSelected != -1) {
-						
-						
-						
-/* ******************************************************************************
- *						resultsTable.setVisible(false);							*
- * ******************************************************************************/ 
-						
-//						showingSubjectsOfName = resultsTableModel.getNameOfSubjectInRow(rowSelected) ;
-//						container.startWorkingAnimation("retreiving subject " + 
-//								showingSubjectsOfName
-//								+ " content...");
-
-						final long subjectToLoad = resultsTableModel.getIDofContentInRow(rowSelected);
-/*						showingSubjectsOfID = subjectToLoad;
-						try {
-							ControllerHandlerFactory.getPipe().getSubjects(subjectToLoad, container);
-
-							ControllerHandlerFactory.getPipe().getThreads(subjectToLoad, container);
-
-							container.addToNavigate(showingSubjectsOfName, linkPressListener());
-
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-*/					}
+					if (rowSelected != -1)
+						selectedID = resultsTableModel.getIDofContentInRow(rowSelected);
+					setVisible(false);
 				}
 			}
 		});
 		String[] columns = {"Author", "Title", "Content" };
 		resultsTableModel = new TableModel(columns);
 		this.resultsTable.setModel(resultsTableModel);
-		
-		
+
+
 		this.btn_nextPage = new JButton("next");
 		this.btn_prevPage = new JButton("prev");
 
-		
+
 		this.btn_nextPage.setPreferredSize(new Dimension(85, 35));
 		this.btn_prevPage.setPreferredSize(new Dimension(85, 35));
-		
+
 		this.resultsTable.setBorder(BorderFactory.createLineBorder(Color.black));
-		
+
 		JScrollPane tScroll = new JScrollPane(this.resultsTable);
-		
+
 		tScroll.setPreferredSize(new Dimension(224, 100));
 		this.pnl_results = new JPanel();
 		this.pnl_results.setBorder(BorderFactory.createTitledBorder("Search results"));
-		
-		
-		
+
+
+
 		GroupLayout tResultsLayout = new GroupLayout(this.pnl_results);
 		tResultsLayout.setHorizontalGroup(tResultsLayout.createParallelGroup()
 				.addGroup(tResultsLayout.createSequentialGroup()
 						.addContainerGap()
-						
+
 						.addComponent(tScroll, GroupLayout.PREFERRED_SIZE, 
 								GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 								.addContainerGap())
@@ -353,14 +337,14 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 		/* number of search results handling */
 		this.btnGrp_numberOfResults = new ButtonGroup();;
-		
-		
+
+
 		this.radBtn_5 = new JRadioButton("5 results per page");
 		this.radBtn_10 = new JRadioButton("10 results per page");
 		this.radBtn_15 = new JRadioButton("15 results per page");
 		this.radBtn_20 = new JRadioButton("20 results per page");
 
-		
+
 		this.radBtn_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedNumberOfResults = 5;
@@ -393,7 +377,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 					search();
 			}
 		});
-		
+
 		this.pnl_resultRadBtnHolder = new JPanel(); 
 		BoxLayout bl = new BoxLayout(this.pnl_resultRadBtnHolder, BoxLayout.X_AXIS);
 		this.pnl_resultRadBtnHolder.setLayout(bl);
@@ -403,11 +387,11 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.btnGrp_numberOfResults.add(this.radBtn_15);
 		this.btnGrp_numberOfResults.add(this.radBtn_20);
 
-/*		this.radBtn_5.setToolTipText("Show 5 results per page");
+		/*		this.radBtn_5.setToolTipText("Show 5 results per page");
 		this.radBtn_10.setToolTipText("Show 10 results per page");
 		this.radBtn_15.setToolTipText("Show 15 results per page");
 		this.radBtn_20.setToolTipText("Show 20 results per page");
-*/
+		 */
 		this.radBtn_10.setSelected(true);
 
 		this.pnl_resultRadBtnHolder.setBorder(BorderFactory.createTitledBorder("Results per page"));
@@ -416,7 +400,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.pnl_resultRadBtnHolder.add(this.radBtn_15);		
 		this.pnl_resultRadBtnHolder.add(this.radBtn_20);
 
-		
+
 		/* search type option handling */
 		this.btnGrp_searchOption = new ButtonGroup();
 		this.radBtn_author = new JRadioButton("Search By Author");
@@ -435,7 +419,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 		/* searching area handling */
 		this.txtFld_searchField = new JTextField("enter search phrase here");
-		
+
 		this.txtFld_searchField.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
@@ -444,8 +428,8 @@ public class SearchDialog extends JDialog implements GUIHandler
 			public void keyReleased(KeyEvent e) {}
 			public void keyTyped(KeyEvent e) {}
 		});
-		
-		
+
+
 		this.txtFld_searchField.setPreferredSize(new Dimension(200, 30));
 		this.txtFld_searchField.setForeground(Color.GRAY);
 
@@ -561,7 +545,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 		//		this.setLBLText();
 
 		this.setModal(true);
-		
+
 		this.pnl_results.setVisible(false);
 		this.pack();
 		this.btn_search.requestFocus();
@@ -575,7 +559,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.radBtn_author.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				lbl_searchDescription.setText("Please enter a user's name : ");
-//				lbl_searchDescription.setToolTipText("Enter a username to search by");
+				//				lbl_searchDescription.setToolTipText("Enter a username to search by");
 			}
 
 		});
@@ -584,10 +568,10 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 			public void actionPerformed(ActionEvent arg0) {
 				lbl_searchDescription.setText("Please enter a phrase : ");
-/*				lbl_searchDescription.setToolTipText("Enter a phrase to search by.\n" +
+				/*				lbl_searchDescription.setToolTipText("Enter a phrase to search by.\n" +
 						"It is possible to use logic operators such as 'AND' and 'OR'.\n" +
 				"Logic operators are case sensative.");						
-*/			}
+				 */			}
 
 		});
 		this.radBtn_author.setSelected(true);
@@ -637,11 +621,11 @@ public class SearchDialog extends JDialog implements GUIHandler
 			public void windowDeiconified(WindowEvent arg0) {}
 			public void windowIconified(WindowEvent arg0) {}
 			public void windowOpened(WindowEvent arg0) {}
-			
+
 		});
-		
+
 		this.setSize(new Dimension(555, 235));
-		
+
 	}
 	private void search() {
 		if (searchBy.equals("Author")) {
@@ -661,7 +645,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 		}
 	}
 
-/*	public void paint(Graphics g) {
+	/*	public void paint(Graphics g) {
 		Dimension tDimension = this.getSize();
 		if (!this.pnl_results.isVisible()) {
 			if (tDimension.height > 224) {

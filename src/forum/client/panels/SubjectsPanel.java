@@ -4,6 +4,8 @@
 package forum.client.panels;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -24,7 +26,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	/**
 	 * A thread pool that is used to initiate operations in the controller layer.
 	 */
-//	private ExecutorService pool = Executors.newCachedThreadPool();
+	//	private ExecutorService pool = Executors.newCachedThreadPool();
 
 	/**
 	 * 
@@ -62,7 +64,6 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 					int rowSelected = subjectsTable.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
 						subjectsTable.setVisible(false);
-						threadsPanel.changeTableVisible();
 						threadsPanel.setVisible(true);
 						showingSubjectsOfName = subjectsTableModel.getNameOfContentInRow(rowSelected) ;
 						container.startWorkingAnimation("retreiving subject " + 
@@ -107,6 +108,7 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 		addNewSubjectButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(subjectsTableModel.getFatherID() + " cccccccccccccccccccccccccccccc");
 				ReplyModifyDialog tNewSubjectDialog =
 					new ReplyModifyDialog(container.getConnectedUser().getID(), subjectsTableModel.getFatherID(), "subject", addNewSubjectButton);
 				tNewSubjectDialog.setVisible(true);
@@ -130,11 +132,44 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 		JScrollPane tSubjectsTablePane = new JScrollPane(subjectsTable);
 
+		tSubjectsTablePane.setViewport(new JViewport() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -2313357428427772725L;
+
+			public void paint(Graphics g) {
+				/*				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				 */
+				super.paint(g);
+			}
+		});
+
+
+
+		tSubjectsTablePane.setOpaque(false);
+		subjectsTable.setOpaque(false);
+		this.setOpaque(false);
+		tSubjectsTablePane.setBorder(BorderFactory.createEmptyBorder());
+		tSubjectsTablePane.getViewport().setOpaque(false);
+
+		subjectsTable.setFont(new Font("Tahoma", Font.BOLD, 13));
+		subjectsTable.setRowHeight(30);
+
+
+
+		tSubjectsTablePane.getViewport().add(subjectsTable);
+
+
 		GroupLayout tLayout = new GroupLayout(this);
 		this.setLayout(tLayout);
-		tLayout.setHorizontalGroup(
+
+
+		/*tLayout.setHorizontalGroup(
 				tLayout.createSequentialGroup()
-				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
+				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE , Short.MAX_VALUE)
 				.addGap(16, 16, 16)
 				.addGroup(tLayout.createParallelGroup()
 						.addComponent(addNewSubjectButton, GroupLayout.PREFERRED_SIZE,
@@ -143,9 +178,26 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-		);
+		);*/
 
-		tLayout.setVerticalGroup(
+		tLayout.setHorizontalGroup(
+				tLayout.createParallelGroup(Alignment.CENTER)
+				.addGroup(tLayout.createSequentialGroup()
+						.addComponent(addNewSubjectButton, GroupLayout.PREFERRED_SIZE,
+								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGap(16, 16, 16)
+								.addComponent(modifySubjectButton, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addGap(16, 16, 16)
+										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGap(16, 16, 16)
+												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
+
+
+
+
+		/*		tLayout.setVerticalGroup(
 				tLayout.createParallelGroup()
 				.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 				.addGroup(Alignment.CENTER, tLayout.createSequentialGroup()
@@ -156,9 +208,27 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 										.addGap(16, 16, 16)
 										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)));
+												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)));*/
+
+		tLayout.setVerticalGroup(
+				tLayout.createSequentialGroup()
+				.addGroup(tLayout.createParallelGroup()
+						.addComponent(addNewSubjectButton, GroupLayout.PREFERRED_SIZE,
+								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(modifySubjectButton, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGap(16, 16, 16)
+												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
 
 
+
+
+	}
+
+	public void setFatherID(int fatherID) {
+		this.subjectsTableModel.setFatherID(fatherID);
 	}
 
 	public void setGuestView(){
@@ -204,51 +274,83 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
-		this.subjectsTableModel.clearData();
-		if (!encodedView.startsWith("There") && !encodedView.startsWith("addsubjectsuccess")) {
-		
 
-			/*	JOptionPane.showMessageDialog(container, "There are no subjects under the subject " + 
-					this.subjectsTableModel.getNameOfSubject(subjectsTable.getSelectionModel().getMinSelectionIndex()), 
-					"no subjects", JOptionPane.INFORMATION_MESSAGE);
-			 */
+		if (encodedView.startsWith("searchresult")) return;
 
-
-			// each line should represent one subject
+		if (encodedView.startsWith("getpathsuccess")) {
+			container.removeFromNavigateUntil("Show root subjects");
 			String[] tSplitted = encodedView.split("\n");
-			// this is the data which will be presented in the subjects table
-			String[][] tData = new String[tSplitted.length][5];
-			// this is the IDs array which should contain the presented subjects' IDs
-			long[] tIDs = new long[tSplitted.length];
-			for (int i = 0; i < tSplitted.length; i++) {
-				String[] tCurrentSubjectInfo = tSplitted[i].split("\t");
-				// this is the subject's id
-				try {
-					tIDs[i] = Long.parseLong(tCurrentSubjectInfo[0]);
-					for (int j = 1; j < tCurrentSubjectInfo.length; j++)
-						tData[i][j - 1] = tCurrentSubjectInfo[j];
-					this.subjectsTableModel.updateData(tIDs, tData);
+			for (int i = 2; i < tSplitted.length; i++) {
+				if (tSplitted[i].startsWith("THREAD")) break;
+				final String[] tCurrentSubject = tSplitted[i].split("\t");
+				final long id = Integer.parseInt(tCurrentSubject[0]);
+				container.addToNavigate(tCurrentSubject[1], new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 
+						SubjectsPanel.this.setFatherID(Integer.parseInt(tCurrentSubject[0]));
+						container.switchToRootSubjectsView();
+						container.startWorkingAnimation("retreiving subject " + 
+								tCurrentSubject[1] + " content...");
+						try {
 
-				}
-				catch (NumberFormatException e) {
-					SystemLogger.warning("The server response related to subject's update is invalid");
-					this.showingSubjectsOfName = "";
-					this.showingSubjectsOfID = -1;
-					this.subjectsTableModel.clearData();
-					break;
-				}
+							ControllerHandlerFactory.getPipe().getSubjects(id, container);
+							ControllerHandlerFactory.getPipe().getThreads(id, container);
+						} 
+						catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+				});	
 			}
 		}
-				
-		this.subjectsTable.setVisible(false);
-		subjectsTableModel.fireTableDataChanged();
-		this.subjectsTable.setVisible(true);
-		if (showingSubjectsOfID > -1)
-			container.switchToSubjectsAndThreadsView();
 		else {
-			container.switchToRootSubjectsView();
-			container.stopWorkingAnimation();
+
+			this.subjectsTableModel.clearData();
+			if (!encodedView.startsWith("There") && !encodedView.startsWith("addsubjectsuccess")) {
+
+
+				/*	JOptionPane.showMessageDialog(container, "There are no subjects under the subject " + 
+					this.subjectsTableModel.getNameOfSubject(subjectsTable.getSelectionModel().getMinSelectionIndex()), 
+					"no subjects", JOptionPane.INFORMATION_MESSAGE);
+				 */
+
+
+				// each line should represent one subject
+				String[] tSplitted = encodedView.split("\n");
+				// this is the data which will be presented in the subjects table
+				String[][] tData = new String[tSplitted.length][5];
+				// this is the IDs array which should contain the presented subjects' IDs
+				long[] tIDs = new long[tSplitted.length];
+				for (int i = 0; i < tSplitted.length; i++) {
+					String[] tCurrentSubjectInfo = tSplitted[i].split("\t");
+					// this is the subject's id
+					try {
+						tIDs[i] = Long.parseLong(tCurrentSubjectInfo[0]);
+						for (int j = 1; j < tCurrentSubjectInfo.length; j++)
+							tData[i][j - 1] = tCurrentSubjectInfo[j];
+						this.subjectsTableModel.updateData(tIDs, tData);
+
+
+					}
+					catch (NumberFormatException e) {
+						SystemLogger.warning("The server response related to subject's update is invalid");
+						this.showingSubjectsOfName = "";
+						this.showingSubjectsOfID = -1;
+						this.subjectsTableModel.clearData();
+						break;
+					}
+				}
+			}
+
+			this.subjectsTable.setVisible(false);
+			subjectsTableModel.fireTableDataChanged();
+			this.subjectsTable.setVisible(true);
+			if (showingSubjectsOfID > -1)
+				container.switchToSubjectsAndThreadsView();
+			else {
+				container.switchToRootSubjectsView();
+				container.stopWorkingAnimation();
+			}
 		}
 	}
 
@@ -261,18 +363,20 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 		final long id = showingSubjectsOfID;
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				System.out.println("idddddd" + id);
+				subjectsTableModel.setFatherID(id);
 				subjectsTable.setVisible(false);
-				threadsPanel.changeTableVisible();
 				threadsPanel.setVisible(true);
 				System.out.println("name = " + name);
 				container.startWorkingAnimation("retreiving subject " + 
 						name
 						+ " content...");
 				try {
+
 					ControllerHandlerFactory.getPipe().getSubjects(id, container);
 					ControllerHandlerFactory.getPipe().getThreads(id, container);
-				} catch (IOException e1) {
+				} 
+				catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

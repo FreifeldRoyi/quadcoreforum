@@ -25,7 +25,7 @@ import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
  * @author Sepetnitsky Vitali
  *
  */
-public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
+public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 
 	private SessionFactory factory;
 	
@@ -46,8 +46,8 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @throws SAXException
 	 * 		In case a JAXB xml database retrieval error has occurred
 	 */
-	public static JAXBpersistenceDataHandler getInstance() {
-		JAXBpersistenceDataHandler toReturn = new JAXBpersistenceDataHandler();
+	public static SQLpersistenceDataHandler getInstance() {
+		SQLpersistenceDataHandler toReturn = new SQLpersistenceDataHandler();
 		toReturn.setInternalHandlers(toReturn);
 		return toReturn;
 	}
@@ -57,11 +57,11 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * The class constructor.
 	 * 
 	 */
-	private JAXBpersistenceDataHandler() {
+	private SQLpersistenceDataHandler() {
 		factory = SessionFactoryUtil.getInstance();	
 	}
 
-	private void setInternalHandlers(JAXBpersistenceDataHandler util) {
+	private void setInternalHandlers(SQLpersistenceDataHandler util) {
 		this.usersHandler = new UsersPersistenceHandler();
 		this.messagesHandler = new MessagesPersistenceHandler();
 	}
@@ -158,8 +158,8 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#addNewSubject(long, String, String, boolean)
 	 */
-	public void addNewSubject(long subjectID, String name, String description, boolean isTopLevel) throws DatabaseUpdateException {
-			this.messagesHandler.addNewSubject(factory, subjectID, name, description, isTopLevel);
+	public void addNewSubject(long subjectID, String name, String description, long fatherID) throws DatabaseUpdateException {
+			this.messagesHandler.addNewSubject(factory, subjectID, name, description, fatherID);
 	}
 
 	/**
@@ -193,8 +193,8 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#openNewThread(long, String, long)
 	 */
-	public void openNewThread(long threadID, String topic, long rootID) throws DatabaseUpdateException {
-			this.messagesHandler.openNewThread(factory, threadID, topic, rootID);
+	public void openNewThread(long threadID, String topic, long rootID, long fatherID) throws DatabaseUpdateException {
+			this.messagesHandler.openNewThread(factory, threadID, topic, rootID, fatherID);
 	}
 
 	/**
@@ -235,9 +235,9 @@ public class JAXBpersistenceDataHandler implements PersistenceDataHandler {
 	 * @see
 	 * 		PersistenceDataHandler#addNewMessage(long, long, String, String)
 	 */
-	public void addNewMessage(final long messageID, final long userID, final String title, final String content) 
+	public void addNewMessage(final long messageID, final long userID, final String title, final String content, final long fatherID) 
 	throws DatabaseUpdateException {
-			this.messagesHandler.addNewMessage(factory, messageID, userID, title, content);
+			this.messagesHandler.addNewMessage(factory, messageID, userID, title, content, fatherID);
 	}
 
 	/**

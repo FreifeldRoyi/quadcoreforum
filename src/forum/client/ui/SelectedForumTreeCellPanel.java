@@ -135,6 +135,7 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	}
 
 	public void updatePanel(ForumCell cell, ConnectedUserData connectedUser) {
+		if (cell == null) return;
 		currentCellUsername = cell.getAuthorUsername();;
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {

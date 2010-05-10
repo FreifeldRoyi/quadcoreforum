@@ -168,6 +168,23 @@ public interface ForumFacade { //extends SearchEngine {
 	// Subject related methods:	
 	
 	/**
+	 * Finds and returns a subject whose id is equal to the given id
+	 * 
+	 * @param subjectID
+	 * 		The id of the subject which should be retrieved
+	 * 
+	 * @return
+	 * 		The found subject
+	 * 
+	 * @throws SubjectNotFoundException
+	 * 		In case a subject with the given id wasn't found
+	 * @throws DatabaseRetrievalException
+	 * 	    If a problem has occurred while trying to retrieve the required data from the database
+	 */
+	public UISubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException;
+	
+	
+	/**
 	 * Finds and returns all the subject's sub-subjects data, accessible via the UISubject interface.
 	 * 
 	 * @param fatherID
@@ -227,6 +244,23 @@ public interface ForumFacade { //extends SearchEngine {
 
 
 	// Thread related methods
+
+	/**
+	 * Finds and returns a thread whose id is equal to the given id
+	 * 
+	 * @param threadID
+	 * 		The id of the thread which should be retrieved
+	 * 
+	 * @return
+	 * 		The found thread
+	 * 
+	 * @throws ThreadNotFoundException
+	 * 		In case a thread with the given id wasn't found
+	 * @throws DatabaseRetrievalException
+	 * 	    If a problem has occurred while trying to retrieve the required data from the database
+	 */
+	public UIThread getThreadByID(final long threadID) throws ThreadNotFoundException, DatabaseRetrievalException;
+
 	
 	/**
 	 * 

@@ -23,7 +23,7 @@ public class PersistenceFactory
 	 */
 	public static PersistenceDataHandler getPipe() {
 		if (PERSISTENCE_DATA_HANDLER == null) {
-				PERSISTENCE_DATA_HANDLER = JAXBpersistenceDataHandler.getInstance();
+				PERSISTENCE_DATA_HANDLER = SQLpersistenceDataHandler.getInstance();
 		}
 		return PERSISTENCE_DATA_HANDLER;
 	}

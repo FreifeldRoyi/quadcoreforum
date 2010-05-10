@@ -8,10 +8,10 @@ public class SubjectType
 {
 
     protected long subjectID;
+    protected long fatherID;
     protected Set<Long> subSubjectsIDs; 
     protected Set<Long> threadsIDs;
     protected Long lastAddedMessageID;
-    protected boolean isTopLevel;
     protected String name;
     protected String description;
   
@@ -28,6 +28,31 @@ public class SubjectType
     }
 
     /**
+     * Sets the value of the fatherID property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link long }
+     *     
+     */
+    public void setFatherID(long fatherID) {
+        this.fatherID = fatherID;
+    }
+    
+    
+    /**
+     * Gets the value of the fatherID property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link long }
+     *     
+     */
+    public long getFatherID() {
+        return this.fatherID;
+    }
+
+    /**
      * Sets the value of the name property.
      * 
      * @param value
@@ -39,6 +64,7 @@ public class SubjectType
         this.name = value;
     }
 
+    
     /**
      * Gets the value of the description property.
      * 
@@ -131,21 +157,4 @@ public class SubjectType
     public void setLastAddedMessageID(Long value) {
         this.lastAddedMessageID = value;
     }
-
-    /**
-     * Gets the value of the isToLevel property.
-     * 
-     */
-    public boolean isIsTopLevel() {
-        return isTopLevel;
-    }
-
-    /**
-     * Sets the value of the isToLevel property.
-     * 
-     */
-    public void setIsTopLevel(boolean value) {
-        this.isTopLevel = value;
-    }
-
 }

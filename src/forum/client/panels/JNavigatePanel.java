@@ -3,12 +3,17 @@
  */
 package forum.client.panels;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.*;
 
 import javax.swing.*;
+
+import forum.client.controllerlayer.ControllerHandlerFactory;
+import forum.client.ui.events.GUIHandler;
 
 /**
  * @author sepetnit
@@ -29,12 +34,12 @@ public class JNavigatePanel extends JPanel {
 	private JLabel createArrowLabel() {
 		JLabel tArrow = new JLabel(arrow);
 		tArrow.setFont(arrowFont);
+		tArrow.setForeground(Color.WHITE);
 		return tArrow;	
 	}
 	private void updateNavigateView() {
 		this.removeAll();
 		this.setVisible(false);
-
 		Iterator<JLinkButton> tIter = links.iterator();
 		while (tIter.hasNext()) {			
 			this.add(tIter.next());
@@ -55,10 +60,7 @@ public class JNavigatePanel extends JPanel {
 		while (tIter.hasNext()) {
 			tIter.next();
 			tIter.remove();
-			System.out.println("removeing");
 		}
-		System.out.println(links.size());
-
 		this.updateNavigateView();
 	}	
 
@@ -80,18 +82,5 @@ public class JNavigatePanel extends JPanel {
 		this.insertLink(toAdd);
 	}
 
-	public static void main(String[] args) {
-		JFrame f = new JFrame();
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JNavigatePanel test = new JNavigatePanel(new JLinkButton("hello"));
-		test.setSize(400, 100);
-		test.insertLink(new JLinkButton("ARE"));
-		test.insertLink(new JLinkButton("WE"));
-		test.insertLink(new JLinkButton("WEE"));
-
-		f.getContentPane().add(test);
-		f.setSize(400, 100);
-		f.pack();
-		f.setVisible(true);
-	}
+	
 }

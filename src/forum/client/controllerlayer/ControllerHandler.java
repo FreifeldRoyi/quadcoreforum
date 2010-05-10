@@ -106,5 +106,5 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	public abstract void promoteToModerator(Component comp, String username);
 
-
+	public abstract void getPath(Component comp, long messageID);
 }

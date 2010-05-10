@@ -94,7 +94,7 @@ public class MessagesPersistenceHandler {
 	public Collection<ForumSubject> getTopLevelSubjects(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		Collection<ForumSubject> toReturn = new Vector<ForumSubject>();
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
-		String query = "from SubjectType where SubjectID != -1 AND isTopLevel = true";
+		String query = "from SubjectType where SubjectID != -1 AND FatherID = -1";
 		List tResult = session.createQuery(query).list();
 		for (SubjectType tCurrentSubjectType : (List<SubjectType>)tResult) 
 			toReturn.add(PersistentToDomainConverter.convertSubjectTypeToForumSubject(tCurrentSubjectType));
@@ -167,10 +167,10 @@ public class MessagesPersistenceHandler {
 	 * 		PersistenceDataHandler#addNewSubject(long, String, String, boolean)
 	 */
 	public void addNewSubject(SessionFactory ssFactory, long subjectID, String name, String description, 
-			boolean isTopLevel) throws DatabaseUpdateException {
+			long fatherID) throws DatabaseUpdateException {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
-			SubjectType tNewSubjectType = ExtendedObjectFactory.createSubject(subjectID, name, description, isTopLevel);
+			SubjectType tNewSubjectType = ExtendedObjectFactory.createSubject(subjectID, name, description, fatherID);
 			session.save(tNewSubjectType);
 			this.commitTransaction(session);
 		}
@@ -292,10 +292,10 @@ public class MessagesPersistenceHandler {
 	 * 		PersistenceDataHandler#openNewThread(long, String, long)
 	 */
 	public void openNewThread(SessionFactory ssFactory, long threadID, String topic, 
-			long rootID) throws DatabaseUpdateException {
+			long rootID, long fatherSubjectID) throws DatabaseUpdateException {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
-			ThreadType tNewThreadType = ExtendedObjectFactory.createThreadType(threadID, topic, rootID);
+			ThreadType tNewThreadType = ExtendedObjectFactory.createThreadType(threadID, topic, rootID, fatherSubjectID);
 			session.save(tNewThreadType);
 			this.commitTransaction(session);
 		}
@@ -447,10 +447,10 @@ public class MessagesPersistenceHandler {
 	 * 		PersistenceDataHandler#addNewMessage(long, long, String, String)
 	 */
 	public void addNewMessage(SessionFactory ssFactory, long messageID, long authorID, 
-			String title, String content) throws DatabaseUpdateException {
+			String title, String content, long fatherID) throws DatabaseUpdateException {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
-			MessageType tNewMessageType = ExtendedObjectFactory.createMessageType(messageID, authorID, title, content);
+			MessageType tNewMessageType = ExtendedObjectFactory.createMessageType(messageID, authorID, title, content, fatherID);
 			session.save(tNewMessageType);
 			this.commitTransaction(session);
 		}
@@ -468,7 +468,7 @@ public class MessagesPersistenceHandler {
 	 */
 	public void updateMessage(SessionFactory ssFactory, long messageID, 
 			String newTitle, String newContent, 
-			Collection<Long> replies, long threadID) throws MessageNotFoundException, DatabaseUpdateException {		
+			Collection<Long> replies, long fatherID) throws MessageNotFoundException, DatabaseUpdateException {		
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			MessageType tMsgToEdit = this.getMessageTypeByID(session, messageID);
@@ -478,9 +478,9 @@ public class MessagesPersistenceHandler {
 			}
 			tMsgToEdit.setTitle(newTitle);
 			tMsgToEdit.setContent(newContent);
-			tMsgToEdit.setThreadID(threadID);
+			tMsgToEdit.setFatherID(fatherID);
 			try {
-				this.updateThreadOfReplies(session, tMsgToEdit, replies, threadID);
+				//this.updateThreadOfReplies(session, tMsgToEdit, replies, threadID);
 				tMsgToEdit.setRepliesIDs(new HashSet<Long>(replies));
 				session.update(tMsgToEdit);
 
@@ -496,7 +496,7 @@ public class MessagesPersistenceHandler {
 		}
 	}
 
-	private void updateThreadOfReplies(Session session, 
+/*	private void updateThreadOfReplies(Session session, 
 			MessageType toUpdate, Collection<Long> newReplies, long threadID) throws DatabaseUpdateException {
 		try {
 			for (Long tCurrentReplyID : newReplies)
@@ -509,7 +509,7 @@ public class MessagesPersistenceHandler {
 		catch (Exception e) {
 			throw new DatabaseUpdateException();
 		}
-	}
+	}*/
 
 	/**
 	 * @param data
@@ -528,6 +528,7 @@ public class MessagesPersistenceHandler {
 				if (tMessageType == null)
 					throw new MessageNotFoundException(messageID);
 				session.delete(tMessageType);
+				/*
 				for (Long tReplyIDToDelete : tMessagesIDsToDelete) {
 					if (tReplyIDToDelete != messageID) {
 						MessageType tCurrentReply = this.getMessageTypeByID(session, tReplyIDToDelete);
@@ -538,7 +539,7 @@ public class MessagesPersistenceHandler {
 							//TODO: add logging
 						}
 					}
-				}
+				}*/
 				this.commitTransaction(session);			
 				return tMessagesIDsToDelete;
 			}

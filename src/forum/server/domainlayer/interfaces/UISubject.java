@@ -45,4 +45,6 @@ public interface UISubject {
 	 * 		A string representation of this subject
 	 */
 	public String toString();
+	
+	public long getFatherID();
 }

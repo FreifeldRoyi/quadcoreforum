@@ -23,6 +23,7 @@ import forum.tcpcommunicationlayer.AddNewThreadMessage;
 import forum.tcpcommunicationlayer.AddReplyMessage;
 import forum.tcpcommunicationlayer.ClientMessage;
 import forum.tcpcommunicationlayer.DeleteMessageMessage;
+import forum.tcpcommunicationlayer.GetPathMessage;
 import forum.tcpcommunicationlayer.GuestsAndMembersNumberMessage;
 import forum.tcpcommunicationlayer.LoginMessage;
 import forum.tcpcommunicationlayer.LogoffMessage;
@@ -592,4 +593,18 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}		
+	
+	public void getPath(Component comp, long messageID) {
+		try {
+			final ClientMessage toSend = new GetPathMessage(messageID);
+			getActiveUsersNumber();
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}
+	}
 }

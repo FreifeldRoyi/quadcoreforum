@@ -50,7 +50,7 @@ import forum.server.domainlayer.SystemLogger;
  * @author Tomer Heber
  *
  */
-public class ForumTree {
+public class ForumTree implements GUIHandler {
 
 	/**
 	 * The JTree GUI component.
@@ -88,6 +88,7 @@ public class ForumTree {
 		//}
 		//catch (Exception e) {}
 	}
+
 
 
 	public ForumTree(final MainPanel container) {
@@ -279,6 +280,28 @@ public class ForumTree {
 		}		
 	}
 
+	public void notifyError(String errorMessage) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void refreshForum(String encodedView) {
+		if (encodedView.startsWith("getpathsuccess")) {
+			m_panel.setVisible(false);
+			final String[] tSplitted = 
+				encodedView.substring(encodedView.indexOf("MESSAGES") + 9).split("\n");
+			new Thread(new Runnable() {
+				public void run() {
+					setRootMessage(Long.parseLong(tSplitted[0]));
+					((MessageTreeNode)m_tree.getModel().getRoot()).getRecursively(tSplitted, 1);
+					container.switchToMessagesView();
+				}
+			}).start();
+		}
+
+	}
+
+
 	/**
 	 * 
 	 * @return The forum tree GUI component. 
@@ -314,6 +337,31 @@ public class ForumTree {
 
 			System.out.println(errorMessage);
 		}
+
+		public void getRecursively(final String[] tSplitted, final int index) {
+			if (index >= tSplitted.length) return;
+			System.out.println(index  + " = index");
+			long tNextMessageToLoad = Long.parseLong(tSplitted[index]);
+			
+			
+			for (int i = 0; i < this.getChildCount(); i++) { 
+				
+				final MessageTreeNode n = (MessageTreeNode)this.getChildAt(i);
+				System.out.println("current id = " + ((ForumCell)n.getUserObject()).getId());
+				System.out.println("next mes ID = " + tNextMessageToLoad);
+				if (((ForumCell)n.getUserObject()).getId() == tNextMessageToLoad) {
+					m_tree.expandPath(new TreePath(
+							((DefaultTreeModel)m_tree.getModel()).getPathToRoot(n)));
+					m_tree.setSelectionPath(new TreePath(
+							((DefaultTreeModel)m_tree.getModel()).getPathToRoot(n)));
+					System.out.println("path to root " + tSplitted[index]);
+					n.getRecursively(tSplitted, index + 1);
+					break;
+
+				}
+			}
+		}
+
 
 		public void refreshForum(String encodedView) {
 			ForumCell rootCell = decodeView(encodedView);
@@ -399,23 +447,14 @@ public class ForumTree {
 		if (encodedView.startsWith("replysuccess") || 
 				encodedView.startsWith("modifysuccess") || 
 				encodedView.startsWith("deletesuccess") ||
-				encodedView.startsWith("searchresult"))
-
+				encodedView.startsWith("searchresult") ||
+				encodedView.startsWith("getpathsuccess"))
 			return null;
 		try {
-			///	\t	////////////\t/// f
-			///////////////// s1
-			//////////////////////////s11
-			///////////////// s2
-			/////////////////////////s21
-			/////////////////////////s22
-
-
-			System.out.println("encodedview = " + encodedView);
-
 			String[] tSplitted = encodedView.split("\n\tAREPLYMESSAGE: ");
 
 			System.out.println("***********splitted: ");
+
 			for (int i = 0; i <tSplitted.length;i++)
 				System.out.println("splitted [" + i + "] = " + tSplitted[i]);
 
@@ -425,24 +464,16 @@ public class ForumTree {
 					tRootAsStringArray[3] += ("\t" + tRootAsStringArray[i]);  
 				}
 			}
-			/*			int index = 1;
-			while (index < tSplitted.length && !tSplitted[index].startsWith("\t\tASUBREPLYMESSAGE: ") &&
-					!tSplitted[index].startsWith("\tAREPLYMESSAGE: ")) {
-				tRootAsStringArray[3] += tSplitted[index];  
-				index++;
-			}
-			 */
+
+
 
 
 
 			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
 					tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
 
-			for (int i = 1/*index*/; i < tSplitted.length; i++) {
+			for (int i = 1; i < tSplitted.length; i++) {
 				String[] tCurrentReplies = tSplitted[i].split("\n\t\tASUBREPLYMESSAGE: ");
-				System.out.println("***********replies: ");
-				for (int t = 0; t <tCurrentReplies.length;t++)
-					System.out.println("replies [" + t + "] = " + tCurrentReplies[t]);
 
 				String[] tCurrReply = tCurrentReplies[0].split("\t");
 				if (tCurrReply.length > 4) {
@@ -459,55 +490,16 @@ public class ForumTree {
 							tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
 						}
 					}
-
-					//				int j = ++i;
-
-					//				while (j < tSplitted.length && !tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ") &&
-					//						!tSplitted[j].startsWith("\tAREPLYMESSAGE: ")) {
-					//					tCurrentReplyAsStringArray[3] += tSplitted[j];  
-					//					j = ++i;
-					//				}		
-
-					System.out.println("reply[0] = " + tCurrentReplyAsStringArray[0] + "reply[1] = " + tCurrentReplyAsStringArray[1] + 
-							"reply[2] = " + tCurrentReplyAsStringArray[2] + "reply[3] = " + tCurrentReplyAsStringArray[3]);
-
-
 					ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
 							tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
 					tReply.add(tCurrentReply);
 				}
 
-				/*				while (j < tSplitted.length && tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ")) {
-					tCurrentReplyAsStringArray = tSplitted[j].split("\t");
-
-					if (tCurrentReplyAsStringArray.length > 4) {
-						for (int k = 4; k < tCurrentReplyAsStringArray.length; k++) {
-							tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
-						}
-					}
-
-					j = ++i;
-
-					while (j < tSplitted.length && !tSplitted[j].startsWith("\t\tASUBREPLYMESSAGE: ") &&
-							!tSplitted[j].startsWith("\tAREPLYMESSAGE: ")) {
-						tCurrentReplyAsStringArray[3] += tSplitted[j];  
-						j = ++i;
-					}		
-
-
-
-					ForumCell tCurrentReplyToReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[1]),
-							tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3], tCurrentReplyAsStringArray[4]);
-					tCurrentReply.add(tCurrentReplyToReply);
-					j++;
-				}
-				i = j - 1;
-				 */				
-
 				tRoot.add(tReply);
 			}
 			return tRoot;
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			e.printStackTrace();
 			SystemLogger.warning("Error while parsing messages view response");
 			return null;
@@ -647,6 +639,7 @@ public class ForumTree {
 			}
 		}), EventType.MESSAGES_UPDATED);
 		pipe.deleteMessage(container.getConnectedUser().getID(), parentCell == null? -1 : parentCell.getId(), cell.getId(), button);
+
 		m_tree.setSelectionRow(0);
 	}
 
@@ -663,6 +656,8 @@ public class ForumTree {
 			}
 		});
 	}
+
+
 
 	/**
 	 * This is for testing purposes only! <br>

@@ -138,11 +138,11 @@ public class MessagesCache {
 	 * @throws DatabaseUpdateException
 	 * 		In case the new subject can't be added to the database due to a database connection error
 	 */
-	public ForumSubject createNewSubject(final String name, final String description, boolean isTopLevel) throws
+	public ForumSubject createNewSubject(final String name, final String description, final long fatherID) throws
 	DatabaseUpdateException {
 		long tSubjectID = this.getNextSubjectID();
-		this.pipe.addNewSubject(tSubjectID, name, description, isTopLevel);
-		ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description, isTopLevel);
+		this.pipe.addNewSubject(tSubjectID, name, description, fatherID);
+		ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description, fatherID);
 		this.idsToSubjectsMapping.put(tNewSubject.getID(), tNewSubject);
 		return tNewSubject;			
 	}
@@ -209,11 +209,11 @@ public class MessagesCache {
 	 * @throws DatabaseUpdateException
 	 * 		In case the created thread can't be added to the database due to a database connection error
 	 */
-	public ForumThread openNewThread(final String topic, long rootID) throws DatabaseUpdateException {
+	public ForumThread openNewThread(final String topic, long rootID, final long fatherSubjectID) throws DatabaseUpdateException {
 		final long tThreadID = this.getNextThreadID();
-		ForumThread tNewThread = new ForumThread(tThreadID, topic, rootID);
+		ForumThread tNewThread = new ForumThread(tThreadID, topic, rootID, fatherSubjectID);
 		this.idsToThreadsMapping.put(tThreadID, tNewThread);
-		this.pipe.openNewThread(tThreadID, topic, rootID);
+		this.pipe.openNewThread(tThreadID, topic, rootID, fatherSubjectID);
 		return tNewThread;
 	}
 
@@ -291,10 +291,11 @@ public class MessagesCache {
 	 * @throws DatabaseUpdateException
 	 * 		In case the created message can't be added to the database due to a database connection error
 	 */
-	public ForumMessage createNewMessage(final long authorID, final String title, final String content) throws DatabaseUpdateException {
+	public ForumMessage createNewMessage(final long authorID, final String title, 
+			final String content, final long fatherID) throws DatabaseUpdateException {
 		long tMessageID = this.getNextMessageID();
-		ForumMessage tNewMessage = new ForumMessage(tMessageID, authorID, title, content);
-		this.pipe.addNewMessage(tMessageID, authorID, title, content);
+		ForumMessage tNewMessage = new ForumMessage(tMessageID, authorID, title, content, fatherID);
+		this.pipe.addNewMessage(tMessageID, authorID, title, content, fatherID);
 		this.idsToMessagesMapping.put(tMessageID, tNewMessage);
 		return tNewMessage;
 	}
@@ -330,7 +331,8 @@ public class MessagesCache {
 	 * 		In case the database can't be updated due to a database connection error
 	 */
 	public void updateInDatabase(ForumMessage updatedMessage) throws MessageNotFoundException, DatabaseUpdateException {
-		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies(), -1);
+		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies(),
+				updatedMessage.getFatherID());
 		if (!this.idsToMessagesMapping.containsKey(updatedMessage.getID()))
 			this.idsToMessagesMapping.put(updatedMessage.getID(), updatedMessage);
 	}

@@ -15,6 +15,7 @@ public class ForumThread implements UIThread {
 	private String topic;
 	private long numOfResponses;
 	private long numOfViews;
+	private long fatherSubjectID;
 
 	// TODO: handle numOfResponses, numOfViews, latestPostID
 
@@ -34,13 +35,15 @@ public class ForumThread implements UIThread {
 	 * @param numOfViews
 	 * 		The number of views of the thread content
 	 */
-	public ForumThread(final long threadID, final String topic, final long rootID, int numOfReponses, int numOfViews)
+	public ForumThread(final long threadID, final String topic, final long rootID, int numOfReponses, int numOfViews,
+			long fatherSubjectID)
 	{
 		this.threadID = threadID;
 		this.topic = topic;
 		this.rootMessageID = rootID;
 		this.numOfResponses = numOfReponses;
 		this.numOfViews = numOfViews;
+		this.fatherSubjectID = fatherSubjectID;
 	}
 
 	/**
@@ -54,8 +57,8 @@ public class ForumThread implements UIThread {
 	 * @param rootID
 	 * 		The id of the thread root message
 	 */
-	public ForumThread(final long threadID, final String topic, final long rootID) {
-		this(threadID, topic, rootID, 0, 0);
+	public ForumThread(final long threadID, final String topic, final long rootID, final long fatherSubjectID) {
+		this(threadID, topic, rootID, 0, 0, fatherSubjectID);
 	}
 
 	// getters
@@ -101,6 +104,10 @@ public class ForumThread implements UIThread {
 		return this.numOfViews;
 	}
 
+	public long getFatherID() {
+		return this.fatherSubjectID;
+	}
+	
 	/**
 	 * @see
 	 * 		UIThread#toString()

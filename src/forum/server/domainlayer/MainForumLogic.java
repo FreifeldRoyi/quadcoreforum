@@ -186,6 +186,14 @@ public class MainForumLogic implements ForumFacade {
 
 	/**
 	 * @see
+	 * 		ForumFacade#getSubjectByID(long)
+	 */
+	public UISubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
+		return this.messagesController.getSubjectByID(subjectID);
+	}
+	
+	/**
+	 * @see
 	 * 		ForumFacade#getSubjects(long)
 	 */
 	public Collection<UISubject> getSubjects(long fatherID)
@@ -205,6 +213,14 @@ public class MainForumLogic implements ForumFacade {
 
 	
 	// Thread related methods
+	
+	/**
+	 * @see
+	 * 		ForumFacade#getThreadByID(long)
+	 */
+	public UIThread getThreadByID(long thread) throws ThreadNotFoundException, DatabaseRetrievalException {
+		return this.messagesController.getThreadByID(thread);
+	}
 	
 	/**
 	 * @see

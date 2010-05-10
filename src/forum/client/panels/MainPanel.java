@@ -17,6 +17,7 @@ import forum.server.domainlayer.user.Permission;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +26,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -80,12 +80,18 @@ public class MainPanel extends JFrame implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
+		System.out.println("\n---------------------\n"+encodedView);
+		
+		
+		
+				
 		// simulates a press on the home button
 
 		if (encodedView.startsWith("register") || 
 				encodedView.startsWith("activenumbers\t") ||
 				encodedView.startsWith("activeusernames\t") ||
-				encodedView.startsWith("promoted\t")) return;
+				encodedView.startsWith("promoted\t") ||
+				encodedView.startsWith("getpathsuccess")) return;
 
 
 		this.pnl_navigate.setVisible(false);
@@ -126,14 +132,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
-				subjectsPanel.setModeratorOrAdminView();
+			subjectsPanel.setModeratorOrAdminView();
 		}
 		else if (connectedUser.getType() == ConnectedUserData.UserType.MEMBER)
 			subjectsPanel.setMemberView();
 		else
 			subjectsPanel.setGuestView();
-		
-		
+
+
 		this.setEnabled(true);
 
 		if (!this.connectedUser.isGuest()) {
@@ -252,10 +258,28 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	private void initGUIComponents() {
 		// prepares the navigate panel
-		pnl_navigate = new JPanel();
+		pnl_navigate = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background2.jpg").getImage(), 
+						0, 0, 1680, 1050, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+
+
+
+
 		btn_login = new JButton("login");
 		btn_register = new JButton("register");
 		lbl_welcome = new JLabel();
+
+		lbl_welcome.setForeground(Color.WHITE);
 
 		btn_logout = new JButton("logout");
 		btn_logout.setVisible(false);
@@ -272,6 +296,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		lbl_welcome.setFont(new Font("Tahoma", Font.BOLD, 14)); // NOI18N
 		lbl_welcome.setText("Hello guest!"); // NOI18N
+		lbl_welcome.setOpaque(false);
+
+
 
 		this.btn_register.addActionListener(new ActionListener() {
 
@@ -288,15 +315,26 @@ public class MainPanel extends JFrame implements GUIHandler {
 			}
 
 		});
-		
+
+
 		btn_search = new JButton("search");
 
+		
 		btn_search.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						SearchDialog tNewSearchDialog = new SearchDialog();
 						tNewSearchDialog.setVisible(true);
+						System.out.println(tNewSearchDialog.getSelectedID());
+						try {
+							if (tNewSearchDialog.getSelectedID() != -1)
+								ControllerHandlerFactory.getPipe().getPath(MainPanel.this, tNewSearchDialog.getSelectedID());
+						} 
+						catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 				);
@@ -325,6 +363,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		tShowRootSubjects.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
+				subjectsPanel.setFatherID(-1);
 				startWorkingAnimation("loading root subjects ...");
 				subjectsPanel.updateFields(-1, "");
 				controller.getSubjects(-1, mainPanel);
@@ -335,6 +374,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		pnl_links = new JNavigatePanel(tShowRootSubjects);
 
+		pnl_links.setOpaque(false);
 		//tMainLinkButton.setPreferredSize(new Dimension(20, 10));
 
 		JSeparator tVerticalSeparator = new JSeparator(SwingConstants.VERTICAL);
@@ -418,15 +458,31 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		// prepares the fast login panel
 
-		pnl_fastLogin = new JPanel();
+		pnl_fastLogin = new JPanel() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8175327762515671628L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background2.jpg").getImage(), 
+						0, 0, 1680, 1050, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+
+		};
 		fastLoginButton = new JButton();
 		fastLoginUsernameLabel = new JLabel();
 		fastLoginUsernameInput = new JTextField();
 		fastLoginPasswordLabel = new JLabel();
 		fastLoginPasswordInput = new JPasswordField();
 
-		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		pnl_fastLogin.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Fast Login"));
+		pnl_fastLogin.setBorder(BorderFactory.createEtchedBorder());
+		pnl_fastLogin.setBorder(BorderFactory.createTitledBorder(pnl_fastLogin.getBorder(), "Fast Login", 0, 0,
+				new Font("Tahoma", Font.BOLD, 12), Color.WHITE));
+
 		fastLoginButton.setText("Login");
 
 		fastLoginButton.addActionListener(new ActionListener() {
@@ -438,10 +494,13 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 
 		fastLoginUsernameLabel.setFont(lbl_welcome.getFont());
+		fastLoginUsernameLabel.setForeground(Color.WHITE);
+
 		fastLoginUsernameLabel.setText("Username");
 		fastLoginUsernameInput.setText("");
 
 		fastLoginPasswordLabel.setFont(lbl_welcome.getFont());
+		fastLoginPasswordLabel.setForeground(Color.WHITE);
 		fastLoginPasswordLabel.setText("Password");
 		fastLoginPasswordInput.setText("");
 
@@ -550,10 +609,23 @@ public class MainPanel extends JFrame implements GUIHandler {
 			e1.printStackTrace();
 		}
 
-		this.mainPanel = new JPanel();
+		this.mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 4663000630699083767L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
 		//		mainPanel.setPreferredSize(new Dimension(1159, 600));
 
-		JSeparator tMainPanelSeparator = new JSeparator();
+		JLabel tMainPanelSeparator = new JLabel();
+		tMainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
@@ -568,11 +640,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(tStatisticsPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(pnl_fastLogin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.subjectsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
-
+								.addComponent(tMainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.threadsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)								
 
-								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)																
-								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE))
+								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE))															
+								//								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE))
 								.addContainerGap())
 		);
 
@@ -584,17 +656,22 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGap(11, 11, 11)
 						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-	//					.addGap(0, 0, Short.MAX_VALUE)
+						.addComponent(tMainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGap(16, 16, 16)
+						//					.addGap(0, 0, Short.MAX_VALUE)
 						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
 						.addComponent(this.threadsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
 
-		//				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+						//				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 
-			//			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+						//			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 						//              .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 						//                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+						//.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+						.addGap(11, 11, 11)
+
 						.addComponent(pnl_fastLogin, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+						.addGap(11, 11, 11)
 						.addComponent(tStatisticsPanel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
 						.addGap(11, 11, 11)
 
@@ -635,7 +712,16 @@ public class MainPanel extends JFrame implements GUIHandler {
 			public void keyReleased(KeyEvent e) {}
 			public void keyTyped(KeyEvent e) {}
 		});
-		
+
+		try {
+			ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(subjectsPanel), EventType.SEARCH_UPDATED);
+			ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tree), EventType.SEARCH_UPDATED);
+
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
 	}
 
 	public void switchToMessagesView() {
