@@ -11,16 +11,21 @@ import org.compass.annotations.SearchableProperty;
 
 import forum.server.domainlayer.interfaces.UIMessage;
 
-@Searchable (extend = "UIMessage")
-public class ForumMessage implements UIMessage {
+@Searchable //(extend = "UIMessage")
+public class ForumMessage extends UIMessage {
 	
+	@SearchableId
 	private long messageID;
 	
+	@SearchableProperty (name = "authorID")
 	private long authorID;
 	
+	@SearchableProperty (name = "title")
 	private String title;
 	
+	@SearchableProperty (name = "content")
 	private String content;
+	
 	private long fatherID;
 	
 	private GregorianCalendar postTime;
@@ -85,13 +90,35 @@ public class ForumMessage implements UIMessage {
 	
 	/**
 	 * @see
-	 * 		UIMessage#getID()
+	 * 		UIMessage#getMessageID()
 	 */
 	//@SearchableId
-	public long getID() {
+	public long getMessageID() {
 		return this.messageID;
 	}
 
+	/* used for the compass */
+	
+	public ForumMessage() {}
+	
+	public void setMessageID(long messageID) {
+		this.messageID = messageID;
+	}
+
+	/* used for the compass */
+	public void setAuthorID(long authorID) {
+		this.authorID = authorID;
+	}
+	
+	public void setFatherID(long fatherID) {
+		this.fatherID = fatherID;
+	}
+	
+	public void setRepliesIDs(Collection<Long> repliesIDs) {
+		this.repliesIDs = repliesIDs;
+	}
+	
+	
 	/**
 	 * @see
 	 * 		UIMessage#getAuthorID()
@@ -227,7 +254,7 @@ public class ForumMessage implements UIMessage {
 	 * 		UIMessage#toString()
 	 */
 	public String toString() {
-		return this.getID() + "\t" + this.getAuthorID() + "\t" + this.getTitle() + "\t" + 
+		return this.getMessageID() + "\t" + this.getAuthorID() + "\t" + this.getTitle() + "\t" + 
 		this.getContent();
 	}
 }

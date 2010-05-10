@@ -5,16 +5,18 @@
 
    <compass name="default">
       <connection>
-         <jdbc dialect="org.apache.lucene.store.jdbc.dialect.MySQLDialect">
-             <dataSourceProvider>
-                 <driverManager url="jdbc:mysql://localhost/quadcoreforumdb" username="root" password="1234" 
-                                driverClass="com.mysql.jdbc.Driver" ></driverManager>
-             </dataSourceProvider>             
+         <jdbc
+         	dialect="org.apache.lucene.store.jdbc.dialect.MySQLDialect">
+         	<dataSourceProvider>
+         		<driverManager
+         			url="jdbc:mysql://localhost/quadcoreforumdb?emulateLocators=true" username="root"
+         			password="1234" driverClass="com.mysql.jdbc.Driver"></driverManager>
+         	</dataSourceProvider>
          </jdbc>
-     </connection>
+      </connection>
    
       <mappings>
-          <class name="forum.server.domainlayer.interfaces.UIMessage"></class>
+<!--          <class name="forum.server.domainlayer.interfaces.UIMessage"></class>-->
           <class name="forum.server.domainlayer.message.ForumMessage"></class>
       </mappings>
    

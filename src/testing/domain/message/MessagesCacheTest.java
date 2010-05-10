@@ -177,21 +177,21 @@ public class MessagesCacheTest extends TestCase {
 			// adds a new thread
 			ForumMessage tRootMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title", "content");
 
-			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tRootMessage.getID());
+			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tRootMessage.getMessageID());
 
 			final int tNumOfMessages = 5; 
 			final Collection<Long> tCreatedMessagesIDs = new Vector<Long>();			
 
 			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title0", "content0");
-			tRootMessage.addReply(tNewMessage.getID());
+			tRootMessage.addReply(tNewMessage.getMessageID());
 			this.messagesCacheUnderTest.updateInDatabase(tRootMessage);
 
-			tCreatedMessagesIDs.add(tRootMessage.getID());
+			tCreatedMessagesIDs.add(tRootMessage.getMessageID());
 
 			for (int i = 1; i < tNumOfMessages; i++) {
 				ForumMessage tNextMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title" + i, "content" + i);
-				tNextMessage.addReply(tNewMessage.getID());
-				tCreatedMessagesIDs.add(tNewMessage.getID());
+				tNextMessage.addReply(tNewMessage.getMessageID());
+				tCreatedMessagesIDs.add(tNewMessage.getMessageID());
 				this.messagesCacheUnderTest.updateInDatabase(tNextMessage);
 				tNewMessage = tNextMessage;
 			}
@@ -206,7 +206,7 @@ public class MessagesCacheTest extends TestCase {
 					// do nothing - the exception should be thrown
 				}
 				try {
-					this.messagesCacheUnderTest.getMessageByID(tRootMessage.getID());
+					this.messagesCacheUnderTest.getMessageByID(tRootMessage.getMessageID());
 					fail("the thread root message wasn't deleted");
 				}
 				catch (MessageNotFoundException e1) {
@@ -244,7 +244,7 @@ public class MessagesCacheTest extends TestCase {
 	public void testGetMessageByID() {
 		try {
 			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
-			ForumMessage tObtainedMessage = this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID());
+			ForumMessage tObtainedMessage = this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());
 			assertSame(tNewMessage, tObtainedMessage);
 		}
 		catch (MessageNotFoundException e) {
@@ -268,7 +268,7 @@ public class MessagesCacheTest extends TestCase {
 			assertEquals(tNewMessage.getAuthorID(), -1);
 			assertEquals(tNewMessage.getTitle(), "title1");
 			assertEquals(tNewMessage.getContent(), "content1");
-			assertSame(tNewMessage, this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID()));
+			assertSame(tNewMessage, this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID()));
 		} 
 		catch (DatabaseUpdateException e) {
 			fail(e.getMessage());
@@ -289,16 +289,16 @@ public class MessagesCacheTest extends TestCase {
 		// TODO: test recursive deletion
 		try {
 			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
-			final long tMessageID = tNewMessage.getID();
+			final long tMessageID = tNewMessage.getMessageID();
 			try {
-				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID());
+				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());
 				this.messagesCacheUnderTest.deleteAMessage(tMessageID);
 			}
 			catch (MessageNotFoundException e) {
 				fail("the message hasn't been added successfuly");
 			}
 			try {
-				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getID());
+				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());
 				fail("the message hasn't been deleted successfuly");
 			}
 			catch (MessageNotFoundException e) {

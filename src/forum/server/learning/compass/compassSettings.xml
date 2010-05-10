@@ -7,15 +7,16 @@
       <connection>
          <jdbc dialect="org.apache.lucene.store.jdbc.dialect.MySQLDialect">
              <dataSourceProvider>
-                 <driverManager url="jdbc:mysql://localhost/quadcoreforumdb" username="root" password="1234" 
+                 <driverManager url="jdbc:mysql://localhost/test?emulateLocators=true" username="root" password="1234" 
                                 driverClass="com.mysql.jdbc.Driver" ></driverManager>
              </dataSourceProvider>             
          </jdbc>
      </connection>
    
       <mappings>
-          <class name="forum.server.domainlayer.message.ForumMessage" ></class>
-      </mappings>
+<class name="forum.server.learning.compass.example.Message" />
+
+    </mappings>
    
    </compass>
 </compass-core-config>

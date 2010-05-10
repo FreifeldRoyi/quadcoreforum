@@ -39,7 +39,7 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 				UIMessage tCurrentReply = iter.next();
 				// TODO: reply the usernames of the authors
 				tResponse += "\tAREPLYMESSAGE: " + tCurrentReply.toString() + "\n";
-				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getID());
+				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getMessageID());
 				for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
 					tResponse += "\t\tASUBREPLYMESSAGE: " + tNextLevelCurrentReply.toString() + "\n";
 			}

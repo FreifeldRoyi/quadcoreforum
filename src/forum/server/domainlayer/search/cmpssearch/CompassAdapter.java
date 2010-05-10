@@ -20,8 +20,8 @@ import forum.server.domainlayer.search.SearchHit;
  */
 public class CompassAdapter implements SearchEngine 
 {
-	/* Adaptee */
-	Compass compass;
+	/* The adaptee */
+	private Compass compass;
 	
 	public CompassAdapter(Compass cmp)
 	{
@@ -55,6 +55,8 @@ public class CompassAdapter implements SearchEngine
 	@Override
 	public SearchHit[] searchByAuthor(long usrID, int from, int to) 
 	{
+		System.out.println("usrID = " + usrID);
+
 		SearchHit[] toReturn = null;
 		
 		CompassSession session = this.compass.openSession();
@@ -96,7 +98,9 @@ public class CompassAdapter implements SearchEngine
 		
 		try
 		{
-			CompassHits hits = session.find("content:\"" + phrase + "\" OR \"title:\"" + phrase + "\"");
+			System.out.println("phrase = " + phrase);
+			CompassHits hits = session.find("title:" + phrase + " OR content:" + phrase);
+//			CompassHits hits = session.find("content: \"" + phrase + "\" OR \" title:\" " + phrase + "\"");
 			CompassHit[] detachedHits = hits.detach(from,to).getHits();
 			
 			toReturn = new SearchHit[detachedHits.length];

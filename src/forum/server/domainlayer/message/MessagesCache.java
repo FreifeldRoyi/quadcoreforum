@@ -331,9 +331,9 @@ public class MessagesCache {
 	 * 		In case the database can't be updated due to a database connection error
 	 */
 	public void updateInDatabase(ForumMessage updatedMessage) throws MessageNotFoundException, DatabaseUpdateException {
-		this.pipe.updateMessage(updatedMessage.getID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies(),
+		this.pipe.updateMessage(updatedMessage.getMessageID(), updatedMessage.getTitle(), updatedMessage.getContent(), updatedMessage.getReplies(),
 				updatedMessage.getFatherID());
-		if (!this.idsToMessagesMapping.containsKey(updatedMessage.getID()))
-			this.idsToMessagesMapping.put(updatedMessage.getID(), updatedMessage);
+		if (!this.idsToMessagesMapping.containsKey(updatedMessage.getMessageID()))
+			this.idsToMessagesMapping.put(updatedMessage.getMessageID(), updatedMessage);
 	}
 }
