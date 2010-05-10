@@ -228,7 +228,7 @@ public class ForumTree implements GUIHandler {
 
 		splitPane.setBottomComponent(selected);
 
-		splitPane.setDividerLocation(310); 
+		splitPane.setDividerLocation(260); 
 		splitPane.setPreferredSize(new Dimension(500, 600));
 
 		m_panel.add(splitPane);

@@ -76,7 +76,7 @@ public class SearchIndex
 		String[] tSubjectSplit = msg.getTitle().split(" ");
 		Vector<String> tNoReservedWords = new Vector<String>();
 		
-		if (!this.items.containsKey(msg.getID()))
+		if (!this.items.containsKey(msg.getMessageID()))
 		{
 			//removal of reserved words from content
 			for (int tIndex = 0; tIndex < tContentSplit.length; ++tIndex)
@@ -98,15 +98,15 @@ public class SearchIndex
 			//add words and relation bindings
 			for (int tIndex = 0; tIndex < tNoReservedWords.size(); ++tIndex)
 			{
-				this.addWord(tNoReservedWords.elementAt(tIndex), msg.getID());
+				this.addWord(tNoReservedWords.elementAt(tIndex), msg.getMessageID());
 			}
 			
 			//message ID <-> message binding
-			this.items.put(new Long (msg.getID()), msg);
+			this.items.put(new Long (msg.getMessageID()), msg);
 			
 			//user name <-> message ID binding
 			Long tUsrID = new Long(msg.getAuthorID());
-			Long tMsgID = new Long(msg.getID());
+			Long tMsgID = new Long(msg.getMessageID());
 			if (this.users.containsKey(tUsrID))
 			{
 				Collection<Long> tCol = this.users.get(tUsrID);

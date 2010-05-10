@@ -41,7 +41,7 @@ public class ForumMessageTest extends TestCase {
 	 */
 	@Test
 	public void testMessageConsructor() {
-		assertEquals(this.messageUnderTest.getID(), ForumMessageTest.DEFAULT_MESSAGE_ID);
+		assertEquals(this.messageUnderTest.getMessageID(), ForumMessageTest.DEFAULT_MESSAGE_ID);
 		assertEquals(this.messageUnderTest.getAuthorID(), ForumMessageTest.DEFAULT_MESSAGE_AUTHOR);
 		assertEquals(this.messageUnderTest.getTitle(), ForumMessageTest.DEFAULT_MESSAGE_TITLE);
 		assertEquals(this.messageUnderTest.getContent(), ForumMessageTest.DEFAULT_MESSAGE_CONTENT);

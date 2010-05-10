@@ -10,21 +10,21 @@ import org.compass.annotations.SearchableProperty;
  * The interface allows the UI only revealing the data needed for the presentation,
  * without changing the Message state.
  */
-@Searchable
+//@Searchable
 public abstract class UIMessage {
 	
 	/**
 	 * @return
 			The unique id of the message
 	 */
-	@SearchableId
-	public abstract long getID();
+	//@SearchableId
+	public abstract long getMessageID();
 
 	/**
 	 * @return
 			The id of the user who wrote the message - the message author
 	 */
-	@SearchableProperty (name = "authorID")
+	//@SearchableProperty (name = "authorID")
 	public abstract long getAuthorID();
 
 	/**
@@ -32,14 +32,14 @@ public abstract class UIMessage {
 	 * @return
 	 * 		The title of the message
 	 */
-	@SearchableProperty (name = "title")
+//	@SearchableProperty (name = "title")
 	public abstract String getTitle();
 	
 	/**
 	 * @return
 	 * 		The content of the message
 	 */
-	@SearchableProperty (name = "content")
+	//@SearchableProperty (name = "content")
 	public abstract String getContent();
 
 	/**
@@ -60,4 +60,6 @@ public abstract class UIMessage {
 	 * 		A string representation of the message
 	 */
 	public abstract String toString();
+	
+	public abstract long getFatherID();
 }

@@ -67,20 +67,28 @@ public class MainForumLogic implements ForumFacade {
 			ForumDataHandler tDataHandler = new ForumDataHandler();
 			
 			File tFile = new File("src/forum/server/domainlayer/search/cmpssearch/compassSettings.xml");
+			
+//			File tFile = new File("src/forum/server/learning/compass/example/compassSettings.xml");
+			
 			CompassConfiguration tConf = CompassConfigurationFactory.newConfiguration().configure(tFile);               
+		
+		//		CompassConfiguration tConf = new CompassConfiguration().setConnection("index.txt").addClass(ForumMessage.class);              
+			
 			Compass compass = tConf.buildCompass();
-			SearchEngineIndexManager tIndexManager = compass.getSearchEngineIndexManager();
+		
+//			SearchEngineIndexManager tIndexManager = compass.getSearchEngineIndexManager();
 			
-			if (tIndexManager != null)
-				tIndexManager.deleteIndex();
-			
+//			if (tIndexManager != null)
+//				tIndexManager.deleteIndex();
+	
 			this.searchController = new CompassAdapter(compass);
 			
 			this.usersController = new UsersController(tDataHandler);
 			this.messagesController = new MessagesController(tDataHandler);
 			
-			for (ForumMessage tCurrent : tDataHandler.getMessagesCache().getAllMessages())
+			for (ForumMessage tCurrent : tDataHandler.getMessagesCache().getAllMessages()) {
 				this.searchController.addData(tCurrent);
+			}
 			
 		}
 		catch (DatabaseUpdateException e) {

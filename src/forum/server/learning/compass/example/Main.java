@@ -29,9 +29,9 @@ public class Main {
 
         Compass compass = conf.buildCompass();
 
-        compass.getSearchEngineIndexManager().deleteIndex();
+//        compass.getSearchEngineIndexManager().deleteIndex();
 
-        /* Open a session (not thread safe!) for this thread */
+        /* Open a session (not thread safe!) for this thread */ 
         CompassSession session = compass.openSession();
 
         Message m = new Message();
@@ -42,8 +42,8 @@ public class Main {
         /**
          * Add the message to the Search engine.
          * Since the Message is saved to the DB the message should be saved only once. 
-         * After the data is already added to the DB, try removing this line and see what happens. 
-         */
+         * After the data is already added to the DB, try removing this line and see what happens. */
+         
         session.save(m);
 
         /* http://www.compass-project.org/docs/2.2.0/reference/html/core-workingwithobjects.html#Searching */

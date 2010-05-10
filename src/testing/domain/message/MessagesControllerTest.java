@@ -273,19 +273,19 @@ public class MessagesControllerTest extends TestCase {
 				Iterator<UIMessage> tMessage1RepliesIter = tRoot1Replies.iterator();
 
 				UIMessage tReply = tMessage1RepliesIter.next();
-				assertEquals(tMessage1.getID(), tReply.getID());
+				assertEquals(tMessage1.getMessageID(), tReply.getMessageID());
 				assertEquals(tMessage1.getAuthorID(), tReply.getAuthorID());
 				assertEquals(tMessage1.getTitle(), tReply.getTitle());
 				assertEquals(tMessage1.getContent(), tReply.getContent());
 
 				tReply = tMessage1RepliesIter.next();
-				assertEquals(tMessage2.getID(), tReply.getID());
+				assertEquals(tMessage2.getMessageID(), tReply.getMessageID());
 				assertEquals(tMessage2.getAuthorID(), tReply.getAuthorID());
 				assertEquals(tMessage2.getTitle(), tReply.getTitle());
 				assertEquals(tMessage2.getContent(), tReply.getContent());
 
 				tReply = tRoot2Replies.iterator().next();
-				assertEquals(tMessage3.getID(), tReply.getID());
+				assertEquals(tMessage3.getMessageID(), tReply.getMessageID());
 				assertEquals(tMessage3.getAuthorID(), tReply.getAuthorID());
 				assertEquals(tMessage3.getTitle(), tReply.getTitle());
 				assertEquals(tMessage3.getContent(), tReply.getContent());
@@ -465,7 +465,7 @@ public class MessagesControllerTest extends TestCase {
 			}
 			try {
 				final UIMessage tUpdatedMessage1 = this.messagesControllerUnderTest.getMessageByID(tMessage1ID);
-				assertEquals(tMessage1ID, tUpdatedMessage1.getID());
+				assertEquals(tMessage1ID, tUpdatedMessage1.getMessageID());
 				assertEquals(this.createdMembers[3].getID(), tUpdatedMessage1.getAuthorID());
 				assertEquals(tUpdatedMessage1.getTitle(), "title1 changed");
 				assertEquals(tUpdatedMessage1.getContent(), "content1 changed");
@@ -486,7 +486,7 @@ public class MessagesControllerTest extends TestCase {
 						tMessage2ID, "title2 updated", "content2 updated");
 				assertTrue("notpermitted exception wasn't thrown for a not permitted user", tWasNotPermitted);
 				final UIMessage tUpdatedMessage2 = this.messagesControllerUnderTest.getMessageByID(tMessage2ID);
-				assertEquals(tMessage2ID, tUpdatedMessage2.getID());
+				assertEquals(tMessage2ID, tUpdatedMessage2.getMessageID());
 				assertEquals(this.createdMembers[3].getID(), tUpdatedMessage2.getAuthorID());
 				assertEquals(tUpdatedMessage2.getTitle(), "title2");
 				assertEquals(tUpdatedMessage2.getContent(), "content2");			
@@ -505,7 +505,7 @@ public class MessagesControllerTest extends TestCase {
 						tMessage1ID, "title1", "content1");
 				assertTrue("notpermitted exception wasn't thrown for a not permitted user", tWasNotPermitted);
 				final UIMessage tUpdatedMessage1 = this.messagesControllerUnderTest.getMessageByID(tMessage1ID);
-				assertEquals(tMessage1ID, tUpdatedMessage1.getID());
+				assertEquals(tMessage1ID, tUpdatedMessage1.getMessageID());
 				assertEquals(this.createdMembers[3].getID(), tUpdatedMessage1.getAuthorID());
 				assertEquals(tUpdatedMessage1.getTitle(), "title1 changed");
 				assertEquals(tUpdatedMessage1.getContent(), "content1 changed");			

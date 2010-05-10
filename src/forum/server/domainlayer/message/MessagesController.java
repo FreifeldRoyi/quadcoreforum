@@ -159,7 +159,7 @@ public class MessagesController {
 				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
 				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content, -1);
 				final ForumThread tNewThread = this.dataHandler.getMessagesCache().openNewThread(topic, 
-						tNewMessage.getID(), tFatherSubject.getID());
+						tNewMessage.getMessageID(), tFatherSubject.getID());
 				tFatherSubject.addThread(tNewThread.getID());
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 				return tNewThread;
@@ -252,7 +252,7 @@ public class MessagesController {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content, fatherID);
 				// adds the new reply to the replied message
-				tFatherMessage.addReply(tNewMessage.getID());
+				tFatherMessage.addReply(tNewMessage.getMessageID());
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
 				SystemLogger.info("A new reply was successfuly added to message " + fatherID + " by a user " + userID + ".");
 				return tNewMessage;
@@ -310,7 +310,7 @@ public class MessagesController {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumMessage tMessageToDelete = this.dataHandler.getMessagesCache().getMessageByID(messageID);
 				final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
-				tFatherMessage.deleteReply(tMessageToDelete.getID());
+				tFatherMessage.deleteReply(tMessageToDelete.getMessageID());
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
 				this.dataHandler.getMessagesCache().deleteAMessage(messageID);
 				SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +

@@ -37,7 +37,7 @@ public class Message {
    public void setContents(String contents) {
        body = contents;
    }
-
+   
    public String getContents() {
        return body;
    }
