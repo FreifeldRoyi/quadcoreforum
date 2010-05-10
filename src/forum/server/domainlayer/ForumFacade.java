@@ -312,7 +312,9 @@ public interface ForumFacade { //extends SearchEngine {
 	public UIThread openNewThread(final long userID, final long subjectID, final String topic, final String title,
 			final String content) throws NotRegisteredException, NotPermittedException, SubjectNotFoundException, 
 			DatabaseUpdateException;
-	
+
+	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException, 
+	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException;
 	
 	// Message related methods:
 	

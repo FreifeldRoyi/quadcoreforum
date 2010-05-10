@@ -13,6 +13,9 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import forum.client.controllerlayer.ControllerHandlerFactory;
 import forum.client.ui.events.GUIHandler;
 import forum.server.domainlayer.SystemLogger;
@@ -89,6 +92,22 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		});
+		
+		this.subjectsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (arg0.getFirstIndex() == -1) {
+					deleteSubjectButton.setEnabled(false);
+					modifySubjectButton.setEnabled(false);
+				}
+				else {
+					deleteSubjectButton.setEnabled(true);
+					modifySubjectButton.setEnabled(true);
+				}
+			}
+		});
+
+		
 		String[] columns = {"Subject",  "Description", "Sub-Subjects#", 
 				"Messages#", "Last Message Info" };
 		subjectsTableModel = new TableModel(columns);
@@ -224,6 +243,9 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 
 
+		((DefaultListSelectionModel)this.subjectsTable.
+				getSelectionModel()).getListSelectionListeners()[0].
+				valueChanged(new ListSelectionEvent(subjectsTable, -1, -1, true));
 
 	}
 

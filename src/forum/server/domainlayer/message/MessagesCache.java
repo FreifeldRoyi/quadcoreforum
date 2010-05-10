@@ -210,10 +210,10 @@ public class MessagesCache {
 	 * 		In case the created thread can't be added to the database due to a database connection error
 	 */
 	public ForumThread openNewThread(final String topic, long rootID, final long fatherSubjectID) throws DatabaseUpdateException {
-		final long tThreadID = this.getNextThreadID();
-		ForumThread tNewThread = new ForumThread(tThreadID, topic, rootID, fatherSubjectID);
-		this.idsToThreadsMapping.put(tThreadID, tNewThread);
-		this.pipe.openNewThread(tThreadID, topic, rootID, fatherSubjectID);
+		//final long tThreadID = this.getNextThreadID();
+		ForumThread tNewThread = new ForumThread(rootID, topic, rootID, fatherSubjectID);
+		this.idsToThreadsMapping.put(rootID, tNewThread);
+		this.pipe.openNewThread(rootID, topic, rootID, fatherSubjectID);
 		return tNewThread;
 	}
 
@@ -236,7 +236,12 @@ public class MessagesCache {
 			this.idsToMessagesMapping.remove(tMessageID);
 	}
 
-
+	public void updateInDatabase(ForumThread updatedThread) throws ThreadNotFoundException, DatabaseUpdateException {
+		this.pipe.updateThread(updatedThread.getID(), updatedThread.getTopic());
+		if (!this.idsToMessagesMapping.containsKey(updatedThread.getID()))
+			this.idsToThreadsMapping.put(updatedThread.getID(), updatedThread);
+	}
+	
 	// Message related methods
 
 	/**

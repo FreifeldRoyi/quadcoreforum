@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="lib/compass/lucene/lucene-queries.jar"/>
 	<classpathentry kind="lib" path="lib/compass/lucene/lucene-snowball.jar"/>
 	<classpathentry kind="lib" path="lib/compass/lucene/lucene-spellchecker.jar"/>
-	<classpathentry kind="lib" path="C:/Documents and Settings/Sepetnitsky Vitali/workspace/quadcoreforum/lib/hibernate/slf4j-api-1.6.0.jar"/>
-	<classpathentry kind="lib" path="C:/Documents and Settings/Sepetnitsky Vitali/workspace/quadcoreforum/lib/hibernate/slf4j-simple-1.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/Royi/WorkspaceEE/quadcoreforum/lib/hibernate/slf4j-api-1.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/Royi/WorkspaceEE/quadcoreforum/lib/hibernate/slf4j-simple-1.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

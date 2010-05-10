@@ -275,6 +275,8 @@ s	 */
 	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException,
 	DatabaseUpdateException;
+	
+	public void updateThread(long threadID, String topic) throws ThreadNotFoundException, DatabaseUpdateException;
 
 	// Message related methods	
 

@@ -338,6 +338,29 @@ public class MessagesPersistenceHandler {
 		}
 	}
 
+	public void updateThread(SessionFactory ssFactory, long threadID, String topic) throws ThreadNotFoundException, 
+	DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			try {
+				ThreadType tThreadToEdit = this.getThreadTypeByID(session, threadID);
+				if (tThreadToEdit == null) {
+					this.commitTransaction(session);
+					throw new ThreadNotFoundException(threadID);
+				}
+				tThreadToEdit.setTopic(topic);
+				this.commitTransaction(session);
+			}
+			catch (DatabaseUpdateException e) {
+				this.commitTransaction(session);
+				throw e;
+			}	
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}	
+
 	// Message related methods
 
 	/**
@@ -496,7 +519,7 @@ public class MessagesPersistenceHandler {
 		}
 	}
 
-/*	private void updateThreadOfReplies(Session session, 
+	/*	private void updateThreadOfReplies(Session session, 
 			MessageType toUpdate, Collection<Long> newReplies, long threadID) throws DatabaseUpdateException {
 		try {
 			for (Long tCurrentReplyID : newReplies)
@@ -565,5 +588,5 @@ public class MessagesPersistenceHandler {
 			toReturn.add(messageID);
 		}
 		return toReturn;
-	}	
+	}
 }
