@@ -55,10 +55,10 @@ public class MessagesCacheTest extends TestCase {
 			try {
 				// adds top level subject
 				tCreatedTopLevel.add(this.messagesCacheUnderTest.createNewSubject("name" + i,
-						"description" + i, true));
-				// adds not top level subject
+						"description" + i, -1));
+				// adds not top level subject (subjects of the first to level subject)
 				this.messagesCacheUnderTest.createNewSubject("name" + (i + tNumberOfCreatedTopLevel),
-						"description" + (i + tNumberOfCreatedTopLevel), false);
+						"description" + (i + tNumberOfCreatedTopLevel), 0);
 			} 
 			catch (DatabaseUpdateException e) {
 				fail(e.getMessage());
@@ -79,7 +79,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetSubjectByID() {
 		try {
-			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("name1", "description1", false);
+			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("name1", "description1", -1);
 			final ForumSubject tObtainedSubject = this.messagesCacheUnderTest.getSubjectByID(tNewSubject.getID());
 			assertSame(tNewSubject, tObtainedSubject);
 		}
@@ -100,7 +100,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testCreateNewSubject() {
 		try {
-			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("sub1", "desc1", true);
+			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("sub1", "desc1", -1);
 			assertEquals(tNewSubject.getName(), "sub1");
 			assertEquals(tNewSubject.getDescription(), "desc1");
 			assertSame(tNewSubject, this.messagesCacheUnderTest.getSubjectByID(tNewSubject.getID()));
@@ -131,7 +131,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetThreadByID() {
 		try {
-			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", -1);
+			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 104, -1);
 			final ForumThread tObtainedThread = this.messagesCacheUnderTest.getThreadByID(tNewThread.getID());
 			assertSame(tNewThread, tObtainedThread);
 		}
@@ -152,7 +152,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testOpenNewThread() {
 		try {
-			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 104);
+			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 104, -1);
 			assertEquals(tNewThread.getTopic(), "topic1");
 			assertEquals(tNewThread.getRootMessageID(), 104);
 			assertSame(tNewThread, this.messagesCacheUnderTest.getThreadByID(tNewThread.getID()));
@@ -175,21 +175,21 @@ public class MessagesCacheTest extends TestCase {
 	public void testDeleteATread() {
 		try {
 			// adds a new thread
-			ForumMessage tRootMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title", "content");
+			ForumMessage tRootMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title", "content", -1);
 
-			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tRootMessage.getMessageID());
+			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tRootMessage.getMessageID(), -1);
 
 			final int tNumOfMessages = 5; 
 			final Collection<Long> tCreatedMessagesIDs = new Vector<Long>();			
 
-			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title0", "content0");
+			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title0", "content0", -1);
 			tRootMessage.addReply(tNewMessage.getMessageID());
 			this.messagesCacheUnderTest.updateInDatabase(tRootMessage);
 
 			tCreatedMessagesIDs.add(tRootMessage.getMessageID());
 
 			for (int i = 1; i < tNumOfMessages; i++) {
-				ForumMessage tNextMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title" + i, "content" + i);
+				ForumMessage tNextMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title" + i, "content" + i, -1);
 				tNextMessage.addReply(tNewMessage.getMessageID());
 				tCreatedMessagesIDs.add(tNewMessage.getMessageID());
 				this.messagesCacheUnderTest.updateInDatabase(tNextMessage);
@@ -243,7 +243,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetMessageByID() {
 		try {
-			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
+			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1", -1);
 			ForumMessage tObtainedMessage = this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());
 			assertSame(tNewMessage, tObtainedMessage);
 		}
@@ -264,7 +264,7 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testCreateNewMessage() {
 		try {
-			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
+			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1", -1);
 			assertEquals(tNewMessage.getAuthorID(), -1);
 			assertEquals(tNewMessage.getTitle(), "title1");
 			assertEquals(tNewMessage.getContent(), "content1");
@@ -288,7 +288,7 @@ public class MessagesCacheTest extends TestCase {
 	public void testDeleteAMessage() {
 		// TODO: test recursive deletion
 		try {
-			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1");
+			final ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1", -1);
 			final long tMessageID = tNewMessage.getMessageID();
 			try {
 				this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());

@@ -84,9 +84,9 @@ public class MessagesControllerTest extends TestCase {
 
 		this.subjectsNamesToIDsMapping = new HashMap<String, Long>();
 
-		ForumSubject tMainSubject = this.dataHandler.getMessagesCache().createNewSubject("main1", "main1", true);
-		ForumSubject tSubSubject1 = this.dataHandler.getMessagesCache().createNewSubject("sub1", "sub1", false);
-		ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().createNewSubject("sub11", "sub11", false);
+		ForumSubject tMainSubject = this.dataHandler.getMessagesCache().createNewSubject("main1", "main1", -1);
+		ForumSubject tSubSubject1 = this.dataHandler.getMessagesCache().createNewSubject("sub1", "sub1", 0);
+		ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().createNewSubject("sub11", "sub11", 0);
 		tMainSubject.addSubSubject(tSubSubject1.getID());
 		tSubSubject1.addSubSubject(tSubSubject11.getID());
 		this.dataHandler.getMessagesCache().updateInDatabase(tMainSubject);

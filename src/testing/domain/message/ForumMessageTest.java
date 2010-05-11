@@ -33,7 +33,7 @@ public class ForumMessageTest extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		this.messageUnderTest = new ForumMessage(ForumMessageTest.DEFAULT_MESSAGE_ID, ForumMessageTest.DEFAULT_MESSAGE_AUTHOR,
-				ForumMessageTest.DEFAULT_MESSAGE_TITLE, ForumMessageTest.DEFAULT_MESSAGE_CONTENT);
+				ForumMessageTest.DEFAULT_MESSAGE_TITLE, ForumMessageTest.DEFAULT_MESSAGE_CONTENT, -1);
 	}
 	
 	/**

@@ -134,9 +134,9 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 				String tResponse = (String)
 				JOptionPane.showInputDialog(ThreadsPanel.this, "Please enter a new topic: ", "Modify " +
 						"thread topic", JOptionPane.PLAIN_MESSAGE);
-				
-				
-				
+				if (tResponse.equals(""))
+					JOptionPane.showMessageDialog(container, "The thread topic can't be empty!", "Modify " +
+							"thread topic", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 		

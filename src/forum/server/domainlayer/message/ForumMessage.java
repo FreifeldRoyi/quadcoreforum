@@ -12,7 +12,7 @@ import org.compass.annotations.SearchableProperty;
 import forum.server.domainlayer.interfaces.UIMessage;
 
 @Searchable //(extend = "UIMessage")
-public class ForumMessage extends UIMessage {
+public class ForumMessage implements UIMessage {
 	
 	@SearchableId
 	private long messageID;
@@ -257,4 +257,17 @@ public class ForumMessage extends UIMessage {
 		return this.getMessageID() + "\t" + this.getAuthorID() + "\t" + this.getTitle() + "\t" + 
 		this.getContent();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o != null && o instanceof ForumMessage) {
+			ForumMessage tMessage = (ForumMessage)o;
+			return tMessage.getMessageID() == this.getMessageID() &&
+				tMessage.getAuthorID() == this.getAuthorID() &&
+				tMessage.getTitle().equals(this.getTitle()) &&
+				tMessage.getContent().equals(this.getContent());
+		}
+		return false;
+	}
+	
 }

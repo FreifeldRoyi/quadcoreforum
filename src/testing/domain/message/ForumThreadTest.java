@@ -21,7 +21,7 @@ public class ForumThreadTest extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		this.threadUnderTest = new ForumThread(ForumThreadTest.DEFAULT_THREAD_ID, 
-				ForumThreadTest.DEFAULT_THREAD_TOPIC, ForumThreadTest.DEFAULT_THREAD_ROOT_MESSAGE);
+				ForumThreadTest.DEFAULT_THREAD_TOPIC, ForumThreadTest.DEFAULT_THREAD_ROOT_MESSAGE, -1);
 	}
 
 	/**

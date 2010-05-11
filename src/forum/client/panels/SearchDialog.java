@@ -574,7 +574,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 				 */			}
 
 		});
-		this.radBtn_content.setSelected(true);
+		this.radBtn_author.setSelected(true);
 
 		this.radBtn_author.getActionListeners()[0].actionPerformed(new ActionEvent(this.radBtn_author, 0, ""));
 		this.radBtn_10.getActionListeners()[0].actionPerformed(new ActionEvent(this.radBtn_10, 0, ""));		

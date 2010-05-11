@@ -41,8 +41,8 @@ public class LoginLogoutTestStory extends GeneralMethodsTest {
 		// checks whether the login succeeded
 		assertNotNull(tLoggedInInfo);
 		// this assertion should always succeed, in case the bridges are implemented properly
-		assertEquals(tLoggedInInfo.length, 4); 
-		for (int i = 0; i < tLoggedInInfo.length; i++)
+		assertEquals(tLoggedInInfo.length, 5); 
+		for (int i = 0; i < tLoggedInInfo.length - 1; i++)
 			assertEquals(tLoggedInInfo[i], tUser1Information[i]);
 		// the logout should succeed
 		assertTrue(super.logout("user1"));	
@@ -56,8 +56,8 @@ public class LoginLogoutTestStory extends GeneralMethodsTest {
 		// checks whether the login succeeded
 		assertNotNull(tLoggedInInfo);
 		// this assertion should always succeed, in case the bridges are implemented properly
-		assertEquals(tLoggedInInfo.length, 4); 
-		for (int i = 0; i < tLoggedInInfo.length; i++)
+		assertEquals(tLoggedInInfo.length, 5); 
+		for (int i = 0; i < tLoggedInInfo.length - 1; i++)
 			assertEquals(tLoggedInInfo[i], tUser2Information[i]);
 		// the logout should succeed
 		assertTrue(super.logout("user2"));

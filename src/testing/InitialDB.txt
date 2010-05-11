@@ -1,7 +1,7 @@
-DROP TABLE IF EXISTS QuadCoreForumDBTest.Members;
 DROP TABLE IF EXISTS QuadCoreForumDBTest.Subjects;
 DROP TABLE IF EXISTS QuadCoreForumDBTest.Threads;
 DROP TABLE IF EXISTS QuadCoreForumDBTest.Messages;
+DROP TABLE IF EXISTS QuadCoreForumDBTest.Members;
 
 CREATE TABLE QuadCoreForumDBTest.Members (
   UserID BIGINT PRIMARY KEY,
@@ -18,7 +18,7 @@ CREATE TABLE QuadCoreForumDBTest.UsersPermissions (
   Permission ENUM('ADD_SUBJECT', 'DELETE_SUBJECT', 'OPEN_THREAD',
   'REPLY_TO_MESSAGE', 'DELETE_THREAD', 'DELETE_MESSAGE', 'EDIT_MESSAGE',
    'VIEW_ALL', 'ADD_SUB_SUBJECT', 'SET_MODERATOR', 'EDIT_SUBJECT'),
-  FOREIGN KEY (UserID) REFERENCES Members(UserID),
+  FOREIGN KEY (UserID) REFERENCES Members(UserID) ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY(UserID, Permission)
 );
 
@@ -29,17 +29,19 @@ CREATE TABLE QuadCoreForumDBTest.Messages(
   Title VARCHAR(20) NOT NULL,
   Content TEXT NOT NULL,
   PostTime DATETIME NOT NULL,
-  ThreadID BIGINT,
+  FatherID BIGINT DEFAULT -1,
+  FOREIGN KEY (FatherID) REFERENCES Messages(MessageID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY (AuthorID) REFERENCES Members(UserID)
 );
 
 CREATE TABLE QuadCoreForumDBTest.Subjects (
   SubjectID BIGINT PRIMARY KEY,
-  isTopLevel Bool,
+  FatherID BIGINT DEFAULT -1,
   lastAddedMessageID BIGINT,
   Name VARCHAR(20) NOT NULL,
   Description VARCHAR(30) NOT NULL,
-  FOREIGN KEY (lastAddedMessageID) REFERENCES Messages(MessageID)
+  FOREIGN KEY (lastAddedMessageID) REFERENCES Messages(MessageID),
+  FOREIGN KEY (FatherID) REFERENCES Subjects(SubjectID) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE QuadCoreForumDBTest.Threads(
@@ -49,13 +51,11 @@ CREATE TABLE QuadCoreForumDBTest.Threads(
   LastMessageID BIGINT DEFAULT -1,
   NumOfViews BIGINT DEFAULT 0,
   NumOfResponses BIGINT DEFAULT 0,
+  FatherSubjectID BIGINT DEFAULT -1,
+  FOREIGN KEY (FatherSubjectID) REFERENCES Subjects(SubjectID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY (StartMessageID) REFERENCES Messages(MessageID) ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY (LastMessageID) REFERENCES Messages(MessageID) ON UPDATE CASCADE ON DELETE NO ACTION
 );
-
-
-ALTER TABLE QuadCoreForumDBTest.Messages ADD CONSTRAINT fq_constraint FOREIGN KEY (ThreadID) REFERENCES QuadCoreForumDBTest.Threads(ThreadID);
-
 
 CREATE TABLE QuadCoreForumDBTest.Replies (
   FatherID BIGINT,
@@ -81,8 +81,11 @@ CREATE TABLE QuadCoreForumDBTest.SubjectsThreads (
   PRIMARY KEY(SubjectID, ThreadID)
 );
 
+INSERT INTO QuadCoreForumDBTest.subjects(SubjectID, Name, Description)
+VALUES(-1, "name", "description");
+
 INSERT INTO QuadCoreForumDBTest.members
-VALUES(-1, "username", "password", "email@email", "first", "last", 'MEMBER');
+VALUES(-1, "2SeU4E1NaMeU", "password", "email@email", "first", "last", 'MEMBER');
 
 INSERT INTO QuadCoreForumDBTest.messages(MessageID, AuthorID, Title, Content, PostTime)
 VALUES(-1, -1, "title", "content", '10/10/10 15:14');
