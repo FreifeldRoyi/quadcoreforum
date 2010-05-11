@@ -289,17 +289,111 @@ public class ForumTree implements GUIHandler {
 
 	}
 
-	public void refreshForum(String encodedView) {
+	public void refreshForum(final String encodedView) {
 		if (encodedView.startsWith("getpathsuccess")) {
+//			System.out.println("\n\n------------------\n\nencoded view:\n"+encodedView + "\n\n-----------------------\n\n");
 			m_panel.setVisible(false);
-			final String[] tSplitted = 
-				encodedView.substring(encodedView.indexOf("MESSAGES") + 9).split("\n");
+			final String tMessages = encodedView.substring(encodedView.indexOf("MESSAGES") + 9);
 			new Thread(new Runnable() {
 				public void run() {
-					setRootMessage(Long.parseLong(tSplitted[0]));
+								
+					try {
+						String tRepliesDelimiter = "\t\tAREPLYMESSAGE: ";
+						String tSubRepliesDelimiter = "\t\t\tASUBREPLYMESSAGE: ";
+						String[] tSplitted = encodedView.split("\n\tAREPLYMESSAGE: ");
+						
+						
+						
+						System.out.println("***********splitted: ");
+						
+						for (int i = 0; i < tSplitted.length; i++)
+							System.out.println("splitted [" + i + "] = " + tSplitted[i]);
+						
+						String[] tRootAsStringArray = tSplitted[0].split("\t");
+						if (tRootAsStringArray.length > 4) {
+							for (int i = 4; i < tRootAsStringArray.length; i++) {
+								tRootAsStringArray[3] += ("\t" + tRootAsStringArray[i]);  
+							}
+						}
+						
+						ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
+								tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
+						
+						for (int i = 1; i < tSplitted.length; i++) {
+							String[] tCurrentReplies = tSplitted[i].split("\n" + tSubRepliesDelimiter);
+							
+							String[] tCurrReply = tCurrentReplies[0].split("\t");
+							if (tCurrReply.length > 4) {
+								for (int j = 4; j < tCurrReply.length; j++) {
+									tCurrReply[3] += ("\t" + tCurrReply[j]);  
+								}
+							}
+							ForumCell tReply = new ForumCell(Long.parseLong(tCurrReply[0]),
+									tCurrReply[1], tCurrReply[2], tCurrReply[3]);
+							for (int j = 1; j < tCurrentReplies.length; j++) {
+								String[] tCurrentReplyAsStringArray = tCurrentReplies[j].split("\t");
+								if (tCurrentReplyAsStringArray.length > 4) {
+									for (int k = 4; k < tCurrentReplyAsStringArray.length; k++) {
+										tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
+									}
+								}
+								ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
+										tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
+								tReply.add(tCurrentReply);
+							}
+/* **************************************************************************************************
+ *  the folowing part should be a recursive call (the whole function should moove to a function)	*
+ * **************************************************************************************************/
+							String[] tCurrentSubReplies = tSplitted[i].split("\n" + tRepliesDelimiter);
+							
+							String[] tCurrSubReply = tCurrentSubReplies[0].split("\t");
+							if (tCurrSubReply.length > 4) {
+								for (int j = 4; j < tCurrSubReply.length; j++) {
+									tCurrSubReply[3] += ("\t" + tCurrSubReply[j]);  
+								}
+							}
+							ForumCell tSubReply = new ForumCell(Long.parseLong(tCurrSubReply[0]),
+									tCurrSubReply[1], tCurrSubReply[2], tCurrSubReply[3]);
+							for (int j = 1; j < tCurrentSubReplies.length; j++) {
+								String[] tCurrentSubReplyAsStringArray = tCurrentSubReplies[j].split("\t");
+								if (tCurrentSubReplyAsStringArray.length > 4) {
+									for (int k = 4; k < tCurrentSubReplyAsStringArray.length; k++) {
+										tCurrentSubReplyAsStringArray[3] += ("\t" + tCurrentSubReplyAsStringArray[k]);  
+									}
+								}
+								ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentSubReplyAsStringArray[0]),
+										tCurrentSubReplyAsStringArray[1], tCurrentSubReplyAsStringArray[2], tCurrentSubReplyAsStringArray[3]);
+								tReply.add(tCurrentReply);
+							}
+							
+							
+							tRoot.add(tReply);
+						}
+//						return tRoot;
+					}
+					catch (NumberFormatException e) {
+						e.printStackTrace();
+						SystemLogger.warning("Error while parsing messages view response");
+	//					return null;
+					}
+					catch (Exception e) { // any parsing exception
+						e.printStackTrace();
+						SystemLogger.warning("Error while parsing messages view response");
+		//				return null;
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+/*					setRootMessage(Long.parseLong(tSplitted[0]));
 					((MessageTreeNode)m_tree.getModel().getRoot()).getRecursively(tSplitted, 1);
 					container.switchToMessagesView();
-				}
+*/				}
 			}).start();
 		}
 

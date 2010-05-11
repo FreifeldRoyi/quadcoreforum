@@ -1,4 +1,4 @@
-package testing.domain.search;
+package forum.server.domainlayer.search.basicsearch;
 
 
 import java.util.Vector; 
@@ -11,7 +11,6 @@ import forum.server.Settings;
 import forum.server.domainlayer.interfaces.UIMessage; 
 import forum.server.domainlayer.message.ForumMessage; 
 import forum.server.domainlayer.search.SearchHit; 
-import forum.server.domainlayer.search.SearchIndex; 
 
 public class SearchIndexTest extends TestCase { 
 
@@ -31,10 +30,10 @@ public class SearchIndexTest extends TestCase {
 
 	@Test 
 	public void testAddAndGetMessage() { 
-		UIMessage tMsg1 = new ForumMessage(0,0,"msg1 bla","content1"); 
-		UIMessage tMsg2 = new ForumMessage(1,0,"msg2 bla","content2"); 
-		UIMessage tMsg3 = new ForumMessage(2,0,"msg3","content3 bla"); 
-		UIMessage tMsg4 = new ForumMessage(3,1,"msg4","content4"); 
+		UIMessage tMsg1 = new ForumMessage(0,0,"msg1 bla","content1", -1); 
+		UIMessage tMsg2 = new ForumMessage(1,0,"msg2 bla","content2", -1); 
+		UIMessage tMsg3 = new ForumMessage(2,0,"msg3","content3 bla", -1); 
+		UIMessage tMsg4 = new ForumMessage(3,1,"msg4","content4", -1); 
 
 		this.se.addMessage(tMsg4); 
 		this.se.addMessage(tMsg3); 

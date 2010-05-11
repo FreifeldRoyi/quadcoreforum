@@ -36,11 +36,12 @@ public class RealBridge implements GeneralForumBridge {
 	public String[] login(final String username, final String password) {
 		try {
 			UIMember tLoggedIn = this.forum.login(username, password);
-			String[] toReturn = new String[4];
+			String[] toReturn = new String[5];
 			toReturn[0] = tLoggedIn.getUsername();
 			toReturn[1] = tLoggedIn.getLastName();
 			toReturn[2] = tLoggedIn.getFirstName();
 			toReturn[3] = tLoggedIn.getEmail();
+			toReturn[4] = tLoggedIn.getID() + "";
 			return toReturn;
 		} 
 		catch (Exception e) {

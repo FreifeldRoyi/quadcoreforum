@@ -21,7 +21,7 @@ public class ForumSubjectTest extends TestCase {
 	private static final int DEFAULT_SUBJECT_ID = 34;
 	private static final String DEFAULT_SUBJECT_NAME = "test subject name";
 	private static final String DEFAULT_SUBJECT_DESCRIPTION = "test subject descripion";
-	private static final boolean DEFAULT_IS_TOP_LEVEL = false;
+	private static final long DEFAULT_FATHER_SUBJECT_ID = -1;
 
 
 	private ForumSubject subjectUnderTest;
@@ -36,7 +36,7 @@ public class ForumSubjectTest extends TestCase {
 	public void setUp() throws Exception {
 		this.subjectUnderTest = new ForumSubject(ForumSubjectTest.DEFAULT_SUBJECT_ID, 
 				ForumSubjectTest.DEFAULT_SUBJECT_NAME, ForumSubjectTest.DEFAULT_SUBJECT_DESCRIPTION,
-				ForumSubjectTest.DEFAULT_IS_TOP_LEVEL);
+				ForumSubjectTest.DEFAULT_FATHER_SUBJECT_ID);
 	}
 
 	/**

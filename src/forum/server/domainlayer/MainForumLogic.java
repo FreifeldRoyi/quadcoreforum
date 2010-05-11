@@ -68,12 +68,8 @@ public class MainForumLogic implements ForumFacade {
 			
 			File tFile = new File("src/forum/server/domainlayer/search/cmpssearch/compassSettings.xml");
 			
-//			File tFile = new File("src/forum/server/learning/compass/example/compassSettings.xml");
-			
 			CompassConfiguration tConf = CompassConfigurationFactory.newConfiguration().configure(tFile);               
 		
-		//		CompassConfiguration tConf = new CompassConfiguration().setConnection("index.txt").addClass(ForumMessage.class);              
-			
 			Compass compass = tConf.buildCompass();
 		
 //			SearchEngineIndexManager tIndexManager = compass.getSearchEngineIndexManager();

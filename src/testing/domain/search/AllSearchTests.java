@@ -9,7 +9,6 @@ public class AllSearchTests extends TestCase {
 				"Test for forum.testing.domainlayer.search");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SearchAgentTest.class);
-		suite.addTestSuite(SearchIndexTest.class);
 		//$JUnit-END$
 		return suite;
 	}
