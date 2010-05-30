@@ -34,6 +34,7 @@ public class GetPathMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
+		System.out.println("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
 			
@@ -62,7 +63,7 @@ public class GetPathMessage extends ClientMessage {
 						response += tRepliesDelimiter + tCurrentReply.toString() + "\n";
 						Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getMessageID());
 						for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
-							response += tSubRepliesDelimiter + tNextLevelCurrentReply.toString() + "\n";
+							response += "\t" + tRepliesDelimiter + tNextLevelCurrentReply.toString() + "\n";
 					}
 				}
 				tCurrentMessage = forum.getMessageByID(tID);
@@ -86,6 +87,7 @@ public class GetPathMessage extends ClientMessage {
 			System.out.println("\n\n------------------\n\nencoded view:\n"+response + "\n\n-----------------------\n\n");
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("getpatherror");
 		}

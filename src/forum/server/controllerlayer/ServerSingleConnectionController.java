@@ -11,8 +11,7 @@ import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.MainForumLogic;
 import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
-import forum.tcpcommunicationlayer.ClientMessage;
-import forum.tcpcommunicationlayer.ServerResponse;
+import forum.tcpcommunicationlayer.*;
 
 /**
  * This class handles a single TCP connection between a client and the server.
@@ -67,15 +66,6 @@ public class ServerSingleConnectionController implements Runnable {
 			return;
 		}
 		pool.execute(sscc);
-	}
-
-	private void updateConnectedUsersInfo() {
-/*		ServerResponse tUsersNumbers = new GuestsAndMembersNumberMessage().doOperation(this.forum);
-		ServerResponse tConnectedUsers = new ViewAllMembersMessage().doOperation(this.forum);
-		SystemLogger.info("Updating all clients about connected users.");
-		synchronized (openConnections) {
-			for (String )
-		}	*/
 	}
 	
 	/* (non-Javadoc)
