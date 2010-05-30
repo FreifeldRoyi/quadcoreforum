@@ -4,7 +4,6 @@
 package testing.domain.search; 
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Vector; 
 
 import junit.framework.TestCase;
@@ -20,8 +19,8 @@ import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.message.ForumMessage; 
 import forum.server.domainlayer.search.SearchHit; 
 import forum.server.domainlayer.search.cmpssearch.CompassAdapter;
-import forum.server.persistentlayer.DatabaseUpdateException; 
-import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsException; 
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
 
 /** 
  * @author Freifeld Royi 
@@ -30,6 +29,11 @@ import forum.server.persistentlayer.pipe.user.exceptions.MemberAlreadyExistsExce
 public class SearchAgentTest extends TestCase 
 { 
 	private class MessagesVector extends Vector<UIMessage> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -113058883922451417L;
+
 		@Override
 		public boolean contains(Object o) {
 			if (o != null && o instanceof ForumMessage)
