@@ -14,6 +14,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.FileHandler;
 
 
+import forum.swingclient.panels.ForgotPasswordDialog;
 import forum.swingclient.ui.events.*;
 import forum.swingclient.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
@@ -282,7 +283,25 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 
 	}
 
-
+	public void updatePassword(final String username, final String email, final String password, final Component comp) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new ChangeProfileDetailsMessage(username, password, null, null, email);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);		
+	}
+	
 
 	public boolean login(final long guestID, final String username, final String password, final Component comp) {
 		/*		if (tResponse == null || !tResponse.hasExecuted())

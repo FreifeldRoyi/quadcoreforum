@@ -10,6 +10,7 @@ import org.compass.core.CompassHits;
 import org.compass.core.CompassSession;
 
 import forum.server.domainlayer.interfaces.UIMessage;
+import forum.server.domainlayer.message.ForumMessage;
 import forum.server.domainlayer.search.SearchEngine;
 import forum.server.domainlayer.search.SearchHit;
 
@@ -22,12 +23,13 @@ public class CompassAdapter implements SearchEngine
 {
 	/* The adaptee */
 	private Compass compass;
-	
+
 	public CompassAdapter(Compass cmp)
 	{
 		this.compass = cmp;
+
 	}
-	
+
 	/**
 	 * @see forum.server.domainlayer.search.SearchEngine#addData(forum.server.domainlayer.interfaces.UIMessage)
 	 */
@@ -38,6 +40,7 @@ public class CompassAdapter implements SearchEngine
 		try 
 		{
 			session.save(msg);
+			session.commit();
 		}
 		catch (CompassException e)
 		{
@@ -49,6 +52,34 @@ public class CompassAdapter implements SearchEngine
 		}
 	}
 
+	@Override
+	public void modifyData(UIMessage msg) 
+	{
+		this.addData(msg);
+	}
+
+	@Override
+	public boolean removeData(long messageID) 
+	{
+		boolean toReturn = true;
+		CompassSession session = this.compass.openSession();
+		try 
+		{
+			session.delete(ForumMessage.class, messageID);
+			//session.commit();
+		}
+		catch (CompassException e)
+		{
+			toReturn = false;
+			session.rollback();
+		}
+		finally
+		{
+			session.close();
+		}
+		return toReturn;
+	}
+
 	/**
 	 * @see forum.server.domainlayer.search.SearchEngine#searchByAuthor(long, int, int)
 	 */
@@ -58,16 +89,16 @@ public class CompassAdapter implements SearchEngine
 		System.out.println("usrID = " + usrID);
 
 		SearchHit[] toReturn = null;
-		
+
 		CompassSession session = this.compass.openSession();
-		
+
 		try 
 		{
 			CompassHits hits = session.find("authorID:\"" + usrID + "\"");
 			CompassHit[] detachedHits = hits.detach(from,to).getHits();
-			
+
 			toReturn = new SearchHit[detachedHits.length];
-			
+
 			for (int i = 0; i < detachedHits.length; ++i)
 			{
 				toReturn[i] = new SearchHit((UIMessage)detachedHits[i].data(), detachedHits[i].score());
@@ -93,18 +124,18 @@ public class CompassAdapter implements SearchEngine
 	public SearchHit[] searchByContent(String phrase, int from, int to) 
 	{
 		SearchHit[] toReturn = null;
-		
+
 		CompassSession session = this.compass.openSession();
-		
+
 		try
 		{
 			System.out.println("phrase = " + phrase);
 			CompassHits hits = session.find("title:" + phrase + " OR content:" + phrase);
-//			CompassHits hits = session.find("content: \"" + phrase + "\" OR \" title:\" " + phrase + "\"");
+			//			CompassHits hits = session.find("content: \"" + phrase + "\" OR \" title:\" " + phrase + "\"");
 			CompassHit[] detachedHits = hits.detach(from,to).getHits();
-			
+
 			toReturn = new SearchHit[detachedHits.length];
-			
+
 			for (int i = 0; i < detachedHits.length; ++i)
 			{
 				toReturn[i] = new SearchHit((UIMessage)detachedHits[i].data(), detachedHits[i].score());
@@ -119,7 +150,7 @@ public class CompassAdapter implements SearchEngine
 		{
 			session.close();
 		}
-		
+
 		return toReturn;
 	}
 }

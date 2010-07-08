@@ -19,6 +19,10 @@ public interface SearchEngine {
 	 */ 
 	public void addData(UIMessage msg); 
 
+	public void modifyData(UIMessage msg);
+
+	public boolean removeData(long messageID);
+	
 	/** 
 	 * Search for all the messages(SearchHit) written by the author called username.<br><br> 
 	 *        

@@ -1,15 +1,15 @@
 package forum.server.updatedpersistentlayer.pipe.user;
 
+
 import java.util.*;
 
 import org.hibernate.*;
 import org.hibernate.classic.Session;
 
 import forum.server.updatedpersistentlayer.*;
-import forum.server.domainlayer.message.ForumSubject;
 import forum.server.domainlayer.user.*;
+import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
 import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
-import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
 import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
 
 /**
@@ -261,6 +261,33 @@ public class UsersPersistenceHandler {
 			MemberType tMemberToUpdate = this.getMemberTypeByID(session, userID);
 			tMemberToUpdate.getPermissions().clear();
 			tMemberToUpdate.getPermissions().addAll(this.parsePermissionsToString(permissions));
+			session.update(tMemberToUpdate);
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
+	/**
+	 * @param data
+	 * 		The forum data where the user details should be updated
+
+	 * @see
+	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String)
+	 */
+	public void updateUser(final SessionFactory ssFactory, final long userID, final String password,
+			final String lastName, final String firstName, final String email) throws 
+			NotRegisteredException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			MemberType tMemberToUpdate = this.getMemberTypeByID(session, userID);
+			if (tMemberToUpdate == null)
+				throw new NotRegisteredException(userID);
+			tMemberToUpdate.setPassword(password);
+			tMemberToUpdate.setLastName(lastName);
+			tMemberToUpdate.setFirstName(firstName);
+			tMemberToUpdate.setEmail(email);
 			session.update(tMemberToUpdate);
 			this.commitTransaction(session);
 		}

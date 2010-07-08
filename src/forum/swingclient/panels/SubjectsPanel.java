@@ -297,12 +297,13 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 	public void refreshForum(String encodedView) {
 
-		if (encodedView.startsWith("searchresult")) return;
+		if (encodedView.startsWith("searchresult") ||
+				encodedView.startsWith("searchnotmessages")) return;
 
 		if (encodedView.startsWith("getpathsuccess")) {
 			container.removeFromNavigateUntil("Show root subjects");
 			String[] tSplitted = encodedView.split("\n");
-			for (int i = 2; i < tSplitted.length; i++) {
+			for (int i = 3; i < tSplitted.length; i++) {
 				if (tSplitted[i].startsWith("THREAD")) break;
 				final String[] tCurrentSubject = tSplitted[i].split("\t");
 				final long id = Integer.parseInt(tCurrentSubject[0]);

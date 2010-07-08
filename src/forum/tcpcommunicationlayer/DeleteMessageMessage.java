@@ -44,19 +44,19 @@ public class DeleteMessageMessage extends ClientMessage {
 		}
 		catch (MessageNotFoundException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("deleteerror\n" + e.getMessage());
 		}
 		catch (NotRegisteredException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("deleteerror\n" + e.getMessage());
 		}
 		catch (NotPermittedException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("deleteerror\n" + e.getMessage());
 		}
 		catch (DatabaseUpdateException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse(e.getMessage());
+			returnObj.setResponse("deleteerror\n" + e.getMessage());
 		}
 		return returnObj;
 	}

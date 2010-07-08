@@ -10,7 +10,6 @@ import java.util.*;
 import org.compass.core.Compass;
 import org.compass.core.config.CompassConfiguration;
 import org.compass.core.config.CompassConfigurationFactory;
-import org.compass.core.engine.SearchEngineIndexManager;
 
 import forum.server.domainlayer.SystemLogger;
 
@@ -72,11 +71,6 @@ public class MainForumLogic implements ForumFacade {
 		
 			Compass compass = tConf.buildCompass();
 		
-//			SearchEngineIndexManager tIndexManager = compass.getSearchEngineIndexManager();
-			
-//			if (tIndexManager != null)
-//				tIndexManager.deleteIndex();
-	
 			this.searchController = new CompassAdapter(compass);
 			
 			this.usersController = new UsersController(tDataHandler);
@@ -96,7 +90,6 @@ public class MainForumLogic implements ForumFacade {
 			throw e;
 		}
 	}
-
 
 	// Guest related methods
 
@@ -144,13 +137,13 @@ public class MainForumLogic implements ForumFacade {
 
 	/**
 	 * @see
-	 * 		ForumFacade#getMemberIdByUsername(String)
+	 * 		ForumFacade#getMemberIdByUsernameAndOrEmail(String, String)
 	 */
-	public long getMemberIdByUsername(final String username) throws NotRegisteredException,
+	public long getMemberIdByUsernameAndOrEmail(final String username, final String email) throws NotRegisteredException,
 	DatabaseRetrievalException {
-		return this.usersController.getMemberIdByUsername(username);
+		return this.usersController.getMemberIdByUsernameAndOrEmail(username, email);
 	}
-
+	
 	/**
 	 * @see
 	 * 		ForumFacade#login(String, String)
@@ -176,7 +169,16 @@ public class MainForumLogic implements ForumFacade {
 			String lastName, String firstName, String email) throws MemberAlreadyExistsException, DatabaseUpdateException  {
 		return this.usersController.registerNewMember(username, password, lastName, firstName, email);
 	}
-	
+
+	/**
+	 * @see
+	 * 		ForumFacade#updateMemberProfile(long, String, String, String, String, String)
+	 */
+	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastName,
+			final String firstName, final String email) throws NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
+		return this.usersController.updateMemberProfile(memberID, username, password, lastName, firstName, email);
+	}
+
 	/**
 	 * @see
 	 * 		ForumFacade#promoteToBeModerator(long, long)
@@ -330,7 +332,9 @@ public class MainForumLogic implements ForumFacade {
 	public UIMessage updateAMessage(final long userID, final long messageID, final String newTitle, 
 			final String newContent) throws NotRegisteredException, NotPermittedException, MessageNotFoundException,
 			DatabaseUpdateException {
-		return this.messagesController.updateAMessage(userID, messageID, newTitle, newContent);
+		UIMessage toReturn = this.messagesController.updateAMessage(userID, messageID, newTitle, newContent);
+		this.searchController.modifyData(toReturn);
+		return toReturn;
 	}
 
 	/**
@@ -339,6 +343,8 @@ public class MainForumLogic implements ForumFacade {
 	 */
 	public void deleteAMessage(final long userID, final long fatherID, final long messageID) throws 
 	NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException {
-		this.messagesController.deleteAMessage(userID, fatherID, messageID);
+		Collection<Long> tDeletedMessagesIDs = this.messagesController.deleteAMessage(userID, fatherID, messageID);
+		for (long tMessageID : tDeletedMessagesIDs)
+			this.searchController.removeData(tMessageID);		
 	}
 }

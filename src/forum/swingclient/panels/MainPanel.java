@@ -80,17 +80,15 @@ public class MainPanel extends JFrame implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
-		System.out.println("\n---------------------\n"+encodedView);
-		
-		
-		
-				
+
+
 		// simulates a press on the home button
 
 		if (encodedView.startsWith("register") || 
 				encodedView.startsWith("activenumbers\t") ||
 				encodedView.startsWith("activeusernames\t") ||
 				encodedView.startsWith("promoted\t") ||
+				encodedView.startsWith("profiledetailsupdatesuccess\t") ||
 				encodedView.startsWith("getpathsuccess")) return;
 
 
@@ -177,6 +175,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 	}
 
 	public void notifyError(String error) {
+		if (error.startsWith("profiledetailsupdateerror\t")) return;
+
 		JOptionPane.showMessageDialog(this, error, 
 				"User identification error", JOptionPane.ERROR_MESSAGE);
 	}
@@ -272,10 +272,22 @@ public class MainPanel extends JFrame implements GUIHandler {
 			}
 		};
 
-
-
-
 		btn_login = new JButton("login");
+
+		this.btn_login.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					LoginDialog tLogin = new LoginDialog();
+					tLogin.setVisible(true);
+				} 
+				catch (IOException e) {
+					SystemLogger.warning("Error while connection to the server!");
+					btn_login.setEnabled(false);
+				}
+			}
+		});
+
 		btn_register = new JButton("register");
 		lbl_welcome = new JLabel();
 
@@ -319,14 +331,13 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		btn_search = new JButton("search");
 
-		
+
 		btn_search.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						SearchDialog tNewSearchDialog = new SearchDialog();
 						tNewSearchDialog.setVisible(true);
-						System.out.println(tNewSearchDialog.getSelectedID());
 						try {
 							if (tNewSearchDialog.getSelectedID() != -1)
 								ControllerHandlerFactory.getPipe().getPath(MainPanel.this, tNewSearchDialog.getSelectedID());

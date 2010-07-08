@@ -66,20 +66,26 @@ public interface ForumFacade { //extends SearchEngine {
 	public Collection<UIMember> getAllMembers() throws DatabaseRetrievalException;
 	
 	/**
-	 * Returns the unique id of the forum member whose user-name equals to the given one
+	 * Returns the unique id of the forum member whose user-name and email equals to the given one
+	 *
+	 * The looking is performed according to the given parameters user-name and/or e-mail.
+	 * 
+	 * At least one of the parameters should be given.
 	 * 
 	 * @param username
 	 * 		The user-name of the member whose id should be retrieved
+	 * @param email
+	 * 		The e-mail of the member whose id should be retrieved
 	 * 
 	 * @return
 	 * 		The id of the required member
 	 * 
 	 * @throws NotRegisteredException
-	 * 		If a member with the given user-name isn't registered to the forum 
+	 * 		If a member with the given user-name or e-mail isn't registered to the forum 
 	 * @throws DatabaseRetrievalException
 	 * 	    If a problem has occurred while trying to retrieve the required data from the database
 	 */
-	public long getMemberIdByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException;
+	public long getMemberIdByUsernameAndOrEmail(final String username, final String email) throws NotRegisteredException, DatabaseRetrievalException;
 
 	/**
 	 * 
@@ -165,6 +171,34 @@ public interface ForumFacade { //extends SearchEngine {
 	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException;
 
+	/**
+	 * 
+	 * Updates the profile of the given member to the given details
+	 * 
+	 * @param memberID
+	 * 		The id of the member whose details should be updated
+	 * @param username
+	 * 		The user-name of the member
+	 * @param password
+	 * 		The updated password of the member
+	 * @param lastName
+	 * 		The updated last name of the member
+	 * @param firstName
+	 * 		The updated first name of the member
+	 * @param email
+	 * 		The updated e-mail of the member
+	 * 
+	 * @return
+	 * 		The data structure of the updated member
+	 * 
+	 * @throws DatabaseUpdateException 
+	 *		If a problem has occurred while trying to update the database of the forum
+	 *
+	 */
+	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastName,
+			final String firstName, final String email) throws NotRegisteredException, MemberAlreadyExistsException, 
+			DatabaseUpdateException;
+	
 	// Subject related methods:	
 	
 	/**
@@ -451,6 +485,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 		The id of the message father
 	 * @param messageID
 	 * 		The id of the message to be deleted
+	 * @return
+	 * 		The deleted message, in order to be deleted from the search index
 	 * 
 	 * @throws NotRegisteredException 
 	 * 		In case the user who wants to delete the message, isn't registered as a forum member

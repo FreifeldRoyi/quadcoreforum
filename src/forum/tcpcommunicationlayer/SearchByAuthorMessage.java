@@ -30,7 +30,7 @@ public class SearchByAuthorMessage extends ClientMessage {
 		long userID = -1;
 		SearchHit[] tHits = null;
 		try {
-			userID = forum.getMemberIdByUsername(this.authorUsername);
+			userID = forum.getMemberIdByUsernameAndOrEmail(this.authorUsername, null);
 			System.out.println("UserID = " + userID + " username = " + this.authorUsername);
 			tHits = forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
 
