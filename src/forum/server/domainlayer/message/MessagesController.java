@@ -323,35 +323,38 @@ public class MessagesController {
 	 * @see
 	 * 		ForumFacade#deleteAMessage(long, long, long)
 	 */
-	public void deleteAMessage(final long userID, final long fatherID, final long messageID) throws NotRegisteredException, 
+	public Collection<Long> deleteAMessage(final long userID, final long fatherID, final long messageID) throws NotRegisteredException, 
 	MessageNotFoundException, NotPermittedException, DatabaseUpdateException {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to delete a message with id " +
 					messageID + " from being a reply of " + fatherID + ".");
 			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
 			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
+				Collection<Long> toReturn = new HashSet<Long>();
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumMessage tMessageToDelete = this.dataHandler.getMessagesCache().getMessageByID(messageID);
 				if (fatherID != -1) { // root message
 					final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
 					tFatherMessage.deleteReply(tMessageToDelete.getMessageID());
 					this.dataHandler.getMessagesCache().updateInDatabase(tFatherMessage);
-					this.dataHandler.getMessagesCache().deleteAMessage(messageID);
+					Collection<Long> tDeletedMessagesIDs = this.dataHandler.getMessagesCache().deleteAMessage(messageID);
 					SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
 							fatherID + " by a user " + userID);
+					toReturn.addAll(tDeletedMessagesIDs);
 				}
 				else {
 					// if the message is a root message its id is same as its thread id
 					try {
-						this.dataHandler.getMessagesCache().deleteATread(tMessageToDelete.getMessageID());
+						Collection<Long> tDeletedMessagesIDs = this.dataHandler.getMessagesCache().deleteATread(tMessageToDelete.getMessageID());
+						SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
+								fatherID + " by a user " + userID);
+						toReturn.addAll(tDeletedMessagesIDs);
 					}
 					catch (ThreadNotFoundException e) {
-						System.out.println("dddddddddddddddd");
 						throw new MessageNotFoundException(messageID);
 					}
-					SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
-							fatherID + " by a user " + userID);
 				}
+				return toReturn;
 			}
 			else {
 				SystemLogger.info("unpermitted operation for user " + userID + ".");

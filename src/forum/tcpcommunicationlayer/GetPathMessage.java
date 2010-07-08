@@ -34,7 +34,6 @@ public class GetPathMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		System.out.println("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
 			
@@ -81,13 +80,12 @@ public class GetPathMessage extends ClientMessage {
 				response = tCurrentFatherID + "\t" + tPreviousSubject.getName() + "\n" + response;
 				tCurrentFatherID = tPreviousSubject.getFatherID();
 			}
-			response = "getpathsuccess\nSUBJECTS\n" + response;
+			response = "getpathsuccess\n" + messageID + "\nSUBJECTS\n" + response;
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(response);
 			System.out.println("\n\n------------------\n\nencoded view:\n"+response + "\n\n-----------------------\n\n");
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("getpatherror");
 		}

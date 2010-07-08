@@ -10,6 +10,7 @@ package forum.server.domainlayer.message;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
@@ -229,11 +230,24 @@ public class MessagesCache {
 	 * @throws DatabaseUpdateException
 	 * 		In case the thread can't be deleted from the database due to a database connection error
 	 */
-	public void deleteATread(final long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
+	public Collection<Long> deleteATread(final long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
+/*		Collection<ForumMessage> tDeletedMessages = new Vector<ForumMessage>();
+		try {
+			ForumThread tThreadToDelete = this.pipe.getThreadByID(threadID);
+			long tRootMessageID = tThreadToDelete.getRootMessageID();
+			ForumMessage tRootMessage = this.getMessageByID(tRootMessageID);
+			
+			for (long tMessageID :)
+			
+		} catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}*/
+		
 		Collection<Long> tRecDeletedMessages = this.pipe.deleteAThread(threadID); // recursively deleted messages
 		this.idsToThreadsMapping.remove(threadID);
 		for (long tMessageID : tRecDeletedMessages)
 			this.idsToMessagesMapping.remove(tMessageID);
+		return tRecDeletedMessages;
 	}
 
 	public void updateInDatabase(ForumThread updatedThread) throws ThreadNotFoundException, DatabaseUpdateException {
@@ -317,10 +331,11 @@ public class MessagesCache {
 	 * @throws DatabaseUpdateException
 	 * 		In case the message can't be deleted from the database due to a database connection error
 	 */
-	public void deleteAMessage(long messageID) throws MessageNotFoundException, DatabaseUpdateException {
+	public Collection<Long> deleteAMessage(long messageID) throws MessageNotFoundException, DatabaseUpdateException {
 		Collection<Long> tRecDeletedMessages = this.pipe.deleteAMessage(messageID); // recursively deleted messages
 		for (long tMessageID : tRecDeletedMessages)
 			this.idsToMessagesMapping.remove(tMessageID);
+		return tRecDeletedMessages;
 	}
 
 	/**

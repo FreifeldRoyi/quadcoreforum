@@ -160,7 +160,7 @@ public class UsersCache {
 	public Collection<ForumMember> getAllMembers() throws DatabaseRetrievalException {
 		return this.pipe.getAllMembers();
 	}
-	
+
 	/**
 	 * Returns whether the cache contains an already loaded user with the given id
 	 * 
@@ -204,7 +204,7 @@ public class UsersCache {
 			this.idsToUsersMapping.remove(id);
 		else throw new NotRegisteredException(id);
 	}
-	
+
 	/**
 	 * 
 	 * Creates a new member in the forum community according to the given attributes and registers it in the forum 
@@ -253,7 +253,25 @@ public class UsersCache {
 		this.idsToUsersMapping.put(id, newMember);
 		return newMember;
 	}
-	
+
+	/**
+	 * 
+	 * Updates the data of the given member of the forum in the forum database
+	 * 
+	 * @param updatedMember
+	 * 		The updated member whose data should be updated in the database
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case a member with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case the database can't be updated due to a database connection error
+	 */
+	public void updateInDatabase(ForumMember updatedMember) throws NotRegisteredException, DatabaseUpdateException {
+		this.pipe.updateUser(updatedMember.getID(), updatedMember.getPassword(), 
+				updatedMember.getLastName(), updatedMember.getFirstName(), updatedMember.getEmail());
+		this.idsToUsersMapping.put(updatedMember.getID(), updatedMember);
+	}
+
 	/**
 	 * 
 	 * Updates the data of the given user of the forum in the forum database
@@ -272,5 +290,4 @@ public class UsersCache {
 		this.idsToUsersMapping.remove(updatedUser.getID());
 		this.pipe.updateUser(updatedUser.getID(), updatedUser.getPermissions());
 	}
-
 }

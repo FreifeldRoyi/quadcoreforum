@@ -171,6 +171,16 @@ public class ForumMember extends ForumUser implements UIMember {
 		this.password = password;
 	}
 
+	/**
+	 * Sets the member e-mail to be the given one
+	 * 
+	 * @param email
+	 * 		A new e-mail to which the member's password should be set
+	 */
+	public void setEmail(final String email) {
+		this.email = email;
+	}
+
 	// methods
 	
 	/**

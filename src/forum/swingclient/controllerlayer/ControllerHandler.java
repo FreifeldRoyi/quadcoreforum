@@ -30,6 +30,8 @@ public abstract class ControllerHandler extends GUIObservable {
 		}
 	}
 	
+	public abstract void updatePassword(final String username, final String email, final String password, final Component comp);
+
 	public abstract void registerToForum(final Component comp, String username, String password, 
 			String email, String firstName, String lastName);
 	

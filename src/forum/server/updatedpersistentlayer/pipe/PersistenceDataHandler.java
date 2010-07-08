@@ -140,6 +140,32 @@ public interface PersistenceDataHandler {
 	public void updateUser(final long userID, final Collection<Permission> permissions) throws
 	NotRegisteredException, DatabaseUpdateException;
 
+
+	/**
+	 * This method updates the details of the given user in the database
+	 * 
+	 * @param userID
+	 * 		The id of the user
+	 * @param password
+	 * 		The password of the user
+	 * @param lastName
+	 * 		The lastName of the user
+	 * @param firstName
+	 * 		The firstName of the user
+	 * @param email
+	 * 		The e-mail of the new member
+	 * @param permissions
+	 * 		The permissions set of the new member
+	 * 
+	 * @throws NotRegisteredException
+	 * 		In case the user which should be updated wasn't found
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
+	public void updateUser(final long userID, final String password,
+			final String lastName, final String firstName, final String email) throws 
+			NotRegisteredException, DatabaseUpdateException;
+	
 	// Subject related methods
 
 	/**

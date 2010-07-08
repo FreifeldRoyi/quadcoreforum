@@ -6,11 +6,8 @@
 package forum.server.updatedpersistentlayer.pipe;
 
 import java.util.*;
-import java.io.File;
 
 import org.hibernate.SessionFactory;
-
-import forum.server.Settings;
 
 import forum.server.domainlayer.message.*;
 import forum.server.domainlayer.user.*;
@@ -128,6 +125,16 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 			this.usersHandler.updateUser(factory, userID, permissions);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String)
+	 */
+	public void updateUser(final long userID, final String password,
+			final String lastName, final String firstName, final String email) throws 
+			NotRegisteredException, DatabaseUpdateException {
+		this.usersHandler.updateUser(factory, userID, password, lastName, firstName, email);
+	}
+	
 	// Subject related methods
 
 	/**

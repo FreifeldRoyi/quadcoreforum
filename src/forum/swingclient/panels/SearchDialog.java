@@ -81,14 +81,13 @@ public class SearchDialog extends JDialog implements GUIHandler
 	 * @see forum.client.ui.events.GUIHandler#refreshForum(java.lang.String)
 	 */
 	public void refreshForum(String encodedView) {
-		System.out.println("got refresh search");
 		if (encodedView.startsWith("searchnotmessages")) {
-			JOptionPane.showMessageDialog(this, "No messages were found", "empty", JOptionPane.INFORMATION_MESSAGE);
 			this.setMinimumSize(new Dimension(555, 235));
 			this.setSize(new Dimension(555, 235));
 			pnl_results.setVisible(false);
+			JOptionPane.showMessageDialog(this, "No messages were found", "empty", JOptionPane.INFORMATION_MESSAGE);
 		}
-		else {			
+		else {
 
 			this.resultsTable.setVisible(false);
 			this.resultsTableModel.clearData();
@@ -277,6 +276,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 					int rowSelected = resultsTable.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1)
 						selectedID = resultsTableModel.getIDofContentInRow(rowSelected);
+					controller.deleteObserver(SearchDialog.this);
 					setVisible(false);
 				}
 			}

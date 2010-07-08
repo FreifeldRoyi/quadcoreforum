@@ -26,7 +26,7 @@ public class UsersController {
 	private long guestsCounter;
 	// stores a set of all the user-names of members currently connected to the forum
 	private Collection<String> activeMembersUserNames;
-	
+
 	/**
 	 * The class constructor.
 	 * 
@@ -58,7 +58,7 @@ public class UsersController {
 		final Collection<Permission> permissions = this.getDefaultGuestPermissions();
 		return this.dataHandler.getUsersCache().createNewGuest(permissions);
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#removeGuest(long)
@@ -113,17 +113,24 @@ public class UsersController {
 		SystemLogger.info("A forum members were retrieved and returned.");
 		return toReturn;
 	}
-	
+
 	/**
 	 * @see
-	 * 		ForumFacade#getMemberIdByUsername(String)
+	 * 		ForumFacade#getMemberIdByUsernameAndOrEmail(String, String)
 	 */
-	public long getMemberIdByUsername(final String username) throws NotRegisteredException, DatabaseRetrievalException {
-		ForumMember tMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
-		if (tMember == null)
-			throw new NotRegisteredException(username);
-		else
-			return tMember.getID();
+	public long getMemberIdByUsernameAndOrEmail(final String username, final String email) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumMember tMember = null;
+		if (username != null) {
+			tMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
+			if (tMember == null || (email != null && !tMember.getEmail().equals(email)))
+				throw new NotRegisteredException(username);
+		}
+		else {
+			tMember = this.dataHandler.getUsersCache().getMemberByEmail(email);
+			if (tMember == null)
+				throw new NotRegisteredException(username);
+		}
+		return tMember.getID();
 	}
 
 	/**
@@ -152,7 +159,7 @@ public class UsersController {
 	private String encryptPassword(final String password) {
 		return PasswordEncryptor.encryptMD5(password);
 	}
-	
+
 	/**
 	 * 
 	 * Encrypts the entered password according to a chosen encryption algorithm and checks
@@ -236,10 +243,90 @@ public class UsersController {
 	 * @return
 	 * 		True if the given user is forum guest and false otherwise
 	 */
-	private boolean isGuest(ForumUser userToCheck) {
+	/*private boolean isGuest(ForumUser userToCheck) {
 		return (userToCheck != null) && (userToCheck.getID() < 0);
+	}*/
+
+	/**
+	 * @see
+	 * 		ForumFacade#updateMemberProfile(long, String, String, String, String, String)
+	 */
+	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastname,
+			final String firstname, final String email) throws NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
+		SystemLogger.info("A member " + username + " with id " + memberID + " requests to change his profile details.");
+
+		ForumMember tForumMember = null;
+		try {				
+			 tForumMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
+			 if (tForumMember == null) {
+				 SystemLogger.info("A member with id " + memberID + " doesn't exist in the database.");
+				 throw new NotRegisteredException(memberID);
+			 }
+		}
+		catch (DatabaseRetrievalException e) {
+			SystemLogger.severe("Can't update profile because of database retrieval error.");
+			throw new DatabaseUpdateException();
+		}
+
+		// used for recovery
+		String tPassword = null;
+		String tLastName = null;
+		String tFirstName = null;
+		String tEmail = null;
+
+		// check if the given email is already assigned to a different member
+		if (email != null) {
+
+			ForumMember tOtherMember = null;
+			try {
+				tOtherMember = this.dataHandler.getUsersCache().getMemberByEmail(email);
+			}
+			catch (DatabaseRetrievalException e) {
+				SystemLogger.severe("Can't update profile because of database retrieval error.");
+				throw new DatabaseUpdateException();
+			}
+			if (tOtherMember != null && !tOtherMember.getUsername().equals(username))
+				throw new MemberAlreadyExistsException(email);
+			tEmail = tForumMember.getEmail();
+			tForumMember.setEmail(email);
+		}
+
+		if (password != null) {
+			tPassword = tForumMember.getPassword();
+			tForumMember.setPassword(this.encryptPassword(password));
+		}
+
+		if (lastname != null) {
+			tLastName = tForumMember.getLastName();
+			tForumMember.setLastName(lastname);
+		}
+
+		if (firstname != null) {
+			tFirstName = tForumMember.getFirstName();
+			tForumMember.setFirstName(firstname);
+		}
+
+		try {
+			this.dataHandler.getUsersCache().updateInDatabase(tForumMember);
+			SystemLogger.info("The profile of " + username + " has been successfully changed.");
+		}
+		catch (NotRegisteredException e) {
+			tForumMember.setPassword(tPassword);
+			tForumMember.setLastName(tLastName);
+			tForumMember.setFirstName(tFirstName);
+			tForumMember.setEmail(tEmail);
+			throw e;
+		}
+		catch (DatabaseUpdateException e) {
+			tForumMember.setPassword(tPassword);
+			tForumMember.setLastName(tLastName);
+			tForumMember.setFirstName(tFirstName);
+			tForumMember.setEmail(tEmail);
+			throw e;
+		}
+		return tForumMember;
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#promoteToBeModerator(long, long)
@@ -257,7 +344,7 @@ public class UsersController {
 				tForumUser.setPermissions(this.getDefaultModeratorPermissions());
 				this.dataHandler.getUsersCache().updateInDatabase(tForumUser);
 				SystemLogger.info("The user with " + username + " has been successfully promoted to be a " +
-						"moderator of the forum.");
+				"moderator of the forum.");
 			}
 			else {
 				SystemLogger.info("unpermitted operation for user " + applicantID + ".");
@@ -268,9 +355,9 @@ public class UsersController {
 			throw new DatabaseUpdateException();
 		}
 	}
-	
+
 	// Default permissions methods
-	
+
 	/**
 	 * 
 	 * @return
@@ -281,7 +368,7 @@ public class UsersController {
 		toReturn.add(Permission.VIEW_ALL);
 		return toReturn;
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -295,7 +382,7 @@ public class UsersController {
 		toReturn.add(Permission.EDIT_MESSAGE);
 		return toReturn;
 	}
-	
+
 	/**
 	 * 
 	 * @return
