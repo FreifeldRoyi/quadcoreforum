@@ -7,6 +7,8 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -44,6 +46,8 @@ public class LoginDialog extends JDialog implements GUIHandler {
 	 */
 	private static final long serialVersionUID = 1L;
 
+//	private GUIHandler forumMainPanel;
+
 	private JPanel mainPanel;
 	private JButton loginButton;
 	private JLinkButton forgotPasswordButton;
@@ -57,66 +61,28 @@ public class LoginDialog extends JDialog implements GUIHandler {
 	private JPanel informationPanel;
 	private JLabel informationLabel;
 
+	private long guestID;
 
 	public ControllerHandler controller;
 
-
 	@Override
 	public void notifyError(String errorMessage) {
-		System.out.println("login  --- error");
-		if (errorMessage.startsWith("loginerror\t")) {
-			String[] tSplittedMessage = errorMessage.split("\t");
-			String tErrorMessage = tSplittedMessage[1];
-			informationLabel.setText(tErrorMessage);
-		}
-
+		this.controller.deleteObserver(this);
+		informationLabel.setText("Wrong username or password");
+		this.setEnabled(true);
 	}
 
 	@Override
 	public void refreshForum(String encodedView) {
-		System.out.println("Encoded = " + encodedView);
-		if (encodedView.startsWith("loginsuccess\t")) {
-			this.controller.deleteObserver(this);
-			JOptionPane.showMessageDialog(this, "The login process was completed successfully!",
-					"success", JOptionPane.INFORMATION_MESSAGE);
-			this.dispose();
-		}
-		else if (encodedView.startsWith("loginerror\t"))
-			this.notifyError(encodedView);
-
+		if (encodedView.startsWith("activenumbers\t")) return;
+		this.controller.deleteObserver(this);
+		this.cancelButton.doClick();
 	}
-	/*
-	public static void main(String[] args) {
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e) {
-			SystemLogger.warning("Can't use default system look and feel, will use java default" +
-			" look and feel style.");
-		}
-
-		try {
-			LoginDialog tLoginPanel = new LoginDialog();
-
-
-			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-			int X = (screen.width / 2) - (tLoginPanel.getWidth() / 2); // Center horizontally.
-			int Y = (screen.height / 2) - (tLoginPanel.getHeight() / 2); // Center vertically.
-			tLoginPanel.setLocation(X, Y);
-
-		}
-		catch (IOException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "initialization error", 
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
-
-	}*/
-
-	public LoginDialog() throws IOException {
+	public LoginDialog(GUIHandler forumMainPanel, long guestID) throws IOException {
 		super();
+//		this.forumMainPanel = forumMainPanel;
+		this.guestID = guestID;
 		this.setTitle("Login Page");
 		controller = ControllerHandlerFactory.getPipe();
 
@@ -127,24 +93,7 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.getContentPane().add(mainPanel);
 		this.setMinimumSize(new Dimension(450, 300));
 
-		this.addWindowListener(new WindowListener() {
-
-			public void windowDeactivated(WindowEvent e) {}
-			public void windowActivated(WindowEvent e) {}
-			public void windowClosed(WindowEvent e) {}
-			public void windowDeiconified(WindowEvent e) {}
-			public void windowIconified(WindowEvent e) {}
-			public void windowOpened(WindowEvent e) {}
-
-
-			public void windowClosing(WindowEvent e) {
-				SystemLogger.info("The client requested to finish the login without finish the operation.");
-				controller.deleteObserver(LoginDialog.this);
-			}
-		});
-
 		this.setEnabled(true);
-		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		this.pack();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		int X = (screen.width / 2) - (this.getWidth() / 2); // Center horizontally.
@@ -177,6 +126,18 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.usernameInput = new JTextField(20);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+
+		this.usernameInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					loginButton.doClick();
+			}
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
+		});
+		
+		
+		
 		loginPanel.add(this.usernameInput);
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
@@ -186,6 +147,17 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.passwordInput = new JPasswordField(20);
 		this.passwordInput.setText("");
 		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		
+		this.passwordInput.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					loginButton.doClick();
+			}
+			public void keyReleased(KeyEvent e) {}
+			public void keyTyped(KeyEvent e) {}
+		});
+		
 		loginPanel.add(this.passwordInput);
 		this.passwordLabel.setLabelFor(this.passwordInput);
 
@@ -201,11 +173,12 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				informationLabel.setText("");
-				if(usernameInput.getText().length()>0 && passwordInput.getPassword().length>0)
-				{
+				if(usernameInput.getText().length() > 0 && passwordInput.getPassword().length > 0) {
 					System.out.println("controller login");
-					controller.login(1,usernameInput.getText(),
-							new String(passwordInput.getPassword()),loginButton);
+					controller.addObserver(new GUIObserver(LoginDialog.this), EventType.USER_CHANGED);
+					LoginDialog.this.setEnabled(false);
+					controller.login(LoginDialog.this.guestID, usernameInput.getText(),
+							new String(passwordInput.getPassword()), LoginDialog.this);
 				}
 				else {
 					informationLabel.setText("you must insert not empty user name and password");
@@ -216,9 +189,9 @@ public class LoginDialog extends JDialog implements GUIHandler {
 
 		forgotPasswordButton = new JLinkButton("forgot password?", Color.black);
 		forgotPasswordButton.setForeground(Color.black);
-		
+
 		forgotPasswordButton.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				try {
 					informationLabel.setText("");
@@ -232,9 +205,16 @@ public class LoginDialog extends JDialog implements GUIHandler {
 				}				
 			}
 		});
-		
-		
+
+
 		cancelButton = new JButton("Cancel");
+
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				LoginDialog.this.dispose();
+			}
+		});
 
 		loginButton.setPreferredSize(new Dimension(100, 40));
 		cancelButton.setPreferredSize(new Dimension(100, 40));
@@ -245,18 +225,18 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		mainPanel.setLayout(tMainPanelLayout);
 		tMainPanelLayout.setHorizontalGroup(
 				tMainPanelLayout.createSequentialGroup()
+				.addContainerGap()
+				.addGroup(tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+						.addComponent(loginPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+						.addGroup(tMainPanelLayout.createSequentialGroup()
+								.addComponent(forgotPasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addGap(0, 0, Short.MAX_VALUE)
+								.addComponent(loginButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addGap(0, 0, 20)
+								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+						))
 						.addContainerGap()
-						.addGroup(tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-								.addComponent(loginPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-								.addGroup(tMainPanelLayout.createSequentialGroup()
-										.addComponent(forgotPasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
-										.addGap(0, 0, Short.MAX_VALUE)
-										.addComponent(loginButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
-										.addGap(0, 0, 20)
-										.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
-								))
-								.addContainerGap()
 		);
 
 
@@ -274,19 +254,19 @@ public class LoginDialog extends JDialog implements GUIHandler {
 								.addContainerGap()
 				)
 		);
-		
+
 
 	}	
 
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		try {
-			new LoginDialog().setVisible(true);
+			new LoginDialog(1).setVisible(true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 
 }

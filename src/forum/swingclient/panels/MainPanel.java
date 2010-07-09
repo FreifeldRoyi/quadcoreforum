@@ -14,10 +14,14 @@ import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.user.Permission;
 
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,6 +46,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private JMenuBar mainPanelMenu;
 	private JButton btn_login;
 	private JButton btn_register;
+	private Component registerLoginGap;
 	private JButton btn_logout;
 	private JButton btn_search;
 
@@ -75,6 +80,12 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private ConnectedUserData connectedUser;
 
 
+
+
+
+
+
+
 	public ConnectedUserData getConnectedUser() {		
 		return this.connectedUser;
 	}
@@ -91,8 +102,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 				encodedView.startsWith("profiledetailsupdatesuccess\t") ||
 				encodedView.startsWith("getpathsuccess")) return;
 
-
-		this.pnl_navigate.setVisible(false);
+		//		this.pnl_navigate.setVisible(false);
 
 		if (!encodedView.startsWith("loggedout\t")) {
 
@@ -126,7 +136,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 			this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
 
-		}		
+		}
 
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
@@ -143,18 +153,25 @@ public class MainPanel extends JFrame implements GUIHandler {
 		if (!this.connectedUser.isGuest()) {
 			this.lbl_welcome.setText("Hello " + this.connectedUser.getLastAndFirstName() + "!");
 			this.btn_login.setVisible(false);
+			this.registerLoginGap.setVisible(false);
 			this.btn_logout.setVisible(true);			
 			this.btn_register.setVisible(false);
 			this.pnl_fastLogin.setVisible(false);
+			if (this.connectedUser.getID() == 0)
+				btn_show_members.setVisible(true);
+
 		}
 		else {
 			this.lbl_welcome.setText("Hello Guest!");
 			this.btn_login.setVisible(true);
+			this.registerLoginGap.setVisible(true);
 			this.btn_logout.setVisible(false);			
 			this.btn_register.setVisible(true);
 
 			this.pnl_fastLogin.setVisible(true);
 			this.fastLoginButton.setEnabled(false);
+			btn_show_members.setVisible(false);
+
 		}
 
 		this.fastLoginPasswordInput.setText("");
@@ -166,16 +183,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 		if (!this.threadsPanel.isVisible() && !this.threadsPanel.showsMessages())
 			controller.getSubjects(-1, this.subjectsPanel);
 
-		if (this.connectedUser.getID() == 0)
-			btn_show_members.setVisible(true);
-		else
-			btn_show_members.setVisible(false);
-		this.pnl_navigate.setVisible(true);
 
 	}
 
 	public void notifyError(String error) {
+		if (!this.isActive())
+			return;
 		if (error.startsWith("profiledetailsupdateerror\t")) return;
+
 
 		JOptionPane.showMessageDialog(this, error, 
 				"User identification error", JOptionPane.ERROR_MESSAGE);
@@ -274,11 +289,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		btn_login = new JButton("login");
 
+		registerLoginGap = Box.createRigidArea(new Dimension(18, 35));
+
+
 		this.btn_login.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					LoginDialog tLogin = new LoginDialog();
+					LoginDialog tLogin = new LoginDialog(MainPanel.this, connectedUser.getID());
 					tLogin.setVisible(true);
 				} 
 				catch (IOException e) {
@@ -289,6 +307,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 		});
 
 		btn_register = new JButton("register");
+
+
 		lbl_welcome = new JLabel();
 
 		lbl_welcome.setForeground(Color.WHITE);
@@ -388,31 +408,41 @@ public class MainPanel extends JFrame implements GUIHandler {
 		pnl_links.setOpaque(false);
 		//tMainLinkButton.setPreferredSize(new Dimension(20, 10));
 
+
+		//		btn_register.setPreferredSize(new Dimension(85, 35));
+
+		//	JPanel pnl_register = new JPanel();
+		//pnl_register.setOpaque(false);
+		//pnl_register.setLayout(new FlowLayout(FlowLayout.LEFT));
+		//pnl_register.add(btn_register);
+		//pnl_register.add();
+
 		JSeparator tVerticalSeparator = new JSeparator(SwingConstants.VERTICAL);
 
-		tNavigatePanelLayout.setHorizontalGroup(
-				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-				.addGroup(GroupLayout.Alignment.TRAILING, tNavigatePanelLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)	
-								.addComponent(tNavigatePanelSeparator, GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
-								.addComponent(pnl_links, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
-								.addGroup(tNavigatePanelLayout.createSequentialGroup()
-										.addComponent(lbl_welcome, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
-										.addComponent(btn_show_members, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(btn_search, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(tVerticalSeparator, 1, 1, 1)
-										.addGap(18, 18, 18)
-										.addComponent(btn_register, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(btn_login, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
-										.addGap(18, 18, 18)
-										.addComponent(btn_logout, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-										.addContainerGap())
-		);
+
+		tNavigatePanelLayout.setHorizontalGroup(		
+				tNavigatePanelLayout.createSequentialGroup()
+				.addContainerGap()
+				.addGroup(tNavigatePanelLayout.createParallelGroup()
+						.addComponent(pnl_links, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
+						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, 1113, Short.MAX_VALUE)
+						.addGroup(tNavigatePanelLayout.createSequentialGroup()
+								.addComponent(lbl_welcome, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
+								.addComponent(btn_show_members, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+								.addGap(18, 18, 18)
+								.addComponent(btn_search, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+								.addGap(18, 18, 18)
+								.addComponent(tVerticalSeparator, 1, 1, 1)
+								.addGap(18, 18, 18)
+								.addComponent(btn_register, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+								.addComponent(registerLoginGap, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btn_login, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btn_logout, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
+								.addContainerGap());
+
+
+
 		tNavigatePanelLayout.setVerticalGroup(
 				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(tNavigatePanelLayout.createSequentialGroup()
@@ -426,6 +456,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(btn_logout, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
 								.addComponent(btn_search, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
 								.addComponent(btn_show_members, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+								.addComponent(registerLoginGap, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
 
 								.addComponent(btn_register, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
 								.addComponent(tVerticalSeparator, 35, 35, 35)

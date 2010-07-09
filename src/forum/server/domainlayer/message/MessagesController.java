@@ -158,10 +158,16 @@ public class MessagesController {
 				SystemLogger.info("Permission granted for user " + userID + ".");
 				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
 				final ForumMessage tNewMessage = this.dataHandler.getMessagesCache().createNewMessage(userID, title, content, -1);
+
 				final ForumThread tNewThread = this.dataHandler.getMessagesCache().openNewThread(topic, 
 						tNewMessage.getMessageID(), tFatherSubject.getID());
+
+
+
 				tFatherSubject.addThread(tNewThread.getID());
+
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
+
 				return tNewThread;
 			}
 			else {
@@ -174,7 +180,7 @@ public class MessagesController {
 		}
 	}
 
-	public void deleteAThread(final long userID, final long fatherID, final long threadID) throws NotRegisteredException, 
+	private void deleteAThread(final long userID, final long fatherID, final long threadID) throws NotRegisteredException, 
 	NotPermittedException, SubjectNotFoundException, ThreadNotFoundException, DatabaseUpdateException {
 		try {
 			SystemLogger.info("A user with id " + userID + " requests to delete ther thread with id " +
@@ -187,9 +193,16 @@ public class MessagesController {
 
 				// delete the thread from the desired subject
 				tFatherSubject.deleteThread(threadID);
+
+
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 
 				this.dataHandler.getMessagesCache().deleteATread(tThreadToDelete.getID());
+
+				System.out.println("After delete id = " + tFatherSubject.getID());
+				System.out.println("After delete threads = " + tFatherSubject.getThreads().toString());
+
+
 
 				SystemLogger.info("A thread with id " + threadID + " was deleted successfuly from the subject " +
 						fatherID + " by a user " + userID);
@@ -204,7 +217,7 @@ public class MessagesController {
 		}
 
 	}
-	
+
 	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException,
 	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException {
 		try {
@@ -326,13 +339,27 @@ public class MessagesController {
 	public Collection<Long> deleteAMessage(final long userID, final long fatherID, final long messageID) throws NotRegisteredException, 
 	MessageNotFoundException, NotPermittedException, DatabaseUpdateException {
 		try {
-			SystemLogger.info("A user with id " + userID + " requests to delete a message with id " +
-					messageID + " from being a reply of " + fatherID + ".");
+
+			if (fatherID == -1)
+				SystemLogger.info("A user with id " + userID + " requests to delete a thread with id " +
+						messageID + ".");
+			else
+				SystemLogger.info("A user with id " + userID + " requests to delete a message with id " +
+						messageID + " from being a reply of " + fatherID + ".");
+
 			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
-			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
+
+			if ((fatherID != -1 && tApplicant.isAllowed(Permission.DELETE_MESSAGE)) 
+					|| 
+					(fatherID == -1 && tApplicant.isAllowed(Permission.DELETE_THREAD))) {
+
 				Collection<Long> toReturn = new HashSet<Long>();
 				SystemLogger.info("Permission granted for user " + userID + ".");
+
+
 				final ForumMessage tMessageToDelete = this.dataHandler.getMessagesCache().getMessageByID(messageID);
+
+
 				if (fatherID != -1) { // root message
 					final ForumMessage tFatherMessage = this.dataHandler.getMessagesCache().getMessageByID(fatherID);
 					tFatherMessage.deleteReply(tMessageToDelete.getMessageID());
@@ -345,14 +372,36 @@ public class MessagesController {
 				else {
 					// if the message is a root message its id is same as its thread id
 					try {
-						Collection<Long> tDeletedMessagesIDs = this.dataHandler.getMessagesCache().deleteATread(tMessageToDelete.getMessageID());
-						SystemLogger.info("A message with id " + messageID + " was deleted successfuly from the message " +
-								fatherID + " by a user " + userID);
+
+						final ForumThread tThreadToDelete = this.dataHandler.getMessagesCache().getThreadByID(messageID);
+						final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(tThreadToDelete.getFatherID());
+
+						// delete the thread from the desired subject
+						tFatherSubject.deleteThread(tMessageToDelete.getMessageID());
+
+						this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
+
+						Collection<Long> tDeletedMessagesIDs = this.dataHandler.getMessagesCache().deleteATread(messageID);
+
+						SystemLogger.info("The thread with id " + messageID + " was deleted successfuly from the subject " +
+								tFatherSubject.getID() + " by a user " + userID);
+
 						toReturn.addAll(tDeletedMessagesIDs);
+
+
+						System.out.println("After delete id = " + tFatherSubject.getID());
+						System.out.println("After delete threads = " + tFatherSubject.getThreads().toString());
+
+
+
 					}
 					catch (ThreadNotFoundException e) {
 						throw new MessageNotFoundException(messageID);
 					}
+					catch (SubjectNotFoundException e) {
+						throw new MessageNotFoundException(messageID);
+					}
+
 				}
 				return toReturn;
 			}

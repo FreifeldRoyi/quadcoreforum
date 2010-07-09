@@ -1,6 +1,7 @@
 package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.message.NotPermittedException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
@@ -38,9 +39,9 @@ public class AddReplyMessage extends ClientMessage {
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
-			forum.addNewReply(this.authorID, this.fatherID, this.title, this.content);
+			UIMessage tAddedMessagee = forum.addNewReply(this.authorID, this.fatherID, this.title, this.content);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("replysuccess");
+			returnObj.setResponse("replysuccess\t" + tAddedMessagee.getMessageID());
 		}
 		catch (MessageNotFoundException e) {
 			returnObj.setHasExecuted(false);

@@ -170,7 +170,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 	}
 
 	public void modifyMessage(final long authorID, long messageID, String newTitle,
-			String newContent, Component comp) {		
+			String newContent, Component comp) {
 		getActiveUsersNumber();
 		final ClientMessage toSend = new ModifyMessageMessage(authorID, 
 				messageID, newTitle, newContent);
@@ -183,6 +183,20 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		catch (InterruptedException e) {
 			SystemLogger.warning("The program was interrupted while waiting");
 		}
+	}
+	
+	public void modifyThread(final long authorID, long threadID, String newTopic, Component comp) {
+		getActiveUsersNumber();
+		final ClientMessage toSend = new ModifyThreadMessage(authorID, threadID, newTopic);
+		try {
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.THREADS_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}		
 	}
 
 	public void addReplyToMessage(final long author, final long replyTo, 
@@ -505,35 +519,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);	
 	}
-
-
-	/*
-	private synchronized void handleQuery(ClientMessage toSend) {
-		this.updateActiveUserNumber();
-		this.connectionController.handleQuery(toSend);		
-	}
-
-	 */
-	/*
-	private synchronized void updateActiveUserNumber() {
-		try {
-			final ClientMessage toSend = new GuestsAndMembersNumberMessage();
-			connectionController.handleQuery(toSend);
-			ServerResponse tResponse = responses.take();
-			if (tResponse == null) { // don't notify
-				// TODO: what to do here
-			}
-			else {
-				notifyObservers(new ForumGUIRefreshEvent(null, tResponse.getResponse(),
-						EventType.USER_CHANGED));
-			}		
-		}
-		catch (InterruptedException e) {
-			SystemLogger.warning("The program was interrupted while waiting");
-		}
-
-	}
-	 */
 
 	public void getActiveUsersNumber() {
 		Runnable tResponseHandler = new Runnable() {
