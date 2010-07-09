@@ -45,18 +45,18 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 	/**
 	 * 
 	 */
-	
+
 	// A timer for the sending button
 
 	private static final String SENDING_STRING = "Sending, please wait";
 	private static final String UPDATING_PASSWORD_STRING = "Updating, please wait";
 
 	private static final String[] SENDING_STRINGS = {SENDING_STRING, SENDING_STRING + ".",  SENDING_STRING + "..", 
-			SENDING_STRING + "...", SENDING_STRING + "....", SENDING_STRING + "....."};
+		SENDING_STRING + "...", SENDING_STRING + "....", SENDING_STRING + "....."};
 
 	private static final String[] UPDATING_STRINGS = {UPDATING_PASSWORD_STRING, UPDATING_PASSWORD_STRING + ".",  UPDATING_PASSWORD_STRING + "..", 
-			UPDATING_PASSWORD_STRING + "...", UPDATING_PASSWORD_STRING + "....", UPDATING_PASSWORD_STRING + "....."};
-	
+		UPDATING_PASSWORD_STRING + "...", UPDATING_PASSWORD_STRING + "....", UPDATING_PASSWORD_STRING + "....."};
+
 	private static final long serialVersionUID = 1L;
 
 	private static final String PASSWORD_CHARSET = "!@0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -68,7 +68,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 	private JLabel sendingLabel;
 	private JLabel updatingLabel;
-	
+
 	private JLabel usernameLabel;
 	private JTextField usernameInput;
 
@@ -80,26 +80,25 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 	private JLabel informationLabel;
 
 	public ControllerHandler controller;
-	
+
 	private String generatedPassword;
-	
+
 	private void sendNewPassword(final String[] dataToSend) {
 		sendingLabel.setVisible(true);				
 
 		SwingWorker<Boolean, Void> tSender = new SwingWorker<Boolean, Void>() {
 			public Boolean doInBackground() {
 				final SendMail tSender = new SendMail();
-				
+
 				String toSend = "<h3>Hello " + dataToSend[3] + " " + dataToSend[4] + "!</h3>" +
 				"This is a message from QuadCoreForum Administrator. <br /> Someone, maybe it was you, asked us to change " +
 				" your forum password. <br /> The new password is: <b><u>" + generatedPassword + "</u></b>.\n\n You can change this " +
 				" password after the first login to the forum.<br />" + "<p>" +
 				"Please don't reply to this message.<br />" + "Best Regards<br />" +
 				"       QuadCoreForum Administrator</p>";
-				
-				
+
 				System.out.println(toSend + "  " +  generatedPassword + " " + "ppppppppppppppppppppppppppppppppp");
-				
+
 				try {
 					tSender.postMail(dataToSend[5], "QuadCoreForum admin message", toSend, "QuadCoreForumAdmin");
 					return true;
@@ -113,7 +112,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 				try {
 					boolean tSendingRetVal = get();
 					sendingLabel.setVisible(false);
-					
+
 					if (tSendingRetVal)
 						JOptionPane.showMessageDialog(ForgotPasswordDialog.this, "A new password was successfully sent to your " +
 								"email,\nyou can change it after the first login.", "Message recovery succeeded",
@@ -121,6 +120,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 					else 
 						JOptionPane.showMessageDialog(ForgotPasswordDialog.this, "A new password couldn't be sent due to a communication "
 								+ "error\n. Please try again later.", "Error while message sending", JOptionPane.ERROR_MESSAGE);
+					ForgotPasswordDialog.this.controller.deleteObserver(ForgotPasswordDialog.this);
 					cancelButton.doClick();
 
 				} catch (InterruptedException ex) {
@@ -134,8 +134,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 		tSender.execute();
 	}
-	
-	
+
+
 	public void refreshForum(String encodedView) {
 		informationLabel.setText("");
 		updatingLabel.setVisible(false);
@@ -159,7 +159,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 			informationLabel.setText(tErrorMessage);
 		}
 	}
-	
+
 
 	public ForgotPasswordDialog() throws IOException {
 		super();
@@ -228,7 +228,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 		updatingLabel.setVisible(false);
 
 		// Timer initialization
-		
+
 		Timer tSendingTimer = new Timer(500, new ActionListener() {
 			int tIndex = 0;
 			public void actionPerformed(ActionEvent e) {
@@ -327,8 +327,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 	private class SendPasswordActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			controller.addObserver(new GUIObserver(ForgotPasswordDialog.this), EventType.USER_CHANGED);
 			if(usernameInput.getText().length() > 0 && emailInput.getText().length() > 0) {
+				controller.addObserver(new GUIObserver(ForgotPasswordDialog.this), EventType.USER_CHANGED);
 				ForgotPasswordDialog.this.generatedPassword = getRandomPassword();
 				controller.updatePassword(usernameInput.getText(),
 						emailInput.getText(), generatedPassword, ForgotPasswordDialog.this);

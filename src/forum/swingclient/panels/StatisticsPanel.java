@@ -57,8 +57,8 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 		long tMembersNumber = Long.parseLong(tSplitted[2]);
 		connectedStatisticsLabel.setText("Total: " +
 				(tGuestsNumber + tMembersNumber) + " are connected, " + 
-				tMembersNumber + " are registered users and " + 
-				tGuestsNumber + " are guests");		
+				tMembersNumber + (tMembersNumber == 1? " is registered user" : " are registered users") + " and " + 
+				tGuestsNumber + (tGuestsNumber == 1? " is guest" : " are guests"));
 
 
 		if (tMembersNumber == 0)

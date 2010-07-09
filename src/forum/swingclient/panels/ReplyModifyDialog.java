@@ -44,6 +44,10 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	private JButton cancel;
 	private boolean succeeded;
 
+	// used in order to scroll to the created / updated subject / thread / message id
+	private long createdOrUpdatedID;
+	
+	
 
 	//	private JButton replyModifyButton;
 
@@ -129,6 +133,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long fatherID, String topicType,
 			final JButton replyModifyButton) {
 		super();
+		this.setTitle("Add new subject");
 		initializeGUIContent(authorID, fatherID, replyModifyButton);
 		this.topicType = topicType;
 		arrangeLayout();
@@ -177,17 +182,20 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	}
 
 
-
-
 	private void initializeGUIContent(long authorID, long replyModifiedID, JButton replyModifyButton) {
 		this.title = new JTextField();
+		
+		this.title.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
 		this.content = new JTextArea();
 		//		this.content.setAutoscrolls(true);
 		this.contentPane = new JScrollPane(content);
 		this.ok = new JButton();
 		this.cancel = new JButton();
 		this.topicType = "message";
+		
 		this.content.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
 		this.setPreferredSize(new Dimension(400, 300));
 		this.setMinimumSize(new Dimension(400, 300));
 
@@ -231,18 +239,13 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 				.addGroup(tLayout.createSequentialGroup()
 						.addGap(10, 10, 10)
-						.addComponent((topicType.equals("thread")? topicLabel : box), 100,100,100)
+						.addComponent((topicType.equals("thread")? topicLabel : box), 100, 100, 100)
 						.addGap(10, 10, 10))
 						.addGroup(tLayout.createSequentialGroup()
 								.addGap(10, 10, 10)
 								.addComponent((topicType.equals("thread")? this.topic : box), 
 										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 										.addGap(10, 10, 10))
-
-
-
-
-
 										.addGroup(tLayout.createSequentialGroup()
 												.addGap(10, 10, 10)
 												.addComponent(titleLabel, 100, 100, 100)
@@ -266,9 +269,9 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 																)
 																.addGroup(tLayout.createSequentialGroup()
-																		.addGap(10, 10, 10)
+																		.addGap(10, 10, Short.MAX_VALUE)
 																		.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-																		.addGap(5, 10, Short.MAX_VALUE)
+																		.addGap(10, 10, 10)
 																		.addComponent(this.ok, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 																		.addGap(10, 10, 10)
 
@@ -319,11 +322,15 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JOptionPane.showMessageDialog(this, "error occurred!!!!!!", "error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, errorMessage, "error occured", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public boolean shouldUpdateGUI() {
 		return succeeded;
+	}
+	
+	public long getChangedID() {
+		return createdOrUpdatedID;
 	}
 
 	public void refreshForum(String encodedView) {
@@ -338,10 +345,13 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		System.out.println("subjects encodedview = \n"+ encodedView);
 		
 		String tLastMessageWord = null;
-		if (encodedView.equals("replysuccess") || encodedView.equals("addsubjectsuccess") ||
-				encodedView.equals("addthreadsuccess"))
+		if (encodedView.startsWith("replysuccess") || encodedView.startsWith("addsubjectsuccess") ||
+				encodedView.startsWith("addthreadsuccess")) {
 			tLastMessageWord = "added";
-		else if (encodedView.equals("modifysuccess"))
+			this.createdOrUpdatedID = Long.parseLong(encodedView.split("\t")[1]); // the id of the added message
+			System.out.println("Created idddddddddddddddddddddddddddddddddddd is " + this.createdOrUpdatedID);
+		}
+		else if (encodedView.startsWith("modifysuccess"))
 			tLastMessageWord = "modified";
 		else if (!encodedView.startsWith("searchresult")){
 			JOptionPane.showMessageDialog(this, "error occurredd!!", "error", JOptionPane.ERROR_MESSAGE);

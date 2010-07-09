@@ -190,16 +190,28 @@ public class MessagesPersistenceHandler {
 	public void updateSubject(SessionFactory ssFactory, long id, Collection<Long> subSubjects,
 			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
 		try {
+			
+			System.out.println("Sub-Subjects = " + subSubjects.toString());
+			System.out.println("Threads = " + threads.toString());
+			
+			
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(session, id);
+			System.out.println("father subject retrieved");
 			// update the sub-subjects
 			tSubjectToUpdate.getSubSubjectsIDs().clear();
 			tSubjectToUpdate.getSubSubjectsIDs().addAll(subSubjects);
 			// update the threads
 			tSubjectToUpdate.getThreadsIDs().clear();
 			tSubjectToUpdate.getThreadsIDs().addAll(threads);
+			System.out.println("before update");
+
 			session.update(tSubjectToUpdate);
+			System.out.println("after update");
+
 			this.commitTransaction(session);
+			System.out.println("after commit");
+
 		}
 		catch (DatabaseRetrievalException e) {
 			throw new DatabaseUpdateException();
@@ -294,8 +306,17 @@ public class MessagesPersistenceHandler {
 	public void openNewThread(SessionFactory ssFactory, long threadID, String topic, 
 			long rootID, long fatherSubjectID) throws DatabaseUpdateException {
 		try {
+			
+			System.out.println("Thread ID will be " + threadID);
+			System.out.println("Father ID will be " + fatherSubjectID);
+
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			ThreadType tNewThreadType = ExtendedObjectFactory.createThreadType(threadID, topic, rootID, fatherSubjectID);
+			
+			System.out.println("Thread id IS " + tNewThreadType.getThreadID());
+			System.out.println("Thread FATHER IS " + tNewThreadType.getFatherSubjectID());
+			
+			
 			session.save(tNewThreadType);
 			this.commitTransaction(session);
 		}
@@ -314,7 +335,7 @@ public class MessagesPersistenceHandler {
 	public Collection<Long> deleteAThread(SessionFactory ssFactory, 
 			long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
 		try {
-			Session session = this.getSessionAndBeginTransaction(ssFactory);		
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			ThreadType tThreadToDelete = this.getThreadTypeByID(session, threadID);
 			if (tThreadToDelete == null) {
 				this.commitTransaction(session);
@@ -551,18 +572,7 @@ public class MessagesPersistenceHandler {
 				if (tMessageType == null)
 					throw new MessageNotFoundException(messageID);
 				session.delete(tMessageType);
-				/*
-				for (Long tReplyIDToDelete : tMessagesIDsToDelete) {
-					if (tReplyIDToDelete != messageID) {
-						MessageType tCurrentReply = this.getMessageTypeByID(session, tReplyIDToDelete);
-						try {
-							session.delete(tCurrentReply);
-						}
-						catch (HibernateException e) {
-							//TODO: add logging
-						}
-					}
-				}*/
+
 				this.commitTransaction(session);			
 				return tMessagesIDsToDelete;
 			}

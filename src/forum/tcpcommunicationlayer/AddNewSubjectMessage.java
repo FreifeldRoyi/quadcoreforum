@@ -1,6 +1,7 @@
 package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UISubject;
 import forum.server.domainlayer.message.NotPermittedException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectAlreadyExistsException;
@@ -42,9 +43,9 @@ public class AddNewSubjectMessage extends ClientMessage {
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
-			forum.addNewSubject(this.userID, this.fatherID, this.subjectName, this.subjectDescription);
+			UISubject tAddedSubject = forum.addNewSubject(this.userID, this.fatherID, this.subjectName, this.subjectDescription);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("addsubjectsuccess");
+			returnObj.setResponse("addsubjectsuccess\t" + tAddedSubject.getID());
 		} 
 		catch (SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);

@@ -250,10 +250,12 @@ public class MainForumLogic implements ForumFacade {
 		try {
 			tMsg = getMessageByID(toReturn.getID());
 			this.searchController.addData(tMsg);
-		} catch (MessageNotFoundException e) {
+		}
+		catch (MessageNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (DatabaseRetrievalException e) {
+		}
+		catch (DatabaseRetrievalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

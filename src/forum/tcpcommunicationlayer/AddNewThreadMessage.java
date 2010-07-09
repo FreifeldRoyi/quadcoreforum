@@ -4,6 +4,7 @@
 package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.interfaces.UIThread;
 import forum.server.domainlayer.message.NotPermittedException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
@@ -49,9 +50,9 @@ public class AddNewThreadMessage extends ClientMessage {
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 
 		try {
-			forum.openNewThread(this.userID, this.subjectId, this.topic, this.title, this.content);
+			UIThread tAddedThread = forum.openNewThread(this.userID, this.subjectId, this.topic, this.title, this.content);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("addthreadsuccess");
+			returnObj.setResponse("addthreadsuccess\t" + tAddedThread.getID());
 		}
 		catch (SubjectNotFoundException e) {
 			returnObj.setHasExecuted(false);
