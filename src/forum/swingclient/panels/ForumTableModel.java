@@ -9,15 +9,15 @@ import javax.swing.table.AbstractTableModel;
  * @author sepetnit
  *
  */
-public class TableModel extends AbstractTableModel {
+public class ForumTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -2017616938246653051L;
 	private long fatherID;
 	private long[] subjectsIDs;
-	private String[][] rowData;
+	private Object[][] rowData;
 	private String[] columnNames;
 
-	public void updateData(final long[] subjectsIDs, final String[][] rowData) {
+	public void updateData(final long[] subjectsIDs, final Object[][] rowData) {
 		this.subjectsIDs = subjectsIDs;
 		this.rowData = rowData;
 	}
@@ -35,7 +35,7 @@ public class TableModel extends AbstractTableModel {
 	}
 
 	public String getNameOfContentInRow(int row) {
-		return this.rowData[row][0];
+		return (String)this.rowData[row][1];
 	}
 
 	public void clearData() {
@@ -43,7 +43,7 @@ public class TableModel extends AbstractTableModel {
 		rowData = new String[0][0];		
 	}
 	
-	public TableModel(String[] columns) {
+	public ForumTableModel(String[] columns) {
 		super();
 		fatherID = -1;
 		columnNames = columns;

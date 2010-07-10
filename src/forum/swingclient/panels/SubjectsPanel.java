@@ -3,21 +3,14 @@
  */
 package forum.swingclient.panels;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
-import forum.swingclient.ui.JScrollableTable;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.server.domainlayer.SystemLogger;
 
@@ -25,50 +18,41 @@ import forum.server.domainlayer.SystemLogger;
  * @author sepetnit
  *
  */
-public class SubjectsPanel extends JPanel implements GUIHandler {
+public class SubjectsPanel extends TabularPanel implements GUIHandler {
 
 	private static final long serialVersionUID = -5210803978059150523L;
 
-	private JScrollableTable subjectsTable;
-	private TableModel subjectsTableModel;
-	private MainPanel container;	
 	private ThreadsPanel threadsPanel;
-
-	private JButton addNewSubjectButton;
-	private JButton deleteSubjectButton;
-	private JButton modifySubjectButton;
-
 
 	private String showingSubjectsOfName;
 	private long showingSubjectsOfID;
 
-
+	
 	public SubjectsPanel(final MainPanel cont, final ThreadsPanel threads) {
-		this.container = cont;
+		super(cont, TabularPanel.SUBJECTS_TABLE, 
+				new String[] {"Select", "Subject",  "Description", "Subjects#", 
+				"Messages#", "Last Message Info"});
 		this.threadsPanel = threads;
 		this.showingSubjectsOfName = "";
 		this.showingSubjectsOfID = -1;
-		this.subjectsTable = new JScrollableTable();
-		this.subjectsTable.setFocusable(false);
-		this.subjectsTable.setSelectionModel(new DefaultListSelectionModel());
-		this.subjectsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		this.subjectsTable.addMouseListener(new MouseAdapter() {
+
+		this.table.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent e) {
 				// handle double click
-				if (e.getClickCount() == 2) {
-					int rowSelected = subjectsTable.getSelectionModel().getMinSelectionIndex();
+				if (selectionState.shouldRespondToClick(e.getClickCount())) {
+					int rowSelected = table.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
 						//subjectsTable.setVisible(false);
 						threadsPanel.setVisible(true);
-						showingSubjectsOfName = subjectsTableModel.getNameOfContentInRow(rowSelected) ;
+						showingSubjectsOfName = tableModel.getNameOfContentInRow(rowSelected) ;
 						container.startWorkingAnimation("retreiving subject " + 
 								showingSubjectsOfName
 								+ " content...");
 
-						final long subjectToLoad = subjectsTableModel.getIDofContentInRow(rowSelected);
-						subjectsTableModel.setFatherID(subjectToLoad);
+						final long subjectToLoad = tableModel.getIDofContentInRow(rowSelected);
+						tableModel.setFatherID(subjectToLoad);
 						threadsPanel.updateFather(subjectToLoad);
 						showingSubjectsOfID = subjectToLoad;
 						try {
@@ -86,48 +70,19 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		});
-		
-		this.subjectsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
-			public void valueChanged(ListSelectionEvent arg0) {
-				if (arg0.getFirstIndex() == -1) {
-					deleteSubjectButton.setEnabled(false);
-					modifySubjectButton.setEnabled(false);
-				}
-				else {
-					deleteSubjectButton.setEnabled(true);
-					modifySubjectButton.setEnabled(true);
-				}
-			}
-		});
+		addButton.setText("add new");
 
-		
-		String[] columns = {"Subject",  "Description", "Sub-Subjects#", 
-				"Messages#", "Last Message Info" };
-		subjectsTableModel = new TableModel(columns);
-		this.subjectsTable.setModel(subjectsTableModel);
-
-
-		addNewSubjectButton = new JButton();
-		deleteSubjectButton = new JButton();
-		modifySubjectButton = new JButton();
-
-		addNewSubjectButton.setText("add new");
-		deleteSubjectButton.setText("delete");
-		modifySubjectButton.setText("modify");
-
-		Dimension tSubjectsButtonsDimension = new Dimension(90, 35);
-		addNewSubjectButton.setPreferredSize(tSubjectsButtonsDimension);
-
-		addNewSubjectButton.addActionListener(new ActionListener(){
+		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				ReplyModifyDialog tNewSubjectDialog =
 					new ReplyModifyDialog(container.getConnectedUser().getID(), 
-							subjectsTableModel.getFatherID(), "subject", addNewSubjectButton);
+							tableModel.getFatherID(), "", "", "subject", addButton);
 				tNewSubjectDialog.setVisible(true);
 				if (tNewSubjectDialog.shouldUpdateGUI()) {
+					shouldScrollTo = tNewSubjectDialog.getChangedID();
 					try {
-						ControllerHandlerFactory.getPipe().getSubjects(subjectsTableModel.getFatherID(), subjectsTable);
+						ControllerHandlerFactory.getPipe().getSubjects(tableModel.getFatherID(), table);
 					} 
 					catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -138,101 +93,49 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 			}});
 
 
+		this.modifyButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 
+				int tSelectedSubjectRowIndex = table.getSelectedRow();
 
-		deleteSubjectButton.setPreferredSize(tSubjectsButtonsDimension);
-		modifySubjectButton.setPreferredSize(tSubjectsButtonsDimension);		
+				ReplyModifyDialog tModifySubjectDialog =
+					new ReplyModifyDialog(container.getConnectedUser().getID(),
+							tableModel.getIDofContentInRow(tSelectedSubjectRowIndex),
+							(String)table.getValueAt(tSelectedSubjectRowIndex, 1),
+							(String)table.getValueAt(tSelectedSubjectRowIndex, 2), 
+							"modifysubject", modifyButton);
 
-
-		JScrollPane tSubjectsTablePane = new JScrollPane(subjectsTable);
-
-		tSubjectsTablePane.setViewport(new JViewport() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = -2313357428427772725L;
-
-			public void paint(Graphics g) {
-				/*				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
-						0, 0, 1920, 1200, null);
-				setOpaque(false);
-				 */
-				super.paint(g);
-			}
-		});
-
-
-
-		tSubjectsTablePane.setOpaque(false);
-		subjectsTable.setOpaque(false);
-		this.setOpaque(false);
-		tSubjectsTablePane.setBorder(BorderFactory.createEmptyBorder());
-		tSubjectsTablePane.getViewport().setOpaque(false);
-
-		subjectsTable.setFont(new Font("Tahoma", Font.BOLD, 13));
-		subjectsTable.setRowHeight(30);
-
-
-
-		tSubjectsTablePane.getViewport().add(subjectsTable);
-
-
-		GroupLayout tLayout = new GroupLayout(this);
-		this.setLayout(tLayout);
-
-		tLayout.setHorizontalGroup(
-				tLayout.createParallelGroup(Alignment.CENTER)
-				.addGroup(tLayout.createSequentialGroup()
-						.addComponent(addNewSubjectButton, GroupLayout.PREFERRED_SIZE,
-								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addGap(16, 16, 16)
-								.addComponent(modifySubjectButton, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addGap(16, 16, 16)
-										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGap(16, 16, 16)
-												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
-
-		tLayout.setVerticalGroup(
-				tLayout.createSequentialGroup()
-				.addGroup(tLayout.createParallelGroup()
-						.addComponent(addNewSubjectButton, GroupLayout.PREFERRED_SIZE,
-								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(modifySubjectButton, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(deleteSubjectButton, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGap(16, 16, 16)
-												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
-
-
-
-		((DefaultListSelectionModel)this.subjectsTable.
-				getSelectionModel()).getListSelectionListeners()[0].
-				valueChanged(new ListSelectionEvent(subjectsTable, -1, -1, true));
-
+				tModifySubjectDialog.setVisible(true);
+				if (tModifySubjectDialog.shouldUpdateGUI()) {
+					shouldScrollTo = tModifySubjectDialog.getChangedID();
+					try {
+						ControllerHandlerFactory.getPipe().getSubjects(tableModel.getFatherID(), table);
+					}
+					catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				tModifySubjectDialog.dispose();
+			}});
 	}
 
 	public void setFatherID(int fatherID) {
-		this.subjectsTableModel.setFatherID(fatherID);
+		this.tableModel.setFatherID(fatherID);
 	}
 
 	public void setGuestView(){
-		this.addNewSubjectButton.setVisible(false);
-		this.modifySubjectButton.setVisible(false);
-		this.deleteSubjectButton.setVisible(false);
+		super.setGuestView();
 		this.threadsPanel.setGuestView();
 	}
 
 	public void setMemberView(){
+		super.setMemberView();
 		this.threadsPanel.setMemberView();
 	}
 
 	public void setModeratorOrAdminView(){
-		this.addNewSubjectButton.setVisible(true);
-		this.modifySubjectButton.setVisible(true);
-		this.deleteSubjectButton.setVisible(true);
+		super.setModeratorOrAdminView();
 		this.threadsPanel.setModeratorOrAdminView();
 	}
 
@@ -254,7 +157,8 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 
 		if (encodedView.startsWith("searchresult") ||
 				encodedView.startsWith("searchnotmessages") ||
-				encodedView.startsWith("addsubjectsuccess")) return;
+				encodedView.startsWith("addsubjectsuccess") ||
+				encodedView.startsWith("subjectupdatesuccess")) return;
 
 		if (encodedView.startsWith("getpathsuccess")) {
 			container.removeFromNavigateUntil("Show root subjects");
@@ -284,13 +188,22 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 		}
 		else {
 
-			this.subjectsTableModel.clearData();
-			if (!encodedView.startsWith("There") && !encodedView.startsWith("addsubjectsuccess")) {
+			this.tableModel.clearData();
+			if (!encodedView.startsWith("There")) {
 
 				// each line should represent one subject
-				String[] tSplitted = encodedView.split("\n");
+				String[] tSplitted = encodedView.split("\n\t\r");
 				// this is the data which will be presented in the subjects table
-				String[][] tData = new String[tSplitted.length][5];
+				Object[][] tData = new Object[tSplitted.length][6];
+
+				JRadioButton[] tSelectionButtons = new JRadioButton[tSplitted.length];
+
+				this.table.setFirstColumnRadiosGroup(new ButtonGroup());
+				
+				boolean tScrollToFound = 
+					(this.shouldScrollTo == -1)? true : false; // after a thread was updated we want to scroll to its row
+
+
 				// this is the IDs array which should contain the presented subjects' IDs
 				long[] tIDs = new long[tSplitted.length];
 				for (int i = 0; i < tSplitted.length; i++) {
@@ -298,9 +211,19 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 					// this is the subject's id
 					try {
 						tIDs[i] = Long.parseLong(tCurrentSubjectInfo[0]);
+
+						if (!tScrollToFound && (this.shouldScrollTo == tIDs[i])) {
+							this.shouldScrollTo = i;
+							tScrollToFound = true;
+						}						
+
+						tSelectionButtons[i] = new JRadioButton();
+						this.table.getFirstColumnRadiosGroup().add(tSelectionButtons[i]);
+						tSelectionButtons[i].setHorizontalAlignment(SwingConstants.CENTER);
+						tData[i][0] = tSelectionButtons[i];
 						for (int j = 1; j < tCurrentSubjectInfo.length; j++)
-							tData[i][j - 1] = tCurrentSubjectInfo[j];
-						this.subjectsTableModel.updateData(tIDs, tData);
+							tData[i][j] = tCurrentSubjectInfo[j];
+						this.tableModel.updateData(tIDs, tData);
 
 
 					}
@@ -308,15 +231,34 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 						SystemLogger.warning("The server response related to subject's update is invalid");
 						this.showingSubjectsOfName = "";
 						this.showingSubjectsOfID = -1;
-						this.subjectsTableModel.clearData();
+						this.tableModel.clearData();
 						break;
 					}
 				}
 			}
 
-			//this.subjectsTable.setVisible(false);
-			subjectsTableModel.fireTableDataChanged();
-			this.subjectsTable.setVisible(true);
+			//this.table.setVisible(false);
+
+
+			tableModel.fireTableDataChanged();
+
+			if (this.shouldScrollTo == -1) 
+				shouldScrollTo = 0;
+
+			// By using SwingUtilities we are bypassing the problem to get the maximum before the size is changed
+
+			this.table.getSelectionModel().setSelectionInterval((int)shouldScrollTo, (int)shouldScrollTo);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					table.scrollToVisible((int)shouldScrollTo, 0);
+					shouldScrollTo = -1;
+				}
+			});
+
+
+			this.table.setVisible(true);
+			this.setVisible(true);
 			if (showingSubjectsOfID > -1)
 				container.switchToSubjectsAndThreadsView();
 			else {
@@ -326,19 +268,14 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 		}
 	}
 
-	public void showActionButtons() {
-
-	}
 
 	private ActionListener linkPressListener() {
 		final String name = showingSubjectsOfName;
 		final long id = showingSubjectsOfID;
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("idddddd" + id);
-				subjectsTableModel.setFatherID(id);
-				//subjectsTable.setVisible(false);
-				threadsPanel.setVisible(true);
+				tableModel.setFatherID(id);
+				//				threadsPanel.setVisible(true);
 				System.out.println("name = " + name);
 				container.startWorkingAnimation("retreiving subject " + 
 						name
@@ -355,6 +292,4 @@ public class SubjectsPanel extends JPanel implements GUIHandler {
 			}
 		};	
 	}
-
-
 }

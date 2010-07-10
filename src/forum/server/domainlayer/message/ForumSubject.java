@@ -3,6 +3,7 @@
  */
 package forum.server.domainlayer.message;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 import forum.server.domainlayer.interfaces.UISubject;
@@ -206,4 +207,10 @@ public class ForumSubject implements UISubject {
 	public void deleteThread(final long threadID) {
 		this.threadsIDs.remove(threadID);
 	}
+	
+	public void updateMe(String newName, String newDescription) {
+		this.name = newName;
+		this.description = newDescription;
+	}
+
 }

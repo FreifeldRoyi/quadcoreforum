@@ -3,8 +3,6 @@
  */
 package forum.swingclient.panels;
 
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -12,16 +10,11 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultTreeModel;
 
 import forum.swingclient.controllerlayer.ControllerHandler;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.ForumTree;
-import forum.swingclient.ui.JScrollableTable;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
@@ -30,101 +23,52 @@ import forum.server.domainlayer.SystemLogger;
  * @author sepetnit
  *
  */
-public class ThreadsPanel extends JPanel implements GUIHandler {
+public class ThreadsPanel extends TabularPanel implements GUIHandler {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5210803978059150523L;
 
-	private JScrollableTable threadsTable;
-	private TableModel threadsTableModel;
-	private MainPanel container;	
 	private ForumTree messages;
 
-	private JButton addNewThreadButton;
-	private JButton deleteThreadButton;
-	private JButton modifyThreadButton;	
-
-	private long shouldScrollTo; // points to the thread id whose row should be selected after GUI refresh
-
+	
 	public ThreadsPanel(final MainPanel cont, final ForumTree messages) {
-		this.container = cont;
+		super(cont, TabularPanel.THREADS_TABLE, new String[]{"Select", "Thread",  "Messages#", "Views#"});
 		this.messages = messages;
-		//		this.messages.getForumTreeUI().setVisible(false);
-		this.threadsTable = new JScrollableTable();
-
-		this.threadsTable.setFocusable(false);
-		this.threadsTable.setSelectionModel(new DefaultListSelectionModel());
-
-
-
-		this.threadsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-
-		this.threadsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-			public void valueChanged(ListSelectionEvent arg0) {
-				if (arg0.getFirstIndex() == -1) {
-					deleteThreadButton.setEnabled(false);
-					modifyThreadButton.setEnabled(false);
-				}
-				else {
-					deleteThreadButton.setEnabled(true);
-					modifyThreadButton.setEnabled(true);
-				}
-			}
-		});
-
-
-
-
-		this.threadsTable.addMouseListener(new MouseAdapter() {
+		
+		this.table.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent e) {
 				// handle double click
-				if (e.getClickCount() == 2) {
-					int rowSelected = threadsTable.getSelectionModel().getMinSelectionIndex();
+				if (selectionState.shouldRespondToClick(e.getClickCount())) {
+					int rowSelected = table.getSelectionModel().getMinSelectionIndex();
 					if (rowSelected != -1) {
 
-						final long tMessageIDToLoad = threadsTableModel.getIDofContentInRow(rowSelected);
+						final long tMessageIDToLoad = tableModel.getIDofContentInRow(rowSelected);
 						container.startWorkingAnimation("retreiving thread " + 
-								threadsTableModel.getNameOfContentInRow(rowSelected) 
+								tableModel.getNameOfContentInRow(rowSelected) 
 								+ " content...");
 
-						messages.setFatherID(threadsTableModel.getFatherID());
+						messages.setFatherID(tableModel.getFatherID());
 						messages.setRootMessage(tMessageIDToLoad);
 					}
 				}
 			}
 		});
+		
+		this.addButton.setText("open new");
 
-		String[] columns = {"Thread",  "Messages#", "Views#"};
-		this.threadsTableModel = new TableModel(columns);
-
-		this.threadsTable.setModel(this.threadsTableModel);
-
-
-		addNewThreadButton = new JButton();
-		deleteThreadButton = new JButton();
-		modifyThreadButton = new JButton();
-
-		addNewThreadButton.setText("open new");
-		deleteThreadButton.setText("delete");
-		modifyThreadButton.setText("modify");
-
-		Dimension tThreadsButtonsDimension = new Dimension(90, 35);
-		addNewThreadButton.setPreferredSize(tThreadsButtonsDimension);
-
-		addNewThreadButton.addActionListener(new ActionListener(){
+		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				ReplyModifyDialog tNewThreadDialog =
-					new ReplyModifyDialog(container.getConnectedUser().getID(), threadsTableModel.getFatherID(), "thread", addNewThreadButton);
+					new ReplyModifyDialog(container.getConnectedUser().getID(), tableModel.getFatherID(), 
+							"", "", "thread", addButton);
 				tNewThreadDialog.setVisible(true);
 				if (tNewThreadDialog.shouldUpdateGUI()) {
 					shouldScrollTo = tNewThreadDialog.getChangedID();
 					try {
-						ControllerHandlerFactory.getPipe().getThreads(threadsTableModel.getFatherID(), threadsTable);
+						ControllerHandlerFactory.getPipe().getThreads(tableModel.getFatherID(), table);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -134,10 +78,10 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 			}});
 
 
-		modifyThreadButton.addActionListener(new ActionListener() {
+		modifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				String tCurrentThreadTopic = (String)threadsTableModel.getValueAt(threadsTable.getSelectedRow(), 0);
+				String tCurrentThreadTopic = (String)tableModel.getValueAt(table.getSelectedRow(), 0);
 
 				String tResponse = (String)
 				JOptionPane.showInputDialog(ThreadsPanel.this, "Please enter a new topic: ", "Modify " +
@@ -150,7 +94,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 								"thread topic", JOptionPane.ERROR_MESSAGE);
 					else {
 						try {
-							final long tThreadToModifyID = threadsTableModel.getIDofContentInRow(threadsTable.getSelectedRow());
+							final long tThreadToModifyID = tableModel.getIDofContentInRow(table.getSelectedRow());
 							shouldScrollTo = tThreadToModifyID;
 							final ControllerHandler controller = ControllerHandlerFactory.getPipe();
 
@@ -172,15 +116,15 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 												controller.deleteObserver(this);
 												new Thread(new Runnable() {
 													public void run() {
-														controller.getSubjects(threadsTableModel.getFatherID(), container);
-														controller.getThreads(threadsTableModel.getFatherID(), container);
+														controller.getSubjects(tableModel.getFatherID(), container);
+														controller.getThreads(tableModel.getFatherID(), container);
 													}}).start();
 											}
 										}
 									}), EventType.THREADS_UPDATED);
 
 							controller.modifyThread(container.getConnectedUser().getID(),
-									tThreadToModifyID, tResponse, deleteThreadButton);
+									tThreadToModifyID, tResponse, modifyButton);
 						}
 
 
@@ -192,7 +136,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 			}
 		});
 
-		deleteThreadButton.addActionListener(new ActionListener() {
+		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 
@@ -203,7 +147,7 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 						return;
 					}
 
-					final long tThreadToDeleteID = threadsTableModel.getIDofContentInRow(threadsTable.getSelectedRow());
+					final long tThreadToDeleteID = tableModel.getIDofContentInRow(table.getSelectedRow());
 
 					final ControllerHandler controller = ControllerHandlerFactory.getPipe();
 
@@ -226,15 +170,15 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 										shouldScrollTo = -1;
 										new Thread(new Runnable() {
 											public void run() {
-												controller.getSubjects(threadsTableModel.getFatherID(), container);
-												controller.getThreads(threadsTableModel.getFatherID(), container);
+												controller.getSubjects(tableModel.getFatherID(), container);
+												controller.getThreads(tableModel.getFatherID(), container);
 											}}).start();
 									}
 								}
 							}), EventType.MESSAGES_UPDATED);
 
 					controller.deleteMessage(container.getConnectedUser().getID(), -1, 
-							tThreadToDeleteID, deleteThreadButton);
+							tThreadToDeleteID, deleteButton);
 
 
 				} 
@@ -245,91 +189,11 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 			}
 		});
 
-		deleteThreadButton.setPreferredSize(tThreadsButtonsDimension);
-		modifyThreadButton.setPreferredSize(tThreadsButtonsDimension);		
-
-
-		JScrollPane tSubjectsTablePane = new JScrollPane(threadsTable);
-
-		tSubjectsTablePane.setOpaque(false);
-		threadsTable.setOpaque(false);
-		this.setOpaque(false);
-		tSubjectsTablePane.setBorder(BorderFactory.createEmptyBorder());
-		tSubjectsTablePane.getViewport().setOpaque(false);
-
-		threadsTable.setFont(new Font("Tahoma", Font.BOLD, 13));
-		threadsTable.setRowHeight(30);
-
-
-
-
-		GroupLayout tLayout = new GroupLayout(this);
-		this.setLayout(tLayout);
-
-
-		tLayout.setHorizontalGroup(
-				tLayout.createParallelGroup(Alignment.CENTER)
-				.addGroup(tLayout.createSequentialGroup()
-						.addComponent(addNewThreadButton, GroupLayout.PREFERRED_SIZE,
-								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addGap(16, 16, 16)
-								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addGap(16, 16, 16)
-										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGap(16, 16, 16)
-												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
-
-		tLayout.setVerticalGroup(
-				tLayout.createSequentialGroup()
-				.addGroup(tLayout.createParallelGroup()
-						.addComponent(addNewThreadButton, GroupLayout.PREFERRED_SIZE,
-								GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(modifyThreadButton, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(deleteThreadButton, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-												.addGap(16, 16, 16)
-												.addComponent(tSubjectsTablePane, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE));
-
-
-
-
-		((DefaultListSelectionModel)this.threadsTable.
-				getSelectionModel()).getListSelectionListeners()[0].
-				valueChanged(new ListSelectionEvent(threadsTable, -1, -1, true));
-
 	}	
 
 	public void updateFather(long fatherID) {
-		threadsTableModel.setFatherID(fatherID);
+		tableModel.setFatherID(fatherID);
 	}
-
-	public void setGuestView(){
-		this.addNewThreadButton.setVisible(false);
-		this.modifyThreadButton.setVisible(false);
-		this.deleteThreadButton.setVisible(false);
-	}
-
-	public void setMemberView(){
-		this.addNewThreadButton.setVisible(true);
-		this.modifyThreadButton.setVisible(false);
-		this.deleteThreadButton.setVisible(false);
-	}
-
-	public void setAuthorView(){
-		this.addNewThreadButton.setVisible(true);
-		this.modifyThreadButton.setVisible(true);
-		this.deleteThreadButton.setVisible(false);
-	}
-
-	public void setModeratorOrAdminView(){
-		this.addNewThreadButton.setVisible(true);
-		this.modifyThreadButton.setVisible(true);
-		this.deleteThreadButton.setVisible(true);
-	}
-
 
 	public boolean showsMessages() {
 		return this.messages.getForumTreeUI().isVisible();
@@ -346,13 +210,17 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 	public void refreshForum(String encodedView) {
 		if (encodedView.startsWith("addthreadsuccess") ||
 				encodedView.startsWith("threadupdatesuccess")) return;
-		this.threadsTableModel.clearData();
+		this.tableModel.clearData();
 		if (!encodedView.startsWith("There")) {
 			// each line should represent one thread
 			String[] tSplitted = encodedView.split("\n");
 			// this is the data which will be presented in the threads table
-			String[][] tData = new String[tSplitted.length][3];
+			Object[][] tData = new Object[tSplitted.length][4];
 
+			JRadioButton[] tSelectionButtons = new JRadioButton[tSplitted.length];
+			this.table.setFirstColumnRadiosGroup(new ButtonGroup());
+
+			
 			boolean tScrollToFound = 
 				(this.shouldScrollTo == -1)? true : false; // after a thread was updated we want to scroll to its row
 
@@ -368,14 +236,19 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 
 					if (!tScrollToFound && (this.shouldScrollTo == tIDs[i])) {
 						this.shouldScrollTo = i;
-						System.out.println("should scroll tooooooooooooooooooooooooooooooooooooooooooooo" + i);
 						tScrollToFound = true;
 					}						
 
-						tRoots[i] = Long.parseLong(tCurrentThreadInfo[1]);
+					tRoots[i] = Long.parseLong(tCurrentThreadInfo[1]);
+					
+					tSelectionButtons[i] = new JRadioButton();
+					this.table.getFirstColumnRadiosGroup().add(tSelectionButtons[i]);
+					tSelectionButtons[i].setHorizontalAlignment(SwingConstants.CENTER);
+					tData[i][0] = tSelectionButtons[i];
+
 					for (int j = 2; j < tCurrentThreadInfo.length; j++)
-						tData[i][j - 2] = tCurrentThreadInfo[j];
-					this.threadsTableModel.updateData(tRoots, tData);
+						tData[i][j - 1] = tCurrentThreadInfo[j];
+					this.tableModel.updateData(tRoots, tData);
 				}
 				catch (NumberFormatException e) {
 					SystemLogger.warning("The server response related to subject's update is invalid");
@@ -383,14 +256,26 @@ public class ThreadsPanel extends JPanel implements GUIHandler {
 				}
 			}
 		}
-		this.threadsTableModel.fireTableDataChanged();
 		
-		if (this.shouldScrollTo == -1)
-			this.threadsTable.scrollToVisible(0, 0);
-		else
-			this.threadsTable.scrollToVisible((int)shouldScrollTo, 0);
+		this.tableModel.fireTableDataChanged();
+
+		if (this.shouldScrollTo == -1) 
+			shouldScrollTo = 0;
+
+		// By using SwingUtilities we are bypassing the problem to get the maximum rows value
+		// before the size is changed
+
+
+		this.table.getSelectionModel().setSelectionInterval((int)shouldScrollTo, (int)shouldScrollTo);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				table.scrollToVisible((int)shouldScrollTo, 0);
+				shouldScrollTo = -1;
+			}
+		});
 		
-		this.threadsTable.setVisible(true);
+		this.table.setVisible(true);
 		this.setVisible(true);
 		container.stopWorkingAnimation();
 	}

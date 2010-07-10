@@ -198,6 +198,20 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			SystemLogger.warning("The program was interrupted while waiting");
 		}		
 	}
+	
+	public void modifySubject(final long authorID, long subjectID, String newName, String newDescription, Component comp) {
+		getActiveUsersNumber();
+		final ClientMessage toSend = new ModifySubjectMessage(authorID, subjectID, newName, newDescription);
+		try {
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SUBJECTS_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}		
+	}
 
 	public void addReplyToMessage(final long author, final long replyTo, 
 			final String title, final String content, final Component comp) {

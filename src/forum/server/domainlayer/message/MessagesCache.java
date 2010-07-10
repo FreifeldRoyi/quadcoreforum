@@ -161,7 +161,8 @@ public class MessagesCache {
 	 * 		In case the database can't be updated due to a database connection error
 	 */
 	public void updateInDatabase(ForumSubject updatedSubject) throws SubjectNotFoundException, DatabaseUpdateException {
-		this.pipe.updateSubject(updatedSubject.getID(), updatedSubject.getSubSubjects(), updatedSubject.getThreads());
+		this.pipe.updateSubject(updatedSubject.getID(), updatedSubject.getName(),
+				updatedSubject.getDescription(), updatedSubject.getSubSubjects(), updatedSubject.getThreads());
 		if (!this.idsToSubjectsMapping.containsKey(updatedSubject.getID()))
 			this.idsToSubjectsMapping.put(updatedSubject.getID(), updatedSubject);
 	}

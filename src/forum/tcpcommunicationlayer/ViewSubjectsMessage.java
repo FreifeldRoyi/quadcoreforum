@@ -40,7 +40,7 @@ public class ViewSubjectsMessage extends ClientMessage {
 			else {
 				Iterator<UISubject> iter = tRetrievedSubjects.iterator();
 				while(iter.hasNext())
-					tResponse += iter.next().toString() + "\n";
+					tResponse += iter.next().toString() + "\n\t\r";
 			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(tResponse);

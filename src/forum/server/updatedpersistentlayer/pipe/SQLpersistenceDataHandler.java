@@ -171,11 +171,11 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 
 	/**
 	 * @see
-	 * 		PersistenceDataHandler#updateSubject(long, Collection, Collection)
+	 * 		PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection)
 	 */
-	public void updateSubject(long id, Collection<Long> subSubjects,
+	public void updateSubject(long id, String name, String description, Collection<Long> subSubjects,
 			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
-			this.messagesHandler.updateSubject(factory, id, subSubjects, threads);
+			this.messagesHandler.updateSubject(factory, id, name, description, subSubjects, threads);
 	}
 
 	// Thread related methods

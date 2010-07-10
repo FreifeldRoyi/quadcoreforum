@@ -78,7 +78,9 @@ public abstract class ControllerHandler extends GUIObservable {
 	public abstract void modifyMessage(final long authorID, long messageID, String newTitle, String newContent, Component comp);
 
 	public abstract void modifyThread(final long authorID, long threadID, String newTopic, Component comp);
-	
+
+	public abstract void modifySubject(final long authorID, long subjectID, String newName, String newDescription, Component comp);
+
 	/**
 	 * Adds a reply message.
 	 * */
