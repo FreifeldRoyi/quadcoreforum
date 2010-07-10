@@ -6,10 +6,10 @@ import org.hibernate.*;
 import org.hibernate.classic.Session;
 
 import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
 import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
 import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 import forum.server.domainlayer.message.*;
-import forum.server.learning.TestMessage;
 
 /**
  * This class is responsible of performing the operations of reading from and writing to the database
@@ -185,16 +185,11 @@ public class MessagesPersistenceHandler {
 	 * @throws DatabaseUpdateException 
 	 * 
 	 * @see
-	 * 		PersistenceDataHandler#updateSubject(long, Collection, Collection)
+	 * 		PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection)
 	 */
-	public void updateSubject(SessionFactory ssFactory, long id, Collection<Long> subSubjects,
+	public void updateSubject(SessionFactory ssFactory, long id, String name, String description, Collection<Long> subSubjects,
 			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
-		try {
-			
-			System.out.println("Sub-Subjects = " + subSubjects.toString());
-			System.out.println("Threads = " + threads.toString());
-			
-			
+		try {			
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(session, id);
 			System.out.println("father subject retrieved");
@@ -204,6 +199,10 @@ public class MessagesPersistenceHandler {
 			// update the threads
 			tSubjectToUpdate.getThreadsIDs().clear();
 			tSubjectToUpdate.getThreadsIDs().addAll(threads);
+			
+			tSubjectToUpdate.setName(name);
+			tSubjectToUpdate.setDescription(description);
+			
 			System.out.println("before update");
 
 			session.update(tSubjectToUpdate);

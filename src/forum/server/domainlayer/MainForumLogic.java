@@ -217,6 +217,15 @@ public class MainForumLogic implements ForumFacade {
 		return this.messagesController.addNewSubject(userID, fatherID, name, description);
 	}
 
+	/**
+	 * @see
+	 * 		ForumFacade#updateASubject(long, long, String, String)
+	 */
+	public UISubject updateASubject(long userID, long subjectID, String name, 
+			String description) throws NotRegisteredException, NotPermittedException,
+			SubjectNotFoundException, SubjectAlreadyExistsException, DatabaseUpdateException {
+		return this.messagesController.updateASubject(userID, subjectID, name, description);
+	}
 	
 	// Thread related methods
 	

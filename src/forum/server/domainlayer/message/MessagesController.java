@@ -113,6 +113,45 @@ public class MessagesController {
 		}
 	}
 
+	/**
+	 * @see
+	 * 		ForumFacade#updateASubject(long, long, String, String)
+	 */
+	public UISubject updateASubject(long userID, long subjectID, String name, 
+			String description) throws NotRegisteredException, NotPermittedException,
+			SubjectNotFoundException, SubjectAlreadyExistsException, DatabaseUpdateException {
+		try {
+			SystemLogger.info("A user with id " + userID + " requests to edit a subject with id " +
+					subjectID + ".");
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
+			final ForumSubject tSubjectToEdit = this.dataHandler.getMessagesCache().getSubjectByID(subjectID);
+			if (tApplicant.isAllowed(Permission.EDIT_SUBJECT)) {
+				SystemLogger.info("Permission granted for user " + userID + ".");
+
+				// Checks if there already exists a subject with the given name at the same level
+				SystemLogger.info("Checks if the new name for the subject " + subjectID + " is unique.");
+						
+				Collection<UISubject> tRequiredLevelSubjects = this.getSubjects(tSubjectToEdit.getFatherID());
+				for (UISubject tCurrentSubject : tRequiredLevelSubjects)
+					if (tCurrentSubject.getName().equals(name) && tCurrentSubject.getID() != tSubjectToEdit.getID())
+						throw new SubjectAlreadyExistsException(name);
+				
+				tSubjectToEdit.updateMe(name, description);
+				this.dataHandler.getMessagesCache().updateInDatabase(tSubjectToEdit);
+				SystemLogger.info("The subject with id " + subjectID + " was updated successfully.");
+				return tSubjectToEdit;
+			}
+			else {
+				SystemLogger.info("unpermitted operation for user " + userID + ".");
+				throw new NotPermittedException(userID, Permission.EDIT_SUBJECT);
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
+
 	// Thread related methods
 
 	/**
@@ -193,7 +232,6 @@ public class MessagesController {
 
 				// delete the thread from the desired subject
 				tFatherSubject.deleteThread(threadID);
-
 
 				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
 

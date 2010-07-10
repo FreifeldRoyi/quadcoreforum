@@ -37,7 +37,7 @@ public class ViewSubjectContentMessage extends ClientMessage {
 			else {
 				Iterator<UISubject> tIter = tSubSubjects.iterator();
 				while(tIter.hasNext()) {
-					tResponse += tIter.next().toString() + "\n";
+					tResponse += tIter.next().toString() + "\n\t\r";
 				}
 			}
 			tResponse += "\n";

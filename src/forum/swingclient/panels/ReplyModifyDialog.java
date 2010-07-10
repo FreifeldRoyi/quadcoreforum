@@ -54,6 +54,9 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long modifiedID, final String currentTitle, 
 			final String currentContent, final JButton replyModifyButton) {
 		super();
+		
+		this.setTitle("Modify message");
+		
 		initializeGUIContent(authorID, modifiedID, replyModifyButton);
 		arrangeLayout();
 		this.succeeded = false;
@@ -105,6 +108,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long repliedID,
 			final JButton replyModifyButton) {
 		super();
+		this.setTitle("Reply to message");
 		initializeGUIContent(authorID, repliedID, replyModifyButton);		
 		arrangeLayout();
 		this.ok.addActionListener(new ActionListener() {
@@ -130,14 +134,23 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		});	
 	}
 
-	public ReplyModifyDialog(final long authorID, final long fatherID, String topicType,
+	public ReplyModifyDialog(final long authorID, final long fatherID, String existingName, String existingDescription, String topicType,
 			final JButton replyModifyButton) {
 		super();
-		this.setTitle("Add new subject");
+		if (topicType.equals("subject"))
+			this.setTitle("Add new subject");
+		else if (topicType.equals("thread"))
+			this.setTitle("Open new thread");
+		else
+			this.setTitle("Modify subject");
+
 		initializeGUIContent(authorID, fatherID, replyModifyButton);
+		this.title.setText(existingName);
+		this.content.setText(existingDescription);
+
 		this.topicType = topicType;
 		arrangeLayout();
-		if (topicType.equals("subject")) {
+		if (topicType.contains("subject")) {
 			titleLabel.setText("name");
 			contentLabel.setText("description");
 		}
@@ -146,12 +159,14 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					if (topic != null && topic.isVisible() && topic.getText().equals("")){
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "thread topic cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "thread topic cannot be empty.",
+								"error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					if (title.getText().equals("")) {
 						JOptionPane.showMessageDialog(ReplyModifyDialog.this,
-								ReplyModifyDialog.this.topicType + " title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+								ReplyModifyDialog.this.topicType + " " + titleLabel.getText() + 
+								" cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					if (content.getText().equals("")) {
@@ -163,10 +178,13 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
 								EventType.SUBJECTS_UPDATED);
 						ControllerHandlerFactory.getPipe().addNewSubject(authorID, fatherID,
-								title.getText().trim(), content.getText().trim(), replyModifyButton);
-						
-						
-						
+								title.getText().trim(), content.getText().trim(), replyModifyButton);						
+					}
+					else if (ReplyModifyDialog.this.topicType.equals("modifysubject")) {
+						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
+								EventType.SUBJECTS_UPDATED);
+						ControllerHandlerFactory.getPipe().modifySubject(authorID, fatherID,
+								title.getText().trim(), content.getText().trim(), replyModifyButton);					
 					}
 					else {
 						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
@@ -334,6 +352,8 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
+		
+		
 		try {
 			ControllerHandlerFactory.getPipe().deleteObserver(this);
 		} 
@@ -349,10 +369,11 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 				encodedView.startsWith("addthreadsuccess")) {
 			tLastMessageWord = "added";
 			this.createdOrUpdatedID = Long.parseLong(encodedView.split("\t")[1]); // the id of the added message
-			System.out.println("Created idddddddddddddddddddddddddddddddddddd is " + this.createdOrUpdatedID);
 		}
-		else if (encodedView.startsWith("modifysuccess"))
+		else if (encodedView.startsWith("modifysuccess") || (encodedView.startsWith("subjectupdatesuccess"))) {
 			tLastMessageWord = "modified";
+			this.createdOrUpdatedID = Long.parseLong(encodedView.split("\t")[1]); // the id of the added message
+		}
 		else if (!encodedView.startsWith("searchresult")){
 			JOptionPane.showMessageDialog(this, "error occurredd!!", "error", JOptionPane.ERROR_MESSAGE);
 			System.out.println("\n\nencoded:" + encodedView + "\n\n---------------------");
@@ -361,6 +382,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 			return;
 
 		if (tLastMessageWord != null) {
+			if (topicType.contains("subject")) topicType = "subject";
 			JOptionPane.showMessageDialog(this, "The " + topicType + " was " +
 					tLastMessageWord + " successfully!", "success", JOptionPane.INFORMATION_MESSAGE);
 

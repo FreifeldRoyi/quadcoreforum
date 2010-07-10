@@ -42,7 +42,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 	private JPanel pnl_searchOptionHolder;
 
 	private JTable resultsTable;
-	private TableModel resultsTableModel;
+	private ForumTableModel resultsTableModel;
 
 	private JTextField txtFld_searchField;
 	private String toSearch;
@@ -282,7 +282,7 @@ public class SearchDialog extends JDialog implements GUIHandler
 			}
 		});
 		String[] columns = {"Author", "Title", "Content" };
-		resultsTableModel = new TableModel(columns);
+		resultsTableModel = new ForumTableModel(columns);
 		this.resultsTable.setModel(resultsTableModel);
 
 

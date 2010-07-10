@@ -49,7 +49,7 @@ public interface ForumFacade { //extends SearchEngine {
 	public long getActiveGuestsNumber();
 
 	// User related methods
-	
+
 	/**
 	 * @return
 	 * 		A collection of the currently active forum members user-names
@@ -64,7 +64,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 	    If a problem has occurred while trying to retrieve the required data from the database
 	 */
 	public Collection<UIMember> getAllMembers() throws DatabaseRetrievalException;
-	
+
 	/**
 	 * Returns the unique id of the forum member whose user-name and email equals to the given one
 	 *
@@ -150,7 +150,7 @@ public interface ForumFacade { //extends SearchEngine {
 	public long registerNewMember(final String username, final String password, final String lastName,
 			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException;
 
-	
+
 	/**
 	 * 
 	 * Makes a registered forum member to be a moderator and get specific moderator permissions like edit 
@@ -198,9 +198,9 @@ public interface ForumFacade { //extends SearchEngine {
 	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastName,
 			final String firstName, final String email) throws NotRegisteredException, MemberAlreadyExistsException, 
 			DatabaseUpdateException;
-	
+
 	// Subject related methods:	
-	
+
 	/**
 	 * Finds and returns a subject whose id is equal to the given id
 	 * 
@@ -216,8 +216,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 	    If a problem has occurred while trying to retrieve the required data from the database
 	 */
 	public UISubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException;
-	
-	
+
+
 	/**
 	 * Finds and returns all the subject's sub-subjects data, accessible via the UISubject interface.
 	 * 
@@ -272,10 +272,13 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 		In case the new subject can't be added to the forum database because of database connection
 	 * 		errors
 	 */
-	public UISubject addNewSubject(final long userID, final long fatherID, final String name, final String description)
-			throws SubjectNotFoundException, SubjectAlreadyExistsException, NotRegisteredException, 
+	public UISubject addNewSubject(final long userID, final long fatherID, final String name,
+			final String description) throws SubjectNotFoundException, SubjectAlreadyExistsException, NotRegisteredException, 
 			NotPermittedException, DatabaseUpdateException;
 
+	public UISubject updateASubject(long userID, long subjectID, String name, 
+			String description) throws NotRegisteredException, NotPermittedException,
+			SubjectNotFoundException, SubjectAlreadyExistsException, DatabaseUpdateException;
 
 	// Thread related methods
 
@@ -295,7 +298,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 */
 	public UIThread getThreadByID(final long threadID) throws ThreadNotFoundException, DatabaseRetrievalException;
 
-	
+
 	/**
 	 * 
 	 * Finds and returns all the subject's threads data, accessible via the UIThread interface.
@@ -349,21 +352,21 @@ public interface ForumFacade { //extends SearchEngine {
 
 	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException, 
 	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException;
-	
+
 	// Message related methods:
-	
+
 	/**
 	 * @see
 	 * 		SearchEngine#searchByAuthor(long, int, int)
 	 */
 	public SearchHit[] searchByAuthor(long usrID, int from, int to);
-	
+
 	/**
 	 * @see
 	 * 		SearchEngine#searchByContent(String, int, int)
 	 */
 	public SearchHit[] searchByContent(String phrase, int from, int to);
-	
+
 	/**
 	 * Finds and returns a message whose id is equal to the given id
 	 * 
@@ -379,7 +382,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 	    If a problem has occurred while trying to retrieve the required data from the database
 	 */
 	public UIMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException;
-	
+
 	/**
 	 * Returns a collection of messages, accessible via the UIMessage interface, whose author id
 	 * is the given one.
@@ -415,7 +418,7 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 		In case the required data can't be retrieved from the database
 	 */
 	public Collection<UIMessage> getReplies(final long fatherID) throws MessageNotFoundException, DatabaseRetrievalException;
-	
+
 	/**
 	 *
 	 * Adds a new message as a reply to the given one - doesn't open a new thread
@@ -464,12 +467,12 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @throws NotRegisteredException 
 	 * 		In case the user who wants to update the message, isn't registered as a forum member
 	 * @throws NotPermittedException 
-     *		In case the user who wants to update the message doesn't have the permission to perform
-     *		this operation
+	 *		In case the user who wants to update the message doesn't have the permission to perform
+	 *		this operation
 	 * @throws MessageNotFoundException
 	 * 		In case the message wasn't found in the database
-     * @throws DatabaseUpdateException 
-     * 		In case the message can't be updated in the database due to a database connection error 
+	 * @throws DatabaseUpdateException 
+	 * 		In case the message can't be updated in the database due to a database connection error 
 	 */
 	public UIMessage updateAMessage(final long userID, final long messageID, final String newTitle, 
 			final String newContent) throws NotRegisteredException, NotPermittedException, 
@@ -500,24 +503,24 @@ public interface ForumFacade { //extends SearchEngine {
 	 */
 	public void deleteAMessage(final long userID, final long fatherID, final long messageID)
 	throws NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException;
-		
+
 }
-	// Update related messages:
+// Update related messages:
 
-	// TODO: void updatePassword(long userId, String oldPassword, String newPassword);
+// TODO: void updatePassword(long userId, String oldPassword, String newPassword);
 
-	// TODO: void updateMemberDetails( ... )
+// TODO: void updateMemberDetails( ... )
 
-	// Deletion related messages:
+// Deletion related messages:
 
-	// TODO: void deleteThread(final long userId, final long dirId, final long threadId);
-	
-	// Search related methods:
+// TODO: void deleteThread(final long userId, final long dirId, final long threadId);
 
-	//TODO: Set<SearchResult> searchByContent(final String message);
+// Search related methods:
 
-	// TODO: Set<SearchResult> searchByAuthor(final String authorName);
+//TODO: Set<SearchResult> searchByContent(final String message);
 
-	// TODO: Set<SearchResult> searchByDate(final Date fromDate, final Date toDate);
+// TODO: Set<SearchResult> searchByAuthor(final String authorName);
 
-	// and there can be more and more ...
+// TODO: Set<SearchResult> searchByDate(final Date fromDate, final Date toDate);
+
+// and there can be more and more ...

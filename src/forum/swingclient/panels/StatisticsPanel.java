@@ -50,6 +50,7 @@ public class StatisticsPanel extends JPanel implements GUIHandler {
 	}
 
 	public void refreshForum(String encodedView) {
+		System.out.println("dsadsfjdskfdjgfdkgkfd");
 		if (!encodedView.startsWith("activenumbers\t"))
 			return;
 		String[] tSplitted = encodedView.split("\t");

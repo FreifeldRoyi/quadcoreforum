@@ -226,6 +226,10 @@ s	 */
 	 * 
 	 * @param subjectID
 	 * 		The id of the subject to be updated
+	 * @param name
+	 * 		The name of the subject to be update
+	 * @param description
+	 * 		The description of the subject to be updated
 	 * @param subSubjects
 	 * 		The collection of the subject sub-subjects' IDs
 	 * @param threads
@@ -236,7 +240,8 @@ s	 */
 	 * @throws DatabaseUpdateException
 	 * 		In case there is a problem with the database updating
 	 */
-	public void updateSubject(final long subjectID, final Collection<Long> subSubjects,
+	public void updateSubject(final long subjectID, final String name, final String description,
+			final Collection<Long> subSubjects, 
 			final Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException;
 
 	// Thread related methods
