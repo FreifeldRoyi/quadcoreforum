@@ -3,6 +3,7 @@
  */
 package forum.swingclient.panels;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -10,8 +11,11 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.*;
 
+import forum.swingclient.controllerlayer.ControllerHandler;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
+import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
+import forum.swingclient.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 
 /**
@@ -36,9 +40,7 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 		this.showingSubjectsOfName = "";
 		this.showingSubjectsOfID = -1;
 
-
 		this.table.addMouseListener(new MouseAdapter() {
-
 			public void mouseClicked(MouseEvent e) {
 				// handle double click
 				if (selectionState.shouldRespondToClick(e.getClickCount())) {
@@ -52,6 +54,9 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 								+ " content...");
 
 						final long subjectToLoad = tableModel.getIDofContentInRow(rowSelected);
+						tableModel.clearData();
+						tableModel.fireTableDataChanged();
+
 						tableModel.setFatherID(subjectToLoad);
 						threadsPanel.updateFather(subjectToLoad);
 						showingSubjectsOfID = subjectToLoad;
@@ -118,6 +123,77 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 				}
 				tModifySubjectDialog.dispose();
 			}});
+		
+		
+		deleteButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+
+					if (JOptionPane.showConfirmDialog(SubjectsPanel.this,
+							"Are you sure you want to delete the entire subject?", "delete",
+							JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
+								JOptionPane.NO_OPTION) {
+						return;
+					}
+
+					final long tSubjectToDeleteID = tableModel.getIDofContentInRow(table.getSelectedRow());
+
+					final ControllerHandler controller = ControllerHandlerFactory.getPipe();
+
+					controller.addObserver(
+							new GUIObserver(new GUIHandler() {
+								public void notifyError(String errorMessage) {
+									controller.deleteObserver(this);
+									JOptionPane.showMessageDialog(SubjectsPanel.this, 
+											"cannot delete the subject!", "error", JOptionPane.ERROR_MESSAGE);
+								}
+
+								public void refreshForum(final String encodedView) {
+
+									if (encodedView.startsWith("deletesubjectsuccess")) {
+										JOptionPane.showMessageDialog(SubjectsPanel.this, 
+												"The subject with id " + tSubjectToDeleteID + " was deleted " +
+												" successfully.", "delete success", JOptionPane.INFORMATION_MESSAGE);
+										controller.deleteObserver(this);
+										shouldScrollTo = -1;
+										new Thread(new Runnable() {
+											public void run() {
+												System.out
+														.println("iiiiiiiiiiiiiiiiiiiiiiii " + tableModel.getFatherID());
+												controller.getSubjects(tableModel.getFatherID(), container);
+												if (tableModel.getFatherID() > -1)
+													controller.getThreads(tableModel.getFatherID(), container);
+											}}).start();
+									}
+								}
+							}), EventType.SUBJECTS_UPDATED);
+
+					controller.deleteSubject(container.getConnectedUser().getID(), 
+							tableModel.getFatherID(), tSubjectToDeleteID, deleteButton);
+
+
+				} 
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 	public void setFatherID(int fatherID) {
@@ -158,7 +234,8 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 		if (encodedView.startsWith("searchresult") ||
 				encodedView.startsWith("searchnotmessages") ||
 				encodedView.startsWith("addsubjectsuccess") ||
-				encodedView.startsWith("subjectupdatesuccess")) return;
+				encodedView.startsWith("subjectupdatesuccess") ||
+				encodedView.startsWith("deletesubject")) return;
 
 		if (encodedView.startsWith("getpathsuccess")) {
 			container.removeFromNavigateUntil("Show root subjects");
@@ -187,8 +264,8 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 			}
 		}
 		else {
-
 			this.tableModel.clearData();
+			this.table.removeAll();
 			if (!encodedView.startsWith("There")) {
 
 				// each line should represent one subject
@@ -242,20 +319,7 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 
 			tableModel.fireTableDataChanged();
 
-			if (this.shouldScrollTo == -1) 
-				shouldScrollTo = 0;
-
-			// By using SwingUtilities we are bypassing the problem to get the maximum before the size is changed
-
-			this.table.getSelectionModel().setSelectionInterval((int)shouldScrollTo, (int)shouldScrollTo);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					table.scrollToVisible((int)shouldScrollTo, 0);
-					shouldScrollTo = -1;
-				}
-			});
-
+			super.selectAndScrollToRow();
 
 			this.table.setVisible(true);
 			this.setVisible(true);
@@ -267,7 +331,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 			}
 		}
 	}
-
 
 	private ActionListener linkPressListener() {
 		final String name = showingSubjectsOfName;
@@ -282,8 +345,8 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 						+ " content...");
 				try {
 
-					ControllerHandlerFactory.getPipe().getSubjects(id, container);
-					ControllerHandlerFactory.getPipe().getThreads(id, container);
+					ControllerHandlerFactory.getPipe().getSubjects(id, (Component)e.getSource());
+					ControllerHandlerFactory.getPipe().getThreads(id, (Component)e.getSource());
 				} 
 				catch (IOException e1) {
 					// TODO Auto-generated catch block

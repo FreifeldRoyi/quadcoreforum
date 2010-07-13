@@ -87,6 +87,22 @@ public interface ForumFacade { //extends SearchEngine {
 	 */
 	public long getMemberIdByUsernameAndOrEmail(final String username, final String email) throws NotRegisteredException, DatabaseRetrievalException;
 
+
+	/**
+	 * Finds and returns the forum member whose id equals to the given one
+	 * 
+	 * @param memberID
+	 * 		The id of the required member
+	 * 
+	 * @return
+	 * 		The forum member whose id equals to the given one
+	 * @throws NotRegisteredException
+	 * 		In case a member with the given id isn't registered to the forum
+	 * @throws DatabaseRetrievalException
+	 * 		In case an exception was thrown while trying to retrieve the required data from the database
+	 */
+	public UIMember getMemberByID(long memberID) throws NotRegisteredException, DatabaseRetrievalException ;
+
 	/**
 	 * 
 	 * logs-in a user with the given parameters
@@ -173,6 +189,20 @@ public interface ForumFacade { //extends SearchEngine {
 
 	/**
 	 * 
+	 * @param memberID
+	 * @param prevPassword
+	 * @param newPassword
+	 * @param askChangePassword
+	 * 		If one of the prevPassword or newPassword fields is null, this message is sent only in order to
+	 * 		update this value
+	 * @return
+	 */
+	public UIMember updateMemberPassword(final long memberID, final String prevPassword, 
+			final String newPassword, final boolean askChangePassword) throws NotRegisteredException, 
+			DatabaseUpdateException, WrongPasswordException;
+
+	/**
+	 * 
 	 * Updates the profile of the given member to the given details
 	 * 
 	 * @param memberID
@@ -196,8 +226,10 @@ public interface ForumFacade { //extends SearchEngine {
 	 *
 	 */
 	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastName,
-			final String firstName, final String email) throws NotRegisteredException, MemberAlreadyExistsException, 
-			DatabaseUpdateException;
+			final String firstName, final String email, boolean shouldAskPassword) throws NotRegisteredException, 
+			MemberAlreadyExistsException, DatabaseUpdateException;
+
+
 
 	// Subject related methods:	
 
@@ -280,6 +312,31 @@ public interface ForumFacade { //extends SearchEngine {
 			String description) throws NotRegisteredException, NotPermittedException,
 			SubjectNotFoundException, SubjectAlreadyExistsException, DatabaseUpdateException;
 
+	/**
+	 * 
+	 * Finds and deletes a subject with the given id
+	 * 
+	 * @param userID
+	 * 		The id of the user who requests to delete the subject
+	 * @param fatherID
+	 * 		The id of the father subject - from which the give subject should be deleted,
+	 * 		in case the given subject is a top level one, fatherID will be -1
+	 * @param subjectID
+	 * 		The id of the subject to be deleted
+	 * 
+	 * @throws NotRegisteredException 
+	 * 		In case the user who wants to delete the subject, isn't registered as a forum member
+	 * @throws NotPermittedException 
+	 * 		In case the user who wants to delete the subject doesn't have a permission to perform
+	 * 		this operation
+	 * @throws SubjectNotFoundException
+	 * 		In case the subject which should be deleted wasn't found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case the subject can't be deleted from the database due to a database connection error 
+	 */
+	public void deleteASubject(final long userID, final long fatherID, final long subjectID)
+	throws NotRegisteredException, NotPermittedException, SubjectNotFoundException, DatabaseUpdateException;
+
 	// Thread related methods
 
 	/**
@@ -287,6 +344,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 
 	 * @param threadID
 	 * 		The id of the thread which should be retrieved
+	 * @param shouldUpdateViews
+	 * 		Whether the number of views of the thread should be incremented
 	 * 
 	 * @return
 	 * 		The found thread
@@ -296,7 +355,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @throws DatabaseRetrievalException
 	 * 	    If a problem has occurred while trying to retrieve the required data from the database
 	 */
-	public UIThread getThreadByID(final long threadID) throws ThreadNotFoundException, DatabaseRetrievalException;
+	public UIThread getThreadByID(final long threadID,
+			final boolean shouldUpdateViews) throws ThreadNotFoundException, DatabaseRetrievalException;
 
 
 	/**
@@ -407,6 +467,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * 
 	 * @param fatherID
 	 * 		The id of the message whose replies should be represented
+	 * @param shouldUpdateViews	
+	 * 		Whether the number of the thread views should be incremented
 	 * 
 	 * @return
 	 * 		A collection of all the replies of the message with the given id, accessible via the
@@ -417,7 +479,8 @@ public interface ForumFacade { //extends SearchEngine {
 	 * @throws DatabaseRetrievalException 
 	 * 		In case the required data can't be retrieved from the database
 	 */
-	public Collection<UIMessage> getReplies(final long fatherID) throws MessageNotFoundException, DatabaseRetrievalException;
+	public Collection<UIMessage> getReplies(final long fatherID, 
+			boolean shouldUpdateViews) throws MessageNotFoundException, DatabaseRetrievalException;
 
 	/**
 	 *
@@ -503,17 +566,12 @@ public interface ForumFacade { //extends SearchEngine {
 	 */
 	public void deleteAMessage(final long userID, final long fatherID, final long messageID)
 	throws NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException;
-
 }
 // Update related messages:
 
 // TODO: void updatePassword(long userId, String oldPassword, String newPassword);
 
-// TODO: void updateMemberDetails( ... )
-
 // Deletion related messages:
-
-// TODO: void deleteThread(final long userId, final long dirId, final long threadId);
 
 // Search related methods:
 

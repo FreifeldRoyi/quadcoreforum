@@ -31,13 +31,16 @@ public class ChangeProfileDetailsMessage extends ClientMessage {
 	/* The e-mail of the user. */
 	private String email;
 
+	private boolean shouldAskPassword;
+
 	public ChangeProfileDetailsMessage(final String username, final String password, final String lastname, 
-			final String firstname, final String email) {
+			final String firstname, final String email, final boolean shouldAskPassword) {
 		this.username = username;
 		this.password = password;		
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
+		this.shouldAskPassword = shouldAskPassword;
 	}
 
 
@@ -52,14 +55,14 @@ public class ChangeProfileDetailsMessage extends ClientMessage {
 		try {
 			long memberIDToUpdate = forum.getMemberIdByUsernameAndOrEmail(username, email);
 
-			UIMember tUpdatedMember = 
-				forum.updateMemberProfile(memberIDToUpdate, this.username, this.password, this.lastname, this.firstname, this.email);
-			
-			returnObj.setResponse("profiledetailsupdatesuccess\t" + tUpdatedMember.getID() + "\t" + 
-					tUpdatedMember.getUsername() + "\t" + tUpdatedMember.getFirstName() + "\t" +
-					tUpdatedMember.getLastName() + "\t" + tUpdatedMember.getEmail());
-			returnObj.setHasExecuted(true);
-			
+				UIMember tUpdatedMember = 
+					forum.updateMemberProfile(memberIDToUpdate, this.username, this.password, 
+							this.lastname, this.firstname, this.email, this.shouldAskPassword);
+
+				returnObj.setResponse("profiledetailsupdatesuccess\t" + tUpdatedMember.getID() + "\t" + 
+						tUpdatedMember.getUsername() + "\t" + tUpdatedMember.getFirstName() + "\t" +
+						tUpdatedMember.getLastName() + "\t" + tUpdatedMember.getEmail());
+				returnObj.setHasExecuted(true);
 
 		}
 		catch (NotRegisteredException e) {

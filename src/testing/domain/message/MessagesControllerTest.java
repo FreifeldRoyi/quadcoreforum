@@ -265,8 +265,8 @@ public class MessagesControllerTest extends TestCase {
 					tRootMessage2ID, "title5", "content5");
 
 			try {
-				Collection<UIMessage> tRoot1Replies = this.messagesControllerUnderTest.getReplies(tRootMessage1ID);
-				Collection<UIMessage> tRoot2Replies = this.messagesControllerUnderTest.getReplies(tRootMessage2ID);
+				Collection<UIMessage> tRoot1Replies = this.messagesControllerUnderTest.getReplies(tRootMessage1ID, false);
+				Collection<UIMessage> tRoot2Replies = this.messagesControllerUnderTest.getReplies(tRootMessage2ID, false);
 				assertTrue(tRoot1Replies.size() == 2);
 				assertTrue(tRoot2Replies.size() == 1);
 

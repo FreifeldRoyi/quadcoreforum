@@ -51,9 +51,9 @@ public class ForumThreadTest extends TestCase {
 		assertEquals(this.threadUnderTest.getNumOfResponses(), tCurrentNumOfResponses + 1);
 		this.threadUnderTest.incNumOfResponses();
 		assertEquals(this.threadUnderTest.getNumOfResponses(), tCurrentNumOfResponses + 2);
-		this.threadUnderTest.decNumOfResponses();
+		this.threadUnderTest.decNumOfResponsesBy(1);
 		assertEquals(this.threadUnderTest.getNumOfResponses(), tCurrentNumOfResponses + 1);
-		this.threadUnderTest.decNumOfResponses();
+		this.threadUnderTest.decNumOfResponsesBy(1);
 		assertEquals(this.threadUnderTest.getNumOfResponses(), tCurrentNumOfResponses);
 	}
 

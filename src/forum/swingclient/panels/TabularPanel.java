@@ -124,14 +124,12 @@ public class TabularPanel extends JPanel {
 			}
 		});
 
-
-
 		// Selection on creation
 
-		((DefaultListSelectionModel)this.table.
+/*		((DefaultListSelectionModel)this.table.
 				getSelectionModel()).getListSelectionListeners()[0].
 				valueChanged(new ListSelectionEvent(table, -1, -1, true));
-
+*/
 	}
 
 	protected void setGuestView() {		
@@ -153,5 +151,15 @@ public class TabularPanel extends JPanel {
 		this.addButton.setVisible(true);
 		this.modifyButton.setVisible(true);
 		this.deleteButton.setVisible(true);
+	}
+	
+	public void selectAndScrollToRow() {
+		if (this.shouldScrollTo == -1) shouldScrollTo = 0;
+		this.selectionState.selectAndScrollToRow(this.table, (int)shouldScrollTo);
+		shouldScrollTo = -1;
+		if (this.tableModel.getRowCount() == 0) {
+			this.deleteButton.setEnabled(false);
+			this.modifyButton.setEnabled(false);
+		}
 	}
 }

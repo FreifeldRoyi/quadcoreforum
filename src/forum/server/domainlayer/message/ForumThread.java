@@ -35,9 +35,8 @@ public class ForumThread implements UIThread {
 	 * @param numOfViews
 	 * 		The number of views of the thread content
 	 */
-	public ForumThread(final long threadID, final String topic, final long rootID, int numOfReponses, int numOfViews,
-			long fatherSubjectID)
-	{
+	public ForumThread(final long threadID, final String topic, final long rootID, long numOfReponses, long numOfViews,
+			long fatherSubjectID) {
 		this.threadID = threadID;
 		this.topic = topic;
 		this.rootMessageID = rootID;
@@ -127,11 +126,19 @@ public class ForumThread implements UIThread {
 	}
 
 	/**
+	 * Sets the number of responses to the given number
+	 */
+	public void setNumOfResponses(int number) {
+		this.numOfResponses = number;
+	}
+
+	
+	/**
 	 * Decreases the number of responses to the thread's content
 	 */
-	public void decNumOfResponses() {
-		if (this.numOfResponses > 0)
-			this.numOfResponses--;
+	public void decNumOfResponsesBy(long number) {
+		if (this.numOfResponses - number >= 0)
+			this.numOfResponses -= number;
 	}
 
 	/**

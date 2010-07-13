@@ -3,7 +3,8 @@
  */
 package forum.swingclient.panels;
 
-import javax.swing.JTable;
+
+import forum.swingclient.ui.JScrollableTable;
 
 /**
  * @author sepetnit
@@ -16,9 +17,10 @@ public class TabularGuestMemberState extends TabularPanelState {
 	}
 	
 
-	public void selectFirstRow(JTable table) {
-		// TODO Auto-generated method stub
+	@Override
+	public void selectAndScrollToRow(final JScrollableTable table, final int row) {
 		
 	}
+
 
 }

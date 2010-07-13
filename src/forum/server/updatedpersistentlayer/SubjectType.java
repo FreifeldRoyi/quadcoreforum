@@ -11,6 +11,8 @@ public class SubjectType
     protected long fatherID;
     protected Set<Long> subSubjectsIDs; 
     protected Set<Long> threadsIDs;
+    protected long numOfSubSubjects;
+    protected long numOfMessages;
     protected Long lastAddedMessageID;
     protected String name;
     protected String description;
@@ -135,6 +137,34 @@ public class SubjectType
     }    
     
     /**
+	 * @return the number of sub-subjects
+	 */
+	public long getNumOfSubSubjects() {
+		return numOfSubSubjects;
+	}
+
+	/**
+	 * @param numOfSubSubjects the number of sub-subjects to set
+	 */
+	public void setNumOfSubSubjects(long numOfSubSubjects) {
+		this.numOfSubSubjects = numOfSubSubjects;
+	}
+
+	/**
+	 * @return the number of messages
+	 */
+	public long getNumOfMessages() {
+		return numOfMessages;
+	}
+
+	/**
+	 * @param numOfMessages the number of messages to set
+	 */
+	public void setNumOfMessages(long numOfMessages) {
+		this.numOfMessages = numOfMessages;
+	}
+
+	/**
      * Gets the value of the lastAddedMessageID property.
      * 
      * @return

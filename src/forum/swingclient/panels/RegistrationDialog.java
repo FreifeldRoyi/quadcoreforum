@@ -376,7 +376,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 
 		JButton tCancelButton = new JButton();
 		tCancelButton.setText("cancel");
-		tCancelButton.setPreferredSize(new Dimension(100, 50));
+		tCancelButton.setPreferredSize(new Dimension(100, 40));
 		tCancelButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -385,7 +385,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 			
 		});
 		
-		registerButton.setPreferredSize(new Dimension(100, 50));
+		registerButton.setPreferredSize(new Dimension(100, 40));
 
 		this.mainPanel = new JPanel();
 		mainPanel.setPreferredSize(new Dimension(600, 620));
@@ -404,8 +404,9 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 								.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE)
 								.addGroup(tMainPanelLayout.createSequentialGroup()
-										.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 										.addGap(0, 0, Short.MAX_VALUE)
+										.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+										.addGap(10, 10, 10)
 										.addComponent(tCancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
 						)
 						.addContainerGap())

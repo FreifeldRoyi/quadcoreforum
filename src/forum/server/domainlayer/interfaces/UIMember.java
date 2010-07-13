@@ -40,6 +40,8 @@ public interface UIMember extends UIUser {
 	 */
 	public int getPostsNumber();
 	
+	public boolean askChangePassword();
+	
 	/**
 	 * 
 	 * @return

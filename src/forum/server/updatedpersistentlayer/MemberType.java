@@ -20,9 +20,19 @@ public class MemberType {
     protected UserType userType;
     protected Set<String> permissions;
     
+    protected boolean shouldAskChangePassword;
+    
     protected List<Long> postedMessagesIDs;
   
 
+    public boolean getShouldAskChangePassword() {
+    	return this.shouldAskChangePassword;
+    }
+    
+    public void setShouldAskChangePassword(boolean value) {
+    	this.shouldAskChangePassword = value;
+    }
+    
     /**
      * Gets the value of the userID property.
      * 

@@ -127,12 +127,13 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 
 	/**
 	 * @see
-	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String)
+	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String, boolean)
 	 */
 	public void updateUser(final long userID, final String password,
-			final String lastName, final String firstName, final String email) throws 
+			final String lastName, final String firstName, final String email,
+			final boolean shouldAskChangePassword) throws 
 			NotRegisteredException, DatabaseUpdateException {
-		this.usersHandler.updateUser(factory, userID, password, lastName, firstName, email);
+		this.usersHandler.updateUser(factory, userID, password, lastName, firstName, email, shouldAskChangePassword);
 	}
 	
 	// Subject related methods
@@ -171,13 +172,23 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 
 	/**
 	 * @see
-	 * 		PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection)
+	 * 		PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection, long, long)
 	 */
 	public void updateSubject(long id, String name, String description, Collection<Long> subSubjects,
-			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
-			this.messagesHandler.updateSubject(factory, id, name, description, subSubjects, threads);
+			Collection<Long> threads, final long deepSubSubjectsNum, 
+			final long deepMessagesNum) throws SubjectNotFoundException, DatabaseUpdateException {
+			this.messagesHandler.updateSubject(factory, id, name, description, subSubjects, threads, deepSubSubjectsNum
+					, deepMessagesNum);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#deleteASubject(long)
+	 */
+	public void deleteASubject(final long subjectID) throws SubjectNotFoundException, DatabaseUpdateException {
+		this.messagesHandler.deleteASubject(factory, subjectID);
+	}
+	
 	// Thread related methods
 
 	/**
@@ -212,9 +223,9 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 			return this.messagesHandler.deleteAThread(factory, threadID);
 	}
 
-	public void updateThread(long threadID, String topic)
+	public void updateThread(long threadID, String topic, long numOfResponses, long numOfViews)
 			throws ThreadNotFoundException, DatabaseUpdateException {
-		this.messagesHandler.updateThread(factory, threadID, topic);
+		this.messagesHandler.updateThread(factory, threadID, topic, numOfResponses, numOfViews);
 	}
 	
 	// Message related methods	

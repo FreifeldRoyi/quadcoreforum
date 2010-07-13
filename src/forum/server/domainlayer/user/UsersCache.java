@@ -268,7 +268,8 @@ public class UsersCache {
 	 */
 	public void updateInDatabase(ForumMember updatedMember) throws NotRegisteredException, DatabaseUpdateException {
 		this.pipe.updateUser(updatedMember.getID(), updatedMember.getPassword(), 
-				updatedMember.getLastName(), updatedMember.getFirstName(), updatedMember.getEmail());
+				updatedMember.getLastName(), updatedMember.getFirstName(), updatedMember.getEmail(),
+				updatedMember.askChangePassword());
 		this.idsToUsersMapping.put(updatedMember.getID(), updatedMember);
 	}
 

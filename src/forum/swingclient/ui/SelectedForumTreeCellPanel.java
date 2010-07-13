@@ -132,7 +132,7 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 	public void updatePanel(ForumCell cell, ConnectedUserData connectedUser) {
 		if (cell == null) return;
-		currentCellUsername = cell.getAuthorUsername();;
+		currentCellUsername = cell.getAuthorID();;
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
 				this.m_modifyButton.setEnabled(true);

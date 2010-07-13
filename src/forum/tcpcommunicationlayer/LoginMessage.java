@@ -52,7 +52,8 @@ public class LoginMessage extends ClientMessage {
 					type = "MEMBER";
 			
 			String tResponse = tResponseUser.getID() + "\t" + tResponseUser.getUsername() + "\t" + tResponseUser.getLastName() + "\t" +
-			tResponseUser.getFirstName() + "\t" + type + "\n";
+			tResponseUser.getFirstName() + "\t" + type + "\t" +
+			(tResponseUser.askChangePassword()? "ask_pass_update" : "not_ask_pass_update") +  "\n";
 			
 			for (Permission tCurrentPermission : tResponseUser.getPermissions())
 				tResponse += tCurrentPermission.toString() + "\n";
