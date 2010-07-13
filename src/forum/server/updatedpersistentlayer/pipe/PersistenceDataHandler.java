@@ -163,9 +163,9 @@ public interface PersistenceDataHandler {
 	 * 		In case there is a problem with the database updating
 	 */
 	public void updateUser(final long userID, final String password,
-			final String lastName, final String firstName, final String email) throws 
-			NotRegisteredException, DatabaseUpdateException;
-	
+			final String lastName, final String firstName, final String email, 
+			final boolean shouldAskChangePassword) throws NotRegisteredException, DatabaseUpdateException;
+
 	// Subject related methods
 
 	/**
@@ -234,6 +234,10 @@ s	 */
 	 * 		The collection of the subject sub-subjects' IDs
 	 * @param threads
 	 * 		The collection of the subject threads' IDs
+	 * @param deepSubSubjectsNum
+	 * 		The number of subjects under this subject
+	 * @param deepMessagesNum
+	 * 		The number of messages under this subject
 	 * 
 	 * @throws SubjectNotFoundException
 	 * 		In case the subject which should be updated wasn't found
@@ -242,7 +246,21 @@ s	 */
 	 */
 	public void updateSubject(final long subjectID, final String name, final String description,
 			final Collection<Long> subSubjects, 
-			final Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException;
+			final Collection<Long> threads, final long deepSubSubjectsNum, 
+			final long deepMessagesNum) throws SubjectNotFoundException, DatabaseUpdateException;
+
+	/**
+	 * Deletes a subject whose id equals to the given one, from the database
+	 * 
+	 * @param subjectID
+	 * 		The id of the subject which should be removed from the database
+	 *  
+	 * @throws SubjectNotFoundException
+	 * 		In case a subject with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case there is a problem with the database updating
+	 */
+	public void deleteASubject(final long subjectID) throws SubjectNotFoundException, DatabaseUpdateException;
 
 	// Thread related methods
 
@@ -306,8 +324,9 @@ s	 */
 	 */
 	public Collection<Long> deleteAThread(final long threadID) throws ThreadNotFoundException,
 	DatabaseUpdateException;
-	
-	public void updateThread(long threadID, String topic) throws ThreadNotFoundException, DatabaseUpdateException;
+
+	public void updateThread(long threadID, String topic, 
+			long numOfResponses, long numOfViews) throws ThreadNotFoundException, DatabaseUpdateException;
 
 	// Message related methods	
 
@@ -331,7 +350,7 @@ s	 */
 	 * 		In case the required data can't be retrieved due to a database connection error
 	 */	
 	public Collection<ForumMessage> getAllMessages() throws DatabaseRetrievalException;
-	
+
 	/**
 	 * Finds and returns a message whose id equals to the given one
 	 * 

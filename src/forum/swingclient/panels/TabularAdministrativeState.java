@@ -3,7 +3,9 @@
  */
 package forum.swingclient.panels;
 
-import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+
+import forum.swingclient.ui.JScrollableTable;
 
 /**
  * @author sepetnit
@@ -16,9 +18,19 @@ public class TabularAdministrativeState extends TabularPanelState {
 	}
 	
 	@Override
-	public void selectFirstRow(JTable table) {
-		// TODO Auto-generated method stub
+	public void selectAndScrollToRow(final JScrollableTable table, final int row) {
+		// By using SwingUtilities we are bypassing the problem to get the maximum rows value
+		// before the size is changed
+
+		table.getSelectionModel().setSelectionInterval(row, row);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				table.scrollToVisible(row, 0);
+			}
+		});
 		
+
 	}
 
 }

@@ -52,7 +52,7 @@ public class MainForumLogic implements ForumFacade {
 			MainForumLogic.FORUM_FACADE_INSTANCE = new MainForumLogic();
 		return MainForumLogic.FORUM_FACADE_INSTANCE;
 	}
-	
+
 	/**
 	 * Constructs the forum objects according to the database
 	 * 
@@ -64,22 +64,22 @@ public class MainForumLogic implements ForumFacade {
 	private MainForumLogic() throws DatabaseRetrievalException, DatabaseUpdateException {
 		try {
 			ForumDataHandler tDataHandler = new ForumDataHandler();
-			
+
 			File tFile = new File("src/forum/server/domainlayer/search/cmpssearch/compassSettings.xml");
-			
+
 			CompassConfiguration tConf = CompassConfigurationFactory.newConfiguration().configure(tFile);               
-		
+
 			Compass compass = tConf.buildCompass();
-		
+
 			this.searchController = new CompassAdapter(compass);
-			
+
 			this.usersController = new UsersController(tDataHandler);
 			this.messagesController = new MessagesController(tDataHandler);
-			
+
 			for (ForumMessage tCurrent : tDataHandler.getMessagesCache().getAllMessages()) {
 				this.searchController.addData(tCurrent);
 			}
-			
+
 		}
 		catch (DatabaseUpdateException e) {
 			SystemLogger.severe(e.getMessage());
@@ -143,7 +143,15 @@ public class MainForumLogic implements ForumFacade {
 	DatabaseRetrievalException {
 		return this.usersController.getMemberIdByUsernameAndOrEmail(username, email);
 	}
-	
+
+	/**
+	 * @see
+	 * 		ForumFacade#getMemberByID(long)
+	 */
+	public UIMember getMemberByID(long memberID) throws NotRegisteredException, DatabaseRetrievalException {
+		return this.usersController.getMemberByID(memberID);
+	}
+
 	/**
 	 * @see
 	 * 		ForumFacade#login(String, String)
@@ -175,8 +183,18 @@ public class MainForumLogic implements ForumFacade {
 	 * 		ForumFacade#updateMemberProfile(long, String, String, String, String, String)
 	 */
 	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastName,
-			final String firstName, final String email) throws NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
-		return this.usersController.updateMemberProfile(memberID, username, password, lastName, firstName, email);
+			final String firstName, final String email, boolean shouldAskPassword) throws NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
+		return this.usersController.updateMemberProfile(memberID, username, password, lastName, firstName, email, shouldAskPassword);
+	}
+
+	/**
+	 * @see	
+	 * 		ForumFacade#updateMemberPassword(long, String, String, boolean)
+	 */
+	public UIMember updateMemberPassword(final long memberID, final String prevPassword, 
+			final String newPassword, final boolean askChangePassword) throws 
+			NotRegisteredException, DatabaseUpdateException, WrongPasswordException{
+		return this.usersController.updateMemberPassword(memberID, prevPassword, newPassword, askChangePassword);
 	}
 
 	/**
@@ -187,7 +205,7 @@ public class MainForumLogic implements ForumFacade {
 	NotRegisteredException, DatabaseUpdateException {
 		this.usersController.promoteToBeModerator(applicantID, username);
 	}
-	
+
 	// Subject related methods
 
 	/**
@@ -197,7 +215,7 @@ public class MainForumLogic implements ForumFacade {
 	public UISubject getSubjectByID(long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
 		return this.messagesController.getSubjectByID(subjectID);
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#getSubjects(long)
@@ -226,17 +244,28 @@ public class MainForumLogic implements ForumFacade {
 			SubjectNotFoundException, SubjectAlreadyExistsException, DatabaseUpdateException {
 		return this.messagesController.updateASubject(userID, subjectID, name, description);
 	}
-	
-	// Thread related methods
-	
+
 	/**
 	 * @see
-	 * 		ForumFacade#getThreadByID(long)
+	 * 		ForumFacade#deleteASubject(long, long, long)
 	 */
-	public UIThread getThreadByID(long thread) throws ThreadNotFoundException, DatabaseRetrievalException {
-		return this.messagesController.getThreadByID(thread);
+	public void deleteASubject(final long userID, final long fatherID, final long subjectID)
+	throws NotRegisteredException, NotPermittedException, SubjectNotFoundException, DatabaseUpdateException {
+		Collection<Long> tDeletedMessagesIDs = this.messagesController.deleteASubject(userID, fatherID, subjectID);
+		for (long tMessageID : tDeletedMessagesIDs)
+			this.searchController.removeData(tMessageID);
 	}
-	
+
+	// Thread related methods
+
+	/**
+	 * @see
+	 * 		ForumFacade#getThreadByID(long, boolean)
+	 */
+	public UIThread getThreadByID(long thread, final boolean shouldUpdateViews) throws ThreadNotFoundException, DatabaseRetrievalException {
+		return this.messagesController.getThreadByID(thread, shouldUpdateViews);
+	}
+
 	/**
 	 * @see
 	 * 		ForumFacade#getThreads(long)
@@ -254,7 +283,7 @@ public class MainForumLogic implements ForumFacade {
 			final String content) throws NotRegisteredException, NotPermittedException, SubjectNotFoundException,
 			DatabaseUpdateException {
 		UIThread toReturn = this.messagesController.openNewThread(userID, topic, subjectID, title, content);
-		
+
 		UIMessage tMsg = null;
 		try {
 			tMsg = getMessageByID(toReturn.getID());
@@ -268,10 +297,10 @@ public class MainForumLogic implements ForumFacade {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return toReturn;
 	}
-	
+
 	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException,
 	NotPermittedException, ThreadNotFoundException, DatabaseUpdateException {
 		return this.messagesController.updateAThread(userID, threadID, newTopic);
@@ -294,34 +323,34 @@ public class MainForumLogic implements ForumFacade {
 	public SearchHit[] searchByContent(String phrase, int from, int to) {
 		return this.searchController.searchByContent(phrase, from, to);
 	}
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#getMessageByID(long)
 	 */
 	public UIMessage getMessageByID(final long messageID)
-			throws MessageNotFoundException, DatabaseRetrievalException {
+	throws MessageNotFoundException, DatabaseRetrievalException {
 		return this.messagesController.getMessageByID(messageID);
 	}
 
-	
+
 	/**
 	 * @see
 	 * 		ForumFacade#getMessagesByUserID(long)
 	 */
 	public Collection<UIMessage> getMessagesByUserID(long authorID)
-			throws DatabaseRetrievalException, NotRegisteredException {
+	throws DatabaseRetrievalException, NotRegisteredException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	/**
 	 * @see
-	 * 		ForumFacade#getReplies(long)
+	 * 		ForumFacade#getReplies(long, boolean)
 	 */
-	public Collection<UIMessage> getReplies(long fatherID)
+	public Collection<UIMessage> getReplies(long fatherID, boolean shouldUpdateViews)
 	throws MessageNotFoundException, DatabaseRetrievalException {
-		return this.messagesController.getReplies(fatherID);
+		return this.messagesController.getReplies(fatherID, shouldUpdateViews);
 	}
 
 	/**
@@ -356,6 +385,6 @@ public class MainForumLogic implements ForumFacade {
 	NotRegisteredException, NotPermittedException, MessageNotFoundException, DatabaseUpdateException {
 		Collection<Long> tDeletedMessagesIDs = this.messagesController.deleteAMessage(userID, fatherID, messageID);
 		for (long tMessageID : tDeletedMessagesIDs)
-			this.searchController.removeData(tMessageID);		
+			this.searchController.removeData(tMessageID);
 	}
 }

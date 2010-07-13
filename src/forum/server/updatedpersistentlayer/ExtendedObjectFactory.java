@@ -52,6 +52,7 @@ public class ExtendedObjectFactory {
 		tMemberType.setFirstName(firstName);
 		tMemberType.setEmail(email);
 		tMemberType.setPermissions(new HashSet<String>(tSringPermissions));
+		tMemberType.setShouldAskChangePassword(false);
 		return tMemberType;
 	}
 
@@ -124,6 +125,8 @@ public class ExtendedObjectFactory {
 		tSubjectType.setName(name);
 		tSubjectType.setDescription(description);
 		tSubjectType.setFatherID(fatherID);
+		tSubjectType.setNumOfSubSubjects(0);
+		tSubjectType.setNumOfMessages(0);
 		return tSubjectType;
 	}		
 }

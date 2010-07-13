@@ -33,9 +33,9 @@ import forum.swingclient.panels.TabularPanel;
  */
 public class JScrollableTable extends JTable implements MouseMotionListener, MouseListener {
 	private static final long serialVersionUID = 65621709684588442L;
-	
+
 	private static final Color SELECTION_BACKGROUND_COLOR = new Color(231, 239, 214);
-	
+
 	private ButtonGroup selectionRowsGroup;
 	private int type;
 
@@ -48,7 +48,7 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 		this.firstColumnShown = false;
 		this.setSelectionBackground(JScrollableTable.SELECTION_BACKGROUND_COLOR);
 	}
-	
+
 	// MouseListener implementation
 	public void mouseClicked(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
@@ -57,7 +57,7 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 	}
 	public void mousePressed(MouseEvent e) {}
 	public void mouseReleased(MouseEvent e) {}
-	
+
 	// MouseMotionListener implementation
 	public void mouseMoved(MouseEvent e) {  
 		int row = this.rowAtPoint(e.getPoint());  
@@ -68,7 +68,7 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 		}
 	}
 	public void mouseDragged(MouseEvent e) {/* do nothing */}
-	
+
 	private void setFirstColumnVisible(boolean value) {
 		if (value && !firstColumnShown) {
 			this.getColumnModel().addColumn(firstColumn);
@@ -80,9 +80,9 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 			firstColumnShown = false;
 		}
 	}
-	
+
 	private void setSelectionOnMouseMotion(boolean value) {
-		
+
 		this.removeMouseListener(this);		
 		for (MouseMotionListener m : this.getMouseMotionListeners())
 			this.removeMouseMotionListener(m);
@@ -97,10 +97,18 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 	}
 
 	public void setAdministrativeView(boolean value) {
+		this.clearSelection();
+
+		if (value) {
+			if (this.getRowCount() > 0)
+				this.getSelectionModel().setSelectionInterval(0, 0);
+		}
+
+
 		this.setFirstColumnVisible(value);
 		this.setSelectionOnMouseMotion(!value);
 	}
-	
+
 	public ButtonGroup getFirstColumnRadiosGroup() {
 		return selectionRowsGroup;
 	}
@@ -108,7 +116,7 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 	public void setFirstColumnRadiosGroup(ButtonGroup toSet) {
 		this.selectionRowsGroup = toSet;
 	}
-	
+
 	public void setModel(TableModel model) {
 		super.setModel(model);
 		if (model.getColumnCount() > 0) { // the the model was initialized

@@ -157,7 +157,7 @@ public class ForumTree implements GUIHandler {
 						catch (IOException e)  {
 						}
 
-						pipe.getNestedMessages(((ForumCell)node.getUserObject()).getId(), m_panel);
+						pipe.getNestedMessages(((ForumCell)node.getUserObject()).getId(), false, m_panel);
 
 
 						try {
@@ -229,6 +229,10 @@ public class ForumTree implements GUIHandler {
 
 	}
 
+	public long getFatherMessageID() {
+		return this.fatherMessageID;
+	}
+	
 	public void setRootMessage(final long fatherMessageID) {
 		this.fatherMessageID = fatherMessageID;
 
@@ -249,7 +253,7 @@ public class ForumTree implements GUIHandler {
 
 			synchronized (rootNode) {
 				try {
-					this.pipe.getNestedMessages(this.fatherMessageID, this.m_panel);			
+					this.pipe.getNestedMessages(this.fatherMessageID, true, this.m_panel);			
 					rootNode.wait();
 					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(rootNode);
 					this.m_tree.setSelectionRow(0);
@@ -279,14 +283,14 @@ public class ForumTree implements GUIHandler {
 		try {
 			System.out.println(Arrays.toString(tSplitted));
 			String[] tRootAsStringArray = tSplitted[0].split("\t");
-			if (tRootAsStringArray.length > 4) {
-				for (int i = 4; i < tRootAsStringArray.length; i++) {
-					tRootAsStringArray[3] += ("\t" + tRootAsStringArray[i]);  
+			if (tRootAsStringArray.length > 5) {
+				for (int i = 5; i < tRootAsStringArray.length; i++) {
+					tRootAsStringArray[4] += ("\t" + tRootAsStringArray[i]);  
 				}
 			}
 
-			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
-					tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
+			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[1]),
+					tRootAsStringArray[2], tRootAsStringArray[0], tRootAsStringArray[3], tRootAsStringArray[4]);
 
 			for (int i = 1; i < tSplitted.length; i++) {
 				String[] tCurrentReplies = tSplitted[i].split("\n" + tRepliesDelimiter);
@@ -378,7 +382,7 @@ public class ForumTree implements GUIHandler {
 							catch (IOException e)  {
 							}
 
-							pipe.getNestedMessages(((ForumCell)tNodeToExpand.getUserObject()).getId(), m_panel);
+							pipe.getNestedMessages(((ForumCell)tNodeToExpand.getUserObject()).getId(), false, m_panel);
 
 
 							try {
@@ -514,35 +518,36 @@ public class ForumTree implements GUIHandler {
 				System.out.println("splitted [" + i + "] = " + tSplitted[i]);
 
 			String[] tRootAsStringArray = tSplitted[0].split("\t");
-			if (tRootAsStringArray.length > 4) {
-				for (int i = 4; i < tRootAsStringArray.length; i++) {
-					tRootAsStringArray[3] += ("\t" + tRootAsStringArray[i]);  
+			if (tRootAsStringArray.length > 5) {
+				for (int i = 5; i < tRootAsStringArray.length; i++) {
+					tRootAsStringArray[4] += ("\t" + tRootAsStringArray[i]);  
 				}
 			}
 
-			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[0]),
-					tRootAsStringArray[1], tRootAsStringArray[2], tRootAsStringArray[3]);
+			ForumCell tRoot = new ForumCell(Long.parseLong(tRootAsStringArray[1]),
+					tRootAsStringArray[2], tRootAsStringArray[0], tRootAsStringArray[3], tRootAsStringArray[4]);
 
 			for (int i = 1; i < tSplitted.length; i++) {
 				String[] tCurrentReplies = tSplitted[i].split("\n\t\tASUBREPLYMESSAGE: ");
 
 				String[] tCurrReply = tCurrentReplies[0].split("\t");
-				if (tCurrReply.length > 4) {
-					for (int j = 4; j < tCurrReply.length; j++) {
-						tCurrReply[3] += ("\t" + tCurrReply[j]);  
+				if (tCurrReply.length > 5) {
+					for (int j = 5; j < tCurrReply.length; j++) {
+						tCurrReply[4] += ("\t" + tCurrReply[j]);  
 					}
 				}
-				ForumCell tReply = new ForumCell(Long.parseLong(tCurrReply[0]),
-						tCurrReply[1], tCurrReply[2], tCurrReply[3]);
+				ForumCell tReply = new ForumCell(Long.parseLong(tCurrReply[1]),
+						tCurrReply[2], tCurrReply[0], tCurrReply[3], tCurrReply[4]);
 				for (int j = 1; j < tCurrentReplies.length; j++) {
 					String[] tCurrentReplyAsStringArray = tCurrentReplies[j].split("\t");
-					if (tCurrentReplyAsStringArray.length > 4) {
-						for (int k = 4; k < tCurrentReplyAsStringArray.length; k++) {
-							tCurrentReplyAsStringArray[3] += ("\t" + tCurrentReplyAsStringArray[k]);  
+					if (tCurrentReplyAsStringArray.length > 5) {
+						for (int k = 5; k < tCurrentReplyAsStringArray.length; k++) {
+							tCurrentReplyAsStringArray[4] += ("\t" + tCurrentReplyAsStringArray[k]);  
 						}
 					}
-					ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[0]),
-							tCurrentReplyAsStringArray[1], tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[3]);
+					ForumCell tCurrentReply = new ForumCell(Long.parseLong(tCurrentReplyAsStringArray[1]),
+							tCurrentReplyAsStringArray[2], tCurrentReplyAsStringArray[0], 
+							tCurrentReplyAsStringArray[3], tCurrentReplyAsStringArray[4]);
 					tReply.add(tCurrentReply);
 				}
 				tRoot.add(tReply);
@@ -580,7 +585,7 @@ public class ForumTree implements GUIHandler {
 				synchronized (node) {
 					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(node),
 							EventType.MESSAGES_UPDATED);
-					ControllerHandlerFactory.getPipe().getNestedMessages(cell.getId(), m_tree);
+					ControllerHandlerFactory.getPipe().getNestedMessages(cell.getId(), false, m_tree);
 					try {
 						node.wait();
 						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
@@ -614,7 +619,7 @@ public class ForumTree implements GUIHandler {
 			synchronized (node) {
 				pipe.addObserver(new GUIObserver(node),
 						EventType.MESSAGES_UPDATED);
-				pipe.getNestedMessages(cell.getId(), m_tree);
+				pipe.getNestedMessages(cell.getId(), false, m_tree);
 				try {
 					node.wait();
 					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
@@ -684,7 +689,7 @@ public class ForumTree implements GUIHandler {
 
 									System.out.println("id " + parentCell.getId());
 									System.out.println(parent.id);
-									pipe.getNestedMessages(parentCell.getId(), m_tree);
+									pipe.getNestedMessages(parentCell.getId(), false, m_tree);
 									try {
 										System.out.println("waiting");
 										parent.wait();

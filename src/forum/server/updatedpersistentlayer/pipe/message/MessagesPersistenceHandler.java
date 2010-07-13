@@ -185,10 +185,11 @@ public class MessagesPersistenceHandler {
 	 * @throws DatabaseUpdateException 
 	 * 
 	 * @see
-	 * 		PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection)
+	 * 		{@link PersistenceDataHandler#updateSubject(long, String, String, Collection, Collection, long, long)}
 	 */
 	public void updateSubject(SessionFactory ssFactory, long id, String name, String description, Collection<Long> subSubjects,
-			Collection<Long> threads) throws SubjectNotFoundException, DatabaseUpdateException {
+			Collection<Long> threads, final long deepSubSubjectsNum, 
+			final long deepMessagesNum) throws SubjectNotFoundException, DatabaseUpdateException {
 		try {			
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(session, id);
@@ -203,14 +204,37 @@ public class MessagesPersistenceHandler {
 			tSubjectToUpdate.setName(name);
 			tSubjectToUpdate.setDescription(description);
 			
-			System.out.println("before update");
+			tSubjectToUpdate.setNumOfSubSubjects(deepSubSubjectsNum);
+			tSubjectToUpdate.setNumOfMessages(deepMessagesNum);
 
 			session.update(tSubjectToUpdate);
-			System.out.println("after update");
 
 			this.commitTransaction(session);
-			System.out.println("after commit");
 
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+	
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#deleteASubject(long)
+	 */
+	public void deleteASubject(SessionFactory ssFactory, final long subjectID) throws SubjectNotFoundException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			try {
+				SubjectType tSubjectType = this.getSubjectTypeByID(session, subjectID);
+				if (tSubjectType == null)
+					throw new SubjectNotFoundException(subjectID);
+				session.delete(tSubjectType);
+				this.commitTransaction(session);			
+			}
+			catch (DatabaseRetrievalException e) {
+				this.commitTransaction(session);
+				throw new DatabaseUpdateException();
+			}
 		}
 		catch (DatabaseRetrievalException e) {
 			throw new DatabaseUpdateException();
@@ -358,7 +382,8 @@ public class MessagesPersistenceHandler {
 		}
 	}
 
-	public void updateThread(SessionFactory ssFactory, long threadID, String topic) throws ThreadNotFoundException, 
+	public void updateThread(SessionFactory ssFactory, long threadID, String topic, 
+			long numOfResponses, long numOfViews) throws ThreadNotFoundException, 
 	DatabaseUpdateException {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
@@ -369,6 +394,8 @@ public class MessagesPersistenceHandler {
 					throw new ThreadNotFoundException(threadID);
 				}
 				tThreadToEdit.setTopic(topic);
+				tThreadToEdit.setNumOfResponses(numOfResponses);
+				tThreadToEdit.setNumOfViews(numOfViews);
 				this.commitTransaction(session);
 			}
 			catch (DatabaseUpdateException e) {

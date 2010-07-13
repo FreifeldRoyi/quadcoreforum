@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.FileHandler;
 
-
-import forum.swingclient.panels.ForgotPasswordDialog;
 import forum.swingclient.ui.events.*;
 import forum.swingclient.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
@@ -184,7 +182,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			SystemLogger.warning("The program was interrupted while waiting");
 		}
 	}
-	
+
 	public void modifyThread(final long authorID, long threadID, String newTopic, Component comp) {
 		getActiveUsersNumber();
 		final ClientMessage toSend = new ModifyThreadMessage(authorID, threadID, newTopic);
@@ -198,7 +196,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 			SystemLogger.warning("The program was interrupted while waiting");
 		}		
 	}
-	
+
 	public void modifySubject(final long authorID, long subjectID, String newName, String newDescription, Component comp) {
 		getActiveUsersNumber();
 		final ClientMessage toSend = new ModifySubjectMessage(authorID, subjectID, newName, newDescription);
@@ -226,6 +224,20 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		catch (InterruptedException e) {
 			SystemLogger.warning("The program was interrupted while waiting");
 		}
+	}
+
+	public void deleteSubject(long userID, long fatherID, long subjectID, Component comp) {
+		getActiveUsersNumber();
+		final ClientMessage toSend = new DeleteSubjectMessage(userID, fatherID, subjectID);
+		try {
+			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SUBJECTS_UPDATED));
+			synchronized (messages) {
+				messages.put(toSend);
+			}
+		}
+		catch (InterruptedException e) {
+			SystemLogger.warning("The program was interrupted while waiting");
+		}		
 	}
 
 	public void deleteMessage(long userID, long fatherID, long messageID, Component comp) {
@@ -306,16 +318,13 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 		return true;		
-
-
-
 	}
 
-	public void updatePassword(final String username, final String email, final String password, final Component comp) {
+	public void recoverPassword(final String username, final String email, final String password, final Component comp) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
 				getActiveUsersNumber();
-				final ClientMessage toSend = new ChangeProfileDetailsMessage(username, password, null, null, email);
+				final ClientMessage toSend = new ChangeProfileDetailsMessage(username, password, null, null, email, true);
 				try {
 					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
 					synchronized (messages) {
@@ -329,7 +338,28 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);		
 	}
-	
+
+	public void changePassword(final long memberID, final String prevPassword, final String newPassword, 
+			final boolean shouldAskNewPassword, final Component comp) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new PasswordChangeMessage(memberID, prevPassword, newPassword, shouldAskNewPassword);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);		
+	}
+
+
 
 	public boolean login(final long guestID, final String username, final String password, final Component comp) {
 		/*		if (tResponse == null || !tResponse.hasExecuted())
@@ -377,7 +407,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}	
-	
+
 	public void addNewSubject(final long userID, final long fatherID, final String name, final String description, final Component comp) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
@@ -397,8 +427,8 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}	
 
-	
-	
+
+
 	public void getThreads(final long subjectID, final Component comp) {
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
@@ -442,12 +472,12 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}
-	
-	
-	public void getNestedMessages(final long rootID, final Component comp) {
+
+
+	public void getNestedMessages(final long rootID, boolean shouldUpdateViews, final Component comp) {
 		System.out.println(rootID + " nested req");
 		try {
-			final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID);
+			final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID, shouldUpdateViews);
 			getActiveUsersNumber();
 
 			//						notifyObservers(new ForumGUIErrorEvent("Error returned while trying to retrieve threads",
@@ -590,10 +620,10 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}		
-	
-	public void getPath(Component comp, long messageID) {
+
+	public void getPath(Component comp, long prevFatherMessageID, long messageID) {
 		try {
-			final ClientMessage toSend = new GetPathMessage(messageID);
+			final ClientMessage toSend = new GetPathMessage(messageID, prevFatherMessageID);
 			getActiveUsersNumber();
 			sended.put(toSend.getID(), new ClientRequestData(comp, EventType.SEARCH_UPDATED));
 			synchronized (messages) {

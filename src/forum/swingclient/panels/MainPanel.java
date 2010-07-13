@@ -30,6 +30,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -75,6 +76,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private ThreadsPanel threadsPanel;	
 	private ForumTree tree;
 
+	private JLabel mainPanelSeparator;
+
 	public ControllerHandler controller;
 
 	private ConnectedUserData connectedUser;
@@ -92,7 +95,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 	public void refreshForum(String encodedView) {
 
-
 		// simulates a press on the home button
 
 		if (encodedView.startsWith("register") || 
@@ -100,11 +102,13 @@ public class MainPanel extends JFrame implements GUIHandler {
 				encodedView.startsWith("activeusernames\t") ||
 				encodedView.startsWith("promoted\t") ||
 				encodedView.startsWith("profiledetailsupdatesuccess\t") ||
-				encodedView.startsWith("getpathsuccess")) return;
+				encodedView.startsWith("getpathsuccess") ||
+				encodedView.startsWith("passwordupdate")) return;
 
-		//		this.pnl_navigate.setVisible(false);
+		boolean shouldAskPasswordUpdate = false;
 
-		if (!encodedView.startsWith("loggedout\t")) {
+		
+		if (!encodedView.startsWith("loggedout\t")) { // login
 
 
 			String[] tSplitted = encodedView.split("\n");
@@ -118,16 +122,20 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 			if (connectedUserID < 0) // guest
 				this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
-			else
+			else {
 				this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
 						tUserDetails[2], tUserDetails[3], tUserDetails[4], tPermissions);
-
+				if (tUserDetails[5].equals("ask_pass_update"))
+					shouldAskPasswordUpdate = true;
+			}
+			
 		}
 		else {
 
 			String[] tSplitted = encodedView.split("\n");
 			String[] tUserDetails = tSplitted[0].split("\t");
 
+			
 			long connectedUserID = Long.parseLong(tUserDetails[1]);
 
 			Collection<Permission> tPermissions = new Vector<Permission>();
@@ -183,13 +191,20 @@ public class MainPanel extends JFrame implements GUIHandler {
 		if (!this.threadsPanel.isVisible() && !this.threadsPanel.showsMessages())
 			controller.getSubjects(-1, this.subjectsPanel);
 
-
+		
+		// Ask for password update if needed
+		if (shouldAskPasswordUpdate) {
+			ChangePasswordDialog tChangePasswordDlg =
+				new ChangePasswordDialog(this.connectedUser.getID());
+			tChangePasswordDlg.setVisible(true);
+		}
 	}
 
 	public void notifyError(String error) {
 		if (!this.isActive())
 			return;
-		if (error.startsWith("profiledetailsupdateerror\t")) return;
+		if (error.startsWith("profiledetailsupdateerror\t") ||
+				error.startsWith("passwordupdate")) return;
 
 
 		JOptionPane.showMessageDialog(this, error, 
@@ -291,12 +306,17 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		registerLoginGap = Box.createRigidArea(new Dimension(18, 35));
 
-
 		this.btn_login.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					LoginDialog tLogin = new LoginDialog(MainPanel.this, connectedUser.getID());
+					String tUsername = fastLoginUsernameInput.getText();
+					String tPassword = new String(fastLoginPasswordInput.getPassword());
+					fastLoginUsernameInput.setText("");
+					fastLoginPasswordInput.setText("");
+					fastLoginButton.setEnabled(false);
+					
+					LoginDialog tLogin = new LoginDialog(MainPanel.this, tUsername, tPassword, connectedUser.getID());
 					tLogin.setVisible(true);
 				} 
 				catch (IOException e) {
@@ -336,6 +356,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					fastLoginUsernameInput.setText("");
+					fastLoginPasswordInput.setText("");
+					fastLoginButton.setEnabled(false);
 					RegistrationDialog tRegister = new RegistrationDialog();
 					tRegister.setVisible(true);
 				} 
@@ -359,8 +382,15 @@ public class MainPanel extends JFrame implements GUIHandler {
 						SearchDialog tNewSearchDialog = new SearchDialog();
 						tNewSearchDialog.setVisible(true);
 						try {
-							if (tNewSearchDialog.getSelectedID() != -1)
-								ControllerHandlerFactory.getPipe().getPath(MainPanel.this, tNewSearchDialog.getSelectedID());
+							// explanation: if the threads panel is visible then the number of views should
+							// be incremented always, otherwise, only if the ids are different
+							if (tNewSearchDialog.getSelectedID() != -1) {
+								System.out.println(MainPanel.this.threadsPanel.isVisible() + " ooooooooooooooo");
+								ControllerHandlerFactory.getPipe().getPath(MainPanel.this,
+										MainPanel.this.threadsPanel.isVisible()? -1 :
+											MainPanel.this.tree.getFatherMessageID(),
+											tNewSearchDialog.getSelectedID());
+							}
 						} 
 						catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -666,8 +696,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 		};
 		//		mainPanel.setPreferredSize(new Dimension(1159, 600));
 
-		JLabel tMainPanelSeparator = new JLabel();
-		tMainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		mainPanelSeparator = new JLabel();
+		mainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
@@ -682,7 +712,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(tStatisticsPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(pnl_fastLogin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.subjectsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)
-								.addComponent(tMainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(mainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(this.threadsPanel, GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE)								
 
 								.addComponent(tree.getForumTreeUI(), GroupLayout.DEFAULT_SIZE,GroupLayout.DEFAULT_SIZE/* 1139*/, Short.MAX_VALUE))															
@@ -698,7 +728,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGap(11, 11, 11)
 						.addComponent(tree.getForumTreeUI(), 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(this.subjectsPanel, 100, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)// GroupLayout.PREFERRED_SIZE)
-						.addComponent(tMainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(mainPanelSeparator, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addGap(16, 16, 16)
 						//					.addGap(0, 0, Short.MAX_VALUE)
 						//						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
@@ -776,12 +806,14 @@ public class MainPanel extends JFrame implements GUIHandler {
 	}
 
 	public void switchToRootSubjectsView() {
+		this.mainPanelSeparator.setVisible(false);
 		this.subjectsPanel.setVisible(true);
 		this.threadsPanel.setVisible(false);
 		this.tree.getForumTreeUI().setVisible(false);
 	}
 
 	public void switchToSubjectsAndThreadsView() {
+		this.mainPanelSeparator.setVisible(true);
 		this.subjectsPanel.setVisible(true);
 		this.threadsPanel.setVisible(true);
 		this.tree.getForumTreeUI().setVisible(false);

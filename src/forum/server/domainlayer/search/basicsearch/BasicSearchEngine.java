@@ -124,4 +124,18 @@ public class BasicSearchEngine implements SearchEngine
 				
 		return toReturn;
 	}
+
+
+	@Override
+	public void modifyData(UIMessage msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public boolean removeData(long messageID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

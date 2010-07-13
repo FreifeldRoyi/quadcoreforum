@@ -82,9 +82,14 @@ public class SearchDialog extends JDialog implements GUIHandler
 	 */
 	public void refreshForum(String encodedView) {
 		if (encodedView.startsWith("searchnotmessages")) {
-			this.setMinimumSize(new Dimension(555, 235));
-			this.setSize(new Dimension(555, 235));
+			
+			
+//			this.setMinimumSize(new Dimension(555, 235));
+//			this.setSize(new Dimension(555, 235));
+
 			pnl_results.setVisible(false);
+			this.setSize(new Dimension(600, 500));
+
 			JOptionPane.showMessageDialog(this, "No messages were found", "empty", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
@@ -262,7 +267,8 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 	private void initComponents()
 	{
-		this.setMinimumSize(new Dimension(555, 235));
+	//	this.setMinimumSize(new Dimension(600, 100));
+		this.setResizable(false);
 		this.selectedID = -1;
 		this.toSearch = "";
 		this.searchBy = "";
@@ -290,8 +296,8 @@ public class SearchDialog extends JDialog implements GUIHandler
 		this.btn_prevPage = new JButton("prev");
 
 
-		this.btn_nextPage.setPreferredSize(new Dimension(85, 35));
-		this.btn_prevPage.setPreferredSize(new Dimension(85, 35));
+		this.btn_nextPage.setPreferredSize(new Dimension(100, 40));
+		this.btn_prevPage.setPreferredSize(new Dimension(100, 40));
 
 		this.resultsTable.setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -471,12 +477,12 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 
 		this.btn_search = new JButton("Search");
-		this.btn_search.setPreferredSize(new Dimension(85, 35));
+		this.btn_search.setPreferredSize(new Dimension(100, 40));
 
 
 		this.btn_cancel = new JButton("Cancel");
 
-		this.btn_cancel.setPreferredSize(new Dimension(85, 35));
+		this.btn_cancel.setPreferredSize(new Dimension(100, 40));
 
 
 		GroupLayout tLayout = new GroupLayout(this.getContentPane());
@@ -488,47 +494,49 @@ public class SearchDialog extends JDialog implements GUIHandler
 						.addGap(10, 10, 10)
 						.addComponent(this.txtFld_searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 						.addGap(10, 10, 10))
-						.addGap(10, 10, 10)
+						.addGap(20, 20, 20)
 						.addGroup(tLayout.createSequentialGroup()
 								.addGap(10, 10, 10)
 								.addComponent(this.pnl_searchOptionHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 								.addGap(10, 10, 10))
 								.addGroup(tLayout.createSequentialGroup()
 										.addGap(10, 10, 10)
-
 										.addComponent(this.pnl_results, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 										.addGap(10, 10, 10))
-
-
-
 										.addGroup(tLayout.createSequentialGroup()
 												.addGap(10, 10, 10)
 												.addComponent(this.pnl_resultRadBtnHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 												.addGap(10, 10, 10))
-												.addGap(10, 10, 10)
+												.addGap(20, 20, 20)
 												.addGroup(tLayout.createSequentialGroup()
 														.addGap(0, 0, Short.MAX_VALUE)
 														.addComponent(this.btn_search, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-														.addGap(30, 30, 30)
+														.addGap(10, 10, 10)
 														.addComponent(this.btn_cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 														.addGap(10, 10, 10)));
-		//								.addComponent(this.pnl_btnHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
+
+		//
+		//	.addGroup(tLayout.createParallelGroup()
 
 		tLayout.setVerticalGroup(tLayout.createSequentialGroup()
-				.addGap(10, 10, 10)
-				.addGroup(tLayout.createParallelGroup()
-						.addComponent(this.lbl_searchDescription, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(this.txtFld_searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(this.pnl_searchOptionHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(this.pnl_resultRadBtnHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(this.pnl_results, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+				.addGroup(tLayout.createSequentialGroup()
+						.addGap(10, 10, 10)
+						.addGroup(tLayout.createParallelGroup()
+								.addComponent(this.lbl_searchDescription, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(this.txtFld_searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+											.addGap(10, 10, 10)
+								.addComponent(this.pnl_searchOptionHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGap(10, 10, 10)
+
+								.addComponent(this.pnl_resultRadBtnHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGap(10, 10, 10)
+
+								.addComponent(this.pnl_results, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 						.addGap(10, 10, 10)
 						.addGroup(tLayout.createParallelGroup()
 								.addComponent(this.btn_search, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(this.btn_cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addContainerGap()
-		);
-		//								.addComponent(this.pnl_btnHolder, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
+								.addGap(10, 10, 10)));
 
 		this.getContentPane().setLayout(tLayout);
 
@@ -624,7 +632,6 @@ public class SearchDialog extends JDialog implements GUIHandler
 
 		});
 
-		this.setSize(new Dimension(555, 235));
 
 	}
 	private void search() {

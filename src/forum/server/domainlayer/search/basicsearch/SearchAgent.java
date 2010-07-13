@@ -50,4 +50,16 @@ public class SearchAgent implements SearchEngine
 		return this.searchEngine.searchByContent(phrase, from, to);
 	}
 
+	@Override
+	public void modifyData(UIMessage msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean removeData(long messageID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

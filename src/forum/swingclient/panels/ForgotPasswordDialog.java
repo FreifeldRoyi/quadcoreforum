@@ -3,15 +3,12 @@ package forum.swingclient.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -24,7 +21,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
@@ -40,7 +36,7 @@ import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.GUIEvent.EventType;
 
-public class ForgotPasswordDialog extends JDialog implements GUIHandler {
+public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyListener {
 
 	/**
 	 * 
@@ -66,6 +62,9 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 	private JButton sendPasswordButton;
 	private JButton cancelButton;
 
+	private ActionListener btn_cancel_listener;
+	private ActionListener btn_send_listener;
+
 	private JLabel sendingLabel;
 	private JLabel updatingLabel;
 
@@ -82,6 +81,21 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 	public ControllerHandler controller;
 
 	private String generatedPassword;
+
+	// KeyListener implementation
+	public void keyPressed(KeyEvent e) {
+		this.usernameLabel.setForeground(Color.BLACK);
+		this.emailLabel.setForeground(Color.BLACK);
+		this.informationLabel.setText("");
+		
+		if (e.getKeyChar() == KeyEvent.VK_ENTER)
+			sendPasswordButton.doClick();
+		else if (e.getKeyChar() == KeyEvent.VK_ESCAPE)
+			cancelButton.doClick();
+	}
+	public void keyReleased(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {
+	}
 
 	private void sendNewPassword(final String[] dataToSend) {
 		sendingLabel.setVisible(true);				
@@ -115,12 +129,16 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 					if (tSendingRetVal)
 						JOptionPane.showMessageDialog(ForgotPasswordDialog.this, "A new password was successfully sent to your " +
-								"email,\nyou can change it after the first login.", "Message recovery succeeded",
+								"email,\nyou can change it after the first login.", "Password recovery succeeded",
 								JOptionPane.INFORMATION_MESSAGE);
 					else 
 						JOptionPane.showMessageDialog(ForgotPasswordDialog.this, "A new password couldn't be sent due to a communication "
-								+ "error\n. Please try again later.", "Error while message sending", JOptionPane.ERROR_MESSAGE);
+								+ "error\n. Please try again later.", "Error while password sending", JOptionPane.ERROR_MESSAGE);
 					ForgotPasswordDialog.this.controller.deleteObserver(ForgotPasswordDialog.this);
+
+					ForgotPasswordDialog.this.cancelButton.addActionListener(btn_cancel_listener);
+					ForgotPasswordDialog.this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
 					cancelButton.doClick();
 
 				} catch (InterruptedException ex) {
@@ -137,10 +155,10 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 
 	public void refreshForum(String encodedView) {
+		if (encodedView.startsWith("passwordupdate")) return;
 		informationLabel.setText("");
 		updatingLabel.setVisible(false);
 
-		System.out.println("Encoded = " + encodedView);
 		if (encodedView.startsWith("profiledetailsupdatesuccess\t")) {
 			this.controller.deleteObserver(this);
 			String[] tUpdatedDetails = encodedView.split("\t");
@@ -152,10 +170,16 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 	public void notifyError(String error) {
 		if (error.startsWith("profiledetailsupdateerror\t")) {
+			ForgotPasswordDialog.this.sendPasswordButton.addActionListener(btn_send_listener);
+			ForgotPasswordDialog.this.cancelButton.addActionListener(btn_cancel_listener);
+			ForgotPasswordDialog.this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
 			this.controller.deleteObserver(this);
 			String[] tSplittedMessage = error.split("\t");
 			String tErrorMessage = (tSplittedMessage[1].equals("registration"))? 
 					"Wrong username or email" : tSplittedMessage[2];
+			this.usernameLabel.setForeground(Color.RED);
+			this.emailLabel.setForeground(Color.RED);
 			informationLabel.setText(tErrorMessage);
 		}
 	}
@@ -166,6 +190,15 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 		controller = ControllerHandlerFactory.getPipe();
 
 		this.setTitle("Password Recovery Page");
+
+		btn_send_listener = new SendPasswordActionListener();
+		btn_cancel_listener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ForgotPasswordDialog.this.dispose();
+
+			}
+		};
 
 		initGUIComponents();
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -206,6 +239,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 		this.usernameInput = new JTextField(20);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		usernameInput.addKeyListener(this);
+		
 		forgotPasswordPanel.add(this.usernameInput);
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
@@ -215,6 +250,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 		this.emailInput = new JTextField(20);
 		this.emailInput.setText("");
 		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		emailInput.addKeyListener(this);
+		
 		forgotPasswordPanel.add(this.emailInput);
 		this.emailLabel.setLabelFor(this.emailInput);
 
@@ -250,18 +287,19 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 
 		sendPasswordButton = new JButton();
 		sendPasswordButton.setText("Send new");
-		sendPasswordButton.addActionListener(new SendPasswordActionListener());
+
+
+		sendPasswordButton.addActionListener(btn_send_listener);
 
 		cancelButton = new JButton("Cancel");
+		
+		
 
-		cancelButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				ForgotPasswordDialog.this.dispose();
 
-			}
-		});
+		cancelButton.addActionListener(btn_cancel_listener);
+
+
 
 		sendPasswordButton.setPreferredSize(new Dimension(100, 40));
 		cancelButton.setPreferredSize(new Dimension(100, 40));
@@ -328,13 +366,26 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 	private class SendPasswordActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if(usernameInput.getText().length() > 0 && emailInput.getText().length() > 0) {
+				usernameLabel.setForeground(Color.BLACK);
+				emailLabel.setForeground(Color.BLACK);
+				ForgotPasswordDialog.this.sendPasswordButton.removeActionListener(btn_send_listener);
+				ForgotPasswordDialog.this.cancelButton.removeActionListener(btn_cancel_listener);
+				ForgotPasswordDialog.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);				
 				controller.addObserver(new GUIObserver(ForgotPasswordDialog.this), EventType.USER_CHANGED);
 				ForgotPasswordDialog.this.generatedPassword = getRandomPassword();
-				controller.updatePassword(usernameInput.getText(),
+				controller.recoverPassword(usernameInput.getText(),
 						emailInput.getText(), generatedPassword, ForgotPasswordDialog.this);
 			}
-			else
-				informationLabel.setText("you must insert not empty user name and email");
+			else if (usernameInput.getText().length() == 0) {
+					usernameLabel.setForeground(Color.RED);
+					informationLabel.setText("you must insert not empty user-name");
+					usernameInput.grabFocus();
+				}
+			else {
+				emailLabel.setForeground(Color.RED);
+				informationLabel.setText("you must insert not empty email");
+				emailInput.grabFocus();
+			}
 		}
 	}
 
@@ -356,7 +407,4 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler {
 			e.printStackTrace();
 		}
 	}
-
-
 }
-

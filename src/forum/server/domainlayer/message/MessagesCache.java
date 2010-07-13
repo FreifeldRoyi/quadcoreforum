@@ -162,11 +162,29 @@ public class MessagesCache {
 	 */
 	public void updateInDatabase(ForumSubject updatedSubject) throws SubjectNotFoundException, DatabaseUpdateException {
 		this.pipe.updateSubject(updatedSubject.getID(), updatedSubject.getName(),
-				updatedSubject.getDescription(), updatedSubject.getSubSubjects(), updatedSubject.getThreads());
+				updatedSubject.getDescription(), updatedSubject.getSubSubjects(), updatedSubject.getThreads(), 
+				updatedSubject.getDeepNumOfSubSubjects(), updatedSubject.getDeepNumOfMessages());
 		if (!this.idsToSubjectsMapping.containsKey(updatedSubject.getID()))
 			this.idsToSubjectsMapping.put(updatedSubject.getID(), updatedSubject);
 	}
 
+	/**
+	 * 
+	 * Deletes a subject with the given id from the forum database (and from the cache memory)
+	 * 
+	 * @param subjectID
+	 * 		The id of the subject which should be deleted
+	 * 
+	 * @throws SubjectNotFoundException
+	 * 		In case a subject with the given id hasn't been found in the database
+	 * @throws DatabaseUpdateException
+	 * 		In case the subject can't be deleted from the database due to a database connection error
+	 */
+	public void deleteASubject(long subjectID) throws SubjectNotFoundException, DatabaseUpdateException {
+		this.pipe.deleteASubject(subjectID);
+		this.idsToSubjectsMapping.remove(subjectID);
+	}
+	
 	// Thread related methods
 
 	/**
@@ -252,7 +270,8 @@ public class MessagesCache {
 	}
 
 	public void updateInDatabase(ForumThread updatedThread) throws ThreadNotFoundException, DatabaseUpdateException {
-		this.pipe.updateThread(updatedThread.getID(), updatedThread.getTopic());
+		this.pipe.updateThread(updatedThread.getID(), updatedThread.getTopic(), updatedThread.getNumOfResponses(),
+				updatedThread.getNumOfViews());
 		if (!this.idsToMessagesMapping.containsKey(updatedThread.getID()))
 			this.idsToThreadsMapping.put(updatedThread.getID(), updatedThread);
 	}

@@ -132,7 +132,7 @@ public class GUIObservable extends Observable {
 		}
 	}
 
-	public void notifyObservers(GUIEvent event) {
+	public void notifyObservers(final GUIEvent event) {
 		if (this.hasChanged()) {
 			Collection<GUIObserver> toUpdate;
 			switch (event.getEventType()) {
@@ -161,7 +161,16 @@ public class GUIObservable extends Observable {
 			synchronized (tObserversToUpdate) {
 				Iterator<GUIObserver> tObserversIter = tObserversToUpdate.iterator();
 				while (tObserversIter.hasNext()) {
-					tObserversIter.next().update(this, event);
+					final GUIObserver tObserver = tObserversIter.next();
+					System.out.println("notifying " +tObserver + " about " +  event);
+					
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							tObserver.update(GUIObservable.this, event);
+						}
+					}).start();
 				}
 			}
 			this.clearChanged();

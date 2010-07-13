@@ -30,8 +30,11 @@ public abstract class ControllerHandler extends GUIObservable {
 		}
 	}
 	
-	public abstract void updatePassword(final String username, final String email, final String password, final Component comp);
+	public abstract void recoverPassword(final String username, final String email, final String password, final Component comp);
 
+	public abstract void changePassword(final long memberID, final String prevPassword, final String newPassword, 
+			final boolean shouldAskNewPassword, final Component comp);
+	
 	public abstract void registerToForum(final Component comp, String username, String password, 
 			String email, String firstName, String lastName);
 	
@@ -59,7 +62,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	public abstract boolean logout(final Component comp, String username);
 
 	
-	public abstract void getNestedMessages(long rootID, final Component comp);
+	public abstract void getNestedMessages(long rootID, boolean shouldUpdateViews, final Component comp);
 	
 	
 	public abstract void getSubjects(long fatherID, final Component comp);
@@ -67,6 +70,14 @@ public abstract class ControllerHandler extends GUIObservable {
 	public abstract void getThreads(long subjectID, final Component comp);
 	
 	public abstract boolean login(long guestID, String username, String password, final Component comp);
+	
+	/**
+	 * Deletes recursively the subject with the given id and all its content.
+	 * 
+	 * @param id The id of the subject to delete.
+	 */
+	public abstract void deleteSubject(long userID, final long fatherID, long subjectID, Component comp);
+
 	
 	
 	/**
@@ -87,7 +98,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	public abstract void addReplyToMessage(final long author, final long replyTo, 
 			final String title, final String content, final Component comp);
 	/**
-	 * Deletes recursively the message id and all his sons.
+	 * Deletes recursively the message id and all its sons.
 	 * 
 	 * @param id The id of the message to delete.
 	 */
@@ -112,5 +123,7 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	public abstract void promoteToModerator(Component comp, String username);
 
-	public abstract void getPath(Component comp, long messageID);
+	// according to the prev message id we know if the number of view of the thread should be updated - 
+	// if the ids are the same then no otherwise yes
+	public abstract void getPath(Component comp, long prevFatherMessageID, long messageID);
 }

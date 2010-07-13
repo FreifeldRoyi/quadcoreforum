@@ -13,7 +13,8 @@ public class ForumCell {
 	 * A unique identifier of a message. 
 	 */
 	private long id;
-	private String username;
+	private String authorUsername;
+	private String authorID;
 	private String title;
 	private String content;
 	
@@ -22,9 +23,10 @@ public class ForumCell {
 	 */
 	private Vector<ForumCell> sons;
 	
-	public ForumCell(long id, String userName, String title, String content) {
+	public ForumCell(final long id, final String authorID, final String authorUsername, final String title, final String content) {
 		this.id = id;
-		this.username = userName;
+		this.authorID = authorID;
+		this.authorUsername = authorUsername;
 		this.title = title;
 		this.content = content;
 		
@@ -35,7 +37,6 @@ public class ForumCell {
 		return sons;
 	}
 
-	
 	public String getTitle() {
 		return this.title;
 	}
@@ -45,7 +46,7 @@ public class ForumCell {
 	}
 	
 	public String toString() {
-		return title + "  -- by " + this.username;
+		return title + "  -- by " + this.authorUsername;
 	}
 
 	/**
@@ -65,7 +66,19 @@ public class ForumCell {
 		return id;
 	}
 
+	/**
+	 * 
+	 * @return The id of the message author
+	 */
+	public String getAuthorID() {
+		return this.authorID;
+	}
+
+	/**
+	 * 
+	 * @return The user-name of the message author
+	 */
 	public String getAuthorUsername() {
-		return this.username;
+		return this.authorUsername;
 	}
 }

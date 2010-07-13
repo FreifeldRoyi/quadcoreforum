@@ -18,6 +18,8 @@ public class ForumMember extends ForumUser implements UIMember {
 	private String lastName;
 	private String email;
 
+	private boolean shouldAskChangePassword;
+
 	private Collection<Long> postedMessagesIDs;
 
 	/**
@@ -76,7 +78,8 @@ public class ForumMember extends ForumUser implements UIMember {
 	 * 		The permissions which are assigned to the created member
 	 */
 	public ForumMember(final long userID, final String username, final String password, final String lastName, 
-			final String firstName, final String email, final Collection<Permission> permissions) {
+			final String firstName, final String email, final Collection<Permission> permissions,
+			final boolean shouldAskChangePassword) {
 		super(userID, permissions);
 		this.username = username;
 		this.password = password;
@@ -84,10 +87,36 @@ public class ForumMember extends ForumUser implements UIMember {
 		this.lastName = lastName;
 		this.email = email;
 		this.postedMessagesIDs = new Vector<Long>();
+		this.shouldAskChangePassword = shouldAskChangePassword;
 	}
-	
+
+	/**
+	 * A full constructor of a member, hasn't exist yet in the database and therefore some of his attributes are initialized to
+	 * default values
+	 *  
+	 * @param userID
+	 * 		The user id of the created member
+	 * @param username
+	 * 		The user-name of the created member
+	 * @param password
+	 * 		The password of the created member
+	 * @param lastName
+	 * 		The last name of the created member
+	 * @param firstName
+	 * 		The first name of the created member
+	 * @param email
+	 * 		The e-mail address of the created member
+	 * @param permissions
+	 * 		The permissions which are assigned to the created member
+	 */
+	public ForumMember(final long userID, final String username, final String password, final String lastName, 
+			final String firstName, final String email, final Collection<Permission> permissions) {
+		this(userID, username, password, lastName, firstName, email, permissions, false);
+	}
+
+
 	// getters
-	
+
 	/**
 	 * @see
 	 * 		UIMember#getUsername()
@@ -122,7 +151,7 @@ public class ForumMember extends ForumUser implements UIMember {
 	public String getFirstName() {
 		return this.firstName;
 	}
-	
+
 	/**
 	 * @see
 	 * 		UIMember#getEmail()
@@ -182,7 +211,7 @@ public class ForumMember extends ForumUser implements UIMember {
 	}
 
 	// methods
-	
+
 	/**
 	 * Adds a new message id to the member's posts container
 	 * 
@@ -211,5 +240,14 @@ public class ForumMember extends ForumUser implements UIMember {
 	 */
 	public String toString() {
 		return this.username + "\t" + this.lastName + "\t" + this.firstName;
+	}
+
+
+	public void setAskChangePassword(boolean value) {
+		this.shouldAskChangePassword = value;
+	}
+
+	public boolean askChangePassword() {
+		return this.shouldAskChangePassword;
 	}
 }

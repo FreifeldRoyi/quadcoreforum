@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
@@ -16,8 +17,12 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 
 	private long messageID;
 
-	public ViewMessageAndRepliesMessage(final long messageId){
+	/* Whether the views number of the thread should be incremented */
+	private boolean shouldUpdateViews;
+	
+	public ViewMessageAndRepliesMessage(final long messageId, boolean shouldUpdateViews) {
 		this.messageID = messageId;
+		this.shouldUpdateViews = shouldUpdateViews;
 	}
 	/*
 	 * (non-Javadoc)
@@ -25,23 +30,24 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 	 */
 
 	public ServerResponse doOperation(ForumFacade forum) {
-		// TODO - I consider failure only in the case of an exception. Is it o.k???
-		// Response (Vitali) --> Yes
-
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
-			Collection<UIMessage> tReplies = forum.getReplies(this.messageID);
-			String tResponse = tCurrentMessage.toString() + "\n";
+			Collection<UIMessage> tReplies = forum.getReplies(this.messageID, this.shouldUpdateViews);
+
+			String tResponse = this.getAuthorUsername(forum, tCurrentMessage) + "\t" + tCurrentMessage.toString() + "\n";
 
 			Iterator<UIMessage> iter = tReplies.iterator();
 			while (iter.hasNext()) {
 				UIMessage tCurrentReply = iter.next();
 				// TODO: reply the usernames of the authors
-				tResponse += "\tAREPLYMESSAGE: " + tCurrentReply.toString() + "\n";
-				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getMessageID());
+				tResponse += "\tAREPLYMESSAGE: " + this.getAuthorUsername(forum, tCurrentReply) + "\t" + 
+				tCurrentReply.toString() + "\n";
+				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getMessageID(), shouldUpdateViews);
 				for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
-					tResponse += "\t\tASUBREPLYMESSAGE: " + tNextLevelCurrentReply.toString() + "\n";
+					tResponse +=
+						"\t\tASUBREPLYMESSAGE: " + this.getAuthorUsername(forum, tNextLevelCurrentReply) + "\t" + 
+						tNextLevelCurrentReply.toString() + "\n";
 			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(tResponse);
@@ -55,5 +61,27 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 			returnObj.setResponse(e.getMessage());
 		}
 		return returnObj;
+	}
+
+	/**
+	 * Finds and returns the user-name of the given message author
+	 * 
+	 * @param forum
+	 * 		An instance of the ForumFacade from which the data should be retrieved
+	 * @param message
+	 * 		The message whose author user-name should be retrieved
+	 * @return
+	 * 		The user-name of the message author
+	 */
+	private String getAuthorUsername(ForumFacade forum, UIMessage message) {
+		String toReturn = "<Author-Not-Found>";
+		try {
+			toReturn = forum.getMemberByID(message.getAuthorID()).getUsername();
+		}
+		catch (Exception e) {
+			SystemLogger.warning("While retrieving the contents of message " + messageID + " the username " +
+					" of the user with id " + message.getAuthorID() + " wasn't found.");
+		}
+		return toReturn;		
 	}
 }

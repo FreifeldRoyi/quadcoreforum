@@ -274,11 +274,11 @@ public class UsersPersistenceHandler {
 	 * 		The forum data where the user details should be updated
 
 	 * @see
-	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String)
+	 * 		PersistenceDataHandler#updateUser(long, String, String, String, String, boolean)
 	 */
 	public void updateUser(final SessionFactory ssFactory, final long userID, final String password,
-			final String lastName, final String firstName, final String email) throws 
-			NotRegisteredException, DatabaseUpdateException {
+			final String lastName, final String firstName, final String email, 
+			final boolean shouldAskChangePassword) throws NotRegisteredException, DatabaseUpdateException {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			MemberType tMemberToUpdate = this.getMemberTypeByID(session, userID);
@@ -288,6 +288,7 @@ public class UsersPersistenceHandler {
 			tMemberToUpdate.setLastName(lastName);
 			tMemberToUpdate.setFirstName(firstName);
 			tMemberToUpdate.setEmail(email);
+			tMemberToUpdate.setShouldAskChangePassword(shouldAskChangePassword);
 			session.update(tMemberToUpdate);
 			this.commitTransaction(session);
 		}

@@ -5,6 +5,7 @@
 
 package forum.server.domainlayer.user ;
 
+
 import java.util.*;
 
 import forum.server.domainlayer.SystemLogger;
@@ -90,6 +91,17 @@ public class UsersController {
 	}
 
 	// User related methods
+
+	/**
+	 * @see
+	 * 		ForumFacade#getMemberByID(long)
+	 */
+	public UIMember getMemberByID(long memberID) throws NotRegisteredException, DatabaseRetrievalException {
+		ForumUser toReturn = this.dataHandler.getUsersCache().getUserByID(memberID);
+		// if no exception was thrown before this line, then the user exists in the database and 
+		// therefore he is a registered member of the forum
+		return (ForumMember)toReturn;
+	}
 
 	/**
 	 * 
@@ -249,19 +261,20 @@ public class UsersController {
 
 	/**
 	 * @see
-	 * 		ForumFacade#updateMemberProfile(long, String, String, String, String, String)
+	 * 		ForumFacade#updateMemberProfile(long, String, String, String, String, String, boolean)
 	 */
 	public UIMember updateMemberProfile(final long memberID, final String username, final String password, final String lastname,
-			final String firstname, final String email) throws NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
+			final String firstname, final String email, boolean shouldAskPassword) throws
+			NotRegisteredException, MemberAlreadyExistsException, DatabaseUpdateException {
 		SystemLogger.info("A member " + username + " with id " + memberID + " requests to change his profile details.");
 
 		ForumMember tForumMember = null;
 		try {				
-			 tForumMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
-			 if (tForumMember == null) {
-				 SystemLogger.info("A member with id " + memberID + " doesn't exist in the database.");
-				 throw new NotRegisteredException(memberID);
-			 }
+			tForumMember = this.dataHandler.getUsersCache().getMemberByUsername(username);
+			if (tForumMember == null) {
+				SystemLogger.info("A member with id " + memberID + " doesn't exist in the database.");
+				throw new NotRegisteredException(memberID);
+			}
 		}
 		catch (DatabaseRetrievalException e) {
 			SystemLogger.severe("Can't update profile because of database retrieval error.");
@@ -273,7 +286,9 @@ public class UsersController {
 		String tLastName = null;
 		String tFirstName = null;
 		String tEmail = null;
+		boolean tShouldAskPassword = false;
 
+		
 		// check if the given email is already assigned to a different member
 		if (email != null) {
 
@@ -305,6 +320,8 @@ public class UsersController {
 			tFirstName = tForumMember.getFirstName();
 			tForumMember.setFirstName(firstname);
 		}
+		tShouldAskPassword = tForumMember.askChangePassword();
+		tForumMember.setAskChangePassword(shouldAskPassword);
 
 		try {
 			this.dataHandler.getUsersCache().updateInDatabase(tForumMember);
@@ -315,6 +332,7 @@ public class UsersController {
 			tForumMember.setLastName(tLastName);
 			tForumMember.setFirstName(tFirstName);
 			tForumMember.setEmail(tEmail);
+			tForumMember.setAskChangePassword(tShouldAskPassword);
 			throw e;
 		}
 		catch (DatabaseUpdateException e) {
@@ -322,10 +340,54 @@ public class UsersController {
 			tForumMember.setLastName(tLastName);
 			tForumMember.setFirstName(tFirstName);
 			tForumMember.setEmail(tEmail);
+			tForumMember.setAskChangePassword(tShouldAskPassword);
 			throw e;
 		}
 		return tForumMember;
 	}
+
+
+	/**
+	 * @see	
+	 * 		ForumFacade#updateMemberPassword(long, String, String, boolean)
+	 */
+	public UIMember updateMemberPassword(final long memberID, final String prevPassword, 
+			final String newPassword, 
+			final boolean askChangePassword) throws NotRegisteredException, DatabaseUpdateException, WrongPasswordException {
+		SystemLogger.info("A member with id " + memberID + " requests to change his password after recovery.");
+
+		ForumMember tForumMember = null;
+		try {				
+			tForumMember = (ForumMember)this.getMemberByID(memberID);
+
+			if (prevPassword == null || newPassword == null) {
+				tForumMember.setAskChangePassword(askChangePassword);
+				this.dataHandler.getUsersCache().updateInDatabase(tForumMember);
+			}
+			else {
+				if (!this.checkPasswordValidity(prevPassword, tForumMember.getPassword())) {
+					SystemLogger.info("The given previous password of member " + memberID + " is wrong");
+					throw new WrongPasswordException();
+				}
+				else {
+					tForumMember.setPassword(this.encryptPassword(newPassword));
+					tForumMember.setAskChangePassword(false);
+					this.dataHandler.getUsersCache().updateInDatabase(tForumMember);
+				}
+			}
+			return tForumMember;
+		}
+		catch (NotRegisteredException e) {
+			SystemLogger.info("A member with id " + memberID + " doesn't exist in the database.");
+			throw e;
+		}
+
+		catch (DatabaseRetrievalException e) {
+			SystemLogger.severe("Can't update password of member " + memberID + " because of database retrieval error.");
+			throw new DatabaseUpdateException();
+		}
+	}
+
 
 	/**
 	 * @see

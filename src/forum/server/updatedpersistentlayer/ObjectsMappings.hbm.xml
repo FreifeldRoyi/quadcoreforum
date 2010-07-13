@@ -22,6 +22,8 @@
      <property name="name" column="Name" ></property>
        <property name="description" column="Description" ></property>
        <property name="fatherID" column="FatherID"></property>
+        <property name="NumOfSubSubjects" column="NumOfSubSubjects"></property>
+        <property name="numOfMessages" column="NumOfMessages"></property>
        <set name="subSubjectsIDs" table="subsubjects">
             <key column="FatherID"></key>
             <element type="long" column="SubSubjectID"></element>
@@ -59,6 +61,7 @@
      <property name="password" column="UserPassword" ></property>
        <property name="lastName" column="LastName" ></property>
         <property name="firstName" column="FirstName" ></property>
+        <property name="shouldAskChangePassword" column="ShouldAskChangePassword" ></property>
         <property name="userType" column="UserType" ></property>
         
       <set name="permissions" table="UsersPermissions">
@@ -69,13 +72,3 @@
   
   
 </hibernate-mapping>
-
- 
- 
-   <!--  belongs to the members : protected List<Long> postedMessagesIDs;-->
-    
-   
-  
-   
-   <!-- belongs to the messages class: protected List<Long> repliesIDs;-->
-  

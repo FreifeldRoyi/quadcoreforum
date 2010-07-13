@@ -128,7 +128,7 @@ public class RealBridge implements GeneralForumBridge {
 	 */
 	public Collection<String> getReplies(final long fatherID) {
 		try {
-			Collection<UIMessage> tReplies = this.forum.getReplies(fatherID);
+			Collection<UIMessage> tReplies = this.forum.getReplies(fatherID, false);
 			Collection<String> toReturn = new Vector<String>();
 			for (UIMessage tCurrent : tReplies) 
 				toReturn.add(tCurrent.getAuthorID() + tCurrent.getTitle() + tCurrent.getContent());

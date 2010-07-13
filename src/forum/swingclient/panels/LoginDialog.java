@@ -3,14 +3,11 @@ package forum.swingclient.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 
 
@@ -19,7 +16,6 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -29,24 +25,21 @@ import javax.swing.GroupLayout.Alignment;
 
 import javax.swing.border.Border;
 
-import org.eclipse.jdt.internal.compiler.ast.SuperReference;
-import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 
 import forum.swingclient.controllerlayer.ControllerHandler;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.SystemLogger;
 
-public class LoginDialog extends JDialog implements GUIHandler {
+public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-//	private GUIHandler forumMainPanel;
+	//	private GUIHandler forumMainPanel;
 
 	private JPanel mainPanel;
 	private JButton loginButton;
@@ -67,6 +60,7 @@ public class LoginDialog extends JDialog implements GUIHandler {
 
 	@Override
 	public void notifyError(String errorMessage) {
+		if (errorMessage.startsWith("passwordupdate")) return;
 		this.controller.deleteObserver(this);
 		informationLabel.setText("Wrong username or password");
 		this.setEnabled(true);
@@ -74,20 +68,31 @@ public class LoginDialog extends JDialog implements GUIHandler {
 
 	@Override
 	public void refreshForum(String encodedView) {
-		if (encodedView.startsWith("activenumbers\t")) return;
+		if (encodedView.startsWith("activenumbers\t") ||
+				encodedView.startsWith("passwordupdate")) return;
 		this.controller.deleteObserver(this);
 		this.cancelButton.doClick();
 	}
 
-	public LoginDialog(GUIHandler forumMainPanel, long guestID) throws IOException {
+	// KeyListener implementation
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			loginButton.doClick();
+		else if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			cancelButton.doClick();
+	}
+	public void keyReleased(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {}
+
+
+	public LoginDialog(GUIHandler forumMainPanel, String username, String password, long guestID) throws IOException {
 		super();
-//		this.forumMainPanel = forumMainPanel;
 		this.guestID = guestID;
 		this.setTitle("Login Page");
 		controller = ControllerHandlerFactory.getPipe();
 
 
-		initGUIComponents();
+		initGUIComponents(username, password);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		this.getContentPane().add(mainPanel);
@@ -102,7 +107,7 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.setModal(true);
 	}
 
-	private void initGUIComponents() {
+	private void initGUIComponents(String username, String password) {
 
 		this.informationPanel  = new JPanel();
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
@@ -124,20 +129,12 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.usernameLabel);
 		this.usernameInput = new JTextField(20);
-		this.usernameInput.setText("");
+		this.usernameInput.setText(username);
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
-		this.usernameInput.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-					loginButton.doClick();
-			}
-			public void keyReleased(KeyEvent e) {}
-			public void keyTyped(KeyEvent e) {}
-		});
-		
-		
-		
+		this.usernameInput.addKeyListener(this);
+
+
 		loginPanel.add(this.usernameInput);
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
@@ -145,18 +142,11 @@ public class LoginDialog extends JDialog implements GUIHandler {
 		this.passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.passwordLabel);
 		this.passwordInput = new JPasswordField(20);
-		this.passwordInput.setText("");
+		this.passwordInput.setText(password);
 		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		
-		
-		this.passwordInput.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-					loginButton.doClick();
-			}
-			public void keyReleased(KeyEvent e) {}
-			public void keyTyped(KeyEvent e) {}
-		});
+
+
+		this.passwordInput.addKeyListener(this);
 		
 		loginPanel.add(this.passwordInput);
 		this.passwordLabel.setLabelFor(this.passwordInput);
@@ -254,20 +244,6 @@ public class LoginDialog extends JDialog implements GUIHandler {
 								.addContainerGap()
 				)
 		);
-
-
 	}	
-
-
-	/*public static void main(String[] args) {
-		try {
-			new LoginDialog(1).setVisible(true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-
-
 }
 

@@ -34,7 +34,7 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 
 	
 	public ThreadsPanel(final MainPanel cont, final ForumTree messages) {
-		super(cont, TabularPanel.THREADS_TABLE, new String[]{"Select", "Thread",  "Messages#", "Views#"});
+		super(cont, TabularPanel.THREADS_TABLE, new String[]{"Select", "Thread",  "Responses#", "Views#"});
 		this.messages = messages;
 		
 		this.table.addMouseListener(new MouseAdapter() {
@@ -46,11 +46,16 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 					if (rowSelected != -1) {
 
 						final long tMessageIDToLoad = tableModel.getIDofContentInRow(rowSelected);
+
 						container.startWorkingAnimation("retreiving thread " + 
 								tableModel.getNameOfContentInRow(rowSelected) 
 								+ " content...");
 
 						messages.setFatherID(tableModel.getFatherID());
+						tableModel.clearData();
+						tableModel.fireTableDataChanged();
+
+						
 						messages.setRootMessage(tMessageIDToLoad);
 					}
 				}
@@ -81,7 +86,7 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 		modifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				String tCurrentThreadTopic = (String)tableModel.getValueAt(table.getSelectedRow(), 0);
+				String tCurrentThreadTopic = (String)tableModel.getValueAt(table.getSelectedRow(), 1);
 
 				String tResponse = (String)
 				JOptionPane.showInputDialog(ThreadsPanel.this, "Please enter a new topic: ", "Modify " +
@@ -259,21 +264,7 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 		
 		this.tableModel.fireTableDataChanged();
 
-		if (this.shouldScrollTo == -1) 
-			shouldScrollTo = 0;
-
-		// By using SwingUtilities we are bypassing the problem to get the maximum rows value
-		// before the size is changed
-
-
-		this.table.getSelectionModel().setSelectionInterval((int)shouldScrollTo, (int)shouldScrollTo);
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				table.scrollToVisible((int)shouldScrollTo, 0);
-				shouldScrollTo = -1;
-			}
-		});
+		super.selectAndScrollToRow();
 		
 		this.table.setVisible(true);
 		this.setVisible(true);
