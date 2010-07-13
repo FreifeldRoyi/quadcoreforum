@@ -28,6 +28,7 @@ import forum.server.domainlayer.user.Permission;
  * @author Tomer Heber
  *
  */
+//occurredd
 public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 	private static final long serialVersionUID = 3195512056748314498L;

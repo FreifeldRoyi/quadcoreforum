@@ -94,7 +94,7 @@ public class CompassAdapter implements SearchEngine
 
 		try 
 		{
-			CompassHits hits = session.find("authorID:\"" + usrID + "\"");
+			CompassHits hits = session.find("authorID:" + usrID);
 			CompassHit[] detachedHits = hits.detach(from,to).getHits();
 
 			toReturn = new SearchHit[detachedHits.length];

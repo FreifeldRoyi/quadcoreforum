@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 
+import forum.swingclient.controllerlayer.ControllerHandler;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
@@ -46,17 +47,25 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 	// used in order to scroll to the created / updated subject / thread / message id
 	private long createdOrUpdatedID;
-	
-	
+
+	private ControllerHandler controller;
+
 
 	//	private JButton replyModifyButton;
 
 	public ReplyModifyDialog(final long authorID, final long modifiedID, final String currentTitle, 
 			final String currentContent, final JButton replyModifyButton) {
 		super();
-		
+
+		try {
+			controller = ControllerHandlerFactory.getPipe();
+		}
+		catch (IOException e) {
+			// TODO: handle the exception
+		}
+
 		this.setTitle("Modify message");
-		
+
 		initializeGUIContent(authorID, modifiedID, replyModifyButton);
 		arrangeLayout();
 		this.succeeded = false;
@@ -82,25 +91,19 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					if (title.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (content.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
-							EventType.MESSAGES_UPDATED);
-					ControllerHandlerFactory.getPipe().modifyMessage(authorID, modifiedID,
-							title.getText().trim(), content.getText().trim(), replyModifyButton);
+				if (title.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
-				catch (IOException e) {
-					// TODO: handle the exception
+				if (content.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
+				controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
+						EventType.MESSAGES_UPDATED);
+				controller.modifyMessage(authorID, modifiedID,
+						title.getText().trim(), content.getText().trim(), replyModifyButton);
 			}
-
 		});	
 
 	}
@@ -108,28 +111,31 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long repliedID,
 			final JButton replyModifyButton) {
 		super();
+		try {
+			controller = ControllerHandlerFactory.getPipe();
+		}
+		catch (IOException e) {
+			// TODO: handle the exception
+		}
+
 		this.setTitle("Reply to message");
 		initializeGUIContent(authorID, repliedID, replyModifyButton);		
 		arrangeLayout();
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("OK WAS KLICKEDDDDDDDDDDDDDDDDDD");
-				try {
-					if (title.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (content.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
-							EventType.MESSAGES_UPDATED);
-					ControllerHandlerFactory.getPipe().addReplyToMessage(authorID,
-							repliedID, title.getText().trim(), content.getText().trim(), replyModifyButton);
-				} catch (IOException e) {
-					// TODO: handle the exception
+				if (title.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
+				if (content.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
+						EventType.MESSAGES_UPDATED);
+				controller.addReplyToMessage(authorID,
+						repliedID, title.getText().trim(), content.getText().trim(), replyModifyButton);
 			}
 		});	
 	}
@@ -137,6 +143,13 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long fatherID, String existingName, String existingDescription, String topicType,
 			final JButton replyModifyButton) {
 		super();
+		try {
+			controller = ControllerHandlerFactory.getPipe();
+		}
+		catch (IOException e) {
+			// TODO: handle the exception
+		}
+
 		if (topicType.equals("subject"))
 			this.setTitle("Add new subject");
 		else if (topicType.equals("thread"))
@@ -157,43 +170,39 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					if (topic != null && topic.isVisible() && topic.getText().equals("")){
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, "thread topic cannot be empty.",
-								"error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (title.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this,
-								ReplyModifyDialog.this.topicType + " " + titleLabel.getText() + 
-								" cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (content.getText().equals("")) {
-						JOptionPane.showMessageDialog(ReplyModifyDialog.this, 
-								ReplyModifyDialog.this.topicType + " content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (ReplyModifyDialog.this.topicType.equals("subject")) {
-						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
-								EventType.SUBJECTS_UPDATED);
-						ControllerHandlerFactory.getPipe().addNewSubject(authorID, fatherID,
-								title.getText().trim(), content.getText().trim(), replyModifyButton);						
-					}
-					else if (ReplyModifyDialog.this.topicType.equals("modifysubject")) {
-						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
-								EventType.SUBJECTS_UPDATED);
-						ControllerHandlerFactory.getPipe().modifySubject(authorID, fatherID,
-								title.getText().trim(), content.getText().trim(), replyModifyButton);					
-					}
-					else {
-						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(ReplyModifyDialog.this),
-								EventType.THREADS_UPDATED);
-						ControllerHandlerFactory.getPipe().addNewThread(authorID, fatherID, topic.getText(),
-								title.getText().trim(), content.getText().trim(), replyModifyButton);
-					}
-				} catch (IOException e) {
-					// TODO: handle the exception
+				if (topic != null && topic.isVisible() && topic.getText().equals("")){
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "thread topic cannot be empty.",
+							"error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (title.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this,
+							ReplyModifyDialog.this.topicType + " " + titleLabel.getText() + 
+							" cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (content.getText().equals("")) {
+					JOptionPane.showMessageDialog(ReplyModifyDialog.this, 
+							ReplyModifyDialog.this.topicType + " content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (ReplyModifyDialog.this.topicType.equals("subject")) {
+					controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
+							EventType.SUBJECTS_UPDATED);
+					controller.addNewSubject(authorID, fatherID,
+							title.getText().trim(), content.getText().trim(), replyModifyButton);						
+				}
+				else if (ReplyModifyDialog.this.topicType.equals("modifysubject")) {
+					controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
+							EventType.SUBJECTS_UPDATED);
+					controller.modifySubject(authorID, fatherID,
+							title.getText().trim(), content.getText().trim(), replyModifyButton);					
+				}
+				else {
+					controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
+							EventType.THREADS_UPDATED);
+					controller.addNewThread(authorID, fatherID, topic.getText(),
+							title.getText().trim(), content.getText().trim(), replyModifyButton);
 				}
 			}
 		});	
@@ -202,7 +211,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 	private void initializeGUIContent(long authorID, long replyModifiedID, JButton replyModifyButton) {
 		this.title = new JTextField();
-		
+
 		this.title.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
 		this.content = new JTextArea();
@@ -211,7 +220,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		this.ok = new JButton();
 		this.cancel = new JButton();
 		this.topicType = "message";
-		
+
 		this.content.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
 		this.setPreferredSize(new Dimension(400, 300));
@@ -334,47 +343,39 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	}
 
 	public void notifyError(String errorMessage) {
-		try {
-			ControllerHandlerFactory.getPipe().deleteObserver(this);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.controller.deleteObserver(this);
 		JOptionPane.showMessageDialog(this, errorMessage, "error occured", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public boolean shouldUpdateGUI() {
 		return succeeded;
 	}
-	
+
 	public long getChangedID() {
 		return createdOrUpdatedID;
 	}
 
 	public void refreshForum(String encodedView) {
-		
-		
-		try {
-			ControllerHandlerFactory.getPipe().deleteObserver(this);
-		} 
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+
+
 		System.out.println("subjects encodedview = \n"+ encodedView);
-		
+
 		String tLastMessageWord = null;
 		if (encodedView.startsWith("replysuccess") || encodedView.startsWith("addsubjectsuccess") ||
 				encodedView.startsWith("addthreadsuccess")) {
+			controller.deleteObserver(this);
+
 			tLastMessageWord = "added";
 			this.createdOrUpdatedID = Long.parseLong(encodedView.split("\t")[1]); // the id of the added message
 		}
 		else if (encodedView.startsWith("modifysuccess") || (encodedView.startsWith("subjectupdatesuccess"))) {
+			controller.deleteObserver(this);
+
 			tLastMessageWord = "modified";
 			this.createdOrUpdatedID = Long.parseLong(encodedView.split("\t")[1]); // the id of the added message
 		}
-		else if (!encodedView.startsWith("searchresult")){
+		else if (!encodedView.startsWith("search") && !encodedView.startsWith("getpath")){
+			controller.deleteObserver(this);
 			JOptionPane.showMessageDialog(this, "error occurredd!!", "error", JOptionPane.ERROR_MESSAGE);
 			System.out.println("\n\nencoded:" + encodedView + "\n\n---------------------");
 		}

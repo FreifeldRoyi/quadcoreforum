@@ -204,25 +204,26 @@ public class MessagesController {
 								+ e.getMessage());
 					}
 				}				
-				
+
 				this.dataHandler.getMessagesCache().deleteASubject(subjectID);
 
 				if (tFatherSubject != null) {
 					tFatherSubject.deleteSubSubject(subjectID);
 					tFatherSubject.decDeepNumOfSubSubjectsBy(tSubjectToDelete.getDeepNumOfSubSubjects() + 1);
 					this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
-				}
 
-				// Update number of subjects in top level subjects
-				long tSubjectToUpdateID = tFatherSubject.getFatherID();
-				while (tSubjectToUpdateID != -1) {
-					ForumSubject tSubjectToUpdate = 
-						this.dataHandler.getMessagesCache().getSubjectByID(tSubjectToUpdateID);
-					tSubjectToUpdate.decDeepNumOfSubSubjectsBy(tSubjectToDelete.getDeepNumOfSubSubjects() + 1);
-					this.dataHandler.getMessagesCache().updateInDatabase(tSubjectToUpdate);
-					tSubjectToUpdateID = tSubjectToUpdate.getFatherID();
-				}
 
+					// Update number of subjects in top level subjects
+					long tSubjectToUpdateID = tFatherSubject.getFatherID();
+					while (tSubjectToUpdateID != -1) {
+						ForumSubject tSubjectToUpdate = 
+							this.dataHandler.getMessagesCache().getSubjectByID(tSubjectToUpdateID);
+						tSubjectToUpdate.decDeepNumOfSubSubjectsBy(tSubjectToDelete.getDeepNumOfSubSubjects() + 1);
+						this.dataHandler.getMessagesCache().updateInDatabase(tSubjectToUpdate);
+						tSubjectToUpdateID = tSubjectToUpdate.getFatherID();
+					}
+
+				}
 
 				SystemLogger.info("A subject with id " + subjectID + " was deleted successfuly by a user " + userID);
 

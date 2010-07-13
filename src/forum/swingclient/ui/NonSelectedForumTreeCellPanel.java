@@ -23,7 +23,7 @@ import javax.swing.LayoutStyle;
 public class NonSelectedForumTreeCellPanel extends JPanel {
 
 	private static final long serialVersionUID = 6349491114710865385L;
-	private static final ImageIcon plusIcon = new ImageIcon("./images/arrow_in.png");
+//	private static final ImageIcon plusIcon = new ImageIcon("./images/arrow_in.png");
 
 	private JTextArea m_area;
 
@@ -67,12 +67,12 @@ public class NonSelectedForumTreeCellPanel extends JPanel {
 
 
 		msgPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		JLabel imgLabel = new JLabel(plusIcon);
+//		JLabel imgLabel = new JLabel(plusIcon);
 	
 		Component rigid = Box.createRigidArea(new Dimension(5,0));
 		msgPanel.add(rigid);		
 
-		msgPanel.add(imgLabel);
+	//	msgPanel.add(imgLabel);
 
 		
 		tLayout.setHorizontalGroup(
@@ -104,7 +104,7 @@ public class NonSelectedForumTreeCellPanel extends JPanel {
 			tComponents[i].setBackground(color);
 	}
 
-	public void unselect(Color color) {
+	public void unselect() {
 		this.m_area.setBackground(Color.white);
 		Component[] tComponents = this.getComponents();
 		for (int i = 0; i < tComponents.length; i++)

@@ -5,7 +5,6 @@ package forum.swingclient.ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -31,7 +30,7 @@ import forum.swingclient.panels.TabularPanel;
  * @author sepetnit
  *
  */
-public class JScrollableTable extends JTable implements MouseMotionListener, MouseListener {
+public class JScrollableTable extends JForumTable implements MouseMotionListener, MouseListener {
 	private static final long serialVersionUID = 65621709684588442L;
 
 	private static final Color SELECTION_BACKGROUND_COLOR = new Color(231, 239, 214);
@@ -78,21 +77,6 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 		else {
 			this.getColumnModel().removeColumn(firstColumn);
 			firstColumnShown = false;
-		}
-	}
-
-	private void setSelectionOnMouseMotion(boolean value) {
-
-		this.removeMouseListener(this);		
-		for (MouseMotionListener m : this.getMouseMotionListeners())
-			this.removeMouseMotionListener(m);
-		if (value) {
-			this.addMouseListener(this);
-			this.addMouseMotionListener(this);
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		}
-		else {
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
 
@@ -167,15 +151,6 @@ public class JScrollableTable extends JTable implements MouseMotionListener, Mou
 		this.setColumnRenderer(3, tCenterAlignmentRenderer);
 
 	}
-
-	private void setColumnRenderer(int column, TableCellRenderer renderer) {
-		this.getColumnModel().getColumn(column).setCellRenderer(renderer);
-	}
-
-	private void setColumnWidth(int column, int width) {
-		this.getColumnModel().getColumn(column).setPreferredWidth(width);
-	}
-
 
 	// Assumes table is contained in a JScrollPane. Scrolls the
 	// cell (rowIndex, vColIndex) so that it is visible within the view-port.

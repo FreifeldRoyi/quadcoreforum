@@ -227,14 +227,15 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 
 
-			tMainPanel.pack();
-			tMainPanel.setSize(new Dimension(450, 500));
+			tMainPanel.setSize(new Dimension(850, 560));
 			//			tMainPanel.setPreferredSize(new Dimension(450, 500));
 
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
 			int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
 			tMainPanel.setLocation(X, Y);
+			
+			
 			tMainPanel.setExtendedState(MAXIMIZED_BOTH);
 			tMainPanel.setVisible(true);
 
@@ -254,6 +255,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 		controller = ControllerHandlerFactory.getPipe();			
 
 		initGUIComponents();
+		
+		
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setJMenuBar(mainPanelMenu);
 
@@ -284,6 +287,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.startWorkingAnimation("Connecting as a guest ...");		
 		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		controller.registerAsNewGuest(this);
+		this.pack();
 	}
 
 	private void initGUIComponents() {
@@ -379,6 +383,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
+						fastLoginUsernameInput.setText("");
+						fastLoginPasswordInput.setText("");
 						SearchDialog tNewSearchDialog = new SearchDialog();
 						tNewSearchDialog.setVisible(true);
 						try {
@@ -455,7 +461,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 				.addContainerGap()
 				.addGroup(tNavigatePanelLayout.createParallelGroup()
 						.addComponent(pnl_links, GroupLayout.PREFERRED_SIZE, 600, Short.MAX_VALUE)
-						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, 1113, Short.MAX_VALUE)
+						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, 500, Short.MAX_VALUE)
 						.addGroup(tNavigatePanelLayout.createSequentialGroup()
 								.addComponent(lbl_welcome, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
@@ -699,6 +705,19 @@ public class MainPanel extends JFrame implements GUIHandler {
 		mainPanelSeparator = new JLabel();
 		mainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
+		
+		
+		
+//		104, 413, 22
+		
+		
+		
+		System.out.println(pnl_navigate.getHeight());
+		System.out.println(subjectsPanel.getHeight());
+		System.out.println(statusPanel.getHeight());
+
+		
+		
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
 		tMainPanelLayout.setHorizontalGroup(
@@ -751,6 +770,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addContainerGap())
 		);
 
+		
+		
+		
+		
 		busyIcons = new ImageIcon[15];
 		for (int i = 0; i < busyIcons.length; i++)
 			busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");
