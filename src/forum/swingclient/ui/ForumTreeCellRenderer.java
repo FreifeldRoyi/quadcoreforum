@@ -14,6 +14,9 @@ import javax.swing.tree.TreeCellRenderer;
  */
 public class ForumTreeCellRenderer implements TreeCellRenderer { 
 
+	private static final Color SELECTION_BACKGROUND_COLOR = new Color(231, 239, 214);
+
+	
 	private NonSelectedForumTreeCellPanel m_nonselectedPanel;
 	private SelectedForumTreeCellPanel m_selectedPanel;
 	private ForumTree forumTree;
@@ -32,8 +35,6 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 	@Override
 	public Component getTreeCellRendererComponent(
 			JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-
-		
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
 		
 		if (node == null || node.getUserObject() instanceof String) {
@@ -42,12 +43,12 @@ public class ForumTreeCellRenderer implements TreeCellRenderer {
 		
 		if (selected) {
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
-			m_nonselectedPanel.select(new Color(198, 214, 253));
+			m_nonselectedPanel.select(SELECTION_BACKGROUND_COLOR);
 			m_selectedPanel.updatePanel((ForumCell)node.getUserObject(), forumTree.getConnectedUser());
 			return m_nonselectedPanel;			
 		}
 		else {
-			m_nonselectedPanel.unselect(new Color(198, 214, 253));
+			m_nonselectedPanel.unselect();
 			m_nonselectedPanel.updatePanel((ForumCell)node.getUserObject());
 			return m_nonselectedPanel;
 		}

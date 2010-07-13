@@ -5,6 +5,7 @@ package forum.tcpcommunicationlayer;
 
 
 import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.interfaces.UIMessage;
 import forum.server.domainlayer.search.SearchHit;
 
@@ -38,13 +39,36 @@ public class SearchByContentMessage extends ClientMessage {
 		}
 		else {
 			returnObj.setHasExecuted(true);
-			String tResponse = "searchresult\n";
+			String tResponse = "searchresult";
 			for (int i = 0; i < tHits.length; i++) {
 				UIMessage tCurrentMessage = tHits[i].getMessage();
-				tResponse += "\tARESULTMESSAGE: " + tCurrentMessage.toString() + "\n";
+				tResponse += "\n\tARESULTMESSAGE: " + tHits[i].getScore() + "\t" +
+				this.getAuthorUsername(forum, tCurrentMessage) + "\t" + tCurrentMessage.toString();
 			}
 			returnObj.setResponse(tResponse);
 		}
 		return returnObj;
+	}
+	
+	/**
+	 * Finds and returns the user-name of the given message author
+	 * 
+	 * @param forum
+	 * 		An instance of the ForumFacade from which the data should be retrieved
+	 * @param message
+	 * 		The message whose author user-name should be retrieved
+	 * @return
+	 * 		The user-name of the message author
+	 */
+	private String getAuthorUsername(ForumFacade forum, UIMessage message) {
+		String toReturn = "<Author-Not-Found>";
+		try {
+			toReturn = forum.getMemberByID(message.getAuthorID()).getUsername();
+		}
+		catch (Exception e) {
+			SystemLogger.warning("While retrieving the contents of message " + message.getMessageID() + " the username " +
+					" of the user with id " + message.getAuthorID() + " wasn't found.");
+		}
+		return toReturn;		
 	}
 }

@@ -2,10 +2,12 @@ package forum.swingclient.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;
@@ -120,6 +123,10 @@ public class ForumTree implements GUIHandler {
 
 		m_tree.setRowHeight(40);
 
+		m_tree.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		// one click before toggle
+		m_tree.setToggleClickCount(1);
+		
 		m_tree.addTreeSelectionListener(new TreeSelectionListener() {			
 			public void valueChanged(TreeSelectionEvent e) {
 				BasicTreeUI ui = (BasicTreeUI)m_tree.getUI();
@@ -163,9 +170,13 @@ public class ForumTree implements GUIHandler {
 						try {
 							node.wait();
 							((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
-							m_tree.getSelectionModel().setSelectionPath(new TreePath(
-									((DefaultTreeModel)m_tree.getModel()).getPathToRoot(node)));
+							
+							TreePath tPathToSelect = new TreePath(
+									((DefaultTreeModel)m_tree.getModel()).getPathToRoot(node));
+							m_tree.getSelectionModel().setSelectionPath(tPathToSelect);
 
+
+							
 							new Thread(new Runnable() {
 								public void run() {
 									container.stopWorkingAnimation();							
@@ -219,7 +230,6 @@ public class ForumTree implements GUIHandler {
 		splitPane.setBottomComponent(selected);
 
 		splitPane.setDividerLocation(260); 
-		splitPane.setPreferredSize(new Dimension(500, 600));
 
 		m_panel.add(splitPane);
 
@@ -318,8 +328,10 @@ public class ForumTree implements GUIHandler {
 			System.out.println(encodedView);
 			final long tMessageID = Long.parseLong(encodedView.substring(encodedView.indexOf("\n") + 1, encodedView.indexOf("\nSUBJECTS")));
 			final String tMessages = encodedView.substring(encodedView.indexOf("MESSAGES") + 9);
-			new Thread(new Runnable() {
-				public void run() {
+			
+			
+			new SwingWorker<Void, Void>() {
+				public Void doInBackground() {
 					new Thread(new Runnable() {
 						public void run() {
 							container.startWorkingAnimation("Retrieving found message ...");
@@ -407,11 +419,32 @@ public class ForumTree implements GUIHandler {
 						
 
 						m_tree.getSelectionModel().setSelectionPath(tPathToRequiredNode);
+
 						shouldAskExpansion = true;
 					}
 					container.switchToMessagesView();
+					return null;
 				}
-			}).start();
+			
+			
+			public void done() {
+				try {
+					get();
+				} 
+				catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				m_tree.scrollPathToVisible(m_tree.getSelectionPath());				
+			}
+		}.execute();
+			
+
+			
 		}
 	}
 

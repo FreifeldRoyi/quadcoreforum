@@ -124,12 +124,6 @@ public class TabularPanel extends JPanel {
 			}
 		});
 
-		// Selection on creation
-
-/*		((DefaultListSelectionModel)this.table.
-				getSelectionModel()).getListSelectionListeners()[0].
-				valueChanged(new ListSelectionEvent(table, -1, -1, true));
-*/
 	}
 
 	protected void setGuestView() {		
