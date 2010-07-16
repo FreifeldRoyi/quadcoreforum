@@ -1,12 +1,16 @@
 package forum.swingclient.ui;
 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,6 +27,7 @@ import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
@@ -30,7 +35,6 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -39,6 +43,7 @@ import forum.swingclient.controllerlayer.*;
 import forum.swingclient.panels.ReplyModifyDialog;
 import forum.swingclient.panels.MainPanel;
 import forum.swingclient.ui.events.GUIHandler;
+import forum.swingclient.ui.events.JExpansionStatusSavingTree;
 import forum.swingclient.ui.events.GUIEvent.EventType;
 import forum.server.domainlayer.SystemLogger;
 
@@ -49,13 +54,17 @@ import forum.server.domainlayer.SystemLogger;
 
 public class ForumTree implements GUIHandler {
 
+
 	private boolean shouldAskExpansion;
 	private long fatherSubjectID;
+
+	private Map<Long, String> expansionStatus;
+
 
 	/**
 	 * The JTree GUI component.
 	 */
-	private JTree m_tree;
+	private JExpansionStatusSavingTree m_tree;
 
 	/**
 	 * The JPanel GUI component.
@@ -81,19 +90,16 @@ public class ForumTree implements GUIHandler {
 		return this.container.getConnectedUser();
 	}
 
-	public void selectFirstRow() {
-		//try {
-		//if (m_tree.getRowCount() > 0)
-		//	m_tree.setSelectionRow(0);
-		//}
-		//catch (Exception e) {}
-	}
 
 	public void setFatherID(final long fatherSubjectID) {
 		this.fatherSubjectID = fatherSubjectID;
 	}
 
+
+
 	public ForumTree(final MainPanel container) {
+		//		shouldRestoreExpanded = true;
+		expansionStatus = new HashMap<Long, String>();
 
 		shouldAskExpansion = true;
 
@@ -108,7 +114,7 @@ public class ForumTree implements GUIHandler {
 		}
 
 		this.container = container;
-		m_tree = new JTree();
+		m_tree = new JExpansionStatusSavingTree();
 		m_tree.putClientProperty("JTree.lineStyle", "Angled");
 
 		m_tree.getSelectionModel().setSelectionMode(
@@ -126,7 +132,7 @@ public class ForumTree implements GUIHandler {
 		m_tree.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		// one click before toggle
 		m_tree.setToggleClickCount(1);
-		
+
 		m_tree.addTreeSelectionListener(new TreeSelectionListener() {			
 			public void valueChanged(TreeSelectionEvent e) {
 				BasicTreeUI ui = (BasicTreeUI)m_tree.getUI();
@@ -136,9 +142,123 @@ public class ForumTree implements GUIHandler {
 			}
 		});
 
+
+
+		m_tree.addTreeExpansionListener(new TreeExpansionListener() {
+
+			@Override
+			public void treeExpanded(TreeExpansionEvent arg0) {
+				//				shouldRestoreExpanded = false;
+				long tID = ((ForumCell)((DefaultMutableTreeNode)arg0.getPath().getLastPathComponent()).getUserObject()).getId();
+
+				String tE = (String)expansionStatus.get(tID);
+				//				shouldRestoreExpanded = false;
+				m_tree.setToggleClickCount(2);
+				if (tE != null) {
+					m_tree.restoreExpanstionState(m_tree.getRowForPath(arg0.getPath()), tE);
+					m_tree.getSelectionModel().setSelectionPath(arg0.getPath());
+				}
+				m_tree.setToggleClickCount(1);
+
+				//			shouldRestoreExpanded = true;
+
+				/*				if (expandedNodes.get(tID) != null)
+					System.out.println("restores: " +
+							((ForumCell)((DefaultMutableTreeNode)arg0.getPath().getLastPathComponent()).getUserObject()).getTitle());
+				 */			
+
+				/*			Enumeration<TreePath> exps = expandedNodes.get(tID);
+				while (exps!= null && exps.hasMoreElements()){
+					TreePath tp = (TreePath)exps.nextElement();
+					//If it is not a leaf
+
+
+
+
+					if (tp.getLastPathComponent() != null && !m_tree.getModel().isLeaf(tp.getLastPathComponent())){
+
+
+
+						System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+
+
+							for (Object o : tp.getPath()) {
+								String tIDt = 
+									((ForumCell)((DefaultMutableTreeNode)o).getUserObject()).getTitle();
+								System.out.println(tIDt);
+							}
+							System.out.println("el");
+						System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+
+
+
+
+
+
+
+
+
+						TreePath currentPath = m_tree.getNextMatch(tp.getLastPathComponent().toString(),0, 
+								Position.Bias.Forward );
+						m_tree.expandPath(currentPath);
+					}
+				}
+				expandedNodes.put(tID, null);
+				shouldRestoreExpanded = true;*/
+			}
+
+			@Override
+			public void treeCollapsed(TreeExpansionEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
 		m_tree.addTreeWillExpandListener(new TreeWillExpandListener() {
 
-			public void treeWillCollapse(TreeExpansionEvent event){}
+			public void treeWillCollapse(TreeExpansionEvent event)	throws ExpandVetoException {
+				if (event.getPath().getLastPathComponent() == m_tree.getModel().getRoot()) {
+					m_tree.fireTreeWillExpand(event.getPath());
+					throw new ExpandVetoException(event);
+				}
+				
+
+				//				if (((DefaultMutableTreeNode)event.getPath().getLastPathComponent())
+
+				//			System.out.println("lk");
+
+
+
+
+				long tID = ((ForumCell)((DefaultMutableTreeNode)event.getPath().getLastPathComponent()).getUserObject()).getId();
+				try {
+					/*						System.out.println(m_tree.getExpandedDescendants(event.getPath()).hasMoreElements());
+
+				Enumeration<TreePath> a = m_tree.getExpandedDescendants(event.getPath());
+
+					while (a.hasMoreElements()) {
+						TreePath p = a.nextElement();
+						for (Object o : p.getPath()) {
+							String tIDt = 
+								((ForumCell)((DefaultMutableTreeNode)o).getUserObject()).getTitle();
+							System.out.println(tIDt);
+						}
+						System.out.println("el");
+					}
+					System.out.println();*/
+					//	expandedNodes.put(tID, m_tree.getExpandedDescendants(event.getPath()));
+
+					expansionStatus.put(tID, m_tree.getExpansionState(m_tree.getRowForPath(event.getPath())));
+
+				}
+				catch (Exception e) {
+					expansionStatus.put(tID, null);
+				}
+
+			}
+
+
+
 
 			public void treeWillExpand(TreeExpansionEvent event)
 			throws ExpandVetoException {
@@ -169,19 +289,23 @@ public class ForumTree implements GUIHandler {
 
 						try {
 							node.wait();
+
 							((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
-							
+
+							//					if (shouldRestoreExpanded) {
+
 							TreePath tPathToSelect = new TreePath(
 									((DefaultTreeModel)m_tree.getModel()).getPathToRoot(node));
 							m_tree.getSelectionModel().setSelectionPath(tPathToSelect);
+							//}
 
-
-							
 							new Thread(new Runnable() {
 								public void run() {
 									container.stopWorkingAnimation();							
 								}
 							}).start();
+
+							System.out.println("2");
 
 						}
 
@@ -219,7 +343,7 @@ public class ForumTree implements GUIHandler {
 
 		scrl_tree_pane = new JScrollPane(tCurrentPanel);
 
-		
+
 		scrl_tree_pane.setPreferredSize(new Dimension(610,635));
 
 		// Adds the scroll panes to a split pane.
@@ -242,7 +366,7 @@ public class ForumTree implements GUIHandler {
 	public long getFatherMessageID() {
 		return this.fatherMessageID;
 	}
-	
+
 	public void setRootMessage(final long fatherMessageID) {
 		this.fatherMessageID = fatherMessageID;
 
@@ -328,8 +452,8 @@ public class ForumTree implements GUIHandler {
 			System.out.println(encodedView);
 			final long tMessageID = Long.parseLong(encodedView.substring(encodedView.indexOf("\n") + 1, encodedView.indexOf("\nSUBJECTS")));
 			final String tMessages = encodedView.substring(encodedView.indexOf("MESSAGES") + 9);
-			
-			
+
+
 			new SwingWorker<Void, Void>() {
 				public Void doInBackground() {
 					new Thread(new Runnable() {
@@ -416,7 +540,7 @@ public class ForumTree implements GUIHandler {
 						}
 
 
-						
+
 
 						m_tree.getSelectionModel().setSelectionPath(tPathToRequiredNode);
 
@@ -425,26 +549,26 @@ public class ForumTree implements GUIHandler {
 					container.switchToMessagesView();
 					return null;
 				}
-			
-			
-			public void done() {
-				try {
-					get();
-				} 
-				catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				m_tree.scrollPathToVisible(m_tree.getSelectionPath());				
-			}
-		}.execute();
-			
 
-			
+
+				public void done() {
+					try {
+						get();
+					} 
+					catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					m_tree.scrollPathToVisible(m_tree.getSelectionPath());				
+				}
+			}.execute();
+
+
+
 		}
 	}
 
@@ -766,6 +890,8 @@ public class ForumTree implements GUIHandler {
 			}
 		});
 	}
+
+
 
 
 

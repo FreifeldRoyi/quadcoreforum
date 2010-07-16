@@ -202,8 +202,6 @@ public class MembersDialog extends JDialog implements GUIHandler {
 		this.btn_set_moderator = new JButton("promote to moderator");
 				
 		
-		
-		
 		this.btn_set_moderator.setPreferredSize(new Dimension(200, 35));
 
 		final InternalConnectedUsersPanel tUsersPanel = new InternalConnectedUsersPanel();

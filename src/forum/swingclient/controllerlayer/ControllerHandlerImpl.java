@@ -309,7 +309,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					synchronized (messages) {
 						messages.put(toSend);
 					}
-					getActiveUsersNumber();
+//					getActiveUsersNumber();
 				}
 				catch (InterruptedException e) {
 					SystemLogger.warning("The program was interrupted while waiting");
@@ -369,7 +369,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		 */
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
-				getActiveUsersNumber();
+//				getActiveUsersNumber();
 				final ClientMessage toSend = new LoginMessage(guestID, username, password);
 				try {
 					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));

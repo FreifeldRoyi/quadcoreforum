@@ -129,6 +129,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 					shouldAskPasswordUpdate = true;
 			}
 			
+			
 		}
 		else {
 
@@ -146,6 +147,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		}
 
+		this.controller.getActiveUsersNumber();
+
+		
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
 			subjectsPanel.setModeratorOrAdminView();
@@ -823,7 +827,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 		this.subjectsPanel.setVisible(false);
 		this.threadsPanel.setVisible(false);
 		if (!this.tree.getForumTreeUI().isVisible()) {
-			this.tree.selectFirstRow();
 			this.tree.getForumTreeUI().setVisible(true);
 		}
 	}
