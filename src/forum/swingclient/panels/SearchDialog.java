@@ -13,8 +13,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.StyleConstants;
 
-import com.google.gwt.dom.client.Style.Float;
-
 import forum.swingclient.controllerlayer.ControllerHandler;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
