@@ -3,11 +3,13 @@
  */
 package forum.server.updatedpersistentlayer.pipe.message.exceptions;
 
+import java.io.Serializable;
+
 /**
  * @author Sepetnitsky Vitali
  *
  */
-public class SubjectAlreadyExistsException extends Exception {
+public class SubjectAlreadyExistsException extends Exception implements Serializable {
 
 	private static final long serialVersionUID = 7545807122791508691L;
 

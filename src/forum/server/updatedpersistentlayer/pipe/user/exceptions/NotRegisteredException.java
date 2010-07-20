@@ -3,11 +3,13 @@
  */
 package forum.server.updatedpersistentlayer.pipe.user.exceptions;
 
+import java.io.Serializable;
+
 /**
  * @author sepetnit
  *
  */
-public class NotRegisteredException extends Exception {
+public class NotRegisteredException extends Exception implements Serializable {
 
 	private static final long serialVersionUID = 3459306523924172336L;
 

@@ -5,25 +5,30 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
@@ -35,9 +40,9 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
 
 import forum.swingclient.controllerlayer.*;
 import forum.swingclient.panels.ReplyModifyDialog;
@@ -143,6 +148,22 @@ public class ForumTree implements GUIHandler {
 		});
 
 
+		m_tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				DefaultMutableTreeNode tNode = (DefaultMutableTreeNode)m_tree.getSelectionPath().getLastPathComponent();
+				if (!tNode.isLeaf() && tNode != m_tree.getModel().getRoot())
+					return;
+				else
+					try {
+						m_tree.fireTreeWillExpand(new TreePath(tNode.getPath()));
+					}
+				catch (ExpandVetoException e1) {
+					return;
+				}
+			}
+		});
+
 
 		m_tree.addTreeExpansionListener(new TreeExpansionListener() {
 
@@ -159,52 +180,6 @@ public class ForumTree implements GUIHandler {
 					m_tree.getSelectionModel().setSelectionPath(arg0.getPath());
 				}
 				m_tree.setToggleClickCount(1);
-
-				//			shouldRestoreExpanded = true;
-
-				/*				if (expandedNodes.get(tID) != null)
-					System.out.println("restores: " +
-							((ForumCell)((DefaultMutableTreeNode)arg0.getPath().getLastPathComponent()).getUserObject()).getTitle());
-				 */			
-
-				/*			Enumeration<TreePath> exps = expandedNodes.get(tID);
-				while (exps!= null && exps.hasMoreElements()){
-					TreePath tp = (TreePath)exps.nextElement();
-					//If it is not a leaf
-
-
-
-
-					if (tp.getLastPathComponent() != null && !m_tree.getModel().isLeaf(tp.getLastPathComponent())){
-
-
-
-						System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-
-
-							for (Object o : tp.getPath()) {
-								String tIDt = 
-									((ForumCell)((DefaultMutableTreeNode)o).getUserObject()).getTitle();
-								System.out.println(tIDt);
-							}
-							System.out.println("el");
-						System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-
-
-
-
-
-
-
-
-
-						TreePath currentPath = m_tree.getNextMatch(tp.getLastPathComponent().toString(),0, 
-								Position.Bias.Forward );
-						m_tree.expandPath(currentPath);
-					}
-				}
-				expandedNodes.put(tID, null);
-				shouldRestoreExpanded = true;*/
 			}
 
 			@Override
@@ -218,36 +193,14 @@ public class ForumTree implements GUIHandler {
 
 			public void treeWillCollapse(TreeExpansionEvent event)	throws ExpandVetoException {
 				if (event.getPath().getLastPathComponent() == m_tree.getModel().getRoot()) {
-					m_tree.fireTreeWillExpand(event.getPath());
+					System.out.println(event.getSource());
 					throw new ExpandVetoException(event);
 				}
-				
-
-				//				if (((DefaultMutableTreeNode)event.getPath().getLastPathComponent())
-
-				//			System.out.println("lk");
-
 
 
 
 				long tID = ((ForumCell)((DefaultMutableTreeNode)event.getPath().getLastPathComponent()).getUserObject()).getId();
 				try {
-					/*						System.out.println(m_tree.getExpandedDescendants(event.getPath()).hasMoreElements());
-
-				Enumeration<TreePath> a = m_tree.getExpandedDescendants(event.getPath());
-
-					while (a.hasMoreElements()) {
-						TreePath p = a.nextElement();
-						for (Object o : p.getPath()) {
-							String tIDt = 
-								((ForumCell)((DefaultMutableTreeNode)o).getUserObject()).getTitle();
-							System.out.println(tIDt);
-						}
-						System.out.println("el");
-					}
-					System.out.println();*/
-					//	expandedNodes.put(tID, m_tree.getExpandedDescendants(event.getPath()));
-
 					expansionStatus.put(tID, m_tree.getExpansionState(m_tree.getRowForPath(event.getPath())));
 
 				}
@@ -256,8 +209,6 @@ public class ForumTree implements GUIHandler {
 				}
 
 			}
-
-
 
 
 			public void treeWillExpand(TreeExpansionEvent event)
@@ -360,7 +311,6 @@ public class ForumTree implements GUIHandler {
 		m_tree.setModel(new DefaultTreeModel(null));
 
 
-
 	}
 
 	public long getFatherMessageID() {
@@ -454,8 +404,8 @@ public class ForumTree implements GUIHandler {
 			final String tMessages = encodedView.substring(encodedView.indexOf("MESSAGES") + 9);
 
 
-			new SwingWorker<Void, Void>() {
-				public Void doInBackground() {
+			new SwingWorker<TreePath, Void>() {
+				public TreePath doInBackground() {
 					new Thread(new Runnable() {
 						public void run() {
 							container.startWorkingAnimation("Retrieving found message ...");
@@ -491,21 +441,28 @@ public class ForumTree implements GUIHandler {
 						for (ForumCell sonCell : cell.getSons()) {
 							MessageTreeNode sonNode = new MessageTreeNode(sonCell, sonCell.getId());
 
-							if ((tNodeToExpand == null) && (sonCell.getId() == tMessageID))
+							if ((tNodeToExpand == null) && (sonCell.getId() == tMessageID)) {
 								tNodeToExpand = sonNode;
+								
+								System.out.println("sassssssssssssssss: " + sonCell.getId());
+								System.out.println("sassssssssssssssss: " +tMessageID);
+							}
 
 							node.add(sonNode);
 							stack.add(sonNode);
+
 						}
 						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(node);
 					}
 
 					shouldAskExpansion = false;
+					
+					TreePath tPathToRequiredNode = null;
 					if (tNodeToExpand != null) {
 
-
-						TreePath tPathToRequiredNode = new TreePath(
+						tPathToRequiredNode = new TreePath(
 								((DefaultTreeModel)m_tree.getModel()).getPathToRoot(tNodeToExpand)); 
+
 						m_tree.expandPath(tPathToRequiredNode);
 						m_tree.fireTreeExpanded(tPathToRequiredNode);
 
@@ -539,21 +496,27 @@ public class ForumTree implements GUIHandler {
 							}
 						}
 
-
-
-
-						m_tree.getSelectionModel().setSelectionPath(tPathToRequiredNode);
-
+						
+//						for (int i = 0; i < tPathToRequiredNode.getPathCount(); i++)
+//							System.out.println("node: " +
+//							((ForumCell)(((DefaultMutableTreeNode)tPathToRequiredNode.getPathComponent(i)).getUserObject())).getId());
+						
 						shouldAskExpansion = true;
 					}
 					container.switchToMessagesView();
-					return null;
+					return tPathToRequiredNode;
 				}
 
 
 				public void done() {
 					try {
-						get();
+						TreePath tPathToRequiredNode = get();
+						shouldAskExpansion = false;
+						if (tPathToRequiredNode != null)
+							m_tree.getSelectionModel().setSelectionPath(tPathToRequiredNode);
+						else
+							m_tree.setSelectionRow(0);
+						shouldAskExpansion = true;
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -563,12 +526,9 @@ public class ForumTree implements GUIHandler {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					m_tree.scrollPathToVisible(m_tree.getSelectionPath());				
+					m_tree.scrollPathToVisible(m_tree.getSelectionModel().getSelectionPath());
 				}
 			}.execute();
-
-
-
 		}
 	}
 
@@ -595,7 +555,6 @@ public class ForumTree implements GUIHandler {
 		}
 
 		public void notifyError(String errorMessage) {
-
 			System.out.println(errorMessage);
 		}
 
@@ -749,18 +708,139 @@ public class ForumTree implements GUIHandler {
 					} 
 					catch (InterruptedException e) {
 					}
-					m_tree.setSelectionRow(0);
+
+					TreePath tPathToSelect = new TreePath(node.getPath());
+					m_tree.setSelectionPath(tPathToSelect);
 				}
 			}
+			else if (tModifyDialog.errorOcurred()) {
+				this.handleViewMessageError(node);
+			}
+
 			tModifyDialog.dispose();
-
-
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
+	private void handleViewMessageError(final TreeNode node) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+
+				final long tRootID = ((ForumCell)(
+						(DefaultMutableTreeNode)m_tree.getSelectionPath().getPathComponent(0)).getUserObject()).getId();
+				final boolean[] rootFound = new boolean[1];
+				rootFound[0] = false;
+
+
+				pipe.addObserver(new GUIObserver(new GUIHandler() {
+					@Override
+					public void refreshForum(String encodedView) {
+						pipe.deleteObserver(this);
+
+						String[] tSplitted = encodedView.split("\n");
+
+						for (int i = 0; i < tSplitted.length; i++) {
+							String[] tCurrentThreadInfo = tSplitted[i].split("\t");
+							// this is the subject's id
+							try {
+								if (Long.parseLong(tCurrentThreadInfo[0]) == tRootID) {
+									rootFound[0] = true;
+									break;
+								}
+							}
+							catch (NumberFormatException e) {
+								SystemLogger.warning("The server response related to subject's update is invalid");
+								break;
+							}
+						}
+						node.notifyAll();
+					}
+					@Override
+					public void notifyError(String errorMessage) {
+						pipe.deleteObserver(this);
+					}
+				}), EventType.THREADS_UPDATED);
+				pipe.getThreads(ForumTree.this.fatherSubjectID, container);
+				try {
+					synchronized (node) {
+						node.wait();
+					}
+					if (rootFound[0])
+						handleShowExistingMessages(node);
+					else
+						handleReturnToThreadsSubjectsView(node);						
+				}
+				catch (InterruptedException e) { /* do nothing */ }
+			}
+
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleReturnToThreadsSubjectsView(TreeNode node) {
+		TreePath tPath = m_tree.getSelectionPath();
+
+		MessageTreeNode tNode = (MessageTreeNode)tPath.getPathComponent(0);
+		for (int i = 1; i < tPath.getPathCount() - 1; i++) {
+				synchronized (tNode) {
+					try {
+						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tNode),
+								EventType.MESSAGES_UPDATED);
+					} 
+					catch (IOException e)  {
+						
+					}
+
+					pipe.getNestedMessages(((ForumCell)tNode.getUserObject()).getId(), false, m_panel);
+
+
+					try {
+						tNode.wait();
+						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(tNode);
+					}
+
+					catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+				Enumeration<MessageTreeNode> tChilds = tNode.children();
+				boolean tFound = false;
+				MessageTreeNode tCurrentChild = null;
+				while (tChilds.hasMoreElements()) {
+					tCurrentChild = tChilds.nextElement();
+					if (((ForumCell)tCurrentChild.getUserObject()).getId() == 
+						((ForumCell)((MessageTreeNode)tPath.getPathComponent(i + 1)).getUserObject()).getId()) {
+							tFound = true;
+							break;
+					}
+				}
+				if (tFound) {
+					tNode = tCurrentChild;
+					continue;
+				}
+				else
+					break;
+		}
+		
+		new Thread(new Runnable() {
+			public void run() {
+				container.stopWorkingAnimation();							
+			}
+		}).start();
+
+	}
+
+	private void handleShowExistingMessages(TreeNode node) {
+
+
+	}
+
 
 	/**
 	 * Replies to the selected message.
@@ -863,6 +943,9 @@ public class ForumTree implements GUIHandler {
 								}
 							}
 							else { // delete a thread
+								JOptionPane.showMessageDialog(ForumTree.this.container, 
+										"the thread was deleted successfully!", "success",
+										JOptionPane.INFORMATION_MESSAGE);
 
 								pipe.getSubjects(fatherSubjectID, container);
 								pipe.getThreads(fatherSubjectID, container);

@@ -24,7 +24,7 @@ import forum.swingclient.ui.events.GUIEvent.EventType;
  * @author sepetnit
  *
  */
-public class ReplyModifyDialog extends JDialog implements GUIHandler {
+public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListener {
 
 	/**
 	 * 
@@ -38,25 +38,45 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	private JTextField title;
 	private JTextArea content;
 	private JTextField topic;
+	private JLabel topicLabel;
 	private JLabel titleLabel;
 	private JLabel contentLabel;
 	private String topicType;
 	private JButton ok;
 	private JButton cancel;
 	private boolean succeeded;
+	
+	private boolean errorOccured;
 
 	// used in order to scroll to the created / updated subject / thread / message id
 	private long createdOrUpdatedID;
 
 	private ControllerHandler controller;
 
+	// KeyListener implementation
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		if (!content.isFocusOwner() && arg0.getKeyChar() == KeyEvent.VK_ENTER)
+			ok.doClick();
+		else if (arg0.getKeyChar() == KeyEvent.VK_ESCAPE)
+			cancel.doClick();
+	}
 
-	//	private JButton replyModifyButton;
+	@Override
+	public void keyReleased(KeyEvent arg0) {}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		clearLabels();
+	}
+	// end of KeyListener implementation
+
+	
 
 	public ReplyModifyDialog(final long authorID, final long modifiedID, final String currentTitle, 
 			final String currentContent, final JButton replyModifyButton) {
 		super();
-
+		errorOccured = false;
 		try {
 			controller = ControllerHandlerFactory.getPipe();
 		}
@@ -91,11 +111,11 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (title.getText().equals("")) {
+				if (title.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (content.getText().equals("")) {
+				if (content.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -111,6 +131,8 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long repliedID,
 			final JButton replyModifyButton) {
 		super();
+		errorOccured = false;
+
 		try {
 			controller = ControllerHandlerFactory.getPipe();
 		}
@@ -124,11 +146,11 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("OK WAS KLICKEDDDDDDDDDDDDDDDDDD");
-				if (title.getText().equals("")) {
+				if (title.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (content.getText().equals("")) {
+				if (content.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -143,6 +165,8 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public ReplyModifyDialog(final long authorID, final long fatherID, String existingName, String existingDescription, String topicType,
 			final JButton replyModifyButton) {
 		super();
+		errorOccured = false;
+
 		try {
 			controller = ControllerHandlerFactory.getPipe();
 		}
@@ -169,22 +193,45 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		}
 
 		this.ok.addActionListener(new ActionListener() {
+			
 			public void actionPerformed(ActionEvent arg0) {
-				if (topic != null && topic.isVisible() && topic.getText().equals("")){
+				String tPrefix = "";
+				if (ReplyModifyDialog.this.topicType.contains("subject"))
+					tPrefix = "subject";
+				else if (ReplyModifyDialog.this.topicType.contains("message"))
+					tPrefix = "message";
+				else
+					tPrefix = "thread";
+				
+				if (topic != null && topic.isVisible() && topic.getText().trim().length() == 0){
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "thread topic cannot be empty.",
 							"error", JOptionPane.ERROR_MESSAGE);
+					makeLabelNoticeble(topicLabel, topic);
+
 					return;
 				}
-				if (title.getText().equals("")) {
+				if (title.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this,
-							ReplyModifyDialog.this.topicType + " " + titleLabel.getText() + 
+							tPrefix + " " + titleLabel.getText() + 
 							" cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					makeLabelNoticeble(titleLabel, title);
+
 					return;
 				}
-				if (content.getText().equals("")) {
+				if (content.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, 
-							ReplyModifyDialog.this.topicType + " content cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+							tPrefix + " " + contentLabel.getText() + " cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
+					makeLabelNoticeble(contentLabel, content);
+
 					return;
+				}
+				else if (contentLabel.getText().toLowerCase().equals("description")) {
+					if (content.getText().trim().split("\n").length > 3) {
+						JOptionPane.showMessageDialog(ReplyModifyDialog.this, 
+								"subject" + " " + contentLabel.getText() + " is restricted to 3 lines", "error", JOptionPane.ERROR_MESSAGE);
+						makeLabelNoticeble(contentLabel, content);
+						return;
+					}
 				}
 				if (ReplyModifyDialog.this.topicType.equals("subject")) {
 					controller.addObserver(new GUIObserver(ReplyModifyDialog.this),
@@ -208,23 +255,50 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 		});	
 	}
 
+	private void makeLabelNoticeble(JLabel label, JTextField field) {
+		label.setForeground(Color.RED);
+		field.selectAll();
+		field.grabFocus();
+	}
+	
+	private void makeLabelNoticeble(JLabel label, JTextArea area) {
+		label.setForeground(Color.RED);
+		area.selectAll();
+		area.grabFocus();
+	}
+
+	
+	private void clearLabels() {
+		this.contentLabel.setForeground(Color.BLACK);
+		this.titleLabel.setForeground(Color.BLACK);
+		if (topicLabel != null && topicLabel.isVisible())
+			topicLabel.setForeground(Color.BLACK);
+	}
 
 	private void initializeGUIContent(long authorID, long replyModifiedID, JButton replyModifyButton) {
-		this.title = new JTextField();
-
+		this.title = new JRestrictedLengthTextField(40, 40, true);
+		
 		this.title.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-		this.content = new JTextArea();
+		
+		
+		
+		this.content = new JRestrictedLengthTextArea(60);
+		
 		//		this.content.setAutoscrolls(true);
 		this.contentPane = new JScrollPane(content);
+		
+		
 		this.ok = new JButton();
 		this.cancel = new JButton();
 		this.topicType = "message";
 
 		this.content.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-		this.setPreferredSize(new Dimension(400, 300));
-		this.setMinimumSize(new Dimension(400, 300));
+		
+		
+		this.setPreferredSize(new Dimension(500, 300));
+		this.setMinimumSize(new Dimension(500, 300));
 
 
 		this.title.setPreferredSize(new Dimension(200, 30));
@@ -249,9 +323,12 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 
 
 	private void arrangeLayout() {
-		JLabel topicLabel = null;
+		topicLabel = null;
+		title.addKeyListener(this);
+		content.addKeyListener(this);
 		if (topicType.equals("thread")) {
-			topic = new JTextField();
+			topic = new JRestrictedLengthTextField(40, 40, true);
+			topic.addKeyListener(this);
 			this.topic.setPreferredSize(new Dimension(200, 30));
 			topicLabel = new JLabel("topic:");
 		}
@@ -297,9 +374,9 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 																)
 																.addGroup(tLayout.createSequentialGroup()
 																		.addGap(10, 10, Short.MAX_VALUE)
-																		.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-																		.addGap(10, 10, 10)
 																		.addComponent(this.ok, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+																		.addGap(10, 10, 10)
+																		.addComponent(this.cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 																		.addGap(10, 10, 10)
 
 																));
@@ -345,12 +422,19 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler {
 	public void notifyError(String errorMessage) {
 		this.controller.deleteObserver(this);
 		JOptionPane.showMessageDialog(this, errorMessage, "error occured", JOptionPane.ERROR_MESSAGE);
+		this.errorOccured = true;
+		this.cancel.doClick();
 	}
 
 	public boolean shouldUpdateGUI() {
 		return succeeded;
 	}
 
+	public boolean errorOcurred() {
+		return errorOccured;
+	}
+
+	
 	public long getChangedID() {
 		return createdOrUpdatedID;
 	}

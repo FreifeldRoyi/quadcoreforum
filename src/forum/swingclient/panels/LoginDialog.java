@@ -13,7 +13,9 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.InputVerifier;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,7 +65,11 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		if (errorMessage.startsWith("passwordupdate")) return;
 		this.controller.deleteObserver(this);
 		informationLabel.setText("Wrong username or password");
+		this.usernameLabel.setForeground(Color.RED);
+		this.passwordLabel.setForeground(Color.RED);
+		this.usernameInput.selectAll();
 		this.setEnabled(true);
+		this.usernameInput.grabFocus();
 	}
 
 	@Override
@@ -82,7 +88,11 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 			cancelButton.doClick();
 	}
 	public void keyReleased(KeyEvent e) {}
-	public void keyTyped(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {
+		this.informationLabel.setText("");
+		this.passwordLabel.setForeground(Color.BLACK);
+		this.usernameLabel.setForeground(Color.BLACK);
+	}
 
 
 	public LoginDialog(GUIHandler forumMainPanel, String username, String password, long guestID) throws IOException {
@@ -93,6 +103,7 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 
 
 		initGUIComponents(username, password);
+		
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		this.getContentPane().add(mainPanel);
@@ -128,7 +139,9 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.usernameLabel);
-		this.usernameInput = new JTextField(20);
+		this.usernameInput =  new JRestrictedLengthTextField(20, 20, false);  
+		
+		
 		this.usernameInput.setText(username);
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
@@ -141,13 +154,13 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
 		this.passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.passwordLabel);
-		this.passwordInput = new JPasswordField(20);
+		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
 		this.passwordInput.setText(password);
 		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
 
 		this.passwordInput.addKeyListener(this);
-		
+
 		loginPanel.add(this.passwordInput);
 		this.passwordLabel.setLabelFor(this.passwordInput);
 
@@ -172,6 +185,18 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 				}
 				else {
 					informationLabel.setText("you must insert not empty user name and password");
+					if (usernameInput.getText().length() == 0) {
+						usernameLabel.setForeground(Color.red);
+						usernameInput.selectAll();
+						usernameInput.grabFocus();
+						if (passwordInput.getPassword().length == 0)
+							passwordLabel.setForeground(Color.red);
+					}
+					else {
+						passwordLabel.setForeground(Color.red);
+						passwordInput.selectAll();
+						passwordInput.grabFocus();
+					}
 				}
 			}
 		}

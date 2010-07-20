@@ -2,6 +2,7 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIUser;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
 
 /**
@@ -43,6 +44,10 @@ public class LogoffMessage extends ClientMessage {
 		catch (NotConnectedException e) {
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("notconnected");
+		}
+		catch (DatabaseUpdateException e) {
+			returnObj.setHasExecuted(false);
+			returnObj.setResponse("loogedouterror\tdatabase");
 		}
 		return returnObj;
 	}

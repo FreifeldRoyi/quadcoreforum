@@ -104,6 +104,11 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 			public Boolean doInBackground() {
 				final SendMail tSender = new SendMail();
 
+				usernameLabel.setForeground(Color.BLACK);
+				emailLabel.setForeground(Color.BLACK);
+				informationLabel.setText("");
+
+				
 				String toSend = "<h3>Hello " + dataToSend[3] + " " + dataToSend[4] + "!</h3>" +
 				"This is a message from QuadCoreForum Administrator. <br /> Someone, maybe it was you, asked us to change " +
 				" your forum password. <br /> The new password is: <b><u>" + generatedPassword + "</u></b>.\n\n You can change this " +
@@ -156,16 +161,17 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 	public void refreshForum(String encodedView) {
 		if (encodedView.startsWith("passwordupdate")) return;
-		informationLabel.setText("");
-		updatingLabel.setVisible(false);
+
 
 		if (encodedView.startsWith("profiledetailsupdatesuccess\t")) {
 			this.controller.deleteObserver(this);
 			String[] tUpdatedDetails = encodedView.split("\t");
 			this.sendNewPassword(tUpdatedDetails);
 		}
-		else if (encodedView.startsWith("profiledetailsupdateerror\t"))
+		else if (encodedView.startsWith("profiledetailsupdateerror\t")) {
+			updatingLabel.setVisible(false);
 			this.notifyError(encodedView);
+		}
 	}
 
 	public void notifyError(String error) {
@@ -180,6 +186,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 					"Wrong username or email" : tSplittedMessage[2];
 			this.usernameLabel.setForeground(Color.RED);
 			this.emailLabel.setForeground(Color.RED);
+			
 			informationLabel.setText(tErrorMessage);
 		}
 	}
@@ -236,7 +243,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.usernameLabel);
-		this.usernameInput = new JTextField(20);
+		this.usernameInput = new JRestrictedLengthTextField(20, 20, false);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		usernameInput.addKeyListener(this);
@@ -247,7 +254,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.emailLabel = new JLabel("E-mail", JLabel.TRAILING);
 		this.emailLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.emailLabel);
-		this.emailInput = new JTextField(20);
+		this.emailInput = new JRestrictedLengthTextField(40, 40, false);
 		this.emailInput.setText("");
 		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		emailInput.addKeyListener(this);
@@ -286,6 +293,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 
 		sendPasswordButton = new JButton();
+		sendPasswordButton.addKeyListener(this);
+		
 		sendPasswordButton.setText("Send new");
 
 
@@ -293,7 +302,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 		cancelButton = new JButton("Cancel");
 		
-		
+		cancelButton.addKeyListener(this);
 
 
 
@@ -365,9 +374,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 	private class SendPasswordActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if(usernameInput.getText().length() > 0 && emailInput.getText().length() > 0) {
-				usernameLabel.setForeground(Color.BLACK);
-				emailLabel.setForeground(Color.BLACK);
+			if (usernameInput.getText().length() > 0 && emailInput.getText().length() > 0) {
 				ForgotPasswordDialog.this.sendPasswordButton.removeActionListener(btn_send_listener);
 				ForgotPasswordDialog.this.cancelButton.removeActionListener(btn_cancel_listener);
 				ForgotPasswordDialog.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);				

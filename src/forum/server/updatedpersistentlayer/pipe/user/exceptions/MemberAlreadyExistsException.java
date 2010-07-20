@@ -3,11 +3,13 @@
  */
 package forum.server.updatedpersistentlayer.pipe.user.exceptions;
 
+import java.io.Serializable;
+
 /**
  * @author sepetnit
  *
  */
-public class MemberAlreadyExistsException extends Exception {
+public class MemberAlreadyExistsException extends Exception implements Serializable {
 
 	private static final long serialVersionUID = -4533139714961245124L;
 

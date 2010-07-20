@@ -23,10 +23,16 @@ public class UsersController {
 	// the handler through which the class accesses the cache instances through which the operations
 	// of persistence are performed
 	private ForumDataHandler dataHandler;
-	// the current number of guests connected to the forum
-	private long guestsCounter;
 	// stores a set of all the user-names of members currently connected to the forum
-	private Collection<String> activeMembersUserNames;
+	//	private Map<String, Integer> activeMembersUserNames;
+
+	private Collection<Long> guestsIDsToRemove;
+	private TimerTask guestIDsRemovalTask;
+	private Timer guestsIDsRemovalTimer;
+
+	private Collection<String> membersUsernamesToRemove;
+	private TimerTask membersUsernamesToRemoveTask;
+	private Timer membersUsernamesRemovalTimer;
 
 	/**
 	 * The class constructor.
@@ -35,27 +41,26 @@ public class UsersController {
 	 */
 	public UsersController(ForumDataHandler dataHandler) {
 		this.dataHandler = dataHandler;
-		this.guestsCounter = 0;
-		this.activeMembersUserNames = new HashSet<String>();
+		//		this.activeMembersUserNames = new HashMap<String, Integer>();
 	}
 
 	// Guest related methods
 
 	/**
+	 * @throws DatabaseRetrievalException 
 	 * @see
 	 * 		ForumFacade#getActiveGuestsNumber()
 	 */
-	public long getActiveGuestsNumber() {
-		return this.guestsCounter;
+	public long getActiveGuestsNumber() throws DatabaseRetrievalException {
+		return this.dataHandler.getUsersCache().getGuestsNumber();
 	}
 
 	/**
 	 * @see
 	 * 		ForumFacade#addGuest()
 	 */
-	public UIUser addGuest() {
+	public UIUser addGuest() throws DatabaseUpdateException {
 		SystemLogger.fine("A new guest has connected to the forum");
-		this.incActiveGuestsCounter();
 		final Collection<Permission> permissions = this.getDefaultGuestPermissions();
 		return this.dataHandler.getUsersCache().createNewGuest(permissions);
 	}
@@ -68,26 +73,48 @@ public class UsersController {
 		SystemLogger.fine("The guest with id " + guestID + " tries to exit from the forum.");
 		try {
 			this.dataHandler.getUsersCache().removeGuest(guestID);
-			this.decActiveGuestsCounter();
+			//this.decActiveGuestsCounter();
 			SystemLogger.fine("The guest with id " + guestID + " has successfuly been removed from the forum.");
 		}
 		catch (NotRegisteredException e) {
 			SystemLogger.fine("Error occured: a guest with an id " + guestID + " wasn't found in the system.");
 		}
-	}
+		catch (DatabaseUpdateException e) {
+			SystemLogger.severe("Database connection error occurred, the server will try to remove " +
+			" the guest later.");
+			guestsIDsToRemove.add(guestID);
 
-	/**
-	 * Increases the counter of the guests currently connected to the forum
-	 */
-	private void incActiveGuestsCounter() {
-		this.guestsCounter++;
-	}
-
-	/**
-	 * Decreases the counter of guests currently connected to the forum
-	 */
-	private void decActiveGuestsCounter() {
-		this.guestsCounter--;
+			if (guestsIDsRemovalTimer != null) {
+				guestsIDsRemovalTimer.cancel();
+				guestsIDsRemovalTimer.purge();
+			}
+			guestsIDsRemovalTimer = new Timer();
+			if (guestIDsRemovalTask != null)
+				guestIDsRemovalTask.cancel();
+			guestIDsRemovalTask = new TimerTask() {
+				public void run() {
+					try {
+						Long[] tIDs = (Long[])guestsIDsToRemove.toArray();
+						for (int i = 0; i < tIDs.length; i++) {
+							long tGuestID = tIDs[i].longValue();
+							try {
+								dataHandler.getUsersCache().removeGuest(tGuestID);
+							}
+							catch (NotRegisteredException e) {
+								guestsIDsToRemove.remove(tGuestID);
+								continue;
+							}
+							SystemLogger.fine("The guest with id " + tGuestID + " has successfuly been removed from the forum.");
+							guestsIDsToRemove.remove(tGuestID);
+						}
+					}
+					catch (DatabaseUpdateException e) {
+						return;
+					}
+				}
+			};
+			guestsIDsRemovalTimer.schedule(guestIDsRemovalTask, new Date(), 5000);
+		}
 	}
 
 	// User related methods
@@ -108,9 +135,10 @@ public class UsersController {
 	 * @return
 	 * 		A collection of all the user-name of members which are currently active
 	 * 		(logged-in to the forum)
+	 * @throws DatabaseRetrievalException 
 	 */
-	public Collection<String> getActiveMemberNames() {
-		return this.activeMembersUserNames;
+	public Collection<String> getActiveMemberNames() throws DatabaseRetrievalException {
+		return this.dataHandler.getUsersCache().getActiveMemberUserNames();
 	}
 
 	/**
@@ -146,6 +174,7 @@ public class UsersController {
 	}
 
 	/**
+	 * @throws DatabaseRetrievalException 
 	 * @see	ForumFacade#registerNewMember(String, String, String, String, String)
 	 */
 	public long registerNewMember(final String username, final String password, final String lastName,
@@ -194,22 +223,38 @@ public class UsersController {
 	/**
 	 * Adds a new user-name of a member who has been logged-in to the forum
 	 *  
-	 * @param usernameToAdd
+	 * @param memberIDToAdd
 	 * 		The user-name of the member which should be added to the active members collection
+	 * @throws DatabaseUpdateException 
 	 */
-	private void addActiveMemberUsername(String usernameToAdd) {
-		this.activeMembersUserNames.add(usernameToAdd);
+	private void addActiveMemberID(long memberIDToAdd) throws DatabaseUpdateException {
+		this.dataHandler.getUsersCache().addActiveMemberID(memberIDToAdd);
+
+		/*		Integer tConnectedNumbers = this.activeMembersUserNames.get(usernameToAdd);
+		if (tConnectedNumbers == null)
+			this.activeMembersUserNames.put(usernameToAdd, 1);
+		else
+			this.activeMembersUserNames.put(usernameToAdd, tConnectedNumbers + 1);
+		 */
 	}
 
 	/**
 	 * Removes a user-name of a member who has been logged-out from the forum
 	 * 
-	 * @param usernameToRemove
-	 * 		The user-name of the member which should be removed from the active
+	 * @param memberIdToRemove
+	 * 		The id of the member which should be removed from the active
 	 * 		members collection
+	 * @throws DatabaseUpdateException 
+	 * @throws NotConnectedException 
 	 */
-	private void removeActiveMemberUsername(String usernameToRemove) {
-		this.activeMembersUserNames.remove(usernameToRemove);
+	private void removeActiveMemberID(long memberIdToRemove) throws NotConnectedException, DatabaseUpdateException {
+		this.dataHandler.getUsersCache().removeActiveMemberID(memberIdToRemove);
+
+		/*Integer toRemove = this.activeMembersUserNames.get(usernameToRemove);
+		this.activeMembersUserNames.put(usernameToRemove, toRemove - 1);
+		if (toRemove.intValue() - 1 == 0)
+			this.activeMembersUserNames.remove(usernameToRemove);
+		 */
 	}	
 
 	/**
@@ -220,7 +265,7 @@ public class UsersController {
 	WrongPasswordException, DatabaseRetrievalException {
 		SystemLogger.fine("A member with username " + username + " tries to log-in");
 		final ForumMember tMemberToLogIn = this.dataHandler.getUsersCache().getMemberByUsername(username);
-		if (tMemberToLogIn == null) {
+		if (tMemberToLogIn == null || !tMemberToLogIn.getUsername().equals(username)) {
 			SystemLogger.fine("A member with username " + username + " doesn't exist, can't log-in");
 			throw new NotRegisteredException(username);
 		}
@@ -228,8 +273,13 @@ public class UsersController {
 			SystemLogger.fine("Can't log-in a member with username " + username + " because a wrong password was given");
 			throw new WrongPasswordException();
 		}
-		this.addActiveMemberUsername(username);
-		return tMemberToLogIn;
+		try {
+			this.addActiveMemberID(tMemberToLogIn.getID());
+			return tMemberToLogIn;
+		}
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
 	}
 
 	/**
@@ -238,11 +288,61 @@ public class UsersController {
 	 */
 	public void logout(final String username) throws NotConnectedException {
 		SystemLogger.fine("A user with username " + username + " requests to log-out the forum");
-		if (this.activeMembersUserNames.contains(username)) {
-			this.removeActiveMemberUsername(username);
-			SystemLogger.info("The member with username " + username + " has logged-out from the forum");
+		try {
+			long tMemberID = this.dataHandler.getUsersCache().getMemberByUsername(username).getID();
+			this.removeActiveMemberID(tMemberID);
 		}
-		else throw new NotConnectedException(username);
+		catch (DatabaseUpdateException e) {
+			SystemLogger.severe("Database connection error occurred, the server will try to remove " +
+			" the username later.");
+			membersUsernamesToRemove.add(username);
+			removeUsernamesFromDatabase();
+		}
+		catch (DatabaseRetrievalException e) {
+			SystemLogger.severe("Database connection error occurred, the server will try to remove " +
+			" the username later.");
+			membersUsernamesToRemove.add(username);
+			removeUsernamesFromDatabase();
+		}
+
+		SystemLogger.info("The member with username " + username + " has logged-out from the forum");
+		//}
+	}
+
+	private void removeUsernamesFromDatabase() {
+		if (membersUsernamesRemovalTimer != null) {
+			membersUsernamesRemovalTimer.cancel();
+			membersUsernamesRemovalTimer.purge();
+		}
+		membersUsernamesRemovalTimer = new Timer();
+		if (membersUsernamesToRemoveTask != null)
+			membersUsernamesToRemoveTask.cancel();
+		membersUsernamesToRemoveTask = new TimerTask() {
+			public void run() {
+				try {
+					String[] tUsernames = (String[])membersUsernamesToRemove.toArray();
+					for (int i = 0; i < tUsernames.length; i++) {
+						try {
+							long tMemberID = dataHandler.getUsersCache().getMemberByUsername(tUsernames[i]).getID();
+							dataHandler.getUsersCache().removeActiveMemberID(tMemberID);
+						}
+						catch (NotConnectedException e) {
+							membersUsernamesToRemove.remove(tUsernames[i]);
+							continue;
+						}
+						SystemLogger.fine("The member with username " + tUsernames[i] + " has successfuly been removed from the forum.");
+						membersUsernamesToRemove.remove(tUsernames[i]);
+					}
+				}
+				catch (DatabaseUpdateException e) {
+					return;
+				}
+				catch (DatabaseRetrievalException e) {
+					return;
+				}
+			}
+		};
+		membersUsernamesRemovalTimer.schedule(membersUsernamesToRemoveTask, new Date(), 5000);
 	}
 
 	/**
@@ -288,7 +388,7 @@ public class UsersController {
 		String tEmail = null;
 		boolean tShouldAskPassword = false;
 
-		
+
 		// check if the given email is already assigned to a different member
 		if (email != null) {
 
@@ -418,6 +518,34 @@ public class UsersController {
 		}
 	}
 
+	/**
+	 * @see
+	 * 		ForumFacade#demoteToBeMember(long, String)
+	 */
+	public void demoteToBeMember(final long applicantID, final String username) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException {
+		try {
+			SystemLogger.info("A user with id " + applicantID + " requests to demote a user " +
+					username + " to be a regular forum member.");
+			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(applicantID);
+			if (tApplicant.isAllowed(Permission.SET_MODERATOR)) {
+				SystemLogger.info("Permission granted for user " + applicantID + ".");
+				final ForumUser tForumUser = this.dataHandler.getUsersCache().getMemberByUsername(username);
+				tForumUser.setPermissions(this.getDefaultMemberPermissions());
+				this.dataHandler.getUsersCache().updateInDatabase(tForumUser);
+				SystemLogger.info("The user with " + username + " has been successfully demoted to be a " +
+				"regular member of the forum.");
+			}
+			else {
+				SystemLogger.info("unpermitted operation for user " + applicantID + ".");
+				throw new NotPermittedException(applicantID, Permission.SET_MODERATOR);
+			}
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
 	// Default permissions methods
 
 	/**
@@ -455,7 +583,6 @@ public class UsersController {
 		final Collection<Permission> toReturn = this.getDefaultMemberPermissions();
 		toReturn.add(Permission.DELETE_THREAD);
 		toReturn.add(Permission.DELETE_MESSAGE);
-		toReturn.add(Permission.SET_MODERATOR);
 		return toReturn;
 	}
 }

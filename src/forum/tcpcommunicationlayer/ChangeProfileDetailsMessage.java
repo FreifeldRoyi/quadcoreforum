@@ -16,6 +16,8 @@ public class ChangeProfileDetailsMessage extends ClientMessage {
 
 	private static final long serialVersionUID = -2723317717299435031L;
 
+	private long memberID;
+	
 	/* The user-name of the user. */
 	private String username;
 
@@ -33,8 +35,9 @@ public class ChangeProfileDetailsMessage extends ClientMessage {
 
 	private boolean shouldAskPassword;
 
-	public ChangeProfileDetailsMessage(final String username, final String password, final String lastname, 
+	public ChangeProfileDetailsMessage(final long memberID, final String username, final String password, final String lastname, 
 			final String firstname, final String email, final boolean shouldAskPassword) {
+		this.memberID = memberID;
 		this.username = username;
 		this.password = password;		
 		this.firstname = firstname;
@@ -53,10 +56,11 @@ public class ChangeProfileDetailsMessage extends ClientMessage {
 
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		try {
-			long memberIDToUpdate = forum.getMemberIdByUsernameAndOrEmail(username, email);
-
+			
+				if (memberID < 0)
+					memberID = forum.getMemberIdByUsernameAndOrEmail(username, email);
 				UIMember tUpdatedMember = 
-					forum.updateMemberProfile(memberIDToUpdate, this.username, this.password, 
+					forum.updateMemberProfile(memberID, this.username, this.password, 
 							this.lastname, this.firstname, this.email, this.shouldAskPassword);
 
 				returnObj.setResponse("profiledetailsupdatesuccess\t" + tUpdatedMember.getID() + "\t" + 

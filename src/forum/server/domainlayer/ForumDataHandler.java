@@ -26,19 +26,19 @@ public class ForumDataHandler {
 	private static final String ADMIN_ENCRYPTED_PASSWORD = PasswordEncryptor.encryptMD5("1234");
 	private static final String ADMIN_EMAIL = "qcforuminfo@gmail.com";
 	private static final Set<Permission> ADMIN_PERMISSIONS = new HashSet<Permission>();
-	
+
 	static { // initializes administrator permissions
 		ForumDataHandler.ADMIN_PERMISSIONS.addAll(Arrays.asList(Permission.values()));
 	}	
-	
+
 	// this cache is responsible of handling the users connected to the forum
 	private final UsersCache usersCache;
 	// this cache is responsible if handling the forum subjects, threads and messages
 	private final MessagesCache messagesCache;
-	
+
 	// the forum administrator
 	private ForumMember admin;
-	
+
 	/**
 	 * The class constructor.
 	 * 
@@ -53,11 +53,11 @@ public class ForumDataHandler {
 	public ForumDataHandler() throws DatabaseRetrievalException, DatabaseUpdateException {
 		SystemLogger.info("Initializes cache memories");
 		this.usersCache = new UsersCache();
-		this.messagesCache = new MessagesCache();
+		this.messagesCache = new MessagesCache(false);
 		SystemLogger.info("Cache memories have been initializes successfuly");	
 		this.initializeAdmin();
 	}
-	
+
 	/**
 	 * Initializes the forum administrator details to the initial details.
 	 * 
@@ -76,9 +76,9 @@ public class ForumDataHandler {
 		}
 		catch (MemberAlreadyExistsException e) {
 			SystemLogger.info("Admin was previously created in the database");
-		}
-	}	
-	
+		}	
+	}
+
 	/**
 	 * 
 	 * @return
@@ -88,7 +88,7 @@ public class ForumDataHandler {
 	public UsersCache getUsersCache() {
 		return this.usersCache;
 	}
-	
+
 	/**
 	 * 
 	 * @return

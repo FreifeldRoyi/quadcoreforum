@@ -8,6 +8,8 @@ package forum.server.updatedpersistentlayer.pipe;
 
 import java.util.*;
 
+import org.hibernate.SessionFactory;
+
 import forum.server.domainlayer.user.*;
 import forum.server.domainlayer.message.*;
 import forum.server.updatedpersistentlayer.*;
@@ -24,6 +26,12 @@ public interface PersistenceDataHandler {
 
 	// User related methods
 
+	public long getGuestsNumber() throws DatabaseRetrievalException;
+
+	public long getNextFreeGuestID() throws DatabaseRetrievalException;
+
+	public void removeGuest(final long guestID) throws DatabaseUpdateException;	
+	
 	/**
 	 * 
 	 * @return
@@ -34,6 +42,13 @@ public interface PersistenceDataHandler {
 	 */
 	public long getFirstFreeMemberID() throws DatabaseRetrievalException;
 
+	public Collection<String> getActiveMemberUserNames() throws DatabaseRetrievalException;
+
+	public void addActiveMemberID(long memberIDToAdd) throws DatabaseUpdateException;	
+		
+	public void removeActiveMemberID(final long memberID) throws NotConnectedException, DatabaseUpdateException;
+	
+	
 	/**
 	 * 
 	 * @return

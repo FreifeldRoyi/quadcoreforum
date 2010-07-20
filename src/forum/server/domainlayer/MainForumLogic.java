@@ -65,7 +65,10 @@ public class MainForumLogic implements ForumFacade {
 		try {
 			ForumDataHandler tDataHandler = new ForumDataHandler();
 
-			File tFile = new File("src/forum/server/domainlayer/search/cmpssearch/compassSettings.xml");
+			String tOutputPath = System.getProperty("java.class.path");
+			int tIndexOfSemiColon = tOutputPath.indexOf(";");
+			tOutputPath = tIndexOfSemiColon != -1? tOutputPath.substring(0, tIndexOfSemiColon) : tOutputPath;
+			File tFile = new File(tOutputPath + System.getProperty("file.separator") + "forum/server/util/compassSettings.xml");
 
 			CompassConfiguration tConf = CompassConfigurationFactory.newConfiguration().configure(tFile);               
 
@@ -94,11 +97,13 @@ public class MainForumLogic implements ForumFacade {
 	// Guest related methods
 
 	/**
+	 * @throws DatabaseRetrievalException 
 	 * @see
 	 * 		ForumFacade#addGuest()
 	 */
-	public UIUser addGuest() {
+	public UIUser addGuest() throws DatabaseUpdateException {
 		return this.usersController.addGuest();
+
 	}
 
 	/**
@@ -110,20 +115,22 @@ public class MainForumLogic implements ForumFacade {
 	}
 
 	/**
+	 * @throws DatabaseRetrievalException 
 	 * @see
 	 * 		ForumFacade#getActiveGuestsNumber()
 	 */
-	public long getActiveGuestsNumber() {
+	public long getActiveGuestsNumber() throws DatabaseRetrievalException {
 		return this.usersController.getActiveGuestsNumber();
 	}
 
 	// User related methods
 
 	/**
+	 * @throws DatabaseRetrievalException 
 	 * @see
 	 * 		ForumFacade#getActiveMemberUserNames()
 	 */
-	public Collection<String> getActiveMemberUserNames() {
+	public Collection<String> getActiveMemberUserNames() throws DatabaseRetrievalException {
 		return this.usersController.getActiveMemberNames();
 	}
 
@@ -204,6 +211,15 @@ public class MainForumLogic implements ForumFacade {
 	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException {
 		this.usersController.promoteToBeModerator(applicantID, username);
+	}
+
+	/**
+	 * @see
+	 * 		ForumFacade#demoteToBeMember(long, String)
+	 */
+	public void demoteToBeMember(final long applicantID, final String username) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException {
+		this.usersController.demoteToBeMember(applicantID, username);
 	}
 
 	// Subject related methods

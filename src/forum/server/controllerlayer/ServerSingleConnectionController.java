@@ -98,7 +98,7 @@ public class ServerSingleConnectionController implements Runnable {
 				else if (response.memberUsernameChanged()) {
 					this.userConnected = true;
 					this.connectedUserUsername = response.getConnectedMemberUsername();
-				}				
+				}
 
 				System.out.println(response.getResponse() + " server response");
 				/* Send response back to the client */

@@ -29,8 +29,9 @@ public interface ForumFacade { //extends SearchEngine {
 	 *
 	 * @return
 	 * 		The created guest
+	 * @throws DatabaseUpdateException
 	 */
-	public UIUser addGuest();
+	public UIUser addGuest() throws DatabaseUpdateException;
 
 	/**
 	 * Unregisters a guest with a given id. 
@@ -45,16 +46,18 @@ public interface ForumFacade { //extends SearchEngine {
 	/**
 	 * @return
 	 * 		The number of active forum guests - who currently view the forum contents
+	 * @throws DatabaseRetrievalException 
 	 */
-	public long getActiveGuestsNumber();
+	public long getActiveGuestsNumber() throws DatabaseRetrievalException;
 
 	// User related methods
 
 	/**
 	 * @return
 	 * 		A collection of the currently active forum members user-names
+	 * @throws DatabaseRetrievalException 
 	 */
-	public Collection<String> getActiveMemberUserNames();
+	public Collection<String> getActiveMemberUserNames() throws DatabaseRetrievalException;
 
 	/**
 	 * 
@@ -166,7 +169,6 @@ public interface ForumFacade { //extends SearchEngine {
 	public long registerNewMember(final String username, final String password, final String lastName,
 			final String firstName, final String email) throws MemberAlreadyExistsException, DatabaseUpdateException;
 
-
 	/**
 	 * 
 	 * Makes a registered forum member to be a moderator and get specific moderator permissions like edit 
@@ -187,6 +189,26 @@ public interface ForumFacade { //extends SearchEngine {
 	public void promoteToBeModerator(final long applicantID, final String username) throws NotPermittedException, 
 	NotRegisteredException, DatabaseUpdateException;
 
+	/**
+	 * 
+	 * Makes a registered forum member to be a regular member and get only standard member permissions like
+	 * view and reply to messages
+	 * 
+	 * @param applicantID
+	 * 		The id of the user which asks the demotion, typically the forum administrator
+	 * @param username
+	 * 		The user-name of the user for whom the demotion is asked
+	 * 
+	 * @throws NotPermittedException
+	 * 		In case the asking user doesn't have the permission to change permissions
+	 * @throws NotRegisteredException
+	 * 		In case the user which should be demoted, isn't registered as a forum member
+	 * @throws DatabaseUpdateException
+	 *		If a problem has occurred while trying to update the database of the forum
+	 */
+	public void demoteToBeMember(final long applicantID, final String username) throws NotPermittedException, 
+	NotRegisteredException, DatabaseUpdateException;
+	
 	/**
 	 * 
 	 * @param memberID

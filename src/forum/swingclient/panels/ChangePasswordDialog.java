@@ -69,7 +69,7 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 	}			
 	// End of KeyListener implementation
 
-	public ChangePasswordDialog(final long memberID) {
+	public ChangePasswordDialog(final long memberID, final boolean showCheckBox) {
 		super();
 		try {
 			controller = ControllerHandlerFactory.getPipe();
@@ -93,9 +93,9 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.lbl_newPassword = new JLabel("New password:");
 		this.lbl_confirmPassword = new JLabel("Confirm password:");
 
-		this.pass_field_prevPassword = new JPasswordField();
-		this.pass_field_newPassword = new JPasswordField();
-		this.pass_field_confirmPassword = new JPasswordField();
+		this.pass_field_prevPassword = new JRestrictedLengthPasswordField(20, 20);
+		this.pass_field_newPassword = new JRestrictedLengthPasswordField(20, 20);
+		this.pass_field_confirmPassword = new JRestrictedLengthPasswordField(20, 20);
 
 		this.pass_field_prevPassword.setFont(new Font("Tahoma", Font.BOLD, 12));
 		this.pass_field_newPassword.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -180,6 +180,9 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 
 		};	
 
+		if (!showCheckBox)
+			chk_dont_show_again.setVisible(false);
+		
 		btn_cancel_listener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -196,6 +199,7 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 		
 		this.btn_ok.addActionListener(btn_ok_listener);
 		this.btn_cancel.addActionListener(btn_cancel_listener);
+		
 		
 	}
 
@@ -340,9 +344,4 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 		}
 	}
 
-	public static void main(String[] args) {
-		ChangePasswordDialog tDialog = new ChangePasswordDialog(10);
-		tDialog.setVisible(true);
-		System.out.println(tDialog.getHeight());
-	}
 }

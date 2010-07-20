@@ -67,6 +67,30 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 
 	/**
 	 * @see
+	 * 		PersistenceDataHandler#getGuestsNumber()
+	 */
+	public long getGuestsNumber() throws DatabaseRetrievalException {
+		return this.usersHandler.getGuestsNumber(factory);		
+	}
+	
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getNextFreeGuestID()
+	 */	
+	public long getNextFreeGuestID() throws DatabaseRetrievalException {
+		return this.usersHandler.getNextFreeGuestID(factory);
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#removeGuest(long)
+	 */	
+	public void removeGuest(final long guestID) throws DatabaseUpdateException {
+		this.usersHandler.removeGuest(factory, guestID);
+	}
+
+	/**
+	 * @see
 	 * 		PersistenceDataHandler#getFirstFreeMessageID()
 	 */
 
@@ -74,6 +98,30 @@ public class SQLpersistenceDataHandler implements PersistenceDataHandler {
 		return this.usersHandler.getFirstFreeMemberID(factory);
 	}
 
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getActiveMemberUserNames()
+	 */
+	public Collection<String> getActiveMemberUserNames() throws DatabaseRetrievalException {
+		return this.usersHandler.getActiveMemberUserNames(factory);
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#addActiveMemberID(long)
+	 */
+	public void addActiveMemberID(long memberIDToAdd) throws DatabaseUpdateException {
+		this.usersHandler.addActiveMemberID(factory, memberIDToAdd);
+	}
+	
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#removeActiveMemberID(SessionFactory, long)
+	 */
+	public void removeActiveMemberID(final long memberID) throws NotConnectedException, DatabaseUpdateException {
+		this.usersHandler.removeActiveMemberID(factory, memberID);
+	}
+	
 	/**
 	 * @see
 	 * 		PersistenceDataHandler#getAllMembers()

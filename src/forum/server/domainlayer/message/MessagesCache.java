@@ -10,7 +10,6 @@ package forum.server.domainlayer.message;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
@@ -20,10 +19,8 @@ import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
 public class MessagesCache {	
 	private final PersistenceDataHandler pipe; // A pipe to the persistence layer
 
-	private long nextFreeSubjectID;
-	private long nextFreeThreadID;
-	private long nextFreeMessageID;
-
+	private boolean shouldCaching;
+	
 	private final Map<Long, ForumSubject> idsToSubjectsMapping;
 	private final Map<Long, ForumThread> idsToThreadsMapping;
 	private final Map<Long, ForumMessage> idsToMessagesMapping;
@@ -33,12 +30,9 @@ public class MessagesCache {
 	 * 
 	 * Initializes a new cache instance that handles all the forum content operations against the persistent layer
 	 */
-	public MessagesCache() throws DatabaseRetrievalException {
+	public MessagesCache(boolean shouldCaching) throws DatabaseRetrievalException {
 		this.pipe = PersistenceFactory.getPipe();
 		// loads the next free forum content ids according to the forum database
-		this.nextFreeSubjectID =  this.pipe.getFirstFreeSubjectID();
-		this.nextFreeThreadID =  this.pipe.getFirstFreeThreadID();
-		this.nextFreeMessageID = this.pipe.getFirstFreeMessageID();
 		this.idsToSubjectsMapping = new HashMap<Long, ForumSubject>();
 		this.idsToThreadsMapping = new HashMap<Long, ForumThread>();
 		this.idsToMessagesMapping = new HashMap<Long, ForumMessage>();
@@ -51,8 +45,8 @@ public class MessagesCache {
 	 * 
 	 * 		The methods promises that the returned id hasn't been assigned yet to any subject
 	 */
-	private long getNextSubjectID() {
-		return this.nextFreeSubjectID++;
+	private long getNextSubjectID() throws DatabaseRetrievalException {
+		return this.pipe.getFirstFreeSubjectID();
 	}
 
 	/**
@@ -62,8 +56,8 @@ public class MessagesCache {
 	 * 
 	 * 		The methods promises that the returned id hasn't been assigned yet to any thread
 	 */
-	private long getNextThreadID() {
-		return this.nextFreeThreadID++;
+	private long getNextThreadID() throws DatabaseRetrievalException {
+		return this.pipe.getFirstFreeThreadID();
 	}
 
 	/**
@@ -73,8 +67,8 @@ public class MessagesCache {
 	 * 
 	 * 		The methods promises that the returned id hasn't been assigned yet to any message
 	 */
-	private long getNextMessageID() {
-		return this.nextFreeMessageID++;
+	private long getNextMessageID() throws DatabaseRetrievalException {
+		return this.pipe.getFirstFreeMessageID();
 	}
 
 	// Subject related methods
@@ -113,7 +107,7 @@ public class MessagesCache {
 	 * @throws DatabaseRetrievalException
 	 */
 	public ForumSubject getSubjectByID(final long subjectID) throws SubjectNotFoundException, DatabaseRetrievalException {
-		if (this.idsToSubjectsMapping.containsKey(subjectID))
+		if (shouldCaching && this.idsToSubjectsMapping.containsKey(subjectID))
 			return this.idsToSubjectsMapping.get(subjectID);
 		else {
 			ForumSubject toReturn = this.pipe.getSubjectByID(subjectID);
@@ -141,11 +135,16 @@ public class MessagesCache {
 	 */
 	public ForumSubject createNewSubject(final String name, final String description, final long fatherID) throws
 	DatabaseUpdateException {
-		long tSubjectID = this.getNextSubjectID();
-		this.pipe.addNewSubject(tSubjectID, name, description, fatherID);
-		ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description, fatherID);
-		this.idsToSubjectsMapping.put(tNewSubject.getID(), tNewSubject);
-		return tNewSubject;			
+		try {
+			long tSubjectID = this.getNextSubjectID();
+			this.pipe.addNewSubject(tSubjectID, name, description, fatherID);
+			ForumSubject tNewSubject = new ForumSubject(tSubjectID, name, description, fatherID);
+			this.idsToSubjectsMapping.put(tNewSubject.getID(), tNewSubject);
+			return tNewSubject;	
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -184,7 +183,7 @@ public class MessagesCache {
 		this.pipe.deleteASubject(subjectID);
 		this.idsToSubjectsMapping.remove(subjectID);
 	}
-	
+
 	// Thread related methods
 
 	/**
@@ -203,7 +202,7 @@ public class MessagesCache {
 	 * 		In case the required data can't be retrieved from the database due to a database connection error
 	 */
 	public ForumThread getThreadByID(long threadID) throws ThreadNotFoundException, DatabaseRetrievalException {
-		if (this.idsToThreadsMapping.containsKey(threadID))
+		if (shouldCaching && this.idsToThreadsMapping.containsKey(threadID))
 			return this.idsToThreadsMapping.get(threadID);
 		else {
 			ForumThread toReturn = this.pipe.getThreadByID(threadID);
@@ -250,18 +249,18 @@ public class MessagesCache {
 	 * 		In case the thread can't be deleted from the database due to a database connection error
 	 */
 	public Collection<Long> deleteATread(final long threadID) throws ThreadNotFoundException, DatabaseUpdateException {
-/*		Collection<ForumMessage> tDeletedMessages = new Vector<ForumMessage>();
+		/*		Collection<ForumMessage> tDeletedMessages = new Vector<ForumMessage>();
 		try {
 			ForumThread tThreadToDelete = this.pipe.getThreadByID(threadID);
 			long tRootMessageID = tThreadToDelete.getRootMessageID();
 			ForumMessage tRootMessage = this.getMessageByID(tRootMessageID);
-			
+
 			for (long tMessageID :)
-			
+
 		} catch (DatabaseRetrievalException e) {
 			throw new DatabaseUpdateException();
 		}*/
-		
+
 		Collection<Long> tRecDeletedMessages = this.pipe.deleteAThread(threadID); // recursively deleted messages
 		this.idsToThreadsMapping.remove(threadID);
 		for (long tMessageID : tRecDeletedMessages)
@@ -275,7 +274,7 @@ public class MessagesCache {
 		if (!this.idsToMessagesMapping.containsKey(updatedThread.getID()))
 			this.idsToThreadsMapping.put(updatedThread.getID(), updatedThread);
 	}
-	
+
 	// Message related methods
 
 	/**
@@ -290,10 +289,10 @@ public class MessagesCache {
 	 * @throws MessageNotFoundException
 	 * 		In case a message with the given id wasn't found neither in the cache memory nor in the database
 	 * @throws DatabaseRetrievalException
-	 * 		In case the required data can't be retreived from the database
+	 * 		In case the required data can't be retrieved from the database
 	 */
 	public ForumMessage getMessageByID(final long messageID) throws MessageNotFoundException, DatabaseRetrievalException {
-		if (this.idsToMessagesMapping.containsKey(messageID))
+		if (shouldCaching && this.idsToMessagesMapping.containsKey(messageID))
 			return this.idsToMessagesMapping.get(messageID);
 		else {
 			ForumMessage toReturn = this.pipe.getMessageByID(messageID);
@@ -301,7 +300,7 @@ public class MessagesCache {
 			return toReturn;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -332,11 +331,16 @@ public class MessagesCache {
 	 */
 	public ForumMessage createNewMessage(final long authorID, final String title, 
 			final String content, final long fatherID) throws DatabaseUpdateException {
-		long tMessageID = this.getNextMessageID();
-		ForumMessage tNewMessage = new ForumMessage(tMessageID, authorID, title, content, fatherID);
-		this.pipe.addNewMessage(tMessageID, authorID, title, content, fatherID);
-		this.idsToMessagesMapping.put(tMessageID, tNewMessage);
-		return tNewMessage;
+		try {
+			long tMessageID = this.getNextMessageID();
+			ForumMessage tNewMessage = new ForumMessage(tMessageID, authorID, title, content, fatherID);
+			this.pipe.addNewMessage(tMessageID, authorID, title, content, fatherID);
+			this.idsToMessagesMapping.put(tMessageID, tNewMessage);
+			return tNewMessage;
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**

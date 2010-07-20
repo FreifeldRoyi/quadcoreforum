@@ -53,16 +53,23 @@ public class UsersControllerTest extends TestCase {
 	 */
 	@Test
 	public void testGuestMethods() {
-		System.out.println("a");
-		assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 0);
-		final UIUser tGuest1 = this.userControllerUnderTest.addGuest();
-		assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 1);
-		final UIUser tGuest2 = this.userControllerUnderTest.addGuest();
-		assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 2);
-		this.userControllerUnderTest.removeGuest(tGuest1.getID());
-		assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 1);
-		this.userControllerUnderTest.removeGuest(tGuest2.getID());
-		assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 0);
+		try {
+			assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 0);
+			final UIUser tGuest1 = this.userControllerUnderTest.addGuest();
+			assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 1);
+			final UIUser tGuest2 = this.userControllerUnderTest.addGuest();
+			assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 2);
+			this.userControllerUnderTest.removeGuest(tGuest1.getID());
+			assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 1);
+			this.userControllerUnderTest.removeGuest(tGuest2.getID());
+			assertTrue(this.userControllerUnderTest.getActiveGuestsNumber() == 0);
+		}
+		catch (DatabaseRetrievalException e) {
+			fail(e.getMessage());
+		}
+		catch (DatabaseUpdateException e) {
+			fail(e.getMessage());
+		}
 	}
 
 	/**
