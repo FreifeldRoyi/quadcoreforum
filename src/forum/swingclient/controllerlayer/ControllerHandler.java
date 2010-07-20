@@ -30,10 +30,15 @@ public abstract class ControllerHandler extends GUIObservable {
 		}
 	}
 	
+	public abstract void getMemberDetails(final long memberID, final Component comp);
+	
 	public abstract void recoverPassword(final String username, final String email, final String password, final Component comp);
 
 	public abstract void changePassword(final long memberID, final String prevPassword, final String newPassword, 
 			final boolean shouldAskNewPassword, final Component comp);
+
+	public abstract void updateMemberDetails(final Component comp, final long memberID, final String username,
+			final String firstName, final String lastName, final String email);
 	
 	public abstract void registerToForum(final Component comp, String username, String password, 
 			String email, String firstName, String lastName);
@@ -123,6 +128,9 @@ public abstract class ControllerHandler extends GUIObservable {
 	
 	public abstract void promoteToModerator(Component comp, String username);
 
+	public abstract void demoteToMember(Component comp, String username);
+
+	
 	// according to the prev message id we know if the number of view of the thread should be updated - 
 	// if the ids are the same then no otherwise yes
 	public abstract void getPath(Component comp, long prevFatherMessageID, long messageID);

@@ -152,8 +152,7 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 
 									if (encodedView.startsWith("deletesubjectsuccess")) {
 										JOptionPane.showMessageDialog(SubjectsPanel.this, 
-												"The subject with id " + tSubjectToDeleteID + " was deleted " +
-												" successfully.", "delete success", JOptionPane.INFORMATION_MESSAGE);
+												"The subject was deleted successfully.", "delete success", JOptionPane.INFORMATION_MESSAGE);
 										controller.deleteObserver(this);
 										shouldScrollTo = -1;
 										new Thread(new Runnable() {
@@ -180,19 +179,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 			}
 		});
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 	}
 

@@ -1,6 +1,7 @@
 package forum.server.updatedpersistentlayer.pipe.user;
 
 
+import java.math.BigInteger;
 import java.util.*;
 
 import org.hibernate.*;
@@ -73,6 +74,68 @@ public class UsersPersistenceHandler {
 	}
 
 	/**
+	 * @see
+	 * 		PersistenceDataHandler#getGuestsNumber()
+	 */
+	@SuppressWarnings("unchecked")
+	public long getGuestsNumber(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		long toReturn = -1;
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select count(UserID) from ConnectedUsers where UserID < -1";
+		List<BigInteger> tResult = (List<BigInteger>)session.createSQLQuery(query).list();
+		if (tResult.get(0) != null)
+			toReturn = tResult.get(0).longValue();
+		try {
+			this.commitTransaction(session);
+			return toReturn;
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#getNextFreeGuestID()
+	 */	
+	@SuppressWarnings("unchecked")
+	public long getNextFreeGuestID(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		long toReturn = -1;
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select Min(UserID) from ConnectedUsers";
+		List<BigInteger> tResult = (List<BigInteger>)session.createSQLQuery(query).list();
+		if (tResult.get(0) != null) {
+			toReturn = tResult.get(0).longValue();
+			toReturn = (toReturn >= -1)? -2 : (toReturn - 1);
+			session.createSQLQuery("insert into ConnectedUsers values(" + toReturn + ", 1)").executeUpdate();
+		}
+		else
+			throw new DatabaseRetrievalException();
+		try {
+			this.commitTransaction(session);
+			return toReturn;
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#removeGuest(long)
+	 */	
+	public void removeGuest(SessionFactory ssFactory, final long guestID) throws DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			session.createSQLQuery("delete from ConnectedUsers where UserID = " + guestID).executeUpdate();
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
+	/**
 	 * @param data
 	 * 		The forum data from required data should be retrieved
 	 * 
@@ -85,15 +148,77 @@ public class UsersPersistenceHandler {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
 		String query = "select max(userID) from MemberType";
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
-		if (tResult.get(0) != null)
-			toReturn = tResult.get(0).longValue();
+		if (tResult.get(0) != null) {
+			toReturn = tResult.get(0).longValue() + 1;
+			// add a dummy row in order to promise that the calculate id won't be taken by another server
+			session.createSQLQuery("insert into members(UserID, Username, UserPassword, Email) values (" + toReturn + ", \"username" + 
+					toReturn + "\", \"password\", \"email\")").executeUpdate();
+		}
 		try {
 			this.commitTransaction(session);
 		} 
 		catch (DatabaseUpdateException e) {
 			throw new DatabaseRetrievalException();
 		}
-		return ++toReturn;
+		return toReturn;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<String> getActiveMemberUserNames(SessionFactory ssFactory) throws DatabaseRetrievalException {
+		Session session = this.getSessionAndBeginTransaction(ssFactory);
+		String query = "select Username from ConnectedUsers as Con, Members " +
+				"as Mem where Con.UserID = Mem.UserID and Con.UserID != -1";
+		List<String> tResult = (List<String>)session.createSQLQuery(query).list();
+		Collection<String> toReturn = new HashSet(tResult);
+		try {
+			this.commitTransaction(session);
+			return toReturn;
+		} 
+		catch (DatabaseUpdateException e) {
+			throw new DatabaseRetrievalException();
+		}
+	}
+
+	public void addActiveMemberID(SessionFactory ssFactory, long memberIDToAdd) throws DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			int tUpdatedRowsNum = 
+				session.createSQLQuery("update ConnectedUsers set " + 
+						"ConnectionsNum = ConnectionsNum + 1 where UserID = " + memberIDToAdd).executeUpdate();
+			if (tUpdatedRowsNum == 0) // the user doesn't exist in the table
+				session.createSQLQuery("insert into ConnectedUsers values(" + memberIDToAdd + ", 1)").executeUpdate();			
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
+	}
+
+	/**
+	 * @see
+	 * 		PersistenceDataHandler#removeGuest(long)
+	 */	
+	@SuppressWarnings("unchecked")
+	public void removeActiveMemberID(SessionFactory ssFactory, final long memberID) throws NotConnectedException, DatabaseUpdateException {
+		try {
+			Session session = this.getSessionAndBeginTransaction(ssFactory);
+			int tUpdatedRowsNum = 
+				session.createSQLQuery("update ConnectedUsers set " + 
+						"ConnectionsNum = ConnectionsNum - 1 where UserID = " + memberID).executeUpdate();
+			if (tUpdatedRowsNum == 0)
+				throw new NotConnectedException(memberID);			
+			String query = "select ConnectionsNum from ConnectedUsers where UserID = " + memberID;
+			List<BigInteger> tResult = (List<BigInteger>)session.createSQLQuery(query).list();
+			if (tResult.get(0) != null) {
+				long tCurrent = tResult.get(0).longValue();
+				if (tCurrent == 0)
+					session.createSQLQuery("delete from ConnectedUsers where UserID = " + memberID).executeUpdate(); 
+			}
+			this.commitTransaction(session);
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -223,6 +348,8 @@ public class UsersPersistenceHandler {
 		try {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, firstName, email, permissions);
+			// now we can delete the id - in order to add the new member instead
+			session.createSQLQuery("delete from Members where UserID = " + id).executeUpdate();
 			session.save(tNewMemberType);
 			this.commitTransaction(session);
 		}

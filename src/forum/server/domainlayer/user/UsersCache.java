@@ -10,6 +10,8 @@ package forum.server.domainlayer.user;
 
 import java.util.*;
 
+import org.hibernate.SessionFactory;
+
 import forum.server.updatedpersistentlayer.*;
 import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
 import forum.server.updatedpersistentlayer.pipe.PersistenceFactory;
@@ -21,12 +23,7 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
  */
 public class UsersCache {
 
-	// The next id which can be assigned to a new client who connects to the forum
-	// the guest ids will be negative
-	private long nextFreeGuestID;
 	// The next id which can be assigned to a new member of the forum
-	// the members ids will be positive
-	private long nextFreeMemberID;
 	private final Map<Long, ForumUser> idsToUsersMapping;
 	private final PersistenceDataHandler pipe; // A pipe to the persistence layer
 
@@ -38,9 +35,11 @@ public class UsersCache {
 	 */
 	public UsersCache() throws DatabaseRetrievalException {
 		this.pipe = PersistenceFactory.getPipe();
-		this.nextFreeGuestID = -2;
-		this.nextFreeMemberID = this.pipe.getFirstFreeMemberID();
 		this.idsToUsersMapping = new HashMap<Long, ForumUser>();
+	}
+
+	public long getGuestsNumber() throws DatabaseRetrievalException {
+		return this.pipe.getGuestsNumber();
 	}
 
 	/**
@@ -48,20 +47,20 @@ public class UsersCache {
 	 * @return
 	 * 		A free id number that can be assigned to a new member of the forum, who wants to
 	 * 		register (the method promises that the returned id hasn't been assigned to an existing member)
+	 * @throws DatabaseRetrievalException 
 	 */
-	private long getNextFreeMemberID() {
-		// TODO: Make this to be synchronized in order to prevent two members with the same id
-		return this.nextFreeMemberID++;
+	private long getNextFreeMemberID() throws DatabaseRetrievalException {
+		return this.pipe.getFirstFreeMemberID();
 	}
 
 	/**
 	 * 
 	 * @return
 	 * 		The next id which can be assigned to a guest
+	 * @throws DatabaseRetrievalException 
 	 */
-	private long getNextGuestID() {
-		// TODO: Make this to be synchronized in order to prevent two guests with the same id
-		return this.nextFreeGuestID--;
+	private long getNextGuestID() throws DatabaseRetrievalException {
+		return this.pipe.getNextFreeGuestID();
 	}
 
 	/**
@@ -183,11 +182,16 @@ public class UsersCache {
 	 * @return
 	 * 		The created guest
 	 */
-	public ForumUser createNewGuest(final Collection<Permission> permissions) {
-		final long tID = this.getNextGuestID();
-		final ForumUser tNewUser = new ForumUser(tID, permissions);
-		this.idsToUsersMapping.put(tID, tNewUser);
-		return tNewUser;
+	public ForumUser createNewGuest(final Collection<Permission> permissions) throws DatabaseUpdateException {
+		try {
+			final long tID = this.getNextGuestID();
+			final ForumUser tNewUser = new ForumUser(tID, permissions);
+			this.idsToUsersMapping.put(tID, tNewUser);
+			return tNewUser;
+		}
+		catch (DatabaseRetrievalException e) {
+			throw new DatabaseUpdateException();
+		}
 	}
 
 	/**
@@ -199,12 +203,30 @@ public class UsersCache {
 	 * @throws NotRegisteredException
 	 * 		In case a guest with the given id doesn't exist in the cache memory
 	 */
-	public void removeGuest(final long id) throws NotRegisteredException {
-		if (this.idsToUsersMapping.containsKey(id))			
+	public void removeGuest(final long id) throws NotRegisteredException, DatabaseUpdateException {
+		if (this.idsToUsersMapping.containsKey(id)) {
 			this.idsToUsersMapping.remove(id);
+			this.pipe.removeGuest(id);
+		}
 		else throw new NotRegisteredException(id);
 	}
 
+	public long getFirstFreeMemberID() throws DatabaseRetrievalException {
+		return this.pipe.getFirstFreeMemberID();
+	}
+
+	public Collection<String> getActiveMemberUserNames() throws DatabaseRetrievalException {
+		return this.pipe.getActiveMemberUserNames();
+	}
+
+	public void addActiveMemberID(long memberIDToAdd) throws DatabaseUpdateException {
+		this.pipe.addActiveMemberID(memberIDToAdd);
+	}
+	
+	public void removeActiveMemberID(final long memberID) throws NotConnectedException, DatabaseUpdateException {
+		this.pipe.removeActiveMemberID(memberID);
+	}
+	
 	/**
 	 * 
 	 * Creates a new member in the forum community according to the given attributes and registers it in the forum 
@@ -240,18 +262,17 @@ public class UsersCache {
 				throw new MemberAlreadyExistsException(username);
 			else if (this.getMemberByEmail(email) != null)
 				throw new MemberAlreadyExistsException(email); // TODO: throw e-mail already exists exception
+			final long id = this.getNextFreeMemberID();
+			// the new member password should be saved encrypted even in the cache
+			final ForumMember newMember = new ForumMember(id, username, PasswordEncryptor.encryptMD5(password),
+					lastName, firstName, email, permissions);
+			this.pipe.addNewMember(newMember.getID(), username, password, lastName, firstName, email, permissions);	
+			this.idsToUsersMapping.put(id, newMember);
+			return newMember;
 		}
 		catch (DatabaseRetrievalException e) {
-			e.printStackTrace();
 			throw new DatabaseUpdateException();
 		}		
-		final long id = this.getNextFreeMemberID();
-		// the new member password should be saved encrypted even in the cache
-		final ForumMember newMember = new ForumMember(id, username, PasswordEncryptor.encryptMD5(password),
-				lastName, firstName, email, permissions);
-		this.pipe.addNewMember(newMember.getID(), username, password, lastName, firstName, email, permissions);	
-		this.idsToUsersMapping.put(id, newMember);
-		return newMember;
 	}
 
 	/**

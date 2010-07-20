@@ -120,11 +120,11 @@ public class JScrollableTable extends JForumTable implements MouseMotionListener
 
 	private void constructSubjectsTable(int columnsNumber) {
 		// sets widths
-		this.setColumnWidth(0, 1);
+		this.setColumnWidth(0, 10);
 		this.setColumnWidth(1, 340);
 		this.setColumnWidth(2, 340);
-		this.setColumnWidth(3, 30);
-		this.setColumnWidth(4, 30);
+		this.setColumnWidth(3, 90);
+		this.setColumnWidth(4, 90);
 		this.setColumnWidth(5, 250);
 
 		TableCellRenderer tLeftAlignmentRenderer = new ForumTableCellRenderer(StyleConstants.ALIGN_LEFT);
@@ -139,10 +139,10 @@ public class JScrollableTable extends JForumTable implements MouseMotionListener
 
 
 	private void constructThreadsTable(int columnsNumber) {
-		this.setColumnWidth(0, 1);
+		this.setColumnWidth(0, 50);
 		this.setColumnWidth(1, 1001);
-		this.setColumnWidth(2, 30);
-		this.setColumnWidth(3, 30);
+		this.setColumnWidth(2, 100);
+		this.setColumnWidth(3, 100);
 
 		this.setColumnRenderer(1,  new ForumTableCellRenderer(StyleConstants.ALIGN_LEFT));
 

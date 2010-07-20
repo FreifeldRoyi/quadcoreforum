@@ -35,19 +35,19 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
 			Collection<UIMessage> tReplies = forum.getReplies(this.messageID, this.shouldUpdateViews);
 
-			String tResponse = this.getAuthorUsername(forum, tCurrentMessage) + "\t" + tCurrentMessage.toString() + "\n";
+			String tResponse = this.getAuthorUsername(forum, tCurrentMessage) + "\t" + tCurrentMessage.toString();
 
 			Iterator<UIMessage> iter = tReplies.iterator();
 			while (iter.hasNext()) {
 				UIMessage tCurrentReply = iter.next();
 				// TODO: reply the usernames of the authors
-				tResponse += "\tAREPLYMESSAGE: " + this.getAuthorUsername(forum, tCurrentReply) + "\t" + 
-				tCurrentReply.toString() + "\n";
+				tResponse += "\n" + "\tAREPLYMESSAGE: " + this.getAuthorUsername(forum, tCurrentReply) + "\t" + 
+				tCurrentReply.toString();
 				Collection<UIMessage> tNextLevelReplies = forum.getReplies(tCurrentReply.getMessageID(), shouldUpdateViews);
 				for (UIMessage tNextLevelCurrentReply : tNextLevelReplies)
-					tResponse +=
+					tResponse += "\n" +
 						"\t\tASUBREPLYMESSAGE: " + this.getAuthorUsername(forum, tNextLevelCurrentReply) + "\t" + 
-						tNextLevelCurrentReply.toString() + "\n";
+						tNextLevelCurrentReply.toString();
 			}
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(tResponse);

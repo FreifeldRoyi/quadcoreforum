@@ -4,11 +4,14 @@
 package forum.swingclient.panels;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -18,21 +21,12 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
 import javax.swing.SpringLayout;
-import javax.swing.UIManager;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 import forum.swingclient.controllerlayer.ControllerHandler;
@@ -40,13 +34,12 @@ import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.SystemLogger;
 
 /**
  * @author dahany
  *
  */
-public class RegistrationDialog extends JDialog implements GUIHandler {
+public class RegistrationDialog extends JDialog implements GUIHandler, KeyListener {
 
 	/*	@Override
 	public void notifyError(String errorMessage) {
@@ -62,12 +55,15 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 	 */	
 
 
-	
+
 	private static final long serialVersionUID = -5251318786616475794L;	
 
-	private JPanel mainPanel;
+	private long memberID;
+	private boolean shouldUpdateData;
+
 	private JButton registerButton;
-	private JLabel welcomeLabel;
+	private JButton cancelButton = new JButton();
+
 	private JLabel usernameLabel;
 	private JTextField usernameInput;
 	private JLabel passwordLabel;
@@ -82,17 +78,35 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 	private JTextField firstNameInput;
 	private JLabel lastNameLabel;
 	private JTextField lastNameInput;
-	private JPanel navigatePanel;
 	private JPanel registrationPanel;
 	private JPanel informationPanel;
 	private JLabel informationLabel;
 
+	private JLinkButton updatePasswordButton;
+
+
 	public ControllerHandler controller;
 
-	
-	
+	// KeyListener implementation
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		if (arg0.getKeyChar() == KeyEvent.VK_ENTER)
+			registerButton.doClick();
+		else if (arg0.getKeyChar() == KeyEvent.VK_ESCAPE)
+			cancelButton.doClick();
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		if (arg0.getKeyChar() != KeyEvent.VK_ENTER)
+			clearLabels();
+	}
+	// end of KeyListener implementation
+
 	public void refreshForum(String encodedView) {
-		System.out.println("Encoded = " + encodedView);
 		if (encodedView.startsWith("registersuccess\t")) {
 			this.controller.deleteObserver(this);
 			JOptionPane.showMessageDialog(this, "The registration process was completed successfully!",
@@ -101,58 +115,141 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 		}
 		else if (encodedView.startsWith("registererror\t"))
 			this.notifyError(encodedView);
+		else if (encodedView.startsWith("profiledetailsupdatesuccess\t")) {
+			this.controller.deleteObserver(this);
+			JOptionPane.showMessageDialog(this, "Your details were updated successfully!",
+					"success", JOptionPane.INFORMATION_MESSAGE);
+			shouldUpdateData = true;
+			this.dispose();
+		}
 	}
 
 	public void notifyError(String error) {
-		System.out.println("register  --- error");
 		if (error.startsWith("registererror\t")) {
+			this.controller.deleteObserver(this);
 			String[] tSplittedMessage = error.split("\t");
 			String tErrorMessage = tSplittedMessage[1];
 			informationLabel.setText(tErrorMessage);
 		}
-
+		else if (error.startsWith("profiledetailsupdateerror\texistingemail\t")) {
+			informationLabel.setText("The following data already exists: " + emailInput.getText());
+			makeLabelNoticeble(emailLabel, emailInput);
+		}
+		else if (error.startsWith("profiledetailsupdateerror\t")) {
+			this.controller.deleteObserver(this);
+			String[] tSplitted = error.split("\t");
+			JOptionPane.showMessageDialog(this, tSplitted[2],
+					"error", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
-	public static void main(String[] args) {
+	private void setTextFieldNoEditableAppearance(JTextField field) {
+		final Font tFont = new Font("Tahoma", Font.BOLD, 13);
+		field.setEditable(false);
+		field.setFont(tFont);
+		field.setForeground(Color.RED);
+	}
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	public RegistrationDialog(long memberID, String username, String firstName, String lastName, String email,
+			boolean enableInput) throws IOException {
+		this();
+
+		updatePasswordButton.setVisible(true);
+
+		this.passwordInput.setEnabled(false);
+		this.passwordInput.setBackground(Color.GRAY);
+
+		this.confirmPasswordInput.setEnabled(false);
+		this.confirmPasswordInput.setBackground(Color.GRAY);
+
+		this.setTextFieldNoEditableAppearance(usernameInput);
+
+		if (!enableInput) {
+			this.setTitle("Profile display");
+			this.confirmEmailInput.setEnabled(false);
+			this.confirmEmailInput.setBackground(Color.GRAY);
+
+			this.setTextFieldNoEditableAppearance(firstNameInput);
+			this.setTextFieldNoEditableAppearance(lastNameInput);
+			this.setTextFieldNoEditableAppearance(emailInput);
+
+			this.registerButton.setEnabled(false);
 		}
-		catch (Exception e) {
-			SystemLogger.warning("Can't use default system look and feel, will use java default" +
-			" look and feel style.");
-		}
+		else {
+			this.memberID = memberID;
 
+			this.confirmEmailInput.setText(email);
+			this.setTitle("Profile changing");
+
+			this.registerButton.setText("Update");
+			for (ActionListener tAl : this.registerButton.getActionListeners())
+				this.registerButton.removeActionListener(tAl);
+
+			this.registerButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					String tCheck = checkDataValidity();
+					if (tCheck.equals("O.K.")) {
+						controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
+						informationLabel.setText("");
+						controller.updateMemberDetails(RegistrationDialog.this, 
+								RegistrationDialog.this.memberID, usernameInput.getText(),
+								firstNameInput.getText(), lastNameInput.getText(), emailInput.getText());
+					}
+					else {
+						informationLabel.setText(tCheck);
+					}
+				}
+			}
+			);
+
+		}		
+		this.usernameInput.setText(username);
+		this.firstNameInput.setText(firstName);
+		this.lastNameInput.setText(lastName);
+		this.emailInput.setText(email);
+	}
+
+	public boolean shouldUpdateData() {
+		return shouldUpdateData;
+	}
+
+	public static RegistrationDialog getRegistrationDialog(Component container) throws IOException {
 		try {
-			RegistrationDialog tRegistrationPanel = new RegistrationDialog();
-
-
-			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-			int X = (screen.width / 2) - (tRegistrationPanel.getWidth() / 2); // Center horizontally.
-			int Y = (screen.height / 2) - (tRegistrationPanel.getHeight() / 2); // Center vertically.
-			tRegistrationPanel.setLocation(X, Y);
-
+			return new RegistrationDialog();
 		}
 		catch (IOException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "initialization error", 
-					JOptionPane.ERROR_MESSAGE);
-			return;
+			JOptionPane.showMessageDialog(container, "Can't connect to the forum database",
+					"error", JOptionPane.ERROR_MESSAGE);
+			throw e;
 		}
-
-
 	}
 
 	public RegistrationDialog() throws IOException {
 		super();
-		this.setTitle("Registration Page");
+		shouldUpdateData = false;
+
+		updatePasswordButton = new JLinkButton("change password", Color.black);
+		updatePasswordButton.setForeground(Color.black);
+
+		updatePasswordButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				informationLabel.setText("");
+				new ChangePasswordDialog(RegistrationDialog.this.memberID, false).setVisible(true);
+			}
+		});
+
+		updatePasswordButton.setVisible(false);
+
+		this.setTitle("Register to the forum");
 		controller = ControllerHandlerFactory.getPipe();
-		
-		
+
+
 		initGUIComponents();
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		this.getContentPane().add(mainPanel);
-		this.setMinimumSize(new Dimension(615, 640));
 
 		this.addWindowListener(new WindowListener() {
 
@@ -165,13 +262,11 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 
 
 			public void windowClosing(WindowEvent e) {
-				SystemLogger.info("The client requested to finish the registration process.");
 				controller.deleteObserver(RegistrationDialog.this);
 			}
 		});
 
 		this.setEnabled(true);
-		controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 		this.pack();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		int X = (screen.width / 2) - (this.getWidth() / 2); // Center horizontally.
@@ -181,61 +276,6 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 	}
 
 	private void initGUIComponents() {
-
-
-		navigatePanel = new JPanel();
-		welcomeLabel = new JLabel();
-
-
-
-
-		welcomeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-		welcomeLabel.setText("Hello guest!");
-
-		navigatePanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-
-		GroupLayout tNavigatePanelLayout = new GroupLayout(navigatePanel);
-		navigatePanel.setLayout(tNavigatePanelLayout);
-		JSeparator tNavigatePanelSeparator = new JSeparator();
-
-
-		tNavigatePanelLayout.setHorizontalGroup(
-				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-				.addGroup(GroupLayout.Alignment.TRAILING, tNavigatePanelLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)	
-								.addComponent(tNavigatePanelSeparator, GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
-								.addGroup(tNavigatePanelLayout.createSequentialGroup()
-										.addComponent(welcomeLabel, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 797, Short.MAX_VALUE)
-										.addGap(180, 180, 180)
-								))
-								.addContainerGap())
-		);
-		tNavigatePanelLayout.setVerticalGroup(
-				tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tNavigatePanelLayout.createSequentialGroup()
-						.addGap(16, 16, 16)
-						.addGap(16, 16, 16)
-						.addComponent(tNavigatePanelSeparator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-						.addGroup(tNavigatePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(welcomeLabel, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-						)
-						.addContainerGap())
-		);
-
-
-
-		JPanel tStatisticsPanel = new JPanel();
-
-		JMenu tFileMenu= new JMenu();
-		tFileMenu.setText("File");
-
-		JMenuItem tExitMenuItem = new JMenuItem();
-		JMenu tHelpMenu = new JMenu();
-		tFileMenu.add(tExitMenuItem);
-
 
 		this.informationPanel  = new JPanel();
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
@@ -252,70 +292,79 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 		SpringLayout jRegistrationPanel = new SpringLayout();
 		registrationPanel.setLayout(jRegistrationPanel);
 
+		Font tFont = new Font("Tahoma", Font.BOLD, 13);
+
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
-		this.usernameLabel.setFont(welcomeLabel.getFont());
+		this.usernameLabel.setFont(tFont);
 		registrationPanel.add(this.usernameLabel);
-		this.usernameInput = new JTextField(10);
+		this.usernameInput = new JRestrictedLengthTextField(20, 20, false);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.usernameInput);
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
 		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
-		this.passwordLabel.setFont(welcomeLabel.getFont());
+		this.passwordLabel.setFont(tFont);
 		registrationPanel.add(this.passwordLabel);
-		this.passwordInput = new JPasswordField(10);
+		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
 		this.passwordInput.setText("");
 		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.passwordInput);
 		this.passwordLabel.setLabelFor(this.passwordInput);
 
 		this.confirmPasswordLabel = new JLabel("Confirm Password", JLabel.TRAILING);
-		this.confirmPasswordLabel.setFont(welcomeLabel.getFont());
+		this.confirmPasswordLabel.setFont(tFont);
 		registrationPanel.add(this.confirmPasswordLabel);
-		this.confirmPasswordInput = new JPasswordField(10);
+		this.confirmPasswordInput = new JRestrictedLengthPasswordField(20, 20);
 		this.confirmPasswordInput.setText("");
 		confirmPasswordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.confirmPasswordInput);
 		this.confirmPasswordLabel.setLabelFor(this.confirmPasswordInput);
 
 		this.emailLabel = new JLabel("Email", JLabel.TRAILING);
-		this.emailLabel.setFont(welcomeLabel.getFont());
+		this.emailLabel.setFont(tFont);
 		registrationPanel.add(this.emailLabel);
-		this.emailInput = new JTextField(10);
+		this.emailInput = new JRestrictedLengthTextField(40, 40, false);
 		this.emailInput.setText("");
 		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.emailInput);
 		this.emailLabel.setLabelFor(this.emailInput);
 
 		this.confirmEmailLabel = new JLabel("Confirm Email", JLabel.TRAILING);
-		this.confirmEmailLabel.setFont(welcomeLabel.getFont());
+		this.confirmEmailLabel.setFont(tFont);
 		registrationPanel.add(this.confirmEmailLabel);
-		this.confirmEmailInput = new JTextField(10);
+		this.confirmEmailInput = new JRestrictedLengthTextField(40, 40, false);
 		this.confirmEmailInput.setText("");
 		confirmEmailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.confirmEmailInput);
 		this.confirmEmailLabel.setLabelFor(this.confirmEmailInput);
 
 		this.firstNameLabel = new JLabel("First Name", JLabel.TRAILING);
-		this.firstNameLabel.setFont(welcomeLabel.getFont());
+		this.firstNameLabel.setFont(tFont);
 		registrationPanel.add(this.firstNameLabel);
-		this.firstNameInput = new JTextField(10);
+		this.firstNameInput = new JRestrictedLengthTextField(20, 20, false);
 		this.firstNameInput.setText("");
 		firstNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.firstNameInput);
 		this.firstNameLabel.setLabelFor(this.firstNameInput);
 
 		this.lastNameLabel = new JLabel("Last Name", JLabel.TRAILING);
-		this.lastNameLabel.setFont(welcomeLabel.getFont());
+		this.lastNameLabel.setFont(tFont);
 		registrationPanel.add(this.lastNameLabel);
-		this.lastNameInput = new JTextField(10);
+		this.lastNameInput = new JRestrictedLengthTextField(20, 20, false);
 		this.lastNameInput.setText("");
 		lastNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		registrationPanel.add(this.lastNameInput);
 		this.lastNameLabel.setLabelFor(this.lastNameInput);
 
 
+		this.usernameInput.addKeyListener(this);
+		this.passwordInput.addKeyListener(this);
+		this.confirmPasswordInput.addKeyListener(this);
+		this.emailInput.addKeyListener(this);
+		this.confirmEmailInput.addKeyListener(this);
+		this.firstNameInput.addKeyListener(this);
+		this.lastNameInput.addKeyListener(this);
 
 		//		registrationPanel.add(this.registerButton);
 		//	jRegistrationPanel.putConstraint(SpringLayout.NORTH, this.registerButton,
@@ -329,36 +378,19 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 		SpringUtilities.makeCompactGrid(registrationPanel,
 				7, 2, //rows, cols
 				6, 6,        //initX, initY
-				25, 25);       //xPad, yPad
-
-
-		tStatisticsPanel.setBorder(BorderFactory.createTitledBorder("Currently Connected")); // NOI18N
-
-		GroupLayout tStatisticsPanelLayout = new GroupLayout(tStatisticsPanel);
-		tStatisticsPanel.setLayout(tStatisticsPanelLayout);
-		tStatisticsPanelLayout.setHorizontalGroup(
-				tStatisticsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tStatisticsPanelLayout.createSequentialGroup()
-						.addContainerGap(621, Short.MAX_VALUE))
-		);
-		tStatisticsPanelLayout.setVerticalGroup(
-				tStatisticsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tStatisticsPanelLayout.createSequentialGroup()
-						.addGap(29, 29, 29))
-		);
+				15, 15);       //xPad, yPad
 
 
 
 		registerButton = new JButton();
 
-		registerButton.setText("register");
+		registerButton.setText("Register");
 		registerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//				startWorkingAnimation("loading root subjects ...");
 				String tCheck = checkDataValidity();
 				if (tCheck.equals("O.K.")) {
+					controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
 					informationLabel.setText("");
-					System.out.println("controller register");
 					controller.registerToForum(registerButton, usernameInput.getText(),
 							new String(passwordInput.getPassword()), 
 							emailInput.getText(),
@@ -370,127 +402,129 @@ public class RegistrationDialog extends JDialog implements GUIHandler {
 					informationLabel.setText(tCheck);
 				}
 			}
-
 		});
 
-
-		JButton tCancelButton = new JButton();
-		tCancelButton.setText("cancel");
-		tCancelButton.setPreferredSize(new Dimension(100, 40));
-		tCancelButton.addActionListener(new ActionListener() {
-
+		cancelButton = new JButton();
+		cancelButton.setText("Cancel");
+		cancelButton.setPreferredSize(new Dimension(100, 40));
+		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				dispose();				
+				RegistrationDialog.this.dispose();				
 			}
-			
+
 		});
-		
+
 		registerButton.setPreferredSize(new Dimension(100, 40));
 
-		this.mainPanel = new JPanel();
-		mainPanel.setPreferredSize(new Dimension(600, 620));
 
-		JSeparator tMainPanelSeparator = new JSeparator();
 
-		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
-		mainPanel.setLayout(tMainPanelLayout);
+		GroupLayout tMainPanelLayout = new GroupLayout(this.getContentPane());
+		this.getContentPane().setLayout(tMainPanelLayout);
 		tMainPanelLayout.setHorizontalGroup(
 				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 				.addGroup(tMainPanelLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-								.addComponent(navigatePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-								.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-								.addComponent(tMainPanelSeparator, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 1139, Short.MAX_VALUE)
-								.addGroup(tMainPanelLayout.createSequentialGroup()
-										.addGap(0, 0, Short.MAX_VALUE)
-										.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
-										.addGap(10, 10, 10)
-										.addComponent(tCancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
-						)
-						.addContainerGap())
+						.addGap(10, 10, 10)
+						.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+						.addGap(10, 10, 10))
+						.addGroup(tMainPanelLayout.createSequentialGroup()
+								.addGap(10, 10, 10)
+								.addComponent(updatePasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addGap(0, 0, Short.MAX_VALUE)
+								.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addGap(10, 10, 10)
+								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addGap(10, 10, 10))
 		);
 
 		tMainPanelLayout.setVerticalGroup(
-				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addGroup(tMainPanelLayout.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(navigatePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGap(11, 11, 11)
-						.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tMainPanelSeparator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-						.addComponent(registrationPanel, 0, 400, Short.MAX_VALUE)
-						.addGap(11, 11, 11)
-						.addGroup(tMainPanelLayout.createParallelGroup(Alignment.TRAILING)
+				tMainPanelLayout.createSequentialGroup()
+				.addGap(10, 10, 10)
+				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+				.addGap(10, 10, 10)
+				.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+				.addGap(30, 30, 30)
+				.addGroup(tMainPanelLayout.createParallelGroup()
+						.addGroup(tMainPanelLayout.createSequentialGroup()
+								.addGap(20, 20, 20)
+								.addComponent(updatePasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
 								.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
-								.addGap(0, 0, Short.MAX_VALUE)
-								.addComponent(tCancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
-								.addContainerGap())
-		);
-		
+								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
+								.addGap(10, 10, 10));
+
+		this.setMinimumSize(new Dimension(700, 520));
+		this.setPreferredSize(new Dimension(700, 520));
+
+
 		/*
 		this.usernameInput.setText("yakirda");
-		this.passwordInput.setText("123456");
+		identification this.passwordInput.setText("123456");
 		this.confirmPasswordInput.setText("123456");
 		this.firstNameInput.setText("Yakir");
 		this.lastNameInput.setText("Dahan");
 		this.emailInput.setText("a@b.c");
 		this.confirmEmailInput.setText("a@b.c");
-		*/
+		 */
+	}
+
+	private void clearLabels() {
+		this.usernameLabel.setForeground(Color.BLACK);
+		this.passwordLabel.setForeground(Color.BLACK);
+		this.confirmPasswordLabel.setForeground(Color.BLACK);
+		this.lastNameLabel.setForeground(Color.BLACK);
+		this.firstNameLabel.setForeground(Color.BLACK);
+		this.emailLabel.setForeground(Color.BLACK);
+		this.confirmEmailLabel.setForeground(Color.BLACK);
+		this.informationLabel.setText("");
+	}
+
+	private void makeLabelNoticeble(JLabel label, JTextField field) {
+		label.setForeground(Color.RED);
+		field.selectAll();
+		field.grabFocus();
 	}
 
 	public String checkDataValidity() {
 		String toReturn = "O.K.";
-		if (this.usernameInput.getText().length() < 4)
+		if (this.usernameInput.getText().length() < 4) {
+			makeLabelNoticeble(usernameLabel, usernameInput);
+
 			toReturn = "The username must be at least 4 letters long";
-		else if(this.passwordInput.getPassword().length < 6)
+		}
+		else if (this.passwordInput.isEnabled() && this.passwordInput.getPassword().length < 6) {
+			makeLabelNoticeble(passwordLabel, passwordInput);
 			toReturn = "The password must be at least 6 letters long";
-		else if (!Arrays.equals(this.passwordInput.getPassword(), this.confirmPasswordInput.getPassword()))
+		}
+		else if (this.passwordInput.isEnabled() && !Arrays.equals(this.passwordInput.getPassword(), this.confirmPasswordInput.getPassword())) {
+			makeLabelNoticeble(passwordLabel, passwordInput);
+			makeLabelNoticeble(confirmPasswordLabel, confirmPasswordInput);
 			toReturn = "The password fields must be identical";
+		}
 		else{
 			String tEmail = this.emailInput.getText();
 			//int tIndex = tEmail.indexOf('@');
 			String tPattern = ".+@.+[.].+";
-			if (!tEmail.matches(tPattern))
-			//if ((tIndex == -1) || (tEmail.substring(tIndex + 2, tEmail.length() - 1).indexOf('.') == -1))
-				toReturn = "Invaild address. The email address must be in the form: username@domain.extension";
-			else if (!this.emailInput.getText().equals(this.confirmEmailInput.getText()))
+			if (!tEmail.matches(tPattern)) {
+				makeLabelNoticeble(emailLabel, emailInput);
+				//if ((tIndex == -1) || (tEmail.substring(tIndex + 2, tEmail.length() - 1).indexOf('.') == -1))
+				toReturn = "The email address must be in the form: username@domain.extension";
+			}
+			else if (!this.emailInput.getText().equals(this.confirmEmailInput.getText())) {
+				makeLabelNoticeble(emailLabel, emailInput);
+				makeLabelNoticeble(confirmEmailLabel, confirmEmailInput);
 				toReturn = "The email fields must be identical";
-			else if (this.firstNameInput.getText().length() == 0)
+			}
+			else if (this.firstNameInput.getText().length() == 0) {
+				makeLabelNoticeble(firstNameLabel, firstNameInput);
 				toReturn = "The field \"First Name\" is essential";
-			else if (this.lastNameInput.getText().length() == 0)
+			}
+			else if (this.lastNameInput.getText().length() == 0) {
+				makeLabelNoticeble(lastNameLabel, lastNameInput);
 				toReturn = "The field \"Last Name\" is essential";
+			}
 		}
+
 		return toReturn;
 	}
-
-
-
-	/*	public void startWorkingAnimation(String message) {
-		//		statusLabel.setText(message);
-	}
-
-	public void stopWorkingAnimation() {
-		try {
-			Thread.sleep(100);
-		} 
-		catch (InterruptedException e) { 
-			// Do nothing - continue to stop the animation
-		}
-		//		statusLabel.setText("");
-	}
-	 */
-
-
-
-
-
-
-
-
-
-
-
 
 }

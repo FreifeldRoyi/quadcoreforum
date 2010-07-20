@@ -94,9 +94,11 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 				if (tResponse == null) 
 					return;
 				else 
-					if (tResponse.equals(""))
-						JOptionPane.showMessageDialog(container, "The thread topic can't be empty!", "Modify " +
+					if (tResponse.trim().length() == 0) {
+						JOptionPane.showMessageDialog(ThreadsPanel.this, "The thread topic can't be empty!", "Modify " +
 								"thread topic", JOptionPane.ERROR_MESSAGE);
+						modifyButton.doClick();
+					}
 					else {
 						try {
 							final long tThreadToModifyID = tableModel.getIDofContentInRow(table.getSelectedRow());
@@ -115,7 +117,7 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 
 											if (encodedView.startsWith("threadupdatesuccess")) {
 												JOptionPane.showMessageDialog(ThreadsPanel.this, 
-														"The thread with id " + tThreadToModifyID + " was modified " +
+														"The thread was modified " +
 														" successfully.", "modify success", JOptionPane.INFORMATION_MESSAGE);
 
 												controller.deleteObserver(this);
@@ -169,7 +171,7 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 
 									if (encodedView.startsWith("deletesuccess")) {
 										JOptionPane.showMessageDialog(ThreadsPanel.this, 
-												"The thread with id " + tThreadToDeleteID + " was deleted " +
+												"The thread was deleted " +
 												" successfully.", "delete success", JOptionPane.INFORMATION_MESSAGE);
 										controller.deleteObserver(this);
 										shouldScrollTo = -1;

@@ -6,7 +6,6 @@ package forum.swingclient.panels;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -112,7 +111,9 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 	public void refreshForum(String encodedView) {
 		if (encodedView.startsWith("searchnotmessages")) {
 			
-
+			pnl_results.setVisible(false);
+			setResizable(false);
+			this.setMinimumSize(new Dimension(600, 255));
 			this.setSize(new Dimension(600, 255));
 
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -120,8 +121,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			int YY = (screen.height / 2) - (this.getHeight() / 2); // Center vertically.
 			this.setLocation(X, YY);
 
-			pnl_results.setVisible(false);
-
+			
 			
 			JOptionPane.showMessageDialog(this, "No messages were found", "empty", JOptionPane.INFORMATION_MESSAGE);
 
@@ -134,6 +134,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		else {
 
 			this.resultsTable.setVisible(false);
+
 			this.resultsTableModel.clearData();
 
 			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
@@ -182,6 +183,9 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 				public void actionPerformed(ActionEvent e) {
 					resultsTable.setVisible(false);
+					setResizable(false);
+					setMinimumSize(new Dimension(600, 255));
+
 					resultsTableModel.clearData();
 					int tFinalIndex = index + selectedNumberOfResults;
 					String[][] tResultsTable = new String[Math.min(searchResultsContent.length - 1 - index, SearchDialog.this.selectedNumberOfResults)][4];
@@ -202,6 +206,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 					resultsTableModel.updateData(messagesIDs, tResultsTable);
 					resultsTableModel.fireTableDataChanged();
 					resultsTable.setVisible(true);
+					setResizable(true);
 
 					currentPageResNum = index % selectedNumberOfResults == 0? selectedNumberOfResults : index % selectedNumberOfResults; 
 					System.out.println("\n\nindex = " + index);
@@ -218,6 +223,9 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			btn_prevPage.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					resultsTable.setVisible(false);
+					setResizable(false);
+					setMinimumSize(new Dimension(600, 255));
+
 					resultsTableModel.clearData();
 					int tFinalIndex = index - currentPageResNum;
 					index = tFinalIndex - selectedNumberOfResults;
@@ -234,6 +242,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 					resultsTableModel.updateData(messagesIDs, tResultsTable);
 					resultsTableModel.fireTableDataChanged();
 					resultsTable.setVisible(true);
+					setResizable(true);
 
 					currentPageResNum = selectedNumberOfResults;
 					System.out.println("\n\nindex = " + index);
@@ -248,10 +257,11 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			});	
 
 			this.pnl_results.setVisible(true);
+			setResizable(true);
+			this.setSize(new Dimension(600, 600));
+			this.setMinimumSize(new Dimension(600, 600));
 
-			this.setSize(new Dimension(600, 500));
-
-//			this.setMinimumSize(new Dimension(600, 500));
+			
 			System.out.println("end search updating in loop...");
 
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -319,6 +329,8 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 	
 	private void initComponents() {
 		this.setResizable(false);
+		this.setMinimumSize(new Dimension(600, 255));
+
 		
 		this.selectedID = -1;
 		this.toSearch = "";
@@ -595,6 +607,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.btn_search.grabFocus();
 		this.setSize(new Dimension(600, 255));
 
+		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		int X = (screen.width / 2) - (this.getWidth() / 2); // Center horizontally.
 		int YY = (screen.height / 2) - (this.getHeight() / 2); // Center vertically.
@@ -676,7 +689,10 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 	}
 	private void search() {
 		if (searchBy.equals("Author")) {
-			resultsTable.setVisible(false);
+//			resultsTable.setVisible(false);
+//			setResizable(false);
+//			this.setMinimumSize(new Dimension(600, 255));
+
 			resultsTableModel.clearData();
 			resultsTableModel.fireTableDataChanged();
 			controller.searchByAuthor(btn_search, toSearch);
@@ -684,7 +700,10 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		}
 
 		else {
-			resultsTable.setVisible(false);
+//			resultsTable.setVisible(false);
+//			setResizable(false);
+//			this.setMinimumSize(new Dimension(600, 255));
+
 			resultsTableModel.clearData();
 			resultsTableModel.fireTableDataChanged();
 			controller.searchByContent(btn_search, toSearch);

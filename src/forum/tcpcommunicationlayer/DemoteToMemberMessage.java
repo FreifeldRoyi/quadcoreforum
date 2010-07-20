@@ -13,7 +13,7 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredExc
  * @author sepetnit
  *
  */
-public class PromoteToModeratorMessage extends ClientMessage {
+public class DemoteToMemberMessage extends ClientMessage {
 	private static final long serialVersionUID = -2344331771299435031L ;
 
 	/* The id of the user which is asking to promote a user to be a moderator. */
@@ -21,7 +21,7 @@ public class PromoteToModeratorMessage extends ClientMessage {
 	/* The user-name of the user which is asked to be promoted to be a moderator. */
 	private String username;
 
-	public PromoteToModeratorMessage(final long applicantID, final String username) {
+	public DemoteToMemberMessage(final long applicantID, final String username) {
 		this.appicantID = applicantID;
 		this.username = username;
 	}
@@ -32,21 +32,21 @@ public class PromoteToModeratorMessage extends ClientMessage {
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true);
 		try {
-			forum.promoteToBeModerator(this.appicantID, this.username);
+			forum.demoteToBeMember(this.appicantID, this.username);
 			returnObj.setHasExecuted(true);
-			returnObj.setResponse("promoted\t" + this.username + " has been successfully promoted to be a moderator");
+			returnObj.setResponse("demoted\t" + this.username + " has been successfully demoted to be a regular forum member");
 		} 
 		catch (NotPermittedException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("promotionerror\tpermissions");			
+			returnObj.setResponse("demotionerror\tpermissions");			
 		}
 		catch (NotRegisteredException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("promotionerror\tregistration");			
+			returnObj.setResponse("demotionerror\tregistration");			
 		}
 		catch (DatabaseUpdateException e) {
 			returnObj.setHasExecuted(false);
-			returnObj.setResponse("promotionerror\tdatabase");
+			returnObj.setResponse("demotionerror\tdatabase");
 		}
 		return returnObj;
 	}

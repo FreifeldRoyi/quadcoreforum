@@ -14,14 +14,12 @@ import forum.server.domainlayer.SystemLogger;
 import forum.server.domainlayer.user.Permission;
 
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,7 +28,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -48,8 +45,12 @@ public class MainPanel extends JFrame implements GUIHandler {
 	private JButton btn_login;
 	private JButton btn_register;
 	private Component registerLoginGap;
+	private Component profileShowMembersGap;
+
+
 	private JButton btn_logout;
 	private JButton btn_search;
+	private JButton btn_changeProfile;
 
 	private JLabel lbl_welcome;
 	private JButton fastLoginButton;
@@ -84,11 +85,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 
 
-
-
-
-
-
 	public ConnectedUserData getConnectedUser() {		
 		return this.connectedUser;
 	}
@@ -103,11 +99,12 @@ public class MainPanel extends JFrame implements GUIHandler {
 				encodedView.startsWith("promoted\t") ||
 				encodedView.startsWith("profiledetailsupdatesuccess\t") ||
 				encodedView.startsWith("getpathsuccess") ||
-				encodedView.startsWith("passwordupdate")) return;
+				encodedView.startsWith("passwordupdate") ||
+				encodedView.startsWith("memberdetails")) return;
 
 		boolean shouldAskPasswordUpdate = false;
 
-		
+
 		if (!encodedView.startsWith("loggedout\t")) { // login
 
 
@@ -124,19 +121,19 @@ public class MainPanel extends JFrame implements GUIHandler {
 				this.connectedUser = new ConnectedUserData(connectedUserID, tPermissions);
 			else {
 				this.connectedUser = new ConnectedUserData(connectedUserID, tUserDetails[1], 
-						tUserDetails[2], tUserDetails[3], tUserDetails[4], tPermissions);
+						tUserDetails[2], tUserDetails[3], tUserDetails[4], tUserDetails[5], tPermissions);
 				if (tUserDetails[5].equals("ask_pass_update"))
 					shouldAskPasswordUpdate = true;
 			}
-			
-			
+
+
 		}
 		else {
 
 			String[] tSplitted = encodedView.split("\n");
 			String[] tUserDetails = tSplitted[0].split("\t");
 
-			
+
 			long connectedUserID = Long.parseLong(tUserDetails[1]);
 
 			Collection<Permission> tPermissions = new Vector<Permission>();
@@ -149,7 +146,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		this.controller.getActiveUsersNumber();
 
-		
+
 		if (connectedUser.getType() == ConnectedUserData.UserType.ADMIN || 
 				connectedUser.getType() == ConnectedUserData.UserType.MODERATOR) {
 			subjectsPanel.setModeratorOrAdminView();
@@ -169,20 +166,26 @@ public class MainPanel extends JFrame implements GUIHandler {
 			this.btn_logout.setVisible(true);			
 			this.btn_register.setVisible(false);
 			this.pnl_fastLogin.setVisible(false);
-			if (this.connectedUser.getID() == 0)
+			btn_changeProfile.setVisible(true);
+			this.profileShowMembersGap.setVisible(false);
+			if (this.connectedUser.getID() == 0) {
+				this.profileShowMembersGap.setVisible(true);
 				btn_show_members.setVisible(true);
+			}
 
 		}
 		else {
+			this.profileShowMembersGap.setVisible(false);
 			this.lbl_welcome.setText("Hello Guest!");
 			this.btn_login.setVisible(true);
 			this.registerLoginGap.setVisible(true);
 			this.btn_logout.setVisible(false);			
 			this.btn_register.setVisible(true);
-
+			this.profileShowMembersGap.setVisible(false);
 			this.pnl_fastLogin.setVisible(true);
 			this.fastLoginButton.setEnabled(false);
 			btn_show_members.setVisible(false);
+			btn_changeProfile.setVisible(false);
 
 		}
 
@@ -195,11 +198,11 @@ public class MainPanel extends JFrame implements GUIHandler {
 		if (!this.threadsPanel.isVisible() && !this.threadsPanel.showsMessages())
 			controller.getSubjects(-1, this.subjectsPanel);
 
-		
+
 		// Ask for password update if needed
 		if (shouldAskPasswordUpdate) {
 			ChangePasswordDialog tChangePasswordDlg =
-				new ChangePasswordDialog(this.connectedUser.getID());
+				new ChangePasswordDialog(this.connectedUser.getID(), true);
 			tChangePasswordDlg.setVisible(true);
 		}
 	}
@@ -208,8 +211,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 		if (!this.isActive())
 			return;
 		if (error.startsWith("profiledetailsupdateerror\t") ||
-				error.startsWith("passwordupdate")) return;
+				error.startsWith("passwordupdate") ||
+				error.startsWith("memberdetails\t")) return;
 
+		this.setEnabled(true);
 
 		JOptionPane.showMessageDialog(this, error, 
 				"User identification error", JOptionPane.ERROR_MESSAGE);
@@ -238,8 +243,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 			int X = (screen.width / 2) - (tMainPanel.getWidth() / 2); // Center horizontally.
 			int Y = (screen.height / 2) - (tMainPanel.getHeight() / 2); // Center vertically.
 			tMainPanel.setLocation(X, Y);
-			
-			
+
+
 			tMainPanel.setExtendedState(MAXIMIZED_BOTH);
 			tMainPanel.setVisible(true);
 
@@ -259,8 +264,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 		controller = ControllerHandlerFactory.getPipe();			
 
 		initGUIComponents();
-		
-		
+
+
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.setJMenuBar(mainPanelMenu);
 
@@ -313,6 +318,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		btn_login = new JButton("login");
 
 		registerLoginGap = Box.createRigidArea(new Dimension(18, 35));
+		profileShowMembersGap = Box.createRigidArea(new Dimension(18, 35));
 
 		this.btn_login.addActionListener(new ActionListener() {
 
@@ -323,7 +329,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 					fastLoginUsernameInput.setText("");
 					fastLoginPasswordInput.setText("");
 					fastLoginButton.setEnabled(false);
-					
+
 					LoginDialog tLogin = new LoginDialog(MainPanel.this, tUsername, tPassword, connectedUser.getID());
 					tLogin.setVisible(true);
 				} 
@@ -417,9 +423,77 @@ public class MainPanel extends JFrame implements GUIHandler {
 		btn_show_members.setPreferredSize(new Dimension(100, 35));
 		btn_show_members.setVisible(false);
 
+		btn_changeProfile = new JButton("Change profile");
+		btn_changeProfile.setPreferredSize(new Dimension(100, 35));
+		btn_changeProfile.setVisible(false);
+
+		btn_changeProfile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					RegistrationDialog tUpdateDetailsDialog = 
+						new RegistrationDialog(connectedUser.getID(), connectedUser.getUsername(),
+								connectedUser.getFirstName(), 
+								connectedUser.getLastName(), 
+								connectedUser.getEmail(), true);
+
+					tUpdateDetailsDialog.setVisible(true);
+					
+					if (!tUpdateDetailsDialog.shouldUpdateData())
+						return;
+
+					startWorkingAnimation("retreiving updated details...");
+
+					controller.addObserver(new GUIObserver(new GUIHandler() {
+
+						@Override
+						public void refreshForum(String encodedView) {
+							if (!encodedView.startsWith("memberdetails"))
+								return;
+							controller.deleteObserver(this);
+
+							String[] tSplitted = encodedView.split("\t");
+
+							if (!tSplitted[1].equals(connectedUser.getUsername()))
+								return;
+
+							connectedUser.setFirstName(tSplitted[2]);
+							connectedUser.setLastName(tSplitted[3]);
+							connectedUser.setEmail(tSplitted[4]);
+
+							lbl_welcome.setText("Hello " + connectedUser.getLastAndFirstName() + "!");
+
+							stopWorkingAnimation();
+						}
+
+						@Override
+						public void notifyError(String errorMessage) {
+							if (!errorMessage.startsWith("memberdetailserror"))
+								return;
+							controller.deleteObserver(this);
+							stopWorkingAnimation();
+
+						}
+					}), EventType.USER_CHANGED);
+
+					controller.getMemberDetails(connectedUser.getID(), MainPanel.this);
+
+				} 
+				catch (IOException e) {
+					return;
+				}
+			}
+		});
+
+
 		btn_show_members.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new MembersDialog(connectedUser.getID() == 0).setVisible(true);
+				try {
+					new MembersDialog(connectedUser.getID() == 0).setVisible(true);
+				}
+				catch (IOException e) {
+					return;
+				}
 			}
 		});
 
@@ -469,6 +543,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addGroup(tNavigatePanelLayout.createSequentialGroup()
 								.addComponent(lbl_welcome, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 600, Short.MAX_VALUE)
+
+								.addComponent(btn_changeProfile, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+								.addComponent(profileShowMembersGap, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE)
 								.addComponent(btn_show_members, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
 								.addGap(18, 18, 18)
 								.addComponent(btn_search, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
@@ -495,6 +572,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 								.addComponent(lbl_welcome, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
 								.addComponent(btn_logout, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
 								.addComponent(btn_search, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
+								.addComponent(btn_changeProfile, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+								.addComponent(profileShowMembersGap, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
 								.addComponent(btn_show_members, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)							
 								.addComponent(registerLoginGap, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
 
@@ -557,9 +636,9 @@ public class MainPanel extends JFrame implements GUIHandler {
 		};
 		fastLoginButton = new JButton();
 		fastLoginUsernameLabel = new JLabel();
-		fastLoginUsernameInput = new JTextField();
+		fastLoginUsernameInput = new JRestrictedLengthTextField(20, 20, false);
 		fastLoginPasswordLabel = new JLabel();
-		fastLoginPasswordInput = new JPasswordField();
+		fastLoginPasswordInput = new JRestrictedLengthPasswordField(20, 20);
 
 		pnl_fastLogin.setBorder(BorderFactory.createEtchedBorder());
 		pnl_fastLogin.setBorder(BorderFactory.createTitledBorder(pnl_fastLogin.getBorder(), "Fast Login", 0, 0,
@@ -709,19 +788,19 @@ public class MainPanel extends JFrame implements GUIHandler {
 		mainPanelSeparator = new JLabel();
 		mainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
-		
-		
-		
-//		104, 413, 22
-		
-		
-		
+
+
+
+		//		104, 413, 22
+
+
+
 		System.out.println(pnl_navigate.getHeight());
 		System.out.println(subjectsPanel.getHeight());
 		System.out.println(statusPanel.getHeight());
 
-		
-		
+
+
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
 		tMainPanelLayout.setHorizontalGroup(
@@ -774,10 +853,10 @@ public class MainPanel extends JFrame implements GUIHandler {
 						.addContainerGap())
 		);
 
-		
-		
-		
-		
+
+
+
+
 		busyIcons = new ImageIcon[15];
 		for (int i = 0; i < busyIcons.length; i++)
 			busyIcons[i] = new ImageIcon("images/busyicons/busy-icon" + i + ".png");

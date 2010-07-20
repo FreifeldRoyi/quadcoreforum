@@ -2,6 +2,7 @@ package forum.tcpcommunicationlayer;
 
 import forum.server.domainlayer.ForumFacade;
 import forum.server.domainlayer.interfaces.UIUser;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 
 public class AddNewGuestMessage extends ClientMessage {
 
@@ -16,11 +17,17 @@ public class AddNewGuestMessage extends ClientMessage {
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
-		UIUser tNewGuest = forum.addGuest();
-		returnObj.setGuestIDChanged();
-		returnObj.setConnectedGuestID(tNewGuest.getID());
-		returnObj.setHasExecuted(true);
-		returnObj.setResponse(tNewGuest.getID() + "");
+		try {
+			UIUser tNewGuest = forum.addGuest();
+			returnObj.setGuestIDChanged();
+			returnObj.setConnectedGuestID(tNewGuest.getID());
+			returnObj.setHasExecuted(true);
+			returnObj.setResponse(tNewGuest.getID() + "");
+		}
+		catch (DatabaseUpdateException e) {
+			returnObj.setHasExecuted(false);
+			returnObj.setResponse("guestregistrationerror\t");
+		}
 		return returnObj;
 	}
 }

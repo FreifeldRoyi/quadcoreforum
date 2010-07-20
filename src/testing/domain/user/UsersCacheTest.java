@@ -154,18 +154,22 @@ public class UsersCacheTest extends TestCase {
 		final int tCreatedMembersNumber = 3;
 		final Collection<ForumUser> tCreatedUsers = new HashSet<ForumUser>();
 
-		
-		for (int i = 1; i < tCreatedMembersNumber; i++) {
-			final ForumUser tCurrentUser = this.cache.createNewGuest(UsersCacheTest.DEFAULT_PERMISSIONS);
-			tCreatedUsers.add(tCurrentUser);
-		}
 		try {
+
+			for (int i = 1; i < tCreatedMembersNumber; i++) {
+				final ForumUser tCurrentUser = this.cache.createNewGuest(UsersCacheTest.DEFAULT_PERMISSIONS);
+				tCreatedUsers.add(tCurrentUser);
+			}
 			final Collection<ForumUser> tObtainedUsers = this.cache.getAllUsers();
 			assertEquals(tCreatedUsers, tObtainedUsers);
 		}
 		catch (DatabaseRetrievalException e) {
 			fail(e.getMessage());
 		}
+		catch (DatabaseUpdateException e) {
+			fail(e.getMessage());
+		}
+
 	}
 
 	/**
@@ -173,9 +177,9 @@ public class UsersCacheTest extends TestCase {
 	 */
 	@Test
 	public void testCreateNewGuest() {
-		final ForumUser tCreatedGuest = this.cache.createNewGuest(UsersCacheTest.DEFAULT_PERMISSIONS);
-		assertEquals(tCreatedGuest.getPermissions(), UsersCacheTest.DEFAULT_PERMISSIONS);
 		try {
+			final ForumUser tCreatedGuest = this.cache.createNewGuest(UsersCacheTest.DEFAULT_PERMISSIONS);
+			assertEquals(tCreatedGuest.getPermissions(), UsersCacheTest.DEFAULT_PERMISSIONS);
 			assertEquals(tCreatedGuest, this.cache.getUserByID(tCreatedGuest.getID()));
 		} 
 		catch (NotRegisteredException e) {
@@ -184,6 +188,10 @@ public class UsersCacheTest extends TestCase {
 		catch (DatabaseRetrievalException e) {
 			fail("A retrieval of guests shouldn't access to the database");
 		}
+		catch (DatabaseUpdateException e) {
+			fail("Can't create a new guest");
+		}
+
 	}
 
 	/**
@@ -210,6 +218,10 @@ public class UsersCacheTest extends TestCase {
 		catch (DatabaseRetrievalException e) {
 			fail(e.getMessage());
 		}
+		catch (DatabaseUpdateException e) {
+			fail(e.getMessage());
+		}
+
 	}
 
 	/**

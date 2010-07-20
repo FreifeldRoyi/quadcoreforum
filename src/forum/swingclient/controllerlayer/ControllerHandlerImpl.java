@@ -309,7 +309,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					synchronized (messages) {
 						messages.put(toSend);
 					}
-//					getActiveUsersNumber();
+					//					getActiveUsersNumber();
 				}
 				catch (InterruptedException e) {
 					SystemLogger.warning("The program was interrupted while waiting");
@@ -324,7 +324,26 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
 				getActiveUsersNumber();
-				final ClientMessage toSend = new ChangeProfileDetailsMessage(username, password, null, null, email, true);
+				final ClientMessage toSend = new ChangeProfileDetailsMessage(-1, username, password, null, null, email, true);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);		
+	}
+
+	public void getMemberDetails(final long memberID, final Component comp) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new MemberDetailsMessage(memberID);
 				try {
 					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
 					synchronized (messages) {
@@ -359,6 +378,26 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		this.responsesHandlersPool.execute(tResponseHandler);		
 	}
 
+	public void updateMemberDetails(final Component comp, final long memberID, final String username, final String firstName, 
+			final String lastName, final String email) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new ChangeProfileDetailsMessage(memberID, 
+						username, null, lastName, firstName, email, false);
+				try {
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);		
+	}
 
 
 	public boolean login(final long guestID, final String username, final String password, final Component comp) {
@@ -369,7 +408,7 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		 */
 		Runnable tResponseHandler = new Runnable() {
 			public void run() {
-//				getActiveUsersNumber();
+				//				getActiveUsersNumber();
 				final ClientMessage toSend = new LoginMessage(guestID, username, password);
 				try {
 					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
@@ -620,6 +659,25 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		};
 		this.responsesHandlersPool.execute(tResponseHandler);
 	}		
+
+	public void demoteToMember(final Component comp, final String username) {
+		Runnable tResponseHandler = new Runnable() {
+			public void run() {
+				getActiveUsersNumber();
+				final ClientMessage toSend = new DemoteToMemberMessage(0, username);
+				try {							
+					sended.put(toSend.getID(), new ClientRequestData(comp, EventType.USER_CHANGED));
+					synchronized (messages) {
+						messages.put(toSend);
+					}
+				}
+				catch (InterruptedException e) {
+					SystemLogger.warning("The program was interrupted while waiting");
+				}
+			}
+		};
+		this.responsesHandlersPool.execute(tResponseHandler);
+	}
 
 	public void getPath(Component comp, long prevFatherMessageID, long messageID) {
 		try {
