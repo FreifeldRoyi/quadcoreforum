@@ -2,6 +2,7 @@ package forum.server.domainlayer.message;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -168,6 +169,14 @@ public class ForumMessage implements UIMessage {
 		return toReturn;
 	}
 
+	/**
+	 * @see
+	 * 		UIMessage#getDate()
+	 */
+	public Date getDateTime() {
+		return new Date(this.postTime.getTimeInMillis());
+	}	
+	
 	/**
 	 * 
 	 * @return
