@@ -28,9 +28,6 @@ public class ModifyThreadMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		//TODO - again ot is not clear what the return value is in case of a failure - I assumed it is null.
-		// response (Vitali) --> No! exception will be thrown.
-
 		ServerResponse returnObj = new ServerResponse(this.getID(),"", true); 
 		
 		try {

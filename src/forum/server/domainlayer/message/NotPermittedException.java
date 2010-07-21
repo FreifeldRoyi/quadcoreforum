@@ -4,16 +4,24 @@
  */
 package forum.server.domainlayer.message;
 
+import java.io.Serializable;
+
 import forum.server.domainlayer.user.Permission;
 
 /**
  * @author sepetnit
  *
  */
-public class NotPermittedException extends Exception {
-	
-	private static final long serialVersionUID = -1239416816486707410L;
+public class NotPermittedException extends Exception implements Serializable {
 
+	private static final long serialVersionUID = -1650747361145930437L;
+
+	private long userID;
+
+	private Permission permission;
+	
+	public NotPermittedException() { }
+	
 	/**
 	 * The exception constructor, constructs an exception with the suitable message, which informs the user about
 	 * the unpermitted operation
@@ -25,5 +33,35 @@ public class NotPermittedException extends Exception {
 	 */
 	public NotPermittedException(long userID, Permission permission) {
 		super("A user with id " + userID + " doesn't have the permission " + permission);
+		this.userID = userID;
+		this.permission = permission;
+	}
+	
+	/**
+	 * @return the userID
+	 */
+	public long getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @param userID the userID to set
+	 */
+	public void setUserID(long userID) {
+		this.userID = userID;
+	}
+
+	/**
+	 * @return the permission
+	 */
+	public Permission getPermission() {
+		return permission;
+	}
+
+	/**
+	 * @param permission the permission to set
+	 */
+	public void setPermission(Permission permission) {
+		this.permission = permission;
 	}
 }

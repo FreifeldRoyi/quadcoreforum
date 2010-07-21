@@ -25,11 +25,6 @@ public class LogoffMessage extends ClientMessage {
 	 */
 	@Override
 	public ServerResponse doOperation(ForumFacade forum) {
-		//TODO - again: It is not clear from the interface what is the return value in case of a failure or a success
-		//I assumed that if an exception didn't occurred then everything is O.K!
-
-		// Response (Vitali) ---> Again, Exception will be thrown!!!!
-
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			forum.logout(this.username);
