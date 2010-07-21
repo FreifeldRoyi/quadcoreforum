@@ -1,22 +1,7 @@
 package forum.swingclient.panels;
 
-import javax.swing.*;
-import javax.swing.border.*;
-
-import forum.swingclient.controllerlayer.ConnectedUserData;
-import forum.swingclient.controllerlayer.ControllerHandler;
-import forum.swingclient.controllerlayer.ControllerHandlerFactory;
-import forum.swingclient.controllerlayer.GUIObserver;
-import forum.swingclient.ui.ForumTree;
-import forum.swingclient.ui.events.GUIHandler;
-import forum.swingclient.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.SystemLogger;
-import forum.server.domainlayer.user.Permission;
-
-
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -30,6 +15,39 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.GroupLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+
+import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.user.Permission;
+import forum.swingclient.controllerlayer.ConnectedUserData;
+import forum.swingclient.controllerlayer.ControllerHandler;
+import forum.swingclient.controllerlayer.ControllerHandlerFactory;
+import forum.swingclient.controllerlayer.GUIObserver;
+import forum.swingclient.ui.ForumTree;
+import forum.swingclient.ui.events.GUIHandler;
+import forum.swingclient.ui.events.GUIEvent.EventType;
 
 /**
  * The application's main frame.

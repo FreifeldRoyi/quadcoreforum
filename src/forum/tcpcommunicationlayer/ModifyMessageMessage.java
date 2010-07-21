@@ -36,9 +36,6 @@ public class ModifyMessageMessage extends ClientMessage {
 	 * @see forum.tcpcommunicationlayer.ClientMessage#doOperation(forum.server.domainlayer.ForumFacade)
 	 */
 	public ServerResponse doOperation(ForumFacade forum) {
-		// TODO: I assumed failure only in case of exception. Is it o.k??
-		// Response (Vitali) ---> Yes!!!
-
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
 			forum.updateAMessage(userID, messageID, newTitle, newContent);
