@@ -449,8 +449,8 @@ public class MainPanel extends JFrame implements GUIHandler {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					RegistrationDialog tUpdateDetailsDialog = 
-						new RegistrationDialog(connectedUser.getID(), connectedUser.getUsername(),
+					ProfileDialog tUpdateDetailsDialog = 
+						new ProfileDialog(connectedUser.getID(), connectedUser.getUsername(),
 								connectedUser.getFirstName(), 
 								connectedUser.getLastName(), 
 								connectedUser.getEmail(), true);
@@ -623,16 +623,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		mainPanelMenu = new JMenuBar();
 
-		JMenu tFileMenu= new JMenu();
-		tFileMenu.setText("File");
-
-		JMenuItem tExitMenuItem = new JMenuItem();
-		JMenu tHelpMenu = new JMenu();
-		tFileMenu.add(tExitMenuItem);
-
-		mainPanelMenu.add(tFileMenu);
-
-		mainPanelMenu.add(tHelpMenu);
+		
 
 
 		// prepares the fast login panel
@@ -654,7 +645,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 		};
 		fastLoginButton = new JButton();
 		fastLoginUsernameLabel = new JLabel();
-		fastLoginUsernameInput = new JRestrictedLengthTextField(20, 20, false);
+		fastLoginUsernameInput = new JRestrictedLengthTextField(20, 20, false, true);
 		fastLoginPasswordLabel = new JLabel();
 		fastLoginPasswordInput = new JRestrictedLengthPasswordField(20, 20);
 

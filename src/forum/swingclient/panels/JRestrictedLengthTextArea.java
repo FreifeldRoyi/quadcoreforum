@@ -7,7 +7,7 @@ import java.awt.* ;
 public class JRestrictedLengthTextArea extends JTextArea {  
 
 	private static final String ALLOWED_CHARACTERS = "\r\n\t ~!@#$^&*()_+=><?{}[].-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	
+	private boolean shouldLimitChars;
 	private static final long serialVersionUID = 614647389750943872L;
 	// Maximum number of characters allowed in this field  
 	private int maximum ;  
@@ -20,9 +20,10 @@ public class JRestrictedLengthTextArea extends JTextArea {
 	 *                   naturally results from the component implementation. 
 	 *  @param max - The maximum number of characters allowed in this field. 
 	 */  
-	public JRestrictedLengthTextArea(int max) {  
+	public JRestrictedLengthTextArea(int max, boolean limitChars) {  
 		super();  
-		maximum = max ;  
+		maximum = max ;
+		shouldLimitChars = limitChars;
 	}  
 	/** 
 	 *  Constructs a new LimitField initialized with the specified text and columns and 
@@ -44,8 +45,8 @@ public class JRestrictedLengthTextArea extends JTextArea {
 	 * 
 	 *  @return The default model implementation. 
 	 */  
-	protected Document createDefaultModel() {  
-		return new LimitDocument();  
+	protected Document createDefaultModel() {
+		return new LimitDocument();
 	}  
 
 	/** 
@@ -68,6 +69,9 @@ public class JRestrictedLengthTextArea extends JTextArea {
 		}
 		
 		private boolean legal(String str) {
+			if (!shouldLimitChars) {
+				return true;
+			}
 			System.out.println(str);
 			for (char toCheck : str.toCharArray())
 				if (ALLOWED_CHARACTERS.indexOf(toCheck) == -1)

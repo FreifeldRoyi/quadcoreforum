@@ -279,7 +279,7 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 
 						String[] tSplitted = encodedView.split("\t");
 						try {
-							new RegistrationDialog(-1, tSplitted[1], tSplitted[2], 
+							new ProfileDialog(-1, tSplitted[1], tSplitted[2], 
 									tSplitted[3], tSplitted[4], false).setVisible(true);
 						}
 						catch (IOException e) {

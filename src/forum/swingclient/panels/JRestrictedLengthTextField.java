@@ -14,6 +14,7 @@ public class JRestrictedLengthTextField extends JTextField {
 	// Maximum number of characters allowed in this field  
 	private int maximum ;  
 	
+	private boolean shouldLimitChars;
 	private boolean spaceAllowed;
 	
 	/** 
@@ -25,10 +26,11 @@ public class JRestrictedLengthTextField extends JTextField {
 	 *                   naturally results from the component implementation. 
 	 *  @param max - The maximum number of characters allowed in this field. 
 	 */ 
-	public JRestrictedLengthTextField(int columns, int max, boolean spaceAllowed) {  
+	public JRestrictedLengthTextField(int columns, int max, boolean spaceAllowed, boolean LimitChars) {
 		super( columns );  
 		this.spaceAllowed = spaceAllowed;
-		maximum = max ;  
+		maximum = max;
+		shouldLimitChars = LimitChars;
 	}  
 	/** 
 	 *  Constructs a new LimitField initialized with the specified text and columns and 
@@ -51,8 +53,8 @@ public class JRestrictedLengthTextField extends JTextField {
 	 * 
 	 *  @return The default model implementation. 
 	 */  
-	protected Document createDefaultModel() {  
-		return new LimitDocument();  
+	protected Document createDefaultModel() {
+		return new LimitDocument();
 	}  
 
 	/** 
@@ -75,6 +77,9 @@ public class JRestrictedLengthTextField extends JTextField {
 		}
 		
 		private boolean legal(String str) {
+			if (!shouldLimitChars) {
+				return true;
+			}
 			for (char toCheck : str.toCharArray())
 				if (ALLOWED_CHARACTERS.indexOf(toCheck) != -1)
 					continue;

@@ -276,14 +276,14 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 	}
 
 	private void initializeGUIContent(long authorID, long replyModifiedID, JButton replyModifyButton) {
-		this.title = new JRestrictedLengthTextField(40, 40, true);
+		this.title = new JRestrictedLengthTextField(40, 40, true, false);
 		
 		this.title.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
 		
 		
 		
-		this.content = new JRestrictedLengthTextArea(60);
+		this.content = new JRestrictedLengthTextArea(60, false);
 		
 		//		this.content.setAutoscrolls(true);
 		this.contentPane = new JScrollPane(content);
@@ -327,7 +327,7 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 		title.addKeyListener(this);
 		content.addKeyListener(this);
 		if (topicType.equals("thread")) {
-			topic = new JRestrictedLengthTextField(40, 40, true);
+			topic = new JRestrictedLengthTextField(40, 40, true, false);
 			topic.addKeyListener(this);
 			this.topic.setPreferredSize(new Dimension(200, 30));
 			topicLabel = new JLabel("topic:");

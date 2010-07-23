@@ -139,8 +139,7 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.usernameLabel);
-		this.usernameInput =  new JRestrictedLengthTextField(20, 20, false);  
-		
+		this.usernameInput =  new JRestrictedLengthTextField(20, 20, false, true);  
 		
 		this.usernameInput.setText(username);
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));

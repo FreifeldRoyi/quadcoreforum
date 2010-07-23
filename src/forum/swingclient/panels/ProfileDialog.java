@@ -39,46 +39,23 @@ import forum.swingclient.ui.events.GUIEvent.EventType;
  * @author dahany
  *
  */
-public class RegistrationDialog extends JDialog implements GUIHandler, KeyListener {
-
-	/*	@Override
-	public void notifyError(String errorMessage) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void refreshForum(String encodedView) {
-		// TODO Auto-generated method stub
-
-	}
-	 */	
-
-
-
-	private static final long serialVersionUID = -5251318786616475794L;	
+public class ProfileDialog extends JDialog implements GUIHandler, KeyListener {
 
 	private long memberID;
 	private boolean shouldUpdateData;
 
-	private JButton registerButton;
+	private JButton updateButton;
 	private JButton cancelButton = new JButton();
 
 	private JLabel usernameLabel;
 	private JTextField usernameInput;
-	private JLabel passwordLabel;
-	private JPasswordField passwordInput;
-	private JLabel confirmPasswordLabel;
-	private JPasswordField confirmPasswordInput;
 	private JLabel emailLabel;
 	private JTextField emailInput;
-	private JLabel confirmEmailLabel;
-	private JTextField confirmEmailInput;
 	private JLabel firstNameLabel;
 	private JTextField firstNameInput;
 	private JLabel lastNameLabel;
 	private JTextField lastNameInput;
-	private JPanel registrationPanel;
+	private JPanel profilePanel;
 	private JPanel informationPanel;
 	private JLabel informationLabel;
 
@@ -91,7 +68,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	@Override
 	public void keyPressed(KeyEvent arg0) {
 		if (arg0.getKeyChar() == KeyEvent.VK_ENTER)
-			registerButton.doClick();
+			updateButton.doClick();
 		else if (arg0.getKeyChar() == KeyEvent.VK_ESCAPE)
 			cancelButton.doClick();
 	}
@@ -107,15 +84,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	// end of KeyListener implementation
 
 	public void refreshForum(String encodedView) {
-		if (encodedView.startsWith("registersuccess\t")) {
-			this.controller.deleteObserver(this);
-			JOptionPane.showMessageDialog(this, "The registration process was completed successfully!",
-					"success", JOptionPane.INFORMATION_MESSAGE);
-			this.dispose();
-		}
-		else if (encodedView.startsWith("registererror\t"))
-			this.notifyError(encodedView);
-		else if (encodedView.startsWith("profiledetailsupdatesuccess\t")) {
+		if (encodedView.startsWith("profiledetailsupdatesuccess\t")) {
 			this.controller.deleteObserver(this);
 			JOptionPane.showMessageDialog(this, "Your details were updated successfully!",
 					"success", JOptionPane.INFORMATION_MESSAGE);
@@ -125,13 +94,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	}
 
 	public void notifyError(String error) {
-		if (error.startsWith("registererror\t")) {
-			this.controller.deleteObserver(this);
-			String[] tSplittedMessage = error.split("\t");
-			String tErrorMessage = tSplittedMessage[1];
-			informationLabel.setText(tErrorMessage);
-		}
-		else if (error.startsWith("profiledetailsupdateerror\texistingemail\t")) {
+		if (error.startsWith("profiledetailsupdateerror\texistingemail\t")) {
 			informationLabel.setText("The following data already exists: " + emailInput.getText());
 			makeLabelNoticeble(emailLabel, emailInput);
 		}
@@ -150,51 +113,42 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		field.setForeground(Color.RED);
 	}
 
-/*	public RegistrationDialog(long memberID, String username, String firstName, String lastName, String email,
+	public ProfileDialog(long memberID, String username, String firstName, String lastName, String email,
 			boolean enableInput) throws IOException {
 		this();
 
 		updatePasswordButton.setVisible(true);
 
-		this.passwordInput.setEnabled(false);
-		this.passwordInput.setBackground(Color.GRAY);
-
-		this.confirmPasswordInput.setEnabled(false);
-		this.confirmPasswordInput.setBackground(Color.GRAY);
-
 		this.setTextFieldNoEditableAppearance(usernameInput);
 
 		if (!enableInput) {
+			updatePasswordButton.setVisible(false);
 			this.setTitle("Profile display");
-			this.confirmEmailInput.setEnabled(false);
-			this.confirmEmailInput.setBackground(Color.GRAY);
-
 			this.setTextFieldNoEditableAppearance(firstNameInput);
 			this.setTextFieldNoEditableAppearance(lastNameInput);
 			this.setTextFieldNoEditableAppearance(emailInput);
 
-			this.registerButton.setEnabled(false);
+			this.updateButton.setVisible(false);
 		}
 		else {
 			this.memberID = memberID;
 
-			this.confirmEmailInput.setText(email);
-			this.setTitle("Profile changing");
+			this.setTitle("User Profile");
 
-			this.registerButton.setText("Update");
-			for (ActionListener tAl : this.registerButton.getActionListeners())
-				this.registerButton.removeActionListener(tAl);
+			this.updateButton.setText("Update");
+			for (ActionListener tAl : this.updateButton.getActionListeners())
+				this.updateButton.removeActionListener(tAl);
 
-			this.registerButton.addActionListener(new ActionListener() {
+			this.updateButton.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String tCheck = checkDataValidity();
 					if (tCheck.equals("O.K.")) {
-						controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
+						controller.addObserver(new GUIObserver(ProfileDialog.this), EventType.USER_CHANGED);
 						informationLabel.setText("");
-						controller.updateMemberDetails(RegistrationDialog.this, 
-								RegistrationDialog.this.memberID, usernameInput.getText(),
+						controller.updateMemberDetails(ProfileDialog.this, 
+								ProfileDialog.this.memberID, usernameInput.getText(),
 								firstNameInput.getText(), lastNameInput.getText(), emailInput.getText());
 					}
 					else {
@@ -210,14 +164,14 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.lastNameInput.setText(lastName);
 		this.emailInput.setText(email);
 	}
-*/
+
 	public boolean shouldUpdateData() {
 		return shouldUpdateData;
 	}
 
-	public static RegistrationDialog getRegistrationDialog(Component container) throws IOException {
+	public static ProfileDialog getProfileDialog(Component container) throws IOException {
 		try {
-			return new RegistrationDialog();
+			return new ProfileDialog();
 		}
 		catch (IOException e) {
 			JOptionPane.showMessageDialog(container, "Can't connect to the forum database",
@@ -226,7 +180,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		}
 	}
 
-	public RegistrationDialog() throws IOException {
+	public ProfileDialog() throws IOException {
 		super();
 		shouldUpdateData = false;
 
@@ -237,13 +191,13 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 			public void actionPerformed(ActionEvent e) {
 				informationLabel.setText("");
-				new ChangePasswordDialog(RegistrationDialog.this.memberID, false).setVisible(true);
+				new ChangePasswordDialog(ProfileDialog.this.memberID, false).setVisible(true);
 			}
 		});
 
 		updatePasswordButton.setVisible(false);
 
-		this.setTitle("Register to the forum");
+		this.setTitle("User Profile");
 		controller = ControllerHandlerFactory.getPipe();
 
 
@@ -262,7 +216,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 
 			public void windowClosing(WindowEvent e) {
-				controller.deleteObserver(RegistrationDialog.this);
+				controller.deleteObserver(ProfileDialog.this);
 			}
 		});
 
@@ -284,85 +238,54 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.informationLabel.setForeground(new Color(255, 0, 0));
 		informationPanel.add(informationLabel);
 
-		this.registrationPanel = new JPanel();
+		this.profilePanel = new JPanel();
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		this.registrationPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Rgistration"));
+		this.profilePanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Profile"));
 
-
-		SpringLayout jRegistrationPanel = new SpringLayout();
-		registrationPanel.setLayout(jRegistrationPanel);
+		SpringLayout jProfilePanel = new SpringLayout();
+		profilePanel.setLayout(jProfilePanel);
 
 		Font tFont = new Font("Tahoma", Font.BOLD, 13);
 
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
 		this.usernameLabel.setFont(tFont);
-		registrationPanel.add(this.usernameLabel);
+		profilePanel.add(this.usernameLabel);
 		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.usernameInput);
+		profilePanel.add(this.usernameInput);
 		this.usernameLabel.setLabelFor(this.usernameInput);
-
-		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
-		this.passwordLabel.setFont(tFont);
-		registrationPanel.add(this.passwordLabel);
-		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
-		this.passwordInput.setText("");
-		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.passwordInput);
-		this.passwordLabel.setLabelFor(this.passwordInput);
-
-		this.confirmPasswordLabel = new JLabel("Confirm Password", JLabel.TRAILING);
-		this.confirmPasswordLabel.setFont(tFont);
-		registrationPanel.add(this.confirmPasswordLabel);
-		this.confirmPasswordInput = new JRestrictedLengthPasswordField(20, 20);
-		this.confirmPasswordInput.setText("");
-		confirmPasswordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.confirmPasswordInput);
-		this.confirmPasswordLabel.setLabelFor(this.confirmPasswordInput);
 
 		this.emailLabel = new JLabel("Email", JLabel.TRAILING);
 		this.emailLabel.setFont(tFont);
-		registrationPanel.add(this.emailLabel);
+		profilePanel.add(this.emailLabel);
 		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
 		this.emailInput.setText("");
 		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.emailInput);
+		profilePanel.add(this.emailInput);
 		this.emailLabel.setLabelFor(this.emailInput);
-
-		this.confirmEmailLabel = new JLabel("Confirm Email", JLabel.TRAILING);
-		this.confirmEmailLabel.setFont(tFont);
-		registrationPanel.add(this.confirmEmailLabel);
-		this.confirmEmailInput = new JRestrictedLengthTextField(40, 40, false, true);
-		this.confirmEmailInput.setText("");
-		confirmEmailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.confirmEmailInput);
-		this.confirmEmailLabel.setLabelFor(this.confirmEmailInput);
 
 		this.firstNameLabel = new JLabel("First Name", JLabel.TRAILING);
 		this.firstNameLabel.setFont(tFont);
-		registrationPanel.add(this.firstNameLabel);
+		profilePanel.add(this.firstNameLabel);
 		this.firstNameInput = new JRestrictedLengthTextField(20, 20, false, false);
 		this.firstNameInput.setText("");
 		firstNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.firstNameInput);
+		profilePanel.add(this.firstNameInput);
 		this.firstNameLabel.setLabelFor(this.firstNameInput);
 
 		this.lastNameLabel = new JLabel("Last Name", JLabel.TRAILING);
 		this.lastNameLabel.setFont(tFont);
-		registrationPanel.add(this.lastNameLabel);
+		profilePanel.add(this.lastNameLabel);
 		this.lastNameInput = new JRestrictedLengthTextField(20, 20, false, false);
 		this.lastNameInput.setText("");
 		lastNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.lastNameInput);
+		profilePanel.add(this.lastNameInput);
 		this.lastNameLabel.setLabelFor(this.lastNameInput);
 
 
 		this.usernameInput.addKeyListener(this);
-		this.passwordInput.addKeyListener(this);
-		this.confirmPasswordInput.addKeyListener(this);
 		this.emailInput.addKeyListener(this);
-		this.confirmEmailInput.addKeyListener(this);
 		this.firstNameInput.addKeyListener(this);
 		this.lastNameInput.addKeyListener(this);
 
@@ -375,46 +298,28 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		//SpringLayout.WEST, this.lastNameInput);
 
 		//Lay out the panel.
-		SpringUtilities.makeCompactGrid(registrationPanel,
-				7, 2, //rows, cols
+		SpringUtilities.makeCompactGrid(profilePanel,
+				4, 2, //rows, cols
 				6, 6,        //initX, initY
 				15, 15);       //xPad, yPad
 
 
 
-		registerButton = new JButton();
+		updateButton = new JButton();
 
-		registerButton.setText("Register");
-		registerButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String tCheck = checkDataValidity();
-				if (tCheck.equals("O.K.")) {
-					controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
-					informationLabel.setText("");
-					controller.registerToForum(registerButton, usernameInput.getText(),
-							new String(passwordInput.getPassword()), 
-							emailInput.getText(),
-							firstNameInput.getText(),
-							lastNameInput.getText());
-
-				}
-				else {
-					informationLabel.setText(tCheck);
-				}
-			}
-		});
+		updateButton.setText("Update");
 
 		cancelButton = new JButton();
 		cancelButton.setText("Cancel");
 		cancelButton.setPreferredSize(new Dimension(100, 40));
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				RegistrationDialog.this.dispose();				
+				ProfileDialog.this.dispose();				
 			}
 
 		});
 
-		registerButton.setPreferredSize(new Dimension(100, 40));
+		updateButton.setPreferredSize(new Dimension(100, 40));
 
 
 
@@ -425,13 +330,13 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 				.addGroup(tMainPanelLayout.createSequentialGroup()
 						.addGap(10, 10, 10)
-						.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+						.addComponent(profilePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 						.addGap(10, 10, 10))
 						.addGroup(tMainPanelLayout.createSequentialGroup()
 								.addGap(10, 10, 10)
 								.addComponent(updatePasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 								.addGap(0, 0, Short.MAX_VALUE)
-								.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addComponent(updateButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 								.addGap(10, 10, 10)
 								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 								.addGap(10, 10, 10))
@@ -442,13 +347,13 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 				.addGap(10, 10, 10)
 				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
 				.addGap(10, 10, 10)
-				.addComponent(registrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+				.addComponent(profilePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 				.addGap(30, 30, 30)
 				.addGroup(tMainPanelLayout.createParallelGroup()
 						.addGroup(tMainPanelLayout.createSequentialGroup()
 								.addGap(20, 20, 20)
 								.addComponent(updatePasswordButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
-								.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
+								.addComponent(updateButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
 								.addGap(10, 10, 10));
 
@@ -469,12 +374,9 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 	private void clearLabels() {
 		this.usernameLabel.setForeground(Color.BLACK);
-		this.passwordLabel.setForeground(Color.BLACK);
-		this.confirmPasswordLabel.setForeground(Color.BLACK);
 		this.lastNameLabel.setForeground(Color.BLACK);
 		this.firstNameLabel.setForeground(Color.BLACK);
 		this.emailLabel.setForeground(Color.BLACK);
-		this.confirmEmailLabel.setForeground(Color.BLACK);
 		this.informationLabel.setText("");
 	}
 
@@ -491,15 +393,6 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 			toReturn = "The username must be at least 4 letters long";
 		}
-		else if (this.passwordInput.isEnabled() && this.passwordInput.getPassword().length < 6) {
-			makeLabelNoticeble(passwordLabel, passwordInput);
-			toReturn = "The password must be at least 6 letters long";
-		}
-		else if (this.passwordInput.isEnabled() && !Arrays.equals(this.passwordInput.getPassword(), this.confirmPasswordInput.getPassword())) {
-			makeLabelNoticeble(passwordLabel, passwordInput);
-			makeLabelNoticeble(confirmPasswordLabel, confirmPasswordInput);
-			toReturn = "The password fields must be identical";
-		}
 		else{
 			String tEmail = this.emailInput.getText();
 			//int tIndex = tEmail.indexOf('@');
@@ -508,11 +401,6 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 				makeLabelNoticeble(emailLabel, emailInput);
 				//if ((tIndex == -1) || (tEmail.substring(tIndex + 2, tEmail.length() - 1).indexOf('.') == -1))
 				toReturn = "The email address must be in the form: username@domain.extension";
-			}
-			else if (!this.emailInput.getText().equals(this.confirmEmailInput.getText())) {
-				makeLabelNoticeble(emailLabel, emailInput);
-				makeLabelNoticeble(confirmEmailLabel, confirmEmailInput);
-				toReturn = "The email fields must be identical";
 			}
 			else if (this.firstNameInput.getText().length() == 0) {
 				makeLabelNoticeble(firstNameLabel, firstNameInput);
