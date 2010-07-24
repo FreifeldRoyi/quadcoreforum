@@ -1,5 +1,5 @@
 /**
- * 
+ * This test test the MessagesPersistenceHandler class
  */
 package testing.domain.user;
 
@@ -48,15 +48,6 @@ public class UsersCacheTest extends TestCase {
 	@After
 	public void tearDown() throws Exception {
 		Settings.switchToRegularMode();
-	}
-
-	/**
-	 * Test method for {@link forum.server.domainlayer.user.UsersCache#UsersCache()}.
-	 */
-	@Test
-	public void testUsersCacheConstructor() {
-
-
 	}
 
 	/**
@@ -128,7 +119,7 @@ public class UsersCacheTest extends TestCase {
 	@Test
 	public void testGetMemberByEmail() {
 		try {
-			final ForumMember tForumMember = this.cache.createNewMember("a", "b", "c", "d", "e@e",
+			final ForumMember tForumMember = this.cache.createNewMember("aa", "bb", "cc", "dd", "ee@ff",
 					UsersCacheTest.DEFAULT_PERMISSIONS);
 			final ForumMember tObtainedMemberUnderTest = this.cache.getMemberByEmail(tForumMember.getEmail());
 			assertEquals(tForumMember, tObtainedMemberUnderTest);
@@ -161,7 +152,14 @@ public class UsersCacheTest extends TestCase {
 				tCreatedUsers.add(tCurrentUser);
 			}
 			final Collection<ForumUser> tObtainedUsers = this.cache.getAllUsers();
-			assertEquals(tCreatedUsers, tObtainedUsers);
+			final Collection<ForumUser> tObtainedUsersToCheck = this.cache.getAllUsers();
+			tObtainedUsersToCheck.clear();
+			
+			for (ForumUser tCurrentUser : tObtainedUsers)
+				if (tCurrentUser.getID() != 0)
+					tObtainedUsersToCheck.add(tCurrentUser);
+			assertTrue(tCreatedUsers.equals(tObtainedUsersToCheck));
+			assertEquals(tCreatedUsers.size(), tObtainedUsersToCheck.size());
 		}
 		catch (DatabaseRetrievalException e) {
 			fail(e.getMessage());
@@ -169,7 +167,6 @@ public class UsersCacheTest extends TestCase {
 		catch (DatabaseUpdateException e) {
 			fail(e.getMessage());
 		}
-
 	}
 
 	/**

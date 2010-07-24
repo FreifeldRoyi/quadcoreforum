@@ -7,6 +7,7 @@ package testing.acceptancetests.bridges;
 import java.util.Collection;
 import java.util.Vector;
 
+import forum.server.Settings;
 import forum.server.domainlayer.*;
 import forum.server.domainlayer.interfaces.UIMember;
 import forum.server.domainlayer.interfaces.UIMessage;
@@ -14,7 +15,7 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedExce
 
 public class RealBridge implements GeneralForumBridge {
 
-	public ForumFacade forum;
+	private ForumFacade forum;
 
 	/**
 	 * The class constructor.
@@ -67,14 +68,14 @@ public class RealBridge implements GeneralForumBridge {
 	 * @see
 	 * 		GeneralForumBridge#register(String, String, String, String, String)
 	 */
-	public boolean register(final String username, final String password, final String lastName,
+	public long register(final String username, final String password, final String lastName,
 			final String firstName, final String email) {
 		try {
-			this.forum.registerNewMember(username, password, lastName, firstName, email);
-			return true;
+			return this.forum.registerNewMember(username, password, lastName, firstName, email);
 		} 
 		catch (Exception e) {
-			return false;
+			e.printStackTrace();
+			return -1;
 		}
 	}	
 
@@ -102,6 +103,7 @@ public class RealBridge implements GeneralForumBridge {
 			return this.forum.openNewThread(userID, subjectID, topic, title, content).getRootMessageID();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return -1;
 		}
 
@@ -111,14 +113,13 @@ public class RealBridge implements GeneralForumBridge {
 	 * @see
 	 * 		GeneralForumBridge#addNewReply(long, long, String, String)
 	 */
-	public boolean addNewReply(final long authorID, final long fatherID, final String title,
+	public long addNewReply(final long authorID, final long fatherID, final String title,
 			final String content) {
 		try {
-			this.forum.addNewReply(authorID, fatherID, title, content);
-			return true;
+			return this.forum.addNewReply(authorID, fatherID, title, content).getMessageID();
 		}
 		catch (Exception e) {
-			return false;
+			return -1;
 		}
 	}
 
@@ -138,4 +139,20 @@ public class RealBridge implements GeneralForumBridge {
 			return null;
 		}		
 	}
+
+	/**
+	 * @see
+	 * 		GeneralForumBridge#deleteMessage(long, long, long)
+	 */
+	public boolean deleteMessage(final long applicantID, final long messageID, 
+			final long fatherID) {
+		try {
+			this.forum.deleteAMessage(0, fatherID, messageID);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+
 }

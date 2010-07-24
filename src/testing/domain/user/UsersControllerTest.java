@@ -147,7 +147,7 @@ public class UsersControllerTest extends TestCase {
 	/**
 	 * Test method for {@link forum.server.domainlayer.user.UsersController#login(java.lang.String, java.lang.String)}.
 	 * 
-	 * The test tests that the logged in member id is a realy existing member of the forum
+	 * The test tests that the logged in member id is a really existing member of the forum
 	 * 
 	 * The test tests that the password of the new member logged in member is indeed the password given in the login
 	 * signature
@@ -155,11 +155,11 @@ public class UsersControllerTest extends TestCase {
 	@Test
 	public void testLogin() {
 		try {
-			final long tNewUserID = this.userControllerUnderTest.registerNewMember("a", "b", "c", "d", "e@e");
-			final UIMember tLoggedIn = this.userControllerUnderTest.login("a", "b");
+			final long tNewUserID = this.userControllerUnderTest.registerNewMember("1", "2", "3", "4", "5@5");
+			final UIMember tLoggedIn = this.userControllerUnderTest.login("1", "2");
 			assertEquals(tLoggedIn.getID(), tNewUserID);
-			assertEquals("a", this.dataHandler.getUsersCache().getMemberByUsername("a").getUsername());
-			assertNotSame("b", this.dataHandler.getUsersCache().getMemberByUsername("a").getPassword());
+			assertEquals("1", this.dataHandler.getUsersCache().getMemberByUsername("1").getUsername());
+			assertNotSame("2", this.dataHandler.getUsersCache().getMemberByUsername("1").getPassword());
 		}
 		catch (MemberAlreadyExistsException e) {
 			fail(e.getMessage());

@@ -22,7 +22,7 @@ import forum.server.updatedpersistentlayer.pipe.*;
  * @author Sepetnitsky Vitali
  *
  */
-public class JAXBpersistenceDataHandlerTest extends TestCase {
+public class SQLpersistenceDataHandlerTest extends TestCase {
 	private PersistenceDataHandler pipe;
 
 
@@ -56,14 +56,9 @@ public class JAXBpersistenceDataHandlerTest extends TestCase {
 			}
 			pipe.addNewMember(10, "user1", "abc", "a1", "b1", "f1@f", new Vector<Permission>());
 			for (ForumMember tCurrentMember : this.pipe.getAllMembers()) {
-				if (tCurrentMember.getUsername().equals("user1")) {
-					assertTrue(true);
-					return;
-				}
+				assertTrue(tCurrentMember.getUsername().equals("user1"));
 			}
-			fail("user1 wasn't found after updating");
-
-		} 
+		}
 		catch (DatabaseUpdateException e) {
 			fail("database update error");
 		}

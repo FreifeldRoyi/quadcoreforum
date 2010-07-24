@@ -74,7 +74,7 @@ public class GeneralMethodsTest extends TestCase {
 	 * @see
 	 * 		GeneralForumBridge#register(String, String, String, String, String)
 	 */
-	protected boolean register(final String username, final String password, final String lastName,
+	protected long register(final String username, final String password, final String lastName,
 			final String firstName, final String email) {
 		return this.implementationBridge.register(username, password, lastName, firstName, email);
 	}	
@@ -101,11 +101,20 @@ public class GeneralMethodsTest extends TestCase {
 	 * @see
 	 * 		GeneralForumBridge#addNewReply(long, long, String, String)
 	 */
-	protected boolean addNewReply(final long authorID, final long fatherID, final String title,
+	protected long addNewReply(final long authorID, final long fatherID, final String title,
 			final String content) {
 		return this.implementationBridge.addNewReply(authorID, fatherID, title, content);
 	}
 
+	/**
+	 * @see
+	 * 		GeneralForumBridge#deleteMessage(long, long, long)
+	 */
+	protected boolean deleteMessage(final long applicantID, final long messageID, 
+			final long fatherID) {
+		return this.implementationBridge.deleteMessage(applicantID, messageID, fatherID);
+	}
+	
 	/**
 	 * @see
 	 * 		GeneralForumBridge#getReplies(long)

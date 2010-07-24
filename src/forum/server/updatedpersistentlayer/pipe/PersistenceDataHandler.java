@@ -6,17 +6,21 @@
 package forum.server.updatedpersistentlayer.pipe;
 
 
-import java.util.*;
+import java.util.Collection;
 
-import org.hibernate.SessionFactory;
-
-import forum.server.domainlayer.user.*;
-import forum.server.domainlayer.message.*;
-import forum.server.updatedpersistentlayer.*;
-import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
-import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
-
-
+import forum.server.domainlayer.message.ForumMessage;
+import forum.server.domainlayer.message.ForumSubject;
+import forum.server.domainlayer.message.ForumThread;
+import forum.server.domainlayer.user.ForumMember;
+import forum.server.domainlayer.user.ForumUser;
+import forum.server.domainlayer.user.Permission;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.ThreadNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author Vitali Sepetnitsky

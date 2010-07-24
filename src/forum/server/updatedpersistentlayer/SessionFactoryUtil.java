@@ -13,8 +13,6 @@ public class SessionFactoryUtil {
 		if (sessionFactory == null) {
 			sessionFactory = new Configuration()
 			.configure("forum/server/updatedpersistentlayer/hibernate.cfg.xml").buildSessionFactory();
-		
-			
 		}
 		return sessionFactory;
 	}

@@ -36,9 +36,6 @@ public class ForumDataHandler {
 	// this cache is responsible if handling the forum subjects, threads and messages
 	private final MessagesCache messagesCache;
 
-	// the forum administrator
-	private ForumMember admin;
-
 	/**
 	 * The class constructor.
 	 * 
@@ -54,7 +51,7 @@ public class ForumDataHandler {
 		SystemLogger.info("Initializes cache memories");
 		this.usersCache = new UsersCache();
 		this.messagesCache = new MessagesCache(false);
-		SystemLogger.info("Cache memories have been initializes successfuly");	
+		SystemLogger.info("Cache memories have been initialized successfuly");	
 		this.initializeAdmin();
 	}
 
@@ -68,7 +65,7 @@ public class ForumDataHandler {
 	private void initializeAdmin() throws DatabaseUpdateException {
 		SystemLogger.info("Building initial administrator");
 		try {
-			this.admin = this.getUsersCache().createNewMember(ForumDataHandler.ADMIN_INIITIAL_USERNAME, 
+			this.getUsersCache().createNewMember(ForumDataHandler.ADMIN_INIITIAL_USERNAME, 
 					ForumDataHandler.ADMIN_ENCRYPTED_PASSWORD, ForumDataHandler.ADMIN_INIITIAL_USERNAME,
 					ForumDataHandler.ADMIN_INIITIAL_USERNAME,
 					ForumDataHandler.ADMIN_EMAIL,

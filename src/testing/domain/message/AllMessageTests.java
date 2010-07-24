@@ -6,7 +6,7 @@ public class AllMessageTests extends TestCase {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite(
-				"Test for forum.testing.domainlayer.message");
+				"Test for forum.server.domainlayer.message");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ForumSubjectTest.class);
 		suite.addTestSuite(ForumThreadTest.class);
