@@ -3,10 +3,10 @@
 
 package forum.server.updatedpersistentlayer;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Set;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 public class MessageType {
 

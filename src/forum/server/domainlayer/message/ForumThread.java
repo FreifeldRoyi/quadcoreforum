@@ -151,4 +151,10 @@ public class ForumThread implements UIThread {
 	public void updateMe(String newTopic) {
 		this.topic = newTopic;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return (other != null && other instanceof ForumThread &&
+				((ForumThread)other).getID() == getID());
+	}
 }

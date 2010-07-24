@@ -52,17 +52,6 @@ public class MessagesCache {
 	/**
 	 * 
 	 * @return
-	 * 		The next id which can be assigned to a new thread
-	 * 
-	 * 		The methods promises that the returned id hasn't been assigned yet to any thread
-	 */
-	private long getNextThreadID() throws DatabaseRetrievalException {
-		return this.pipe.getFirstFreeThreadID();
-	}
-
-	/**
-	 * 
-	 * @return
 	 * 		The next id which can be assigned to a new message
 	 * 
 	 * 		The methods promises that the returned id hasn't been assigned yet to any message

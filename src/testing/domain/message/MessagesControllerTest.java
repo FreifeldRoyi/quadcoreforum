@@ -29,10 +29,7 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredExc
 public class MessagesControllerTest extends TestCase {
 
 	private ForumDataHandler dataHandler;
-
 	private MessagesController messagesControllerUnderTest;
-
-
 	private Map<String, Long> subjectsNamesToIDsMapping;
 
 	private ForumUser[] createdGuests;
@@ -61,7 +58,6 @@ public class MessagesControllerTest extends TestCase {
 		Settings.switchToTestMode();
 
 		this.dataHandler = new ForumDataHandler();
-
 		this.messagesControllerUnderTest = new MessagesController(dataHandler);
 
 		// constructs forum guests
@@ -239,16 +235,24 @@ public class MessagesControllerTest extends TestCase {
 		try {
 			final long tSubSubject11ID = this.subjectsNamesToIDsMapping.get("sub11");
 
-			final ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
+			ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
 			this.messagesControllerUnderTest.openNewThread(this.createdMembers[3].getID(), "thread1",
 					tSubSubject11ID, "title1", "content1");
 			this.messagesControllerUnderTest.openNewThread(this.createdMembers[3].getID(), "thread2",
 					tSubSubject11ID, "title2", "content2");
-
+			tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
+			
+			System.out.println(tSubSubject11);
+			System.out.println(tSubSubject11.getThreads());
+			//Settings.switchToRegularMode();
+			//System.exit(-1);
+			
 			Iterator<Long> tThreadsIter = tSubSubject11.getThreads().iterator();
 
 			final long tThread1ID = tThreadsIter.next();
 			final long tThread2ID = tThreadsIter.next();
+
+			System.out.println("2");
 
 			final ForumThread tThread1 = this.dataHandler.getMessagesCache().getThreadByID(tThread1ID);
 			final ForumThread tThread2 = this.dataHandler.getMessagesCache().getThreadByID(tThread2ID);
@@ -270,6 +274,8 @@ public class MessagesControllerTest extends TestCase {
 				assertTrue(tRoot1Replies.size() == 2);
 				assertTrue(tRoot2Replies.size() == 1);
 
+				System.out.println("1");
+				
 				Iterator<UIMessage> tMessage1RepliesIter = tRoot1Replies.iterator();
 
 				UIMessage tReply = tMessage1RepliesIter.next();
@@ -295,6 +301,7 @@ public class MessagesControllerTest extends TestCase {
 			}
 		}	
 		catch (NoSuchElementException e) {
+			e.printStackTrace();
 			fail("the thread or one of the messages hasn't been added successfully");
 		}
 		catch (NotPermittedException e) {
@@ -332,12 +339,14 @@ public class MessagesControllerTest extends TestCase {
 		try {
 			final long tSubSubject11ID = this.subjectsNamesToIDsMapping.get("sub11");
 
-			final ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
+			ForumSubject tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
 			this.messagesControllerUnderTest.openNewThread(this.createdMembers[3].getID(), "thread1",
 					tSubSubject11ID, "title1", "content1");
 			this.messagesControllerUnderTest.openNewThread(this.createdMembers[3].getID(), "thread2",
 					tSubSubject11ID, "title2", "content2");
 
+			tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
+			
 			Iterator<Long> tThreadsIter = tSubSubject11.getThreads().iterator();
 
 			final long tThread1ID = tThreadsIter.next();
@@ -349,7 +358,7 @@ public class MessagesControllerTest extends TestCase {
 			final long tRootMessage1ID = tThread1.getRootMessageID();
 			final long tRootMessage2ID = tThread2.getRootMessageID();
 
-			final ForumMessage tRootMessage1 = this.dataHandler.getMessagesCache().getMessageByID(tRootMessage1ID);
+			ForumMessage tRootMessage1 = this.dataHandler.getMessagesCache().getMessageByID(tRootMessage1ID);
 			final ForumMessage tRootMessage2 = this.dataHandler.getMessagesCache().getMessageByID(tRootMessage2ID);
 
 			// test adding a reply by a permitted member
@@ -358,6 +367,9 @@ public class MessagesControllerTest extends TestCase {
 				this.messagesControllerUnderTest.addNewReply(this.createdMembers[0].getID(),
 						tRootMessage1ID, "title11", "content11");
 				// tests that the first reply of the message is the added one
+
+				tRootMessage1 = this.dataHandler.getMessagesCache().getMessageByID(tRootMessage1ID);
+				
 				final long tMessage3ID = tRootMessage1.getReplies().iterator().next();
 				final ForumMessage tMessage3 = this.dataHandler.getMessagesCache().getMessageByID(tMessage3ID);
 				assertEquals(tMessage3.getAuthorID(), this.createdMembers[0].getID());
@@ -368,7 +380,10 @@ public class MessagesControllerTest extends TestCase {
 
 				this.messagesControllerUnderTest.addNewReply(this.createdMembers[1].getID(),
 						tRootMessage1ID, "title12", "content12");
+
 				// tests that the second reply of the message is the added one
+				tRootMessage1 = this.dataHandler.getMessagesCache().getMessageByID(tRootMessage1ID);
+				
 				Iterator<Long> tRepliesIter = tRootMessage1.getReplies().iterator();
 				tRepliesIter.next(); // overcome the first message
 				final long tMessage4ID = tRepliesIter.next();
@@ -434,15 +449,18 @@ public class MessagesControllerTest extends TestCase {
 	public void testUpdateAMessage() {
 		try {
 			final long tMain1SubjectID = this.subjectsNamesToIDsMapping.get("main1");
-			final ForumSubject tMain1Subject = this.dataHandler.getMessagesCache().getSubjectByID(tMain1SubjectID);
+			ForumSubject tMain1Subject = this.dataHandler.getMessagesCache().getSubjectByID(tMain1SubjectID);
 			this.messagesControllerUnderTest.openNewThread(this.createdMembers[3].getID(), "thread1",
 					tMain1SubjectID, "title1", "content1");
+			tMain1Subject = this.dataHandler.getMessagesCache().getSubjectByID(tMain1SubjectID);
+			
 			final long tThreadID = tMain1Subject.getThreads().iterator().next();
 			final ForumThread tThread = this.dataHandler.getMessagesCache().getThreadByID(tThreadID);
 			final long tMessage1ID = tThread.getRootMessageID();
 			this.messagesControllerUnderTest.addNewReply(this.createdMembers[2].getID(), 
 					tMessage1ID, "title2", "content2");
 			final ForumMessage tMessage1 = this.dataHandler.getMessagesCache().getMessageByID(tMessage1ID);
+			
 			final long tMessage2ID = tMessage1.getReplies().iterator().next();
 
 			// tests edition of the first message by a permitted author

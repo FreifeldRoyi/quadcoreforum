@@ -2,16 +2,25 @@ package forum.server.updatedpersistentlayer.pipe.user;
 
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Vector;
 
-import org.hibernate.*;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 
-import forum.server.updatedpersistentlayer.*;
-import forum.server.domainlayer.user.*;
+import forum.server.domainlayer.user.ForumMember;
+import forum.server.domainlayer.user.Permission;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
+import forum.server.updatedpersistentlayer.ExtendedObjectFactory;
+import forum.server.updatedpersistentlayer.MemberType;
 import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
 import forum.server.updatedpersistentlayer.pipe.PersistentToDomainConverter;
-import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * This class is responsible of performing the operations of reading from and writing to the database
@@ -22,28 +31,6 @@ import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
  * @author Sepetnitsky Vitali
  */
 public class UsersPersistenceHandler {
-
-	/*	private void deleteMember(Session session, MemberType toDelete) throws DatabaseUpdateException {
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			session.delete(toDelete);
-			tx.commit();
-		} 
-		catch (RuntimeException e) {
-			if (tx != null && tx.isActive()) {
-				try {
-					// Second try catch as the rollback could fail as well
-					tx.rollback();
-				} catch (HibernateException e1) {
-					// add logging
-				}
-				throw new DatabaseUpdateException();
-			}
-		}
-	}
-	 */
-
 	private Session getSessionAndBeginTransaction(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		try {
 			Session toReturn = ssFactory.getCurrentSession();
@@ -107,14 +94,14 @@ public class UsersPersistenceHandler {
 		if (tResult.get(0) != null) {
 			toReturn = tResult.get(0).longValue();
 			toReturn = (toReturn >= -1)? -2 : (toReturn - 1);
-			session.createSQLQuery("insert into ConnectedUsers values(" + toReturn + ", 1)").executeUpdate();
 		}
 		else
-			throw new DatabaseRetrievalException();
+			toReturn = -2;
+		session.createSQLQuery("insert into ConnectedUsers values(" + toReturn + ", 1)").executeUpdate();
 		try {
 			this.commitTransaction(session);
 			return toReturn;
-		} 
+		}
 		catch (DatabaseUpdateException e) {
 			throw new DatabaseRetrievalException();
 		}
@@ -148,12 +135,18 @@ public class UsersPersistenceHandler {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
 		String query = "select max(userID) from MemberType";
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
+
 		if (tResult.get(0) != null) {
-			toReturn = tResult.get(0).longValue() + 1;
-			// add a dummy row in order to promise that the calculate id won't be taken by another server
-			session.createSQLQuery("insert into members(UserID, Username, UserPassword, Email) values (" + toReturn + ", \"username" + 
-					toReturn + "\", \"password\", \"email\")").executeUpdate();
+			toReturn = Math.max(tResult.get(0).longValue() + 1, 0);
 		}
+		else {
+			System.out.println("result is null");
+			toReturn = 1;
+		}
+		// add a dummy row in order to promise that the calculate id won't be taken by another server
+		session.createSQLQuery("insert into members(UserID, Username, UserPassword, Email) values (" + toReturn + ", \"username" + 
+				toReturn + "\", \"password\", \"email\")").executeUpdate();
+
 		try {
 			this.commitTransaction(session);
 		} 
@@ -167,7 +160,7 @@ public class UsersPersistenceHandler {
 	public Collection<String> getActiveMemberUserNames(SessionFactory ssFactory) throws DatabaseRetrievalException {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
 		String query = "select Username from ConnectedUsers as Con, Members " +
-				"as Mem where Con.UserID = Mem.UserID and Con.UserID != -1";
+		"as Mem where Con.UserID = Mem.UserID and Con.UserID != -1";
 		List<String> tResult = (List<String>)session.createSQLQuery(query).list();
 		Collection<String> toReturn = new HashSet(tResult);
 		try {
@@ -349,6 +342,7 @@ public class UsersPersistenceHandler {
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			MemberType tNewMemberType = ExtendedObjectFactory.createMemberType(id, username, password, lastName, firstName, email, permissions);
 			// now we can delete the id - in order to add the new member instead
+
 			session.createSQLQuery("delete from Members where UserID = " + id).executeUpdate();
 			session.save(tNewMemberType);
 			this.commitTransaction(session);

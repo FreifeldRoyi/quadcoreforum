@@ -24,6 +24,8 @@ public class ProxyBridge implements GeneralForumBridge {
 
 	private boolean user2LoginInfo; // used for the stub implementation
 	private boolean replyAddedInfo; // used for the stub implementation
+	private boolean fatherIDIsMinusOne; // used for the stub implementation of message deletion
+	private int getRepliesCounter; // user for stub implementation of replies generating
 	
 	/**
 	 * The ProxyBridge class constructor, initializes the this.realBridge variable by looking for a class
@@ -36,6 +38,8 @@ public class ProxyBridge implements GeneralForumBridge {
 	 * 
 	 */
 	public ProxyBridge() {
+		fatherIDIsMinusOne = false;
+		getRepliesCounter = 0;
 		try {
 			SystemLogger.info("Switching to test database ...");
 			Class<?> tRealBridgeClass = 
@@ -76,14 +80,16 @@ public class ProxyBridge implements GeneralForumBridge {
 			return this.realBridge.login(username, password);
 		// a stub implementation
 		if (username.equals("user1")) {
-			String[] toReturn = {"user1", "last1", "first1", "user1@gmail.com"};
+			String[] toReturn = {"user1", "last1", "first1", "user1@gmail.com", "3"};
 			return toReturn;
 		}
 		else if (username.equals("user2") && (!password.equals("pass3"))) {
-			String[] toReturn = {"user2", "last2", "first2", "user2@gmail.com"};
+			String[] toReturn = {"user2", "last2", "first2", "user2@gmail.com", "4"};
 			this.user2LoginInfo = true;
 			return toReturn;
 		}
+		else if (username.equals("user10")) // return something - not null
+			return new String[0];
 		return null;
 	}	
 
@@ -106,12 +112,14 @@ public class ProxyBridge implements GeneralForumBridge {
 	 * @see
 	 * 		GeneralForumBridge#register(String, String, String, String, String)
 	 */
-	public boolean register(final String username, final String password, final String lastName,
+	public long register(final String username, final String password, final String lastName,
 			final String firstName, final String email) {
 		if (this.realBridge != null)
 			return this.realBridge.register(username, password, lastName, firstName, email);
 		// a stub implementation
-		return true;
+		if ((username.equals("user10") || username.equals("user20")) && password.equals("pass2"))
+			return -1;
+		return 3;
 	}	
 
 	/**
@@ -133,22 +141,30 @@ public class ProxyBridge implements GeneralForumBridge {
 			final String title, final String content) {
 		if (this.realBridge != null)
 			return this.realBridge.openNewThread(userID, subjectID, topic, title, content);
-		return 2;
+		return 22;
 	}
 
 	/**
 	 * @see
 	 * 		GeneralForumBridge#addNewReply(long, long, String, String)
 	 */
-	public boolean addNewReply(final long authorID, final long fatherID, final String title,
+	public long addNewReply(final long authorID, final long fatherID, final String title,
 			final String content) {
 		if (this.realBridge != null)
 			return this.realBridge.addNewReply(authorID, fatherID, title, content);
 		// a stub implementation
 		this.replyAddedInfo = true;
-		if (fatherID == 20 || authorID == 9 || !this.user2LoginInfo)
-			return false;
-		return true;
+		
+		if (fatherID == 20 || authorID == 9 || (this.user2LoginInfo && fatherID != 22) ||
+				(fatherID == 22 && (authorID == 13 || authorID == 1256)))
+			return -1;
+		if (fatherID == 22)
+			return 3;
+		else if (fatherID == 3)
+			return 4;
+		else if (fatherID == 4)
+			return 5;
+		return 10;
 	}
 
 	/**
@@ -158,10 +174,38 @@ public class ProxyBridge implements GeneralForumBridge {
 	public Collection<String> getReplies(final long fatherID) {
 		if (this.realBridge != null)
 			return this.realBridge.getReplies(fatherID);
+		getRepliesCounter++;
 		// a stub implementation
 		Collection<String> toReturn = new Vector<String>();
-		if (this.replyAddedInfo)
-			toReturn.add("2title1content1");
+		if (getRepliesCounter == 4)
+			return toReturn;
+		if (this.replyAddedInfo && fatherID != 4 && fatherID != 3)
+			toReturn.add("3title1content1");
+		else if (fatherID == 2)
+			toReturn.add("2title2content2");
+		else if (fatherID == 3)
+			return null;
+		else if (fatherID == 7)
+			toReturn.add("4title4content4");
+		else if (fatherID == 5)
+			toReturn.add("5title5content5");
 		return toReturn;
+	}
+
+	/**
+	 * @see
+	 * 		GeneralForumBridge#deleteMessage(long, long, long)
+	 */
+	public boolean deleteMessage(long applicantID, long messageID, long fatherID) {
+		if (this.realBridge != null)
+			return this.realBridge.deleteMessage(applicantID, messageID, fatherID);
+		// a stub implementation
+		if ((fatherID == -1) && !this.fatherIDIsMinusOne ) {
+			this.fatherIDIsMinusOne = true;
+			return true;
+		}
+		else if (fatherIDIsMinusOne)
+			return false;
+		return true;
 	}
 }
