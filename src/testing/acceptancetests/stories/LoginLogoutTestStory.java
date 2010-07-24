@@ -33,8 +33,8 @@ public class LoginLogoutTestStory extends GeneralMethodsTest {
 	public void testLoginAndLogoutFromTheSystem() {
 		// registers two new users to the forum - the method should succeed because we start from an empty
 		// database and the two users details are different
-		assertTrue(super.register("user1", "pass1", "last1", "first1", "user1@gmail.com"));
-		assertTrue(super.register("user2", "pass2", "last2", "first2", "user2@gmail.com"));
+		assertTrue(super.register("user1", "pass1", "last1", "first1", "user1@gmail.com") != -1);
+		assertTrue(super.register("user2", "pass2", "last2", "first2", "user2@gmail.com") != -1);
 		String[] tUser1Information = {"user1", "last1", "first1", "user1@gmail.com"};
 		// logs in the first user with correct user-name and password
 		String[] tLoggedInInfo = super.login("user1", "pass1");

@@ -10,7 +10,7 @@ public class AllDomainTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite(
-				"Test for forum.testing.domainlayer.message");
+				"Test for forum.server.domainlayer");
 		//$JUnit-BEGIN$
 		suite.addTest(AllUserTests.suite());
 		suite.addTest(AllMessageTests.suite());

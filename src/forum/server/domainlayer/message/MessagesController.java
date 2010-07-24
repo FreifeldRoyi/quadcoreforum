@@ -9,18 +9,25 @@
  */
 package forum.server.domainlayer.message ;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Vector;
 
-import forum.server.domainlayer.*;
-import forum.server.domainlayer.interfaces.*;
-import forum.server.domainlayer.user.*;
-
+import forum.server.domainlayer.ForumDataHandler;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.interfaces.UIMessage;
+import forum.server.domainlayer.interfaces.UISubject;
+import forum.server.domainlayer.interfaces.UIThread;
+import forum.server.domainlayer.user.ForumUser;
+import forum.server.domainlayer.user.Permission;
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
-
-
-import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
-import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectAlreadyExistsException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.ThreadNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 public class MessagesController {
 
@@ -96,7 +103,6 @@ public class MessagesController {
 				else {
 					ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
 					ForumSubject tNewSubject = this.dataHandler.getMessagesCache().createNewSubject(name, description, fatherID);
-
 					tFatherSubject.addSubSubject(tNewSubject.getID());
 					tFatherSubject.incDeepNumOfSubSubjects();
 					this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
@@ -329,43 +335,6 @@ public class MessagesController {
 		catch (DatabaseRetrievalException e) {
 			throw new DatabaseUpdateException();
 		}
-	}
-
-	private void deleteAThread(final long userID, final long fatherID, final long threadID) throws NotRegisteredException, 
-	NotPermittedException, SubjectNotFoundException, ThreadNotFoundException, DatabaseUpdateException {
-		try {
-			SystemLogger.info("A user with id " + userID + " requests to delete ther thread with id " +
-					threadID + " from a subject with id " + fatherID);
-			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
-			if (tApplicant.isAllowed(Permission.DELETE_MESSAGE)) {
-				SystemLogger.info("Permission granted for user " + userID + ".");
-				final ForumThread tThreadToDelete = this.dataHandler.getMessagesCache().getThreadByID(threadID);
-				final ForumSubject tFatherSubject = this.dataHandler.getMessagesCache().getSubjectByID(fatherID);
-
-				// delete the thread from the desired subject
-				tFatherSubject.deleteThread(threadID);
-
-				this.dataHandler.getMessagesCache().updateInDatabase(tFatherSubject);
-
-				this.dataHandler.getMessagesCache().deleteATread(tThreadToDelete.getID());
-
-				System.out.println("After delete id = " + tFatherSubject.getID());
-				System.out.println("After delete threads = " + tFatherSubject.getThreads().toString());
-
-
-
-				SystemLogger.info("A thread with id " + threadID + " was deleted successfuly from the subject " +
-						fatherID + " by a user " + userID);
-			}
-			else {
-				SystemLogger.info("unpermitted operation for user " + userID + ".");
-				throw new NotPermittedException(userID, Permission.DELETE_THREAD);
-			}
-		}
-		catch (DatabaseRetrievalException e) {
-			throw new DatabaseUpdateException();
-		}
-
 	}
 
 	public UIThread updateAThread(final long userID, final long threadID, final String newTopic) throws NotRegisteredException,

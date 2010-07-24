@@ -15,14 +15,9 @@ import forum.server.domainlayer.interfaces.UIUser;
  *
  */
 public class ForumUser implements UIUser {
-/*	public enum UserType {
-		GUEST, MEMBER, ADMIN, MODERATOR
-	}
-*/	
 	
 	private long id;
 	private Collection<Permission> permissions;
-//	private UserType type;
 	
 	/**
 	 * The class constructor
@@ -30,7 +25,7 @@ public class ForumUser implements UIUser {
 	 * @param id
 	 * 		The id of the constructed user
 	 * @param permissions
-	 * 		The initiali collection of permissions which are given to the user
+	 * 		The initial collection of permissions which are given to the user
 	 */
 	public ForumUser(final long id, final Collection<Permission> permissions) {
 		this.id = id;

@@ -72,6 +72,8 @@ public class MessagesPersistenceHandler {
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
 		if (tResult.get(0) != null)
 			toReturn = tResult.get(0).longValue();
+		else
+			toReturn = 0;
 		try {
 			this.commitTransaction(session);
 		} 
@@ -121,7 +123,7 @@ public class MessagesPersistenceHandler {
 	 * @throws SubjectNotFoundException
 	 * 		In case a subject with the given id doesn't exist in the database
 	 */
-	public SubjectType getSubjectTypeByID(Session session, 
+	private SubjectType getSubjectTypeByID(Session session, 
 			long subjectID) throws DatabaseRetrievalException {
 		try {
 			return (SubjectType)session.get(SubjectType.class, subjectID);
@@ -259,6 +261,8 @@ public class MessagesPersistenceHandler {
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
 		if (tResult.get(0) != null)
 			toReturn = tResult.get(0).longValue();
+		else
+			toReturn = 0;
 		try {
 			this.commitTransaction(session);
 		}
@@ -425,6 +429,8 @@ public class MessagesPersistenceHandler {
 		List<Long> tResult = (List<Long>)session.createQuery(query).list();
 		if (tResult.get(0) != null)
 			toReturn = tResult.get(0).longValue();
+		else
+			toReturn = 0;
 		try {
 			this.commitTransaction(session);
 		} 
@@ -565,21 +571,7 @@ public class MessagesPersistenceHandler {
 			throw new DatabaseUpdateException();
 		}
 	}
-
-	/*	private void updateThreadOfReplies(Session session, 
-			MessageType toUpdate, Collection<Long> newReplies, long threadID) throws DatabaseUpdateException {
-		try {
-			for (Long tCurrentReplyID : newReplies)
-				if (!toUpdate.getRepliesIDs().contains(tCurrentReplyID)) {
-					MessageType tCurrentReply = this.getMessageTypeByID(session, tCurrentReplyID);
-					tCurrentReply.setThreadID(threadID);
-					session.update(tCurrentReply);
-				}
-		}
-		catch (Exception e) {
-			throw new DatabaseUpdateException();
-		}
-	}*/
+	
 
 	/**
 	 * @param data

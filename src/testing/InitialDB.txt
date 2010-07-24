@@ -1,7 +1,7 @@
-DROP TABLE IF EXISTS QuadCoreForumDBTest.Subjects;
-DROP TABLE IF EXISTS QuadCoreForumDBTest.Threads;
-DROP TABLE IF EXISTS QuadCoreForumDBTest.Messages;
-DROP TABLE IF EXISTS QuadCoreForumDBTest.Members;
+CREATE TABLE QuadCoreForumDBTest.ConnectedUsers (
+  UserID BIGINT PRIMARY KEY,
+  ConnectionsNum BIGINT
+);
 
 CREATE TABLE QuadCoreForumDBTest.Members (
   UserID BIGINT PRIMARY KEY,
@@ -10,6 +10,7 @@ CREATE TABLE QuadCoreForumDBTest.Members (
   Email VARCHAR(40) NOT NULL,
   FirstName VARCHAR(20),
   LastName VARCHAR(20),
+  ShouldAskChangePassword BOOL DEFAULT FALSE,
   UserType ENUM('MEMBER', 'MODERATOR', 'ADMIN') NOT NULL DEFAULT 'MEMBER'
 );
 
@@ -26,7 +27,7 @@ CREATE TABLE QuadCoreForumDBTest.Messages(
   MessageID BIGINT PRIMARY KEY,
   AuthorID BIGINT,
   INDEX (AuthorID),
-  Title VARCHAR(20) NOT NULL,
+  Title VARCHAR(40) NOT NULL,
   Content TEXT NOT NULL,
   PostTime DATETIME NOT NULL,
   FatherID BIGINT DEFAULT -1,
@@ -37,16 +38,18 @@ CREATE TABLE QuadCoreForumDBTest.Messages(
 CREATE TABLE QuadCoreForumDBTest.Subjects (
   SubjectID BIGINT PRIMARY KEY,
   FatherID BIGINT DEFAULT -1,
+  NumOfSubSubjects BIGINT DEFAULT 0,
+  NumOfMessages BIGINT DEFAULT 0,
   lastAddedMessageID BIGINT,
-  Name VARCHAR(20) NOT NULL,
-  Description VARCHAR(30) NOT NULL,
+  Name VARCHAR(40) NOT NULL,
+  Description VARCHAR(60) NOT NULL,
   FOREIGN KEY (lastAddedMessageID) REFERENCES Messages(MessageID),
   FOREIGN KEY (FatherID) REFERENCES Subjects(SubjectID) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE QuadCoreForumDBTest.Threads(
   ThreadID BIGINT PRIMARY KEY,
-  Topic VARCHAR(20),
+  Topic VARCHAR(40),
   StartMessageID BIGINT DEFAULT -1,
   LastMessageID BIGINT DEFAULT -1,
   NumOfViews BIGINT DEFAULT 0,
@@ -85,7 +88,40 @@ INSERT INTO QuadCoreForumDBTest.subjects(SubjectID, Name, Description)
 VALUES(-1, "name", "description");
 
 INSERT INTO QuadCoreForumDBTest.members
-VALUES(-1, "2SeU4E1NaMeU", "password", "email@email", "first", "last", 'MEMBER');
+VALUES(-1, "2SeU4E1NaMeU", "password", "email@email", "first", "last", FALSE, 'MEMBER');
+
+INSERT INTO QuadCoreForumDBTest.members(UserID, Username, UserPassword, Email, FirstName, LastName, UserType)
+VALUES(0, "abcba", "abcba", "abcba@abcba", "abcba", "abcba", 'ADMIN');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'ADD_SUBJECT');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'DELETE_SUBJECT');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'OPEN_THREAD');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'REPLY_TO_MESSAGE');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'DELETE_THREAD');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'DELETE_MESSAGE');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'VIEW_ALL');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'ADD_SUB_SUBJECT');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'SET_MODERATOR');
+
+INSERT INTO QuadCoreForumDBTest.userspermissions
+VALUES(0, 'EDIT_SUBJECT');
 
 INSERT INTO QuadCoreForumDBTest.messages(MessageID, AuthorID, Title, Content, PostTime)
 VALUES(-1, -1, "title", "content", '10/10/10 15:14');
@@ -93,5 +129,50 @@ VALUES(-1, -1, "title", "content", '10/10/10 15:14');
 INSERT INTO QuadCoreForumDBTest.threads(ThreadID, topic, StartMessageID, LastMessageID)
 VALUES(-1, "topic", -1, -1);
 
-INSERT INTO QuadCoreForumDBTest.messages(MessageID, AuthorID, Title, Content, PostTime)
-VALUES(104, -1, "title", "content", '10/10/10 15:14');
+INSERT INTO QuadCoreForumDBTest.connectedusers(UserID, ConnectionsNum)
+VALUES(-1, 1);
+
+
+#INSERT INTO QuadCoreForumDBTest.userspermissions
+#VALUES(1, 'ADD_SUBJECT');
+
+#INSERT INTO QuadCoreForumDBTest.userspermissions
+#VALUES(1, 'SET_MODERATOR');
+
+
+#INSERT INTO QuadCoreForumDBTest.subjects(SubjectID, Name, Description, isTopLevel)
+#VALUES(2, "abc", "def", false);
+
+#INSERT INTO QuadCoreForumDBTest.subsubjects
+#VALUES(1, 2);
+
+#INSERT INTO QuadCoreForumDBTest.messages
+#VALUES(1, 1, "title1", "content1", '10/10/10 15:14', -1);
+
+#INSERT INTO QuadCoreForumDBTest.messages
+#VALUES(2, 1, "title2", "content2", '10/10/10 15:14', -1);
+
+#INSERT INTO QuadCoreForumDBTest.messages
+#VALUES(3, 1, "title3", "content3", '10/10/10 15:14', -1);
+
+#INSERT INTO QuadCoreForumDBTest.replies
+#VALUES(1, 2);
+
+#INSERT INTO QuadCoreForumDBTest.replies
+#VALUES(1, 3);
+
+#INSERT INTO QuadCoreForumDBTest.threads(ThreadID, topic, StartMessageID, LastMessageID)
+#VALUES(1, "thread1", 1, 1);
+
+#INSERT INTO QuadCoreForumDBTest.subjectsthreads
+#VALUES (1, 1)
+
+#UPDATE QuadCoreForumDBTest.messages
+#SET ThreadID = 1
+#WHERE MessageID = 4
+
+#INSERT INTO QuadCoreForumDBTest.subsubjects
+#VALUES(1, 2);
+
+#INSERT INTO QuadCoreForumDBTest.subjectsthreads
+#VALUES(1, 1);

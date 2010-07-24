@@ -225,8 +225,4 @@ public class MemberType {
         }
         return this.postedMessagesIDs;
     }
-
-   
-   
-
 }
