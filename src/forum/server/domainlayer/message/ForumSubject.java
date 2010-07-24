@@ -244,5 +244,5 @@ public class ForumSubject implements UISubject {
 	public void updateMe(String newName, String newDescription) {
 		this.name = newName;
 		this.description = newDescription;
-	}
+	}	
 }

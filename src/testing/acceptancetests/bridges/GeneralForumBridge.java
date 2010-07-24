@@ -32,9 +32,9 @@ public interface GeneralForumBridge {
 	 * 		ForumFacade#registerNewMember(String, String, String, String, String)
 	 * 
 	 * @return
-	 * 		True in case of successful registering and false otherwise.
+	 * 		The id of the new registered user in case of successful registering and -1 otherwise.
 	 */
-	public boolean register(final String username, final String password, final String lastName,
+	public long register(final String username, final String password, final String lastName,
 			final String firstName, final String email);
 
 	/**
@@ -164,8 +164,24 @@ public interface GeneralForumBridge {
 	 * 		ForumFacade#addNewReply(long, long, String, String)
 	 * 
 	 * @return
-	 * 		True if the reply was created and save to the forum database, and false otherwise
+	 * 		The id of the reply the created reply or -1 if an exception was thrown
 	 */
-	public boolean addNewReply(final long authorID, final long fatherID, final String title,
+	public long addNewReply(final long authorID, final long fatherID, final String title,
 			final String content);
+	
+	/**
+	 * 
+	 * Deletes a message with the given id from the forum
+	 * 
+	 * @param applicantID
+	 * 		The id of the user who wants to delete the message
+	 * @param messageID
+	 * 		The id of the message which should be deleted
+	 * @param fatherID
+	 * 		The id of the message from which this message should be deleted,
+	 * 		if the id is -1 than this message is a top-level one (- a root 
+	 * 		message of a thread)
+	 */
+	public boolean deleteMessage(final long applicantID, final long messageID, 
+			final long fatherID);
 }

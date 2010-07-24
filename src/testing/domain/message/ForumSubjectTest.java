@@ -90,6 +90,13 @@ public class ForumSubjectTest extends TestCase {
 	@Test
 	public void testSubjToString() {
 		assertEquals(this.subjectUnderTest.toString(), 34 + "\t" + ForumSubjectTest.DEFAULT_SUBJECT_NAME + "\t" +
-				ForumSubjectTest.DEFAULT_SUBJECT_DESCRIPTION);
+				ForumSubjectTest.DEFAULT_SUBJECT_DESCRIPTION + "\t" + 0 +"\t" + 0);
+		
+//		private static final int DEFAULT_SUBJECT_ID = 34;
+	//	private static final String DEFAULT_SUBJECT_NAME = "test subject name";
+	//	private static final String DEFAULT_SUBJECT_DESCRIPTION = "test subject descripion";
+	//	private static final long DEFAULT_FATHER_SUBJECT_ID = -1;
+
+		
 	}
 }
