@@ -243,7 +243,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.usernameLabel);
-		this.usernameInput = new JRestrictedLengthTextField(20, 20, false);
+		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
 		this.usernameInput.setText("");
 		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		usernameInput.addKeyListener(this);
@@ -254,7 +254,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.emailLabel = new JLabel("E-mail", JLabel.TRAILING);
 		this.emailLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.emailLabel);
-		this.emailInput = new JRestrictedLengthTextField(40, 40, false);
+		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
 		this.emailInput.setText("");
 		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		emailInput.addKeyListener(this);

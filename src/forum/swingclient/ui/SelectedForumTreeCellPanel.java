@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.text.html.HTMLEditorKit;
 
 import forum.server.domainlayer.user.Permission;
 import forum.swingclient.controllerlayer.ConnectedUserData;
@@ -67,6 +68,7 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 		m_forumTree = forumTree;
 
 		m_area = new JEditorPane();
+		m_area.setEditorKit(new HTMLEditorKit());
 		m_area.setFont(new Font("Tahoma", 0, 14));
 		m_area.setText("");
 		m_area.setEditable(false);
