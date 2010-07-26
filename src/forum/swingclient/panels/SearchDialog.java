@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.StyleConstants;
 
@@ -331,6 +332,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 		tScroll.setPreferredSize(new Dimension(224, 100));
 		this.pnl_results = new JPanel();
+		this.pnl_results.setOpaque(false);
 		this.pnl_results.setBorder(BorderFactory.createTitledBorder("Search results"));
 
 
@@ -372,9 +374,17 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 
 		this.radBtn_5 = new JRadioButton("5 results per page");
+		this.radBtn_5.setOpaque(false);
+		this.radBtn_5.setForeground(Color.white);
 		this.radBtn_10 = new JRadioButton("10 results per page");
+		this.radBtn_10.setOpaque(false);
+		this.radBtn_10.setForeground(Color.white);
 		this.radBtn_15 = new JRadioButton("15 results per page");
+		this.radBtn_15.setOpaque(false);
+		this.radBtn_15.setForeground(Color.white);
 		this.radBtn_20 = new JRadioButton("20 results per page");
+		this.radBtn_20.setOpaque(false);
+		this.radBtn_20.setForeground(Color.white);
 
 
 		this.radBtn_5.addActionListener(new ActionListener() {
@@ -409,7 +419,8 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			}
 		});
 
-		this.pnl_resultRadBtnHolder = new JPanel(); 
+		this.pnl_resultRadBtnHolder = new JPanel();
+		this.pnl_resultRadBtnHolder.setOpaque(false);
 		BoxLayout bl = new BoxLayout(this.pnl_resultRadBtnHolder, BoxLayout.X_AXIS);
 		this.pnl_resultRadBtnHolder.setLayout(bl);
 
@@ -424,8 +435,9 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.radBtn_20.setToolTipText("Show 20 results per page");
 		 */
 		this.radBtn_10.setSelected(true);
-
-		this.pnl_resultRadBtnHolder.setBorder(BorderFactory.createTitledBorder("Results per page"));
+		
+		Border tBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+		this.pnl_resultRadBtnHolder.setBorder(BorderFactory.createTitledBorder(tBorder, "Results per page", 0, 0, new Font("Tahoma", Font.BOLD, 13), Color.black));
 		this.pnl_resultRadBtnHolder.add(this.radBtn_5);
 		this.pnl_resultRadBtnHolder.add(this.radBtn_10);
 		this.pnl_resultRadBtnHolder.add(this.radBtn_15);		
@@ -441,8 +453,12 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		/* search type option handling */
 		this.btnGrp_searchOption = new ButtonGroup();
 		this.radBtn_author = new JRadioButton("Search By Author");
+		this.radBtn_author.setOpaque(false);
+		this.radBtn_author.setForeground(Color.white);
 		this.radBtn_content = new JRadioButton("Search By Content");
-
+		this.radBtn_content.setOpaque(false);
+		this.radBtn_content.setForeground(Color.white);
+		
 		this.radBtn_author.addKeyListener(this);
 		this.radBtn_content.addKeyListener(this);
 		
@@ -450,9 +466,10 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.btnGrp_searchOption.add(this.radBtn_content);
 
 		this.pnl_searchOptionHolder = new JPanel(new FlowLayout());
+		this.pnl_searchOptionHolder.setOpaque(false);
 
 		this.pnl_searchOptionHolder.setLayout(new BoxLayout(this.pnl_searchOptionHolder, BoxLayout.X_AXIS));
-		this.pnl_searchOptionHolder.setBorder(BorderFactory.createTitledBorder("Search option"));
+		this.pnl_searchOptionHolder.setBorder(BorderFactory.createTitledBorder(tBorder, "Search option", 0, 0, new Font("Tahoma", Font.BOLD, 13), Color.black));
 
 		this.pnl_searchOptionHolder.add(this.radBtn_author);
 		this.pnl_searchOptionHolder.add(this.radBtn_content);
@@ -510,9 +527,22 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 		this.btn_cancel.setPreferredSize(new Dimension(100, 40));
 
+		JPanel mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
 
-		GroupLayout tLayout = new GroupLayout(this.getContentPane());
-
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+		
+		GroupLayout tLayout = new GroupLayout(mainPanel);
+		mainPanel.setLayout(tLayout);	
 		tLayout.setHorizontalGroup(tLayout.createParallelGroup(Alignment.CENTER)
 				.addGroup(tLayout.createSequentialGroup()
 						.addGap(10, 10, 10)
@@ -564,7 +594,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 								.addComponent(this.btn_cancel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGap(10, 10, 10)));
 
-		this.getContentPane().setLayout(tLayout);
+		this.getContentPane().add(mainPanel);
 
 		//		this.setLayout(this.layout);
 		this.setTitle("Search");

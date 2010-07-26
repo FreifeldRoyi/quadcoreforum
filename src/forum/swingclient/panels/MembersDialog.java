@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -29,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -105,8 +108,10 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 
 		
 		this.connectedStatistics = new JRadioButton("connected");
+		this.connectedStatistics.setOpaque(false);
 		this.existingStatistics = new JRadioButton("existing");
-
+		this.existingStatistics.setOpaque(false);
+		
 		this.connectedStatistics.addKeyListener(this);
 		this.existingStatistics.addKeyListener(this);
 		
@@ -116,7 +121,7 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 				((ForumUsersPieChart)pnl_usersStatisticsPie).updateConnectedStatistics();
 			}
 		});
-
+		
 		this.existingStatistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				UIManager.put("Selected", "Existing");
@@ -145,7 +150,8 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 		tButtonGroup.add(existingStatistics);
 
 		JPanel tStatisticsSelectionPanel = new JPanel();
-
+		tStatisticsSelectionPanel.setOpaque(false);
+		
 		tStatisticsSelectionPanel.setBorder(BorderFactory.createTitledBorder(""));
 		tStatisticsSelectionPanel.setPreferredSize(new Dimension(170, 40));
 		
@@ -158,7 +164,8 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 
 
 		JPanel tStatisticsContainer = new JPanel();
-
+		tStatisticsContainer.setOpaque(false);
+		
 		GroupLayout tStatisticsContainerLayout = new GroupLayout(tStatisticsContainer);
 
 		tStatisticsContainerLayout.setHorizontalGroup(
@@ -321,7 +328,8 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 		this.btn_show_profile.addActionListener(showProfileListener);
 
 		final JPanel tMembersTableCont = new InternalConnectedUsersPanel();
-
+		tMembersTableCont.setOpaque(false);
+		
 		this.btn_cancel.setPreferredSize(tButtonSize);
 
 
@@ -341,14 +349,27 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 
 		this.addKeyListener(this);
 
-
 		tStatisticsContainer.setLayout(tStatisticsContainerLayout);
 
+		Border tBorder = BorderFactory.createLineBorder(Color.WHITE, 1);
+		tStatisticsContainer.setBorder(BorderFactory.createTitledBorder(tBorder, "Statistics", 0, 0, new Font("Tahoma", Font.BOLD, 14), Color.WHITE));
 
-		tStatisticsContainer.setBorder(BorderFactory.createTitledBorder("Statistics"));
+		JPanel mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
 
-		GroupLayout tLayout = new GroupLayout(this.getContentPane());
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
 
+		GroupLayout tLayout = new GroupLayout(mainPanel);
+		mainPanel.setLayout(tLayout);		
 		tLayout.setHorizontalGroup(tLayout.createParallelGroup()
 				.addGroup(tLayout.createSequentialGroup()
 						.addGap(10, 10, 10)
@@ -385,7 +406,7 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 								.addComponent(this.btn_updateStatistics, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGap(10, 10, 10));
 
-		this.getContentPane().setLayout(tLayout);
+		this.getContentPane().add(mainPanel);
 
 		this.setMinimumSize(new Dimension(800, 440));
 
@@ -512,8 +533,8 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 			controller.addObserver(new GUIObserver(this), EventType.USER_CHANGED);
 
 			this.addKeyListener(MembersDialog.this);
-
-			this.setBorder(BorderFactory.createTitledBorder("Existing forum members"));
+			Border tBorder = BorderFactory.createLineBorder(Color.WHITE, 1);
+			this.setBorder(BorderFactory.createTitledBorder(tBorder, "Existing forum members", 0, 0, new Font("Tahoma", Font.BOLD, 14), Color.WHITE));
 
 			this.createMembersTable();
 

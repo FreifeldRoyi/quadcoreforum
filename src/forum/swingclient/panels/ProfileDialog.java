@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -232,6 +234,7 @@ public class ProfileDialog extends JDialog implements GUIHandler, KeyListener {
 	private void initGUIComponents() {
 
 		this.informationPanel  = new JPanel();
+		this.informationPanel.setOpaque(false);
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
 		this.informationLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
@@ -239,6 +242,7 @@ public class ProfileDialog extends JDialog implements GUIHandler, KeyListener {
 		informationPanel.add(informationLabel);
 
 		this.profilePanel = new JPanel();
+		this.profilePanel.setOpaque(false);
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
 		this.profilePanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Profile"));
 
@@ -322,9 +326,23 @@ public class ProfileDialog extends JDialog implements GUIHandler, KeyListener {
 		updateButton.setPreferredSize(new Dimension(100, 40));
 
 
+		JPanel mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
 
-		GroupLayout tMainPanelLayout = new GroupLayout(this.getContentPane());
-		this.getContentPane().setLayout(tMainPanelLayout);
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+
+		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
+		mainPanel.setLayout(tMainPanelLayout);
+		this.getContentPane().add(mainPanel);
 		tMainPanelLayout.setHorizontalGroup(
 				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)

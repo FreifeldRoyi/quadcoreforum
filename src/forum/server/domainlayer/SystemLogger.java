@@ -24,7 +24,7 @@ public class SystemLogger {
 	private static Formatter CUSTOM_FORMATTER; // The formatter of the log messages
 
 	private static final boolean APPEND_NEW_MESSAGES_TO_OLD = true;
-	private static final boolean LOG_TO_FILE_BY_DEFAULT = false ;
+	private static final boolean LOG_TO_FILE_BY_DEFAULT = true ;
 	private static final boolean LOG_TO_CONSOLE_BY_DEFAULT = true ;
 	private static final String MESSAGE_DEFAULT_DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss";
 	private static final Level DEFAULT_LOG_LEVEL = Level.ALL ;

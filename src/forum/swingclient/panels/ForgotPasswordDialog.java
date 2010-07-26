@@ -3,6 +3,7 @@ package forum.swingclient.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -84,8 +86,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 	// KeyListener implementation
 	public void keyPressed(KeyEvent e) {
-		this.usernameLabel.setForeground(Color.BLACK);
-		this.emailLabel.setForeground(Color.BLACK);
+		this.usernameLabel.setForeground(Color.WHITE);
+		this.emailLabel.setForeground(Color.WHITE);
 		this.informationLabel.setText("");
 		
 		if (e.getKeyChar() == KeyEvent.VK_ENTER)
@@ -104,8 +106,8 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 			public Boolean doInBackground() {
 				final SendMail tSender = new SendMail();
 
-				usernameLabel.setForeground(Color.BLACK);
-				emailLabel.setForeground(Color.BLACK);
+				usernameLabel.setForeground(Color.WHITE);
+				emailLabel.setForeground(Color.WHITE);
 				informationLabel.setText("");
 
 				
@@ -221,6 +223,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 	private void initGUIComponents() {
 
 		this.informationPanel  = new JPanel();
+		this.informationPanel.setOpaque(false);
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
 		this.informationLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 
@@ -229,14 +232,16 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 
 
 		this.forgotPasswordPanel = new JPanel();
+		this.forgotPasswordPanel.setOpaque(false);
+		
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		this.forgotPasswordPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Please enter your username and e-mail"));
-
+		this.forgotPasswordPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Please enter your username and e-mail", 0, 0 , new Font("Tahoma", Font.BOLD, 14), Color.BLUE));
 
 		SpringLayout jLoginPanel = new SpringLayout();
 		forgotPasswordPanel.setLayout(jLoginPanel);
 
-		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
+		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);
+		this.usernameLabel.setForeground(Color.WHITE);
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.usernameLabel);
 		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
@@ -248,6 +253,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
 		this.emailLabel = new JLabel("E-mail", JLabel.TRAILING);
+		this.emailLabel.setForeground(Color.WHITE);
 		this.emailLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		forgotPasswordPanel.add(this.emailLabel);
 		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
@@ -309,7 +315,19 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		sendPasswordButton.setPreferredSize(new Dimension(100, 40));
 		cancelButton.setPreferredSize(new Dimension(100, 40));
 
-		this.mainPanel = new JPanel();
+		this.mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
 		//		mainPanel.setPreferredSize(new Dimension(2, 4));
 
 		//JSeparator tMainPanelSeparator = new JSeparator();
