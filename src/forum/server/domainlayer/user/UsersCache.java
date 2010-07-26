@@ -8,14 +8,19 @@
 
 package forum.server.domainlayer.user;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.hibernate.SessionFactory;
-
-import forum.server.updatedpersistentlayer.*;
+import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
+import forum.server.updatedpersistentlayer.DatabaseUpdateException;
 import forum.server.updatedpersistentlayer.pipe.PersistenceDataHandler;
 import forum.server.updatedpersistentlayer.pipe.PersistenceFactory;
-import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.MemberAlreadyExistsException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotConnectedException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 /**
  * @author Sepetnitsky Vitali

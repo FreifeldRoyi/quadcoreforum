@@ -13,16 +13,17 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.text.html.HTMLEditorKit;
 
+import forum.server.domainlayer.user.Permission;
 import forum.swingclient.controllerlayer.ConnectedUserData;
 import forum.swingclient.controllerlayer.ControllerHandlerFactory;
 import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.user.Permission;
 
 /**
  * @author Tomer Heber
@@ -34,7 +35,8 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 	private static final long serialVersionUID = 3195512056748314498L;
 
 	private ForumTree m_forumTree;
-	private JTextArea m_area;
+
+	private JEditorPane m_area;
 	private JButton m_modifyButton;
 	private JButton m_replyButton;
 	private JButton m_deleteButton;
@@ -65,7 +67,8 @@ public class SelectedForumTreeCellPanel extends JPanel implements GUIHandler {
 
 		m_forumTree = forumTree;
 
-		m_area = new JTextArea();
+		m_area = new JEditorPane();
+		m_area.setEditorKit(new HTMLEditorKit());
 		m_area.setFont(new Font("Tahoma", 0, 14));
 		m_area.setText("");
 		m_area.setEditable(false);
