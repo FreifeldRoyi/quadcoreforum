@@ -35,7 +35,7 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 	public SubjectsPanel(final MainPanel cont, final ThreadsPanel threads) {
 		super(cont, TabularPanel.SUBJECTS_TABLE, 
 				new String[] {"Select", "Subject",  "Description", "Subjects#", 
-				"Messages#", "Last Message Info"});
+				"Messages#"});
 		this.threadsPanel = threads;
 		this.showingSubjectsOfName = "";
 		this.showingSubjectsOfID = -1;
@@ -69,7 +69,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
 						}
 					}
 				}
@@ -91,7 +90,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 					} 
 					catch (IOException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
 					}
 				}
 				tNewSubjectDialog.dispose();
@@ -118,7 +116,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 					}
 					catch (IOException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
 					}
 				}
 				tModifySubjectDialog.dispose();
@@ -174,7 +171,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 				} 
 				catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		});
@@ -243,7 +239,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 							ControllerHandlerFactory.getPipe().getThreads(id, container);
 						} 
 						catch (IOException e1) {
-							e1.printStackTrace();
 						}
 					}
 				});	
@@ -324,8 +319,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tableModel.setFatherID(id);
-				//				threadsPanel.setVisible(true);
-				System.out.println("name = " + name);
 				container.startWorkingAnimation("retreiving subject " + 
 						name
 						+ " content...");
@@ -336,7 +329,6 @@ public class SubjectsPanel extends TabularPanel implements GUIHandler {
 				} 
 				catch (IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 		};	

@@ -79,7 +79,6 @@ public class Settings {
 
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			SystemLogger.severe("Can't prepare Test Database");
 			toReturn = false;
 		}
@@ -158,7 +157,6 @@ public class Settings {
 			statement.executeUpdate(tCreateTestDBQuery);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			SystemLogger.severe("Can't create Test Database");
 		}
 		finally {

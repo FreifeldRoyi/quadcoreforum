@@ -140,7 +140,6 @@ public class UsersPersistenceHandler {
 			toReturn = Math.max(tResult.get(0).longValue() + 1, 0);
 		}
 		else {
-			System.out.println("result is null");
 			toReturn = 1;
 		}
 		// add a dummy row in order to promise that the calculate id won't be taken by another server

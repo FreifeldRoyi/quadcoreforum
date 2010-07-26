@@ -203,9 +203,6 @@ public class SimpleLogger extends MarkerIgnoringBase {
     buf.append(LINE_SEPARATOR);
 
     System.err.print(buf.toString());
-    //if (t != null) {
-    //  t.printStackTrace(System.err);
-    //}
     System.err.flush();
 	
   }

@@ -179,9 +179,6 @@ public class SearchAgentTest extends TestCase
 		assertTrue(tMSGByContHelpVec3.size() == 2 &&  
 				tMSGByContHelpVec3.contains(tMsg3) &&  
 				tMSGByContHelpVec3.contains(tMsg4));  
-
-
-		System.out.println(tMSGByContHelpVec4.size());
 		assertTrue(tMSGByContHelpVec4.size() == 1 && 
 				tMSGByContHelpVec4.elementAt(0).equals(tMsg3)); 
 /*				tSHContent9[0].getMessage().equals(tMsg3) && 

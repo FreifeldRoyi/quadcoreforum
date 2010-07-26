@@ -141,7 +141,6 @@ public class MessagesCacheTest extends TestCase {
 			fail(e.getMessage());
 		}
 		catch (DatabaseUpdateException e) {
-			e.printStackTrace();
 			System.exit(-1);
 			fail(e.getMessage());
 		}
@@ -235,7 +234,6 @@ public class MessagesCacheTest extends TestCase {
 			}
 		}
 		catch (MessageNotFoundException e) {
-			e.printStackTrace();
 			fail("the update in database method doesn't work");
 		}
 		catch (DatabaseUpdateException e) {

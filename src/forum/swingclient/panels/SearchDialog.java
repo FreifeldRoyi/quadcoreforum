@@ -89,7 +89,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 	 * @see forum.client.ui.events.GUIHandler#notifyError(java.lang.String)
 	 */
 	public void notifyError(String errorMessage) {
-		System.out.println(errorMessage);
+		//TODO: handle
 	}
 
 	
@@ -101,7 +101,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			}
 		}
 		
-		System.out.println("tSplitted[5] = " + tSplitted[5] + ";");
 		return tSplitted;
 	}
 
@@ -137,13 +136,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 			this.resultsTableModel.clearData();
 
-			System.out.println("eeeeeeeeeeeeencoded = " + encodedView);
-
 			searchResultsContent = encodedView.split("\n\tARESULTMESSAGE: ");
-
-			System.out.println("splitted:");
-			for (int i = 0; i < searchResultsContent.length; i++)
-				System.out.println("splitted[" + i + "] = " + searchResultsContent[i]);
 
 			// remove all the previous listeners
 			for (ActionListener tAL : btn_nextPage.getActionListeners())
@@ -209,8 +202,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 					setResizable(true);
 
 					currentPageResNum = index % selectedNumberOfResults == 0? selectedNumberOfResults : index % selectedNumberOfResults; 
-					System.out.println("\n\nindex = " + index);
-					System.out.println("\n\nsearchResultsContent = " + searchResultsContent.length);
 					if (index < searchResultsContent.length - 1)
 						btn_nextPage.setEnabled(true);
 					else
@@ -245,9 +236,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 					setResizable(true);
 
 					currentPageResNum = selectedNumberOfResults;
-					System.out.println("\n\nindex = " + index);
-					System.out.println("\n\nsearchResultsContent = " + searchResultsContent.length);
-
 					if (index > selectedNumberOfResults)
 						btn_prevPage.setEnabled(true);
 					else
@@ -261,19 +249,12 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 			this.setSize(new Dimension(600, 600));
 			this.setMinimumSize(new Dimension(600, 600));
 
-			
-			System.out.println("end search updating in loop...");
-
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int X = (screen.width / 2) - (this.getWidth() / 2); // Center horizontally.
 			int YY = (screen.height / 2) - (this.getHeight() / 2); // Center vertically.
 			this.setLocation(X, YY);
 
-			//			this.setVisible(true);
-			System.out.println("visible true ...");
-
 		}
-		System.out.println("end search updating ...");
 
 	}
 	
@@ -399,7 +380,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.radBtn_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedNumberOfResults = 5;
-				System.out.println("toSearch = " + toSearch + " field = " + txtFld_searchField.getText());
 				if (pnl_results.isVisible())// && toSearch.equals(txtFld_searchField.getText()))
 					search();
 			}
@@ -605,7 +585,7 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.pack();
 		this.btn_search.addKeyListener(this);
 		this.btn_search.grabFocus();
-		this.setSize(new Dimension(600, 255));
+		this.setSize(new Dimension(600, 265));
 
 		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -656,7 +636,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 

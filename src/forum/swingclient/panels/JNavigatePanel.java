@@ -55,7 +55,6 @@ public class JNavigatePanel extends JPanel {
 	}
 	
 	public void removeAllBeforeAction(String text) {
-		System.out.println("sss");
 		Iterator<JLinkButton> tIter = links.iterator();
 		while (tIter.hasNext() && !tIter.next().getText().equals(text)) {}
 		while (tIter.hasNext()) {

@@ -32,7 +32,6 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 	public ServerResponse doOperation(ForumFacade forum) {
 		ServerResponse returnObj = new ServerResponse(this.getID(), "", true); 
 		try {
-			System.out.println("\n\nasking for message " + this.messageID);
 			UIMessage tCurrentMessage = forum.getMessageByID(this.messageID);
 			Collection<UIMessage> tReplies = forum.getReplies(this.messageID, this.shouldUpdateViews);
 
@@ -54,12 +53,10 @@ public class ViewMessageAndRepliesMessage extends ClientMessage {
 			returnObj.setResponse(tResponse);
 		}
 		catch (MessageNotFoundException e) {
-			System.out.println("\n\nmessageNotFoundException\n\n");
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse(e.getMessage());
 		} 
 		catch (DatabaseRetrievalException e) {
-			System.out.println("\n\ndatabaseRetrievalException\n\n");
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse(e.getMessage());
 		}

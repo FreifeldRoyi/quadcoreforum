@@ -33,25 +33,24 @@ public class GuestsAndMembersNumberMessage extends ClientMessage{
 			long tActiveGuestsNumber = forum.getActiveGuestsNumber();
 			long tActiveMembersNumber = forum.getActiveMemberUserNames().size();
 			Collection<String> tConnected = forum.getActiveMemberUserNames();
-			Collection<String> tConnectedNames = new HashSet<String>();
+/*			Collection<String> tConnectedNames = new HashSet<String>();
 			for (String username : tConnected) {
 				long id = 0;
 				try {
 					id = forum.getMemberIdByUsernameAndOrEmail(username, null);
 				} catch (NotRegisteredException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 				try {
 					UIMember member = forum.getMemberByID(id);
 					tConnectedNames.add(member.getFirstName() + " " + member.getLastName());
 				} catch (NotRegisteredException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
+*/
 			String tConnectedAsString = "";
-			for (String tCurrent : tConnectedNames)
+			for (String tCurrent : tConnected)
 				tConnectedAsString += "\t" + tCurrent;
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse("activenumbers\t" + 

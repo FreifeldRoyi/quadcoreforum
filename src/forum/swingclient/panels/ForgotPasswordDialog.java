@@ -116,8 +116,6 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 				"Please don't reply to this message.<br />" + "Best Regards<br />" +
 				"       QuadCoreForum Administrator</p>";
 
-				System.out.println(toSend + "  " +  generatedPassword + " " + "ppppppppppppppppppppppppppppppppp");
-
 				try {
 					tSender.postMail(dataToSend[5], "QuadCoreForum admin message", toSend, "QuadCoreForumAdmin");
 					return true;
@@ -147,9 +145,7 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 					cancelButton.doClick();
 
 				} catch (InterruptedException ex) {
-					ex.printStackTrace();
 				} catch (ExecutionException ex) {
-					ex.printStackTrace();
 				}
 			}
 
@@ -400,18 +396,15 @@ public class ForgotPasswordDialog extends JDialog implements GUIHandler, KeyList
 		try {
 			ForgotPasswordDialog d = new ForgotPasswordDialog();
 			for (int i = 0 ;i< 19; i++)  {
-				//				System.out.println(d.getRandomPassword());
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 			d.setVisible(true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

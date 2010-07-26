@@ -77,7 +77,6 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 			JOptionPane.showMessageDialog(ChangePasswordDialog.this, "Can't communicate with the server!", "error", JOptionPane.ERROR_MESSAGE);
 
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 
@@ -171,7 +170,6 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 					ChangePasswordDialog.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 					
 					controller.addObserver(new GUIObserver(ChangePasswordDialog.this), EventType.USER_CHANGED);
-					System.out.println("Observer added");
 					controller.changePassword(ChangePasswordDialog.this.memberID, new String(pass_field_prevPassword.getPassword()), 
 							new String(pass_field_newPassword.getPassword()),
 							!chk_dont_show_again.isSelected(), ChangePasswordDialog.this);
@@ -308,8 +306,6 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 		}
 		else if (errorMessage.startsWith("passwordupdateerror\tpassword\t")) {
 			controller.deleteObserver(this);
-
-			System.out.println("oooooooooooooooooppppppppppppppppppp");
 			this.lbl_information.setText("Incorrect previous password");
 			this.setListeners();
 			lbl_prevPassword.setForeground(Color.RED);
@@ -334,7 +330,6 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 
 	@Override
 	public void refreshForum(String encodedView) {
-		System.out.println(encodedView + " pppppppppppooooooooooooopppppppppppppp");
 		if (encodedView.startsWith("passwordupdatesuccess")) {
 			controller.deleteObserver(this);
 			JOptionPane.showMessageDialog(ChangePasswordDialog.this, "The password was successfully updated",

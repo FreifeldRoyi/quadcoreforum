@@ -307,11 +307,9 @@ public class MainForumLogic implements ForumFacade {
 		}
 		catch (MessageNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		catch (DatabaseRetrievalException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		return toReturn;

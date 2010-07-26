@@ -15,22 +15,12 @@ public class SendMail {
 	private static final String emailSubjectTxt  = "QuadCore Network admin message";
 	private static final String emailFromAddress = "qcforuminfo@gmail.com";
 
-	// Add List of Email address to who email needs to be sent to
-	//  private static final String[] emailList = {"lital.badash@gmail.com"};//,"sepetnit@gmail.com","freifeld.royi@gmail.com","badash6@gmail.com"};
-
-	/*public static void main(String args[]) throws Exception {
-    SendMail smtpMailSender = new SendMail();
-    smtpMailSender.postMail( emailList, emailSubjectTxt, emailMsgTxt, emailFromAddress);
-    System.out.println("Sucessfully Sent mail to All Users");
-  }*/
-
 	public void postMail(String recipient, String subject, String message , String from) throws MessagingException {
 		String [] recipients = new String[1];
 		recipients[0] = recipient;		
 		postMail(recipients, subject, message, from);
 	}
 
-	
 	public void postMail(String recipients[], String subject, String message, String from) throws MessagingException {
 
 		boolean debug = false;

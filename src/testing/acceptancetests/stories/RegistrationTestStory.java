@@ -22,7 +22,6 @@ public class RegistrationTestStory extends GeneralMethodsTest {
 	public void setUp() throws Exception {
 		super.setUp();
 	}
-
 	@Test
 	/**
 	 * An acceptance test for registration use-case
