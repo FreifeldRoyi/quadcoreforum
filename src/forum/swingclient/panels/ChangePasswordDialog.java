@@ -6,6 +6,7 @@ package forum.swingclient.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,7 +30,6 @@ import forum.swingclient.ui.events.GUIEvent.EventType;
 public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyListener {
 
 	private static final long serialVersionUID = 5841384666369000328L;
-
 	private long memberID;
 
 	private ControllerHandler controller;
@@ -207,9 +207,23 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 
 		this.setMinimumSize(new Dimension(400, 269));
 
+		JPanel mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
 
-		GroupLayout tLayout = new GroupLayout(this.getContentPane());
-		this.getContentPane().setLayout(tLayout);
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+		
+		GroupLayout tLayout = new GroupLayout(mainPanel);
+		mainPanel.setLayout(tLayout);
+		this.getContentPane().add(mainPanel);
 
 		tLayout.setHorizontalGroup(tLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(this.lbl_information, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)

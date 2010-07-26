@@ -3,6 +3,7 @@ package forum.swingclient.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -115,6 +117,7 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 	private void initGUIComponents(String username, String password) {
 
 		this.informationPanel  = new JPanel();
+		this.informationPanel.setOpaque(false);
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
 		this.informationLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 
@@ -123,14 +126,15 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 
 
 		this.loginPanel = new JPanel();
+		this.loginPanel.setOpaque(false);
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		this.loginPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "login"));
-
+		this.loginPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "login", 0, 0, new Font("Tahoma", Font.BOLD, 12), Color.BLACK));
 
 		SpringLayout jLoginPanel = new SpringLayout();
 		loginPanel.setLayout(jLoginPanel);
 
-		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
+		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);
+		usernameLabel.setForeground(Color.BLACK);
 		this.usernameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.usernameLabel);
 		this.usernameInput =  new JRestrictedLengthTextField(20, 20, false, true);  
@@ -145,6 +149,7 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		this.usernameLabel.setLabelFor(this.usernameInput);
 
 		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
+		passwordLabel.setForeground(Color.BLACK);
 		this.passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		loginPanel.add(this.passwordLabel);
 		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
@@ -225,7 +230,19 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 		loginButton.setPreferredSize(new Dimension(100, 40));
 		cancelButton.setPreferredSize(new Dimension(100, 40));
 
-		this.mainPanel = new JPanel();
+		this.mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);

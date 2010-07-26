@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -277,6 +279,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 	private void initGUIComponents() {
 		this.informationPanel  = new JPanel();
+		this.informationPanel.setOpaque(false);		
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
 		this.informationLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
@@ -284,12 +287,12 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		informationPanel.add(informationLabel);
 
 		this.registrationPanel = new JPanel();
+		this.registrationPanel.setOpaque(false);
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-		this.registrationPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Rgistration"));
+		this.registrationPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Registration", 0, 0, new Font("Tahoma", Font.BOLD, 13), Color.BLACK));
 
 		SpringLayout jRegistrationPanel = new SpringLayout();
 		registrationPanel.setLayout(jRegistrationPanel);
-
 		Font tFont = new Font("Tahoma", Font.BOLD, 13);		
 		initUsernameComponents(tFont);
 		initPasswordComponents(tFont);
@@ -315,8 +318,23 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.cancelButton = new JButton();		
 		initButtons();
 
-		GroupLayout tMainPanelLayout = new GroupLayout(this.getContentPane());
-		this.getContentPane().setLayout(tMainPanelLayout);
+		JPanel mainPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9062536731426386680L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+						0, 0, 1920, 1200, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
+		mainPanel.setLayout(tMainPanelLayout);
+//		this.getContentPane().setLayout(tMainPanelLayout);
+		this.getContentPane().add(mainPanel);
 		tMainPanelLayout.setHorizontalGroup(
 				tMainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addComponent(informationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
@@ -383,7 +401,8 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	}
 	
 	private void initUsernameComponents(Font tFont) {
-		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
+		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);
+		this.usernameLabel.setForeground(Color.BLACK);
 		this.usernameLabel.setFont(tFont);
 		this.registrationPanel.add(this.usernameLabel);
 		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
@@ -395,6 +414,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 
 	private void initPasswordComponents(Font tFont) {
 		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
+		this.passwordLabel.setForeground(Color.BLACK);
 		this.passwordLabel.setFont(tFont);
 		this.registrationPanel.add(this.passwordLabel);
 		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
@@ -404,6 +424,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.passwordLabel.setLabelFor(this.passwordInput);
 
 		this.confirmPasswordLabel = new JLabel("Confirm Password", JLabel.TRAILING);
+		this.confirmPasswordLabel.setForeground(Color.BLACK);
 		this.confirmPasswordLabel.setFont(tFont);
 		this.registrationPanel.add(this.confirmPasswordLabel);
 		this.confirmPasswordInput = new JRestrictedLengthPasswordField(20, 20);
@@ -415,6 +436,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	
 	private void initEmailComponents(Font tFont) {
 		this.emailLabel = new JLabel("Email", JLabel.TRAILING);
+		this.emailLabel.setForeground(Color.BLACK);
 		this.emailLabel.setFont(tFont);
 		this.registrationPanel.add(this.emailLabel);
 		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
@@ -424,6 +446,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.emailLabel.setLabelFor(this.emailInput);
 
 		this.confirmEmailLabel = new JLabel("Confirm Email", JLabel.TRAILING);
+		this.confirmEmailLabel.setForeground(Color.BLACK);
 		this.confirmEmailLabel.setFont(tFont);
 		this.registrationPanel.add(this.confirmEmailLabel);
 		this.confirmEmailInput = new JRestrictedLengthTextField(40, 40, false, true);
@@ -435,6 +458,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	
 	private void initFirstNameComponents(Font tFont) {
 		this.firstNameLabel = new JLabel("First Name", JLabel.TRAILING);
+		this.firstNameLabel.setForeground(Color.BLACK);
 		this.firstNameLabel.setFont(tFont);
 		this.registrationPanel.add(this.firstNameLabel);
 		this.firstNameInput = new JRestrictedLengthTextField(20, 20, false, false);
@@ -446,6 +470,7 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	
 	private void initLastNameComponents(Font tFont) {
 		this.lastNameLabel = new JLabel("Last Name", JLabel.TRAILING);
+		this.lastNameLabel.setForeground(Color.BLACK);
 		this.lastNameLabel.setFont(tFont);
 		this.registrationPanel.add(this.lastNameLabel);
 		this.lastNameInput = new JRestrictedLengthTextField(20, 20, false, false);
