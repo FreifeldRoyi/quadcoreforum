@@ -130,13 +130,9 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (connectedStatistics.isSelected()) {
-					System.out.println("ddddddddddddddddddddddddd " + (String)UIManager.get("Selected"));
-
 					connectedStatistics.doClick();
 				}
 				else {
-					System.out.println("ddddddddddddddddddddddddd " + (String)UIManager.get("Selected"));
-
 					existingStatistics.doClick();
 				}
 			}
@@ -273,8 +269,6 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 					public void refreshForum(String encodedView) {
 						if (!encodedView.startsWith("memberdetails\t"))
 							return;
-						System.out.println("oooooooooooooooooooooooooooooooooooooooooooo");
-
 						controller.deleteObserver(this);
 
 						String[] tSplitted = encodedView.split("\t");
@@ -303,8 +297,6 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 							tErrorMessage = "The connection to database failed";
 						else
 							return;
-						System.out.println("ppppppppppppppppppppppppppppppppppppppppppppppp");
-
 						controller.deleteObserver(this);
 
 						JOptionPane.showMessageDialog(MembersDialog.this, tErrorMessage, "Profile retrieval error",
@@ -322,7 +314,6 @@ public class MembersDialog extends JDialog implements GUIHandler, KeyListener {
 				btn_show_profile.removeActionListener(showProfileListener);
 				btn_cancel.removeActionListener(cancelListener);
 
-				System.out.println(tMemberID + " dssdsdsdsdsdsdsd");
 				controller.getMemberDetails(tMemberID, MembersDialog.this);
 			}
 		};

@@ -125,7 +125,7 @@ public class JScrollableTable extends JForumTable implements MouseMotionListener
 		this.setColumnWidth(2, 340);
 		this.setColumnWidth(3, 90);
 		this.setColumnWidth(4, 90);
-		this.setColumnWidth(5, 250);
+		//this.setColumnWidth(5, 250);
 
 		TableCellRenderer tLeftAlignmentRenderer = new ForumTableCellRenderer(StyleConstants.ALIGN_LEFT);
 		TableCellRenderer tCenterAlignmentRenderer = new ForumTableCellRenderer(StyleConstants.ALIGN_CENTER);
@@ -134,7 +134,7 @@ public class JScrollableTable extends JForumTable implements MouseMotionListener
 		this.setColumnRenderer(2, tLeftAlignmentRenderer);
 		this.setColumnRenderer(3, tCenterAlignmentRenderer);
 		this.setColumnRenderer(4, tCenterAlignmentRenderer);
-		this.setColumnRenderer(5, tLeftAlignmentRenderer);
+		//this.setColumnRenderer(5, tLeftAlignmentRenderer);
 	}
 
 

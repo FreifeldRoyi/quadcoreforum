@@ -76,7 +76,6 @@ public class GetPathMessage extends ClientMessage {
 			response = "getpathsuccess\n" + messageID + "\nSUBJECTS\n" + response;
 			returnObj.setHasExecuted(true);
 			returnObj.setResponse(response);
-			System.out.println("\n\n------------------\n\nencoded view:\n"+response + "\n\n-----------------------\n\n");
 		}
 		catch (Exception e) {
 			returnObj.setHasExecuted(false);
@@ -96,10 +95,7 @@ public class GetPathMessage extends ClientMessage {
 	throws MessageNotFoundException, DatabaseRetrievalException {
 		String response = "";
 
-		System.out.println(Arrays.toString(IDs));
-
 		if (i == IDs.length) {
-			System.out.println("i = ids[length]");
 			return response;
 		}
 		else {
@@ -111,9 +107,6 @@ public class GetPathMessage extends ClientMessage {
 			Collection<UIMessage> tReplies = forum.getReplies(tCurrentMessage.getMessageID(), false);
 
 			for (UIMessage tCurrentReply : tReplies) {
-
-				System.out.println("i = " + i);
-
 
 				if ((i < IDs.length - 1) && (Long.parseLong(IDs[i + 1]) == tCurrentReply.getMessageID()))
 					response += getMessageRepliesAndSubReplies(forum, numOfCalls + 1, "AREPLYMESSAGE: ", i + 1, IDs);

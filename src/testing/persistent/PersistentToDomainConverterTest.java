@@ -57,7 +57,6 @@ public class PersistentToDomainConverterTest extends TestCase {
 		assertEquals(tForumMember.getEmail(), memberTypeUnderTest.getEmail());
 		assertEquals(memberTypeUnderTest.getPermissions().size(), tForumMember.getPermissions().size());
 		for (Permission tCurrentPermission : tForumMember.getPermissions()) {
-			System.out.println(memberTypeUnderTest.getPermissions().contains(tCurrentPermission) );
 			assertTrue(memberTypeUnderTest.getPermissions() != null &&
 					memberTypeUnderTest.getPermissions().contains(tCurrentPermission.toString()));
 		}

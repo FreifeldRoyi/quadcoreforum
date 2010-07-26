@@ -32,8 +32,6 @@ public class GUIObservable extends Observable {
 	}
 
 	public void addObserver(GUIObserver toAdd, EventType event) {
-		System.out.println("\n--------------\nadding new observer" + toAdd.toString() + " event: " + event.toString() + "\n--------------\n");
-		
 		switch (event) {
 		case USER_CHANGED:
 			synchronized (userObservers) {
@@ -63,7 +61,6 @@ public class GUIObservable extends Observable {
 	}
 
 	public synchronized void deleteObserver(GUIHandler handler) {
-		System.out.println("\n--------------\nremoving observer");
 		GUIObserver toDelete = null;
 		EventType tDeleteFrom = EventType.MESSAGES_UPDATED;
 
@@ -162,8 +159,6 @@ public class GUIObservable extends Observable {
 				Iterator<GUIObserver> tObserversIter = tObserversToUpdate.iterator();
 				while (tObserversIter.hasNext()) {
 					final GUIObserver tObserver = tObserversIter.next();
-					System.out.println("notifying " +tObserver + " about " +  event);
-					
 					new Thread(new Runnable() {
 						
 						@Override

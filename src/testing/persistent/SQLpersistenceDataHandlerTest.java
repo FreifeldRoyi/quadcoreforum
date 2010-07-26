@@ -282,7 +282,6 @@ public class SQLpersistenceDataHandlerTest extends TestCase {
 			}
 		} 
 		catch (JAXBException e) {
-			e.printStackTrace();
 			fail("database error!");
 		} catch (IOException e) {
 			fail("database error!");

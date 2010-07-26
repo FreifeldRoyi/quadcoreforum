@@ -116,7 +116,6 @@ public class ForumTree implements GUIHandler {
 			pipe = ControllerHandlerFactory.getPipe();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 		this.container = container;
@@ -196,7 +195,6 @@ public class ForumTree implements GUIHandler {
 
 			public void treeWillCollapse(TreeExpansionEvent event)	throws ExpandVetoException {
 				if (event.getPath().getLastPathComponent() == m_tree.getModel().getRoot()) {
-					System.out.println(event.getSource());
 					throw new ExpandVetoException(event);
 				}
 
@@ -257,14 +255,10 @@ public class ForumTree implements GUIHandler {
 									container.stopWorkingAnimation();							
 								}
 							}).start();
-
-							System.out.println("2");
-
 						}
 
 						catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
-							e1.printStackTrace();
 						}
 
 					}
@@ -354,7 +348,6 @@ public class ForumTree implements GUIHandler {
 						EventType.MESSAGES_UPDATED);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
 			synchronized (rootNode) {
@@ -371,7 +364,6 @@ public class ForumTree implements GUIHandler {
 				}
 				catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
@@ -387,7 +379,6 @@ public class ForumTree implements GUIHandler {
 
 	private ForumCell getRootCell(String[] tSplitted, String tRepliesDelimiter) {
 		try {
-			System.out.println(Arrays.toString(tSplitted));
 			String[] tRootAsStringArray = tSplitted[0].split("\t");
 			if (tRootAsStringArray.length > 5) {
 				for (int i = 5; i < tRootAsStringArray.length; i++) {
@@ -406,12 +397,10 @@ public class ForumTree implements GUIHandler {
 
 		}
 		catch (NumberFormatException e) {
-			e.printStackTrace();
 			SystemLogger.warning("Error while parsing messages view response");
 			return null;
 		}
 		catch (Exception e) { // any parsing exception
-			e.printStackTrace();
 			SystemLogger.warning("Error while parsing messages view response");
 			return null;
 		}	
@@ -421,7 +410,6 @@ public class ForumTree implements GUIHandler {
 
 		if (encodedView.startsWith("getpathsuccess")) {
 			m_panel.setVisible(false);
-			System.out.println(encodedView);
 			final long tMessageID = Long.parseLong(encodedView.substring(encodedView.indexOf("\n") + 1, encodedView.indexOf("\nSUBJECTS")));
 			final String tMessages = encodedView.substring(encodedView.indexOf("MESSAGES") + 9);
 
@@ -465,9 +453,6 @@ public class ForumTree implements GUIHandler {
 
 							if ((tNodeToExpand == null) && (sonCell.getId() == tMessageID)) {
 								tNodeToExpand = sonNode;
-
-								System.out.println("sassssssssssssssss: " + sonCell.getId());
-								System.out.println("sassssssssssssssss: " +tMessageID);
 							}
 
 							node.add(sonNode);
@@ -514,15 +499,8 @@ public class ForumTree implements GUIHandler {
 
 							catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
-								e1.printStackTrace();
 							}
 						}
-
-
-						//						for (int i = 0; i < tPathToRequiredNode.getPathCount(); i++)
-						//							System.out.println("node: " +
-						//							((ForumCell)(((DefaultMutableTreeNode)tPathToRequiredNode.getPathComponent(i)).getUserObject())).getId());
-
 						shouldAskExpansion = true;
 					}
 					container.switchToMessagesView();
@@ -542,11 +520,9 @@ public class ForumTree implements GUIHandler {
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 					catch (ExecutionException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 					m_tree.scrollPathToVisible(m_tree.getSelectionModel().getSelectionPath());
 				}
@@ -627,10 +603,8 @@ public class ForumTree implements GUIHandler {
 				} 
 				catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 
-				System.out.println("noyif" + id);
 				this.notifyAll();
 			}
 		}
@@ -643,7 +617,6 @@ public class ForumTree implements GUIHandler {
 	 * @return The tree representing the forum.
 	 */
 	private ForumCell decodeView(String encodedView) {
-		System.out.println(encodedView);
 		if (encodedView.startsWith("replysuccess") || 
 				encodedView.startsWith("modifysuccess") || 
 				encodedView.startsWith("deletesuccess") ||
@@ -653,11 +626,6 @@ public class ForumTree implements GUIHandler {
 			return null;
 		try {
 			String[] tSplitted = encodedView.split("\n\tAREPLYMESSAGE: ");
-
-			System.out.println("***********splitted: ");
-
-			for (int i = 0; i <tSplitted.length;i++)
-				System.out.println("splitted [" + i + "] = " + tSplitted[i]);
 
 			String[] tRootAsStringArray = tSplitted[0].split("\t");
 			if (tRootAsStringArray.length > 5) {
@@ -697,12 +665,10 @@ public class ForumTree implements GUIHandler {
 			return tRoot;
 		}
 		catch (NumberFormatException e) {
-			e.printStackTrace();
 			SystemLogger.warning("Error while parsing messages view response");
 			return null;
 		}
 		catch (Exception e) { // any parsing exception
-			e.printStackTrace();
 			SystemLogger.warning("Error while parsing messages view response");
 			return null;
 		}
@@ -747,7 +713,6 @@ public class ForumTree implements GUIHandler {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -831,7 +796,6 @@ public class ForumTree implements GUIHandler {
 
 				catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 
@@ -925,12 +889,6 @@ public class ForumTree implements GUIHandler {
 		final ForumCell cell = (ForumCell) node.getUserObject();
 		final ForumCell parentCell = parent != null? (ForumCell) ((MessageTreeNode)parent).getUserObject() : null; 
 
-
-		System.out.println("PARENTCELL = " + parentCell);
-
-		//	System.out.println(cell.getTitle());
-		//	System.out.println(parentCell.getTitle());
-
 		pipe.addObserver(new GUIObserver(new GUIHandler() {
 			public void notifyError(String errorMessage) {
 				if (errorMessage.startsWith("deleteerror\n")) {
@@ -950,13 +908,9 @@ public class ForumTree implements GUIHandler {
 								synchronized (parent) {
 									pipe.addObserver(new GUIObserver(parent), EventType.MESSAGES_UPDATED);
 
-									System.out.println("id " + parentCell.getId());
-									System.out.println(parent.id);
 									pipe.getNestedMessages(parentCell.getId(), false, m_tree);
 									try {
-										System.out.println("waiting");
 										parent.wait();
-										System.out.println("wait end");
 										((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(parent);
 
 										JOptionPane.showMessageDialog(ForumTree.this.m_panel, 

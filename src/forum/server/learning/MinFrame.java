@@ -47,20 +47,8 @@ class MyComp extends JComponent implements MouseMotionListener {
 	}
 	
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		/*System.out.println("ppp");
-		System.out.println(f.getY());
-		System.out.println(e.getY());
-		if (e.getX() == f.getHeight() - getHeight()) {
-			f.setResizable(false);
-			System.out.println("dddd");
-		}*/
-	//	else
-	//		f.setResizable(true);
-	}
+	public void mouseMoved(MouseEvent e) {}
 	public void mouseDragged(MouseEvent e) {
-		System.out.println("res " + e.getXOnScreen());
-		//f.setResizable(true);
 		f.setSize( f.getWidth(), f.getHeight() + e.getY() - 3);
 		f.validate();
 	}

@@ -54,7 +54,6 @@ public class ServerConnectionController extends Thread {
 			/* Wait for the thread to finish running */
 			tThread.join();
 		} catch (InterruptedException e) {			
-			e.printStackTrace();	
 		}		
 	}
 

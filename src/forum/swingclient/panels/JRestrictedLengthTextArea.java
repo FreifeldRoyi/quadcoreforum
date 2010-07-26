@@ -72,7 +72,6 @@ public class JRestrictedLengthTextArea extends JTextArea {
 			if (!shouldLimitChars) {
 				return true;
 			}
-			System.out.println(str);
 			for (char toCheck : str.toCharArray())
 				if (ALLOWED_CHARACTERS.indexOf(toCheck) == -1)
 					return false;

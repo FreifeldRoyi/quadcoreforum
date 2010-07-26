@@ -52,30 +52,21 @@ public class Main {
         CompassHit[] detachedHits = hits.detach(0, 10).getHits();
 
         for (int i = 0; i < detachedHits.length; i++) {
-            System.out.println("score: "+detachedHits[i].getScore());
             Message m2 = (Message)(detachedHits[i].data());
-            System.out.println(m2.getName());
-            System.out.println(m2.getContents());
         }
 
         hits = session.find("contents: Hello OR cool OR today");
         detachedHits = hits.detach(0, 10).getHits();
 
         for (int i = 0; i < detachedHits.length; i++) {
-            System.out.println("score: "+detachedHits[i].getScore());
             Message m2 = (Message)(detachedHits[i].data());
-            System.out.println(m2.getName());
-            System.out.println(m2.getContents());
         }
 
         hits = session.find("contents: Hello AND today");
         detachedHits = hits.detach(0, 10).getHits();
 
         for (int i = 0; i < detachedHits.length; i++) {
-            System.out.println("score: "+detachedHits[i].getScore());
             Message m2 = (Message)(detachedHits[i].data());
-            System.out.println(m2.getName());
-            System.out.println(m2.getContents());
         }
 
         /* After you are done with the session close it */

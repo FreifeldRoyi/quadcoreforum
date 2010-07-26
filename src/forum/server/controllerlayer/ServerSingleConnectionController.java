@@ -62,7 +62,6 @@ public class ServerSingleConnectionController implements Runnable {
 			sscc = new ServerSingleConnectionController(socket);
 		} catch (IOException e) {
 			SystemLogger.severe("Failed to start communication with client "+socket.getInetAddress()+".");
-			e.printStackTrace();
 			return;
 		}
 		pool.execute(sscc);
@@ -100,7 +99,6 @@ public class ServerSingleConnectionController implements Runnable {
 					this.connectedUserUsername = response.getConnectedMemberUsername();
 				}
 
-				System.out.println(response.getResponse() + " server response");
 				/* Send response back to the client */
 				SystemLogger.info("Sending a response back to client " + this.socket.getInetAddress() + ".");
 				this.out.writeObject(response);
@@ -122,7 +120,6 @@ public class ServerSingleConnectionController implements Runnable {
 					if (!this.connectedUserUsername.isEmpty()) {
 						try {
 							this.forum.logout(this.connectedUserUsername);
-							System.out.println("logout");
 						}
 						catch (NotConnectedException e) {
 							SystemLogger.warning("The user requested to log-out isn't connected to the forum");
@@ -130,13 +127,10 @@ public class ServerSingleConnectionController implements Runnable {
 					}
 					else {
 						this.forum.removeGuest(this.connectedUserID);
-						System.out.println("logoutguest");
-
 					}
 				}
 			} catch (IOException e) {
 				SystemLogger.severe("Failed to close I/O streams with some client.");
-				e.printStackTrace();
 			}			
 		}
 	}

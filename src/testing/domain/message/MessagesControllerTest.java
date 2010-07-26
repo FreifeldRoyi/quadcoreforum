@@ -242,18 +242,10 @@ public class MessagesControllerTest extends TestCase {
 					tSubSubject11ID, "title2", "content2");
 			tSubSubject11 = this.dataHandler.getMessagesCache().getSubjectByID(tSubSubject11ID);
 			
-			System.out.println(tSubSubject11);
-			System.out.println(tSubSubject11.getThreads());
-			//Settings.switchToRegularMode();
-			//System.exit(-1);
-			
 			Iterator<Long> tThreadsIter = tSubSubject11.getThreads().iterator();
 
 			final long tThread1ID = tThreadsIter.next();
 			final long tThread2ID = tThreadsIter.next();
-
-			System.out.println("2");
-
 			final ForumThread tThread1 = this.dataHandler.getMessagesCache().getThreadByID(tThread1ID);
 			final ForumThread tThread2 = this.dataHandler.getMessagesCache().getThreadByID(tThread2ID);
 
@@ -274,8 +266,6 @@ public class MessagesControllerTest extends TestCase {
 				assertTrue(tRoot1Replies.size() == 2);
 				assertTrue(tRoot2Replies.size() == 1);
 
-				System.out.println("1");
-				
 				Iterator<UIMessage> tMessage1RepliesIter = tRoot1Replies.iterator();
 
 				UIMessage tReply = tMessage1RepliesIter.next();
@@ -301,7 +291,6 @@ public class MessagesControllerTest extends TestCase {
 			}
 		}	
 		catch (NoSuchElementException e) {
-			e.printStackTrace();
 			fail("the thread or one of the messages hasn't been added successfully");
 		}
 		catch (NotPermittedException e) {

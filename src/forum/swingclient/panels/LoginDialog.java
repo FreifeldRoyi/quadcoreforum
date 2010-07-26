@@ -170,7 +170,6 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 			public void actionPerformed(ActionEvent e) {
 				informationLabel.setText("");
 				if(usernameInput.getText().length() > 0 && passwordInput.getPassword().length > 0) {
-					System.out.println("controller login");
 					controller.addObserver(new GUIObserver(LoginDialog.this), EventType.USER_CHANGED);
 					LoginDialog.this.setEnabled(false);
 					controller.login(LoginDialog.this.guestID, usernameInput.getText(),
@@ -209,7 +208,6 @@ public class LoginDialog extends JDialog implements GUIHandler, KeyListener {
 					LoginDialog.this.setVisible(true);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}				
 			}
 		});

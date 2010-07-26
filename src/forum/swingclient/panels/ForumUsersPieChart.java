@@ -208,11 +208,9 @@ public class ForumUsersPieChart extends ChartPanel implements GUIHandler {
 					}
 				}
 				catch (InterruptedException e) {
-					e.printStackTrace();
 					existingMembersNumbers = null;
 				} 
 				catch (ExecutionException e) {
-					e.printStackTrace();
 					existingMembersNumbers = null;
 				}
 			}
@@ -260,10 +258,8 @@ public class ForumUsersPieChart extends ChartPanel implements GUIHandler {
 					}
 				} catch (InterruptedException e) {
 					activeConnectedNumbers = null;
-					e.printStackTrace();
 					return;
 				} catch (ExecutionException e) {
-					e.printStackTrace();
 					activeConnectedNumbers = null;
 					return;
 				}

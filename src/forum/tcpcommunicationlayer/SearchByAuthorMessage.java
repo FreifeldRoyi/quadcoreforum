@@ -31,7 +31,6 @@ public class SearchByAuthorMessage extends ClientMessage {
 		SearchHit[] tHits = null;
 		try {
 			userID = forum.getMemberIdByUsernameAndOrEmail(this.authorUsername, null);
-			System.out.println("UserID = " + userID + " username = " + this.authorUsername);
 			tHits = forum.searchByAuthor(userID, 0, Integer.MAX_VALUE);
 
 			if (tHits == null) {
@@ -40,7 +39,6 @@ public class SearchByAuthorMessage extends ClientMessage {
 			}
 			else if (tHits.length == 0) {
 				returnObj.setHasExecuted(true);
-				System.out.println("No Hits!!!!!");
 				returnObj.setResponse("searchnotmessages");
 			}
 			else {

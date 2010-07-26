@@ -74,7 +74,6 @@ public class RealBridge implements GeneralForumBridge {
 			return this.forum.registerNewMember(username, password, lastName, firstName, email);
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
 			return -1;
 		}
 	}	
@@ -103,7 +102,6 @@ public class RealBridge implements GeneralForumBridge {
 			return this.forum.openNewThread(userID, subjectID, topic, title, content).getRootMessageID();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			return -1;
 		}
 

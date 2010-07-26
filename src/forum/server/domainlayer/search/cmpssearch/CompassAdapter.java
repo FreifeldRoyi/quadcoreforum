@@ -86,12 +86,8 @@ public class CompassAdapter implements SearchEngine
 	@Override
 	public SearchHit[] searchByAuthor(long usrID, int from, int to) 
 	{
-		System.out.println("usrID = " + usrID);
-
 		SearchHit[] toReturn = null;
-
 		CompassSession session = this.compass.openSession();
-
 		try 
 		{
 			CompassHits hits = session.find("authorID:" + usrID);
@@ -129,7 +125,6 @@ public class CompassAdapter implements SearchEngine
 
 		try
 		{
-			System.out.println("phrase = " + phrase);
 			CompassHits hits = session.find("title:" + phrase + " OR content:" + phrase);
 			//			CompassHits hits = session.find("content: \"" + phrase + "\" OR \" title:\" " + phrase + "\"");
 			CompassHit[] detachedHits = hits.detach(from,to).getHits();

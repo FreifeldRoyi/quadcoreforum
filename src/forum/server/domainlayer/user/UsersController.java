@@ -502,7 +502,6 @@ public class UsersController {
 			if (tApplicant.isAllowed(Permission.SET_MODERATOR)) {
 				SystemLogger.info("Permission granted for user " + applicantID + ".");
 				final ForumUser tForumUser = this.dataHandler.getUsersCache().getMemberByUsername(username);
-				System.out.println(this.getDefaultModeratorPermissions());
 				tForumUser.setPermissions(this.getDefaultModeratorPermissions());
 				this.dataHandler.getUsersCache().updateInDatabase(tForumUser);
 				SystemLogger.info("The user with " + username + " has been successfully promoted to be a " +

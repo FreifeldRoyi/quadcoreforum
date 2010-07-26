@@ -106,12 +106,10 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 					while (true) {
 						try {
 							ClientMessage toSend = messages.take();
-							System.out.println(toSend.getID() + "id sended");
 							connectionController.handleQuery(toSend);
 
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -130,8 +128,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 								}
 								else {
 									sended.remove(id);
-									System.out.println("\n\nserver response = \n\n");
-									System.out.println(tResponse.getResponse());
 									if (tResponse.hasExecuted())
 										notifyObservers(new ForumGUIRefreshEvent(tCRequest.getComponent(),
 												tResponse.getResponse(), tCRequest.getEventType()));
@@ -142,7 +138,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 							}		
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -259,7 +254,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 		try {
 			Thread.sleep(1500);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 
 		//		notifyObservers(new ForumGUIRefreshEvent(comp,getForumView()));
@@ -514,7 +508,6 @@ public class ControllerHandlerImpl extends ControllerHandler implements Observer
 
 
 	public void getNestedMessages(final long rootID, boolean shouldUpdateViews, final Component comp) {
-		System.out.println(rootID + " nested req");
 		try {
 			final ClientMessage toSend = new ViewMessageAndRepliesMessage(rootID, shouldUpdateViews);
 			getActiveUsersNumber();

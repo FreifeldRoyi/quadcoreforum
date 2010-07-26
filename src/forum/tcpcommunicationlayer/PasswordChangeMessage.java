@@ -48,7 +48,6 @@ public class PasswordChangeMessage extends ClientMessage {
 			returnObj.setResponse("passwordupdateerror\tregistration\t" + e.getMessage());
 		} 
 		catch (WrongPasswordException e) {
-			System.out.println("Got wrong password ...");
 			returnObj.setHasExecuted(false);
 			returnObj.setResponse("passwordupdateerror\tpassword\t" + e.getMessage());
 		}

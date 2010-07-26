@@ -20,8 +20,6 @@ public class DBTesting {
 			/* Load the hsqldb driver which implements the jdbc interface */
 			Class.forName("com.mysql.jdbc.Driver" );
 		} catch (Exception e) {
-			System.out.println("ERROR: failed to load HSQLDB JDBC driver.");
-			e.printStackTrace();
 			return;
 		}
 
@@ -53,8 +51,6 @@ public class DBTesting {
 			}
 			catch (SQLException e) {
 				/* Exception is thrown in case the table is already created */
-				
-				System.out.println("The table Student is already created, no need to create it again.");
 			}
 			
 			try {
@@ -65,19 +61,16 @@ public class DBTesting {
 				);
 			}
 			catch (SQLException e) {			
-				e.printStackTrace();
 				/* 
 				 * Exception is thrown if a row with id 1 is already in the table.
 				 * The id must be unique since it's a primary key.
 				 */
-				System.out.println("The key is already in the table.");
 			}
 			
 			/* Receive the table Student by quering with the SELECT operation */
 			ResultSet set = stmt.executeQuery("SELECT * FROM Student");
 			while(set.next()) {
 				/* Go over each of the returned rows and print to the screen the name column of each row */
-				System.out.println(set.getString(2));
 			}
 
 			/* Add some random row to the Student table */
@@ -89,7 +82,6 @@ public class DBTesting {
 			stmt.close();
 			c.close();
 		} catch (SQLException e) {	
-			e.printStackTrace();			
 		}
 	}
 

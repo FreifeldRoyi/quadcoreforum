@@ -417,7 +417,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 							// explanation: if the threads panel is visible then the number of views should
 							// be incremented always, otherwise, only if the ids are different
 							if (tNewSearchDialog.getSelectedID() != -1) {
-								System.out.println(MainPanel.this.threadsPanel.isVisible() + " ooooooooooooooo");
 								ControllerHandlerFactory.getPipe().getPath(MainPanel.this,
 										MainPanel.this.threadsPanel.isVisible()? -1 :
 											MainPanel.this.tree.getFatherMessageID(),
@@ -426,7 +425,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 						} 
 						catch (IOException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -774,7 +772,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 			tStatisticsPanel = new StatisticsPanel();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 
 		this.mainPanel = new JPanel() {
@@ -794,19 +791,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		mainPanelSeparator = new JLabel();
 		mainPanelSeparator.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-
-
-
-
-		//		104, 413, 22
-
-
-
-		System.out.println(pnl_navigate.getHeight());
-		System.out.println(subjectsPanel.getHeight());
-		System.out.println(statusPanel.getHeight());
-
-
 
 		GroupLayout tMainPanelLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tMainPanelLayout);
@@ -904,7 +888,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
-			e2.printStackTrace();
 		}
 
 	}
@@ -952,7 +935,6 @@ public class MainPanel extends JFrame implements GUIHandler {
 			Thread.sleep(300);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		busyIconTimer.stop();
 		statusAnimationLabel.setIcon(MainPanel.idleIcon);

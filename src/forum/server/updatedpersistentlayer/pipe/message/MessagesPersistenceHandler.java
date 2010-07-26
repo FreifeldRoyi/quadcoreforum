@@ -195,7 +195,6 @@ public class MessagesPersistenceHandler {
 		try {			
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			SubjectType tSubjectToUpdate = this.getSubjectTypeByID(session, id);
-			System.out.println("father subject retrieved");
 			// update the sub-subjects
 			tSubjectToUpdate.getSubSubjectsIDs().clear();
 			tSubjectToUpdate.getSubSubjectsIDs().addAll(subSubjects);
@@ -333,16 +332,8 @@ public class MessagesPersistenceHandler {
 	public void openNewThread(SessionFactory ssFactory, long threadID, String topic, 
 			long rootID, long fatherSubjectID) throws DatabaseUpdateException {
 		try {
-			
-			System.out.println("Thread ID will be " + threadID);
-			System.out.println("Father ID will be " + fatherSubjectID);
-
 			Session session = this.getSessionAndBeginTransaction(ssFactory);
 			ThreadType tNewThreadType = ExtendedObjectFactory.createThreadType(threadID, topic, rootID, fatherSubjectID);
-			
-			System.out.println("Thread id IS " + tNewThreadType.getThreadID());
-			System.out.println("Thread FATHER IS " + tNewThreadType.getFatherSubjectID());
-			
 			
 			session.save(tNewThreadType);
 			this.commitTransaction(session);

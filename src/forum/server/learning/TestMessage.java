@@ -60,40 +60,17 @@ public class TestMessage {
 				b.add(2L);
 				b.add(3L);
 
-				
-			//	System.out.println(test.getSubjectByID(factory, 1).getThreads());
-			//	test.deleteAThread(factory, 1);
-			//	System.out.println(test.getSubjectByID(factory, 1).getThreads());
-				
 				Set<Permission> ac = new HashSet<Permission>();
 				ac.add(Permission.ADD_SUB_SUBJECT);
 	
-				System.out.println(test.getFirstFreeMemberID(factory));
-				System.out.println(test.getAllMembers(factory));
-				
 				test.addNewMember(factory, 10, "abc", "def", "cc", "yy", "S@s", new HashSet<Permission>());
-				System.out.println(test.getAllMembers(factory));
 				test.updateUser(factory, 10, ac);
-				System.out.println(test.getAllMembers(factory));
-				
-				System.out.println(test.getMemberByEmail(factory, "S@s").getPermissions());
-				System.out.println(test.getMemberByUsername(factory, "abc").getPermissions());
-				System.out.println(test.getMemberByID(factory, 10).getPassword());
-				
-				
-
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				System.out.println("erro");
-				e.printStackTrace();
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("jjj");
-
-			//			e.printStackTrace();
 			return;
 		}
 	}
@@ -179,7 +156,6 @@ public class TestMessage {
 			final String value) throws NotRegisteredException, DatabaseRetrievalException {
 		Session session = this.getSessionAndBeginTransaction(ssFactory);
 		String query = "from MemberType where " + field  + " like '" + value + "'";
-		System.out.println(query);
 		List tResult = session.createQuery(query).list();
 		if (tResult.size() != 1)
 			throw new DatabaseRetrievalException();

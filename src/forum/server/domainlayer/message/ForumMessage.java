@@ -57,7 +57,6 @@ public class ForumMessage implements UIMessage {
 			GregorianCalendar postTime, Collection<Long> replies, final long fatherID) {
 		this(messageID, authorID, title, content, fatherID);		
 		this.setPostTime(postTime);
-		System.out.println(replies);
 		this.repliesIDs.addAll(replies);
 	}
 

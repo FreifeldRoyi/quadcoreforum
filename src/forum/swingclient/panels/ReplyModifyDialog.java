@@ -145,7 +145,6 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 		arrangeLayout();
 		this.ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("OK WAS KLICKEDDDDDDDDDDDDDDDDDD");
 				if (title.getText().trim().length() == 0) {
 					JOptionPane.showMessageDialog(ReplyModifyDialog.this, "message title cannot be empty.", "error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -441,9 +440,6 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 
 	public void refreshForum(String encodedView) {
 
-
-		System.out.println("subjects encodedview = \n"+ encodedView);
-
 		String tLastMessageWord = null;
 		if (encodedView.startsWith("replysuccess") || encodedView.startsWith("addsubjectsuccess") ||
 				encodedView.startsWith("addthreadsuccess")) {
@@ -461,7 +457,6 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 		else if (!encodedView.startsWith("search") && !encodedView.startsWith("getpath")){
 			controller.deleteObserver(this);
 			JOptionPane.showMessageDialog(this, "error occurredd!!", "error", JOptionPane.ERROR_MESSAGE);
-			System.out.println("\n\nencoded:" + encodedView + "\n\n---------------------");
 		}
 		else
 			return;
@@ -475,7 +470,6 @@ public class ReplyModifyDialog extends JDialog implements GUIHandler, KeyListene
 			setVisible(false);
 		}
 		else {
-			System.out.println("erorrrrrrrrrrrrrrrrrrrrrrrr");
 			// TODO: handle error cases
 		}
 	}

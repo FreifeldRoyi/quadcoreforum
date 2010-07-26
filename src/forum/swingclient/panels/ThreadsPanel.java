@@ -76,7 +76,6 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 						ControllerHandlerFactory.getPipe().getThreads(tableModel.getFatherID(), table);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
 					}
 				}
 				tNewThreadDialog.dispose();
@@ -137,7 +136,6 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 
 						catch (IOException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 			}
@@ -191,7 +189,6 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 				} 
 				catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		});
