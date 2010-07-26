@@ -67,7 +67,7 @@ public class SearchAgentTest extends TestCase
 	@After 
 	public void tearDown() throws Exception  
 	{ 
-//		Settings.switchToRegularMode();
+		Settings.switchToRegularMode();
 	} 
 
 	@Test 

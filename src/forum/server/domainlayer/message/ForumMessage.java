@@ -152,6 +152,8 @@ public class ForumMessage implements UIMessage {
 	 * 		UIMessage#getDate()
 	 */
 	public String getDate() {
+		if (this.postTime == null)
+			return null;
 		String toReturn = this.postTime.get(Calendar.DAY_OF_MONTH) + "//" +
 		this.postTime.get(Calendar.MONTH) + "//" +
 		this.postTime.get(Calendar.YEAR);
@@ -174,7 +176,10 @@ public class ForumMessage implements UIMessage {
 	 * 		UIMessage#getDate()
 	 */
 	public Date getDateTime() {
-		return new Date(this.postTime.getTimeInMillis());
+		if (this.postTime == null)
+			return new Date();
+		else
+			return new Date(this.postTime.getTimeInMillis());
 	}	
 	
 	/**
