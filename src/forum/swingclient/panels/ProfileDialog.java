@@ -357,8 +357,8 @@ public class ProfileDialog extends JDialog implements GUIHandler, KeyListener {
 								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
 								.addGap(10, 10, 10));
 
-		this.setMinimumSize(new Dimension(700, 520));
-		this.setPreferredSize(new Dimension(700, 520));
+		this.setMinimumSize(new Dimension(625, 400));
+		this.setPreferredSize(new Dimension(625, 400));
 
 
 		/*

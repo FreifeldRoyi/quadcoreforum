@@ -12,7 +12,7 @@ public class ForumTableCellRenderer extends JTextPane implements TableCellRender
 
 	private static final long serialVersionUID = 6501807970779590686L;
 
-	private static final Color EVEN_ROWS_COLOR = new Color(245, 249, 238);
+	private static final Color EVEN_ROWS_COLOR = new Color(238, 244, 252);
 
 
 	public ForumTableCellRenderer(int alignment) {
@@ -32,7 +32,7 @@ public class ForumTableCellRenderer extends JTextPane implements TableCellRender
 			boolean isSelected, boolean hasFocus, int row, int column) {
 		if (isSelected) {
 			setForeground(table.getSelectionForeground());
-			setBackground(table.getSelectionBackground());
+			setBackground(new Color (195, 215, 245));
 		}
 		else {
 			setForeground(table.getForeground());
@@ -40,7 +40,7 @@ public class ForumTableCellRenderer extends JTextPane implements TableCellRender
 				setBackground(EVEN_ROWS_COLOR);
 			}
 			else
-				setBackground(table.getBackground());
+				setBackground(Color.WHITE);
 		}
 		setFont(table.getFont());
 		setText((value == null) ? "" : value.toString());

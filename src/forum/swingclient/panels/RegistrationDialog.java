@@ -276,7 +276,6 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 	}
 
 	private void initGUIComponents() {
-
 		this.informationPanel  = new JPanel();
 		this.informationLabel = new JLabel("", JLabel.TRAILING);
 		this.informationLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -288,75 +287,15 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		Border tBlueBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
 		this.registrationPanel.setBorder(BorderFactory.createTitledBorder(tBlueBorder, "Rgistration"));
 
-
 		SpringLayout jRegistrationPanel = new SpringLayout();
 		registrationPanel.setLayout(jRegistrationPanel);
 
-		Font tFont = new Font("Tahoma", Font.BOLD, 13);
-
-		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
-		this.usernameLabel.setFont(tFont);
-		registrationPanel.add(this.usernameLabel);
-		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
-		this.usernameInput.setText("");
-		usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.usernameInput);
-		this.usernameLabel.setLabelFor(this.usernameInput);
-
-		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
-		this.passwordLabel.setFont(tFont);
-		registrationPanel.add(this.passwordLabel);
-		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
-		this.passwordInput.setText("");
-		passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.passwordInput);
-		this.passwordLabel.setLabelFor(this.passwordInput);
-
-		this.confirmPasswordLabel = new JLabel("Confirm Password", JLabel.TRAILING);
-		this.confirmPasswordLabel.setFont(tFont);
-		registrationPanel.add(this.confirmPasswordLabel);
-		this.confirmPasswordInput = new JRestrictedLengthPasswordField(20, 20);
-		this.confirmPasswordInput.setText("");
-		confirmPasswordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.confirmPasswordInput);
-		this.confirmPasswordLabel.setLabelFor(this.confirmPasswordInput);
-
-		this.emailLabel = new JLabel("Email", JLabel.TRAILING);
-		this.emailLabel.setFont(tFont);
-		registrationPanel.add(this.emailLabel);
-		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
-		this.emailInput.setText("");
-		emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.emailInput);
-		this.emailLabel.setLabelFor(this.emailInput);
-
-		this.confirmEmailLabel = new JLabel("Confirm Email", JLabel.TRAILING);
-		this.confirmEmailLabel.setFont(tFont);
-		registrationPanel.add(this.confirmEmailLabel);
-		this.confirmEmailInput = new JRestrictedLengthTextField(40, 40, false, true);
-		this.confirmEmailInput.setText("");
-		confirmEmailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.confirmEmailInput);
-		this.confirmEmailLabel.setLabelFor(this.confirmEmailInput);
-
-		this.firstNameLabel = new JLabel("First Name", JLabel.TRAILING);
-		this.firstNameLabel.setFont(tFont);
-		registrationPanel.add(this.firstNameLabel);
-		this.firstNameInput = new JRestrictedLengthTextField(20, 20, false, false);
-		this.firstNameInput.setText("");
-		firstNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.firstNameInput);
-		this.firstNameLabel.setLabelFor(this.firstNameInput);
-
-		this.lastNameLabel = new JLabel("Last Name", JLabel.TRAILING);
-		this.lastNameLabel.setFont(tFont);
-		registrationPanel.add(this.lastNameLabel);
-		this.lastNameInput = new JRestrictedLengthTextField(20, 20, false, false);
-		this.lastNameInput.setText("");
-		lastNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		registrationPanel.add(this.lastNameInput);
-		this.lastNameLabel.setLabelFor(this.lastNameInput);
-
+		Font tFont = new Font("Tahoma", Font.BOLD, 13);		
+		initUsernameComponents(tFont);
+		initPasswordComponents(tFont);
+		initEmailComponents(tFont);
+		initFirstNameComponents(tFont);
+		initLastNameComponents(tFont);
 
 		this.usernameInput.addKeyListener(this);
 		this.passwordInput.addKeyListener(this);
@@ -366,57 +305,15 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 		this.firstNameInput.addKeyListener(this);
 		this.lastNameInput.addKeyListener(this);
 
-		//		registrationPanel.add(this.registerButton);
-		//	jRegistrationPanel.putConstraint(SpringLayout.NORTH, this.registerButton,
-		//				5,
-		//			SpringLayout.SOUTH, this.lastNameInput);
-		//jRegistrationPanel.putConstraint(SpringLayout.WEST, this.registerButton,
-		//	0,
-		//SpringLayout.WEST, this.lastNameInput);
-
-		//Lay out the panel.
 		SpringUtilities.makeCompactGrid(registrationPanel,
 				7, 2, //rows, cols
 				6, 6,        //initX, initY
 				15, 15);       //xPad, yPad
 
 
-
-		registerButton = new JButton();
-
-		registerButton.setText("Register");
-		registerButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String tCheck = checkDataValidity();
-				if (tCheck.equals("O.K.")) {
-					controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
-					informationLabel.setText("");
-					controller.registerToForum(registerButton, usernameInput.getText(),
-							new String(passwordInput.getPassword()), 
-							emailInput.getText(),
-							firstNameInput.getText(),
-							lastNameInput.getText());
-
-				}
-				else {
-					informationLabel.setText(tCheck);
-				}
-			}
-		});
-
-		cancelButton = new JButton();
-		cancelButton.setText("Cancel");
-		cancelButton.setPreferredSize(new Dimension(100, 40));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				RegistrationDialog.this.dispose();				
-			}
-
-		});
-
-		registerButton.setPreferredSize(new Dimension(100, 40));
-
-
+		this.registerButton = new JButton();
+		this.cancelButton = new JButton();		
+		initButtons();
 
 		GroupLayout tMainPanelLayout = new GroupLayout(this.getContentPane());
 		this.getContentPane().setLayout(tMainPanelLayout);
@@ -451,22 +348,114 @@ public class RegistrationDialog extends JDialog implements GUIHandler, KeyListen
 								.addComponent(registerButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE)
 								.addComponent(cancelButton, GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE,  GroupLayout.PREFERRED_SIZE))
 								.addGap(10, 10, 10));
-
 		this.setMinimumSize(new Dimension(700, 520));
 		this.setPreferredSize(new Dimension(700, 520));
-
-
-		/*
-		this.usernameInput.setText("yakirda");
-		identification this.passwordInput.setText("123456");
-		this.confirmPasswordInput.setText("123456");
-		this.firstNameInput.setText("Yakir");
-		this.lastNameInput.setText("Dahan");
-		this.emailInput.setText("a@b.c");
-		this.confirmEmailInput.setText("a@b.c");
-		 */
 	}
 
+	private void initButtons() {
+		this.registerButton.setText("Register");
+		this.registerButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String tCheck = checkDataValidity();
+				if (tCheck.equals("O.K.")) {
+					controller.addObserver(new GUIObserver(RegistrationDialog.this), EventType.USER_CHANGED);
+					informationLabel.setText("");
+					controller.registerToForum(registerButton, usernameInput.getText(),
+							new String(passwordInput.getPassword()), 
+							emailInput.getText(),
+							firstNameInput.getText(),
+							lastNameInput.getText());
+				}
+				else {
+					informationLabel.setText(tCheck);
+				}
+			}
+		});
+		this.registerButton.setPreferredSize(new Dimension(100, 40));
+
+		this.cancelButton.setText("Cancel");
+		this.cancelButton.setPreferredSize(new Dimension(100, 40));
+		this.cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				RegistrationDialog.this.dispose();				
+			}
+		});		
+	}
+	
+	private void initUsernameComponents(Font tFont) {
+		this.usernameLabel = new JLabel("Username", JLabel.TRAILING);;
+		this.usernameLabel.setFont(tFont);
+		this.registrationPanel.add(this.usernameLabel);
+		this.usernameInput = new JRestrictedLengthTextField(20, 20, false, true);
+		this.usernameInput.setText("");
+		this.usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.usernameLabel.setLabelFor(this.usernameInput);
+		this.registrationPanel.add(this.usernameInput);
+	}
+
+	private void initPasswordComponents(Font tFont) {
+		this.passwordLabel = new JLabel("Password", JLabel.TRAILING);
+		this.passwordLabel.setFont(tFont);
+		this.registrationPanel.add(this.passwordLabel);
+		this.passwordInput = new JRestrictedLengthPasswordField(20, 20);
+		this.passwordInput.setText("");
+		this.passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.passwordInput);
+		this.passwordLabel.setLabelFor(this.passwordInput);
+
+		this.confirmPasswordLabel = new JLabel("Confirm Password", JLabel.TRAILING);
+		this.confirmPasswordLabel.setFont(tFont);
+		this.registrationPanel.add(this.confirmPasswordLabel);
+		this.confirmPasswordInput = new JRestrictedLengthPasswordField(20, 20);
+		this.confirmPasswordInput.setText("");
+		this.confirmPasswordInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.confirmPasswordInput);
+		this.confirmPasswordLabel.setLabelFor(this.confirmPasswordInput);			
+	}
+	
+	private void initEmailComponents(Font tFont) {
+		this.emailLabel = new JLabel("Email", JLabel.TRAILING);
+		this.emailLabel.setFont(tFont);
+		this.registrationPanel.add(this.emailLabel);
+		this.emailInput = new JRestrictedLengthTextField(40, 40, false, true);
+		this.emailInput.setText("");
+		this.emailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.emailInput);
+		this.emailLabel.setLabelFor(this.emailInput);
+
+		this.confirmEmailLabel = new JLabel("Confirm Email", JLabel.TRAILING);
+		this.confirmEmailLabel.setFont(tFont);
+		this.registrationPanel.add(this.confirmEmailLabel);
+		this.confirmEmailInput = new JRestrictedLengthTextField(40, 40, false, true);
+		this.confirmEmailInput.setText("");
+		this.confirmEmailInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.confirmEmailInput);
+		this.confirmEmailLabel.setLabelFor(this.confirmEmailInput);
+	}
+	
+	private void initFirstNameComponents(Font tFont) {
+		this.firstNameLabel = new JLabel("First Name", JLabel.TRAILING);
+		this.firstNameLabel.setFont(tFont);
+		this.registrationPanel.add(this.firstNameLabel);
+		this.firstNameInput = new JRestrictedLengthTextField(20, 20, false, false);
+		this.firstNameInput.setText("");
+		this.firstNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.firstNameInput);
+		this.firstNameLabel.setLabelFor(this.firstNameInput);
+	}
+	
+	private void initLastNameComponents(Font tFont) {
+		this.lastNameLabel = new JLabel("Last Name", JLabel.TRAILING);
+		this.lastNameLabel.setFont(tFont);
+		this.registrationPanel.add(this.lastNameLabel);
+		this.lastNameInput = new JRestrictedLengthTextField(20, 20, false, false);
+		this.lastNameInput.setText("");
+		this.lastNameInput.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		this.registrationPanel.add(this.lastNameInput);
+		this.lastNameLabel.setLabelFor(this.lastNameInput);
+	}
+	
+	
 	private void clearLabels() {
 		this.usernameLabel.setForeground(Color.BLACK);
 		this.passwordLabel.setForeground(Color.BLACK);

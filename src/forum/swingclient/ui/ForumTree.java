@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -18,16 +19,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -44,13 +42,16 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import forum.swingclient.controllerlayer.*;
-import forum.swingclient.panels.ReplyModifyDialog;
+import forum.server.domainlayer.SystemLogger;
+import forum.swingclient.controllerlayer.ConnectedUserData;
+import forum.swingclient.controllerlayer.ControllerHandler;
+import forum.swingclient.controllerlayer.ControllerHandlerFactory;
+import forum.swingclient.controllerlayer.GUIObserver;
 import forum.swingclient.panels.MainPanel;
+import forum.swingclient.panels.ReplyModifyDialog;
 import forum.swingclient.ui.events.GUIHandler;
 import forum.swingclient.ui.events.JExpansionStatusSavingTree;
 import forum.swingclient.ui.events.GUIEvent.EventType;
-import forum.server.domainlayer.SystemLogger;
 
 /**
  * @author Tomer Heber
@@ -120,6 +121,8 @@ public class ForumTree implements GUIHandler {
 
 		this.container = container;
 		m_tree = new JExpansionStatusSavingTree();
+
+
 		m_tree.putClientProperty("JTree.lineStyle", "Angled");
 
 		m_tree.getSelectionModel().setSelectionMode(
@@ -211,8 +214,7 @@ public class ForumTree implements GUIHandler {
 			}
 
 
-			public void treeWillExpand(TreeExpansionEvent event)
-			throws ExpandVetoException {
+			public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
 				if (shouldAskExpansion) {
 
 
@@ -276,7 +278,21 @@ public class ForumTree implements GUIHandler {
 		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.PAGE_AXIS));
 
 
-		JPanel tCurrentPanel = new JPanel();
+		JPanel tCurrentPanel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8175327762515671628L;
+
+			public void paint(Graphics g) {
+				g.drawImage(new ImageIcon("./images/quadcore5.png").getImage(), 
+						725, 0, 596, 333, null);
+				setOpaque(false);
+				super.paint(g);
+			}
+		};
+
+
 
 		GroupLayout tLayout = new GroupLayout(tCurrentPanel);
 
@@ -288,11 +304,14 @@ public class ForumTree implements GUIHandler {
 				.addGap(20, 20, 20)
 				.addComponent(m_tree, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
 
-		tCurrentPanel.setBackground(Color.white);
+		//		tCurrentPanel.setBackground(Color.yellow);
+		//		m_tree.setBackground(Color.yellow);
 
+		m_tree.setOpaque(false);
 		tCurrentPanel.setLayout(tLayout);
 
 		scrl_tree_pane = new JScrollPane(tCurrentPanel);
+
 
 
 		scrl_tree_pane.setPreferredSize(new Dimension(610,635));
@@ -300,11 +319,14 @@ public class ForumTree implements GUIHandler {
 		// Adds the scroll panes to a split pane.
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
+
 		splitPane.setTopComponent(scrl_tree_pane);
 
 		splitPane.setBottomComponent(selected);
 
 		splitPane.setDividerLocation(260); 
+
+
 
 		m_panel.add(splitPane);
 
@@ -443,7 +465,7 @@ public class ForumTree implements GUIHandler {
 
 							if ((tNodeToExpand == null) && (sonCell.getId() == tMessageID)) {
 								tNodeToExpand = sonNode;
-								
+
 								System.out.println("sassssssssssssssss: " + sonCell.getId());
 								System.out.println("sassssssssssssssss: " +tMessageID);
 							}
@@ -456,7 +478,7 @@ public class ForumTree implements GUIHandler {
 					}
 
 					shouldAskExpansion = false;
-					
+
 					TreePath tPathToRequiredNode = null;
 					if (tNodeToExpand != null) {
 
@@ -496,11 +518,11 @@ public class ForumTree implements GUIHandler {
 							}
 						}
 
-						
-//						for (int i = 0; i < tPathToRequiredNode.getPathCount(); i++)
-//							System.out.println("node: " +
-//							((ForumCell)(((DefaultMutableTreeNode)tPathToRequiredNode.getPathComponent(i)).getUserObject())).getId());
-						
+
+						//						for (int i = 0; i < tPathToRequiredNode.getPathCount(); i++)
+						//							System.out.println("node: " +
+						//							((ForumCell)(((DefaultMutableTreeNode)tPathToRequiredNode.getPathComponent(i)).getUserObject())).getId());
+
 						shouldAskExpansion = true;
 					}
 					container.switchToMessagesView();
@@ -555,7 +577,11 @@ public class ForumTree implements GUIHandler {
 		}
 
 		public void notifyError(String errorMessage) {
-			System.out.println(errorMessage);
+			synchronized (this) {
+				pipe.deleteObserver(this);
+				this.notifyAll();
+			}
+
 		}
 
 		public void refreshForum(String encodedView) {
@@ -786,48 +812,48 @@ public class ForumTree implements GUIHandler {
 
 		MessageTreeNode tNode = (MessageTreeNode)tPath.getPathComponent(0);
 		for (int i = 1; i < tPath.getPathCount() - 1; i++) {
-				synchronized (tNode) {
-					try {
-						ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tNode),
-								EventType.MESSAGES_UPDATED);
-					} 
-					catch (IOException e)  {
-						
-					}
+			synchronized (tNode) {
+				try {
+					ControllerHandlerFactory.getPipe().addObserver(new GUIObserver(tNode),
+							EventType.MESSAGES_UPDATED);
+				} 
+				catch (IOException e)  {
 
-					pipe.getNestedMessages(((ForumCell)tNode.getUserObject()).getId(), false, m_panel);
-
-
-					try {
-						tNode.wait();
-						((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(tNode);
-					}
-
-					catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
 				}
-				
-				Enumeration<MessageTreeNode> tChilds = tNode.children();
-				boolean tFound = false;
-				MessageTreeNode tCurrentChild = null;
-				while (tChilds.hasMoreElements()) {
-					tCurrentChild = tChilds.nextElement();
-					if (((ForumCell)tCurrentChild.getUserObject()).getId() == 
-						((ForumCell)((MessageTreeNode)tPath.getPathComponent(i + 1)).getUserObject()).getId()) {
-							tFound = true;
-							break;
-					}
+
+				pipe.getNestedMessages(((ForumCell)tNode.getUserObject()).getId(), false, m_panel);
+
+
+				try {
+					tNode.wait();
+					((DefaultTreeModel)m_tree.getModel()).nodeStructureChanged(tNode);
 				}
-				if (tFound) {
-					tNode = tCurrentChild;
-					continue;
+
+				catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-				else
+			}
+
+			Enumeration<MessageTreeNode> tChilds = tNode.children();
+			boolean tFound = false;
+			MessageTreeNode tCurrentChild = null;
+			while (tChilds.hasMoreElements()) {
+				tCurrentChild = tChilds.nextElement();
+				if (((ForumCell)tCurrentChild.getUserObject()).getId() == 
+					((ForumCell)((MessageTreeNode)tPath.getPathComponent(i + 1)).getUserObject()).getId()) {
+					tFound = true;
 					break;
+				}
+			}
+			if (tFound) {
+				tNode = tCurrentChild;
+				continue;
+			}
+			else
+				break;
 		}
-		
+
 		new Thread(new Runnable() {
 			public void run() {
 				container.stopWorkingAnimation();							

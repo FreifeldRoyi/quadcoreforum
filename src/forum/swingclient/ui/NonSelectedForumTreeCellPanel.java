@@ -60,6 +60,9 @@ public class NonSelectedForumTreeCellPanel extends JPanel {
 
 	//	this.setPreferredSize(new Dimension(800,200));
 
+		this.setOpaque(false);
+		m_area.setOpaque(false);
+//		msgPanel.setOpaque(false);
 		msgPanel.setBackground(Color.white);
 		this.setBackground(Color.white);
 		

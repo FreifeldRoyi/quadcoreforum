@@ -14,7 +14,7 @@ import javax.swing.tree.TreeCellRenderer;
  */
 public class ForumTreeCellRenderer implements TreeCellRenderer { 
 
-	private static final Color SELECTION_BACKGROUND_COLOR = new Color(231, 239, 214);
+	private static final Color SELECTION_BACKGROUND_COLOR = new Color(207, 223, 247);
 
 	
 	private NonSelectedForumTreeCellPanel m_nonselectedPanel;

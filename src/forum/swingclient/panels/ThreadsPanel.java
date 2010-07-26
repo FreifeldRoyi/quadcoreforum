@@ -272,4 +272,9 @@ public class ThreadsPanel extends TabularPanel implements GUIHandler {
 		this.setVisible(true);
 		container.stopWorkingAnimation();
 	}
+	
+	protected void setMemberView(){
+		super.setMemberView();
+		this.addButton.setVisible(true);
+	}
 }

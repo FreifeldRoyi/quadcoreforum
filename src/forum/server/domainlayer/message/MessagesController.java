@@ -9,18 +9,25 @@
  */
 package forum.server.domainlayer.message ;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Vector;
 
-import forum.server.domainlayer.*;
-import forum.server.domainlayer.interfaces.*;
-import forum.server.domainlayer.user.*;
-
+import forum.server.domainlayer.ForumDataHandler;
+import forum.server.domainlayer.ForumFacade;
+import forum.server.domainlayer.SystemLogger;
+import forum.server.domainlayer.interfaces.UIMessage;
+import forum.server.domainlayer.interfaces.UISubject;
+import forum.server.domainlayer.interfaces.UIThread;
+import forum.server.domainlayer.user.ForumUser;
+import forum.server.domainlayer.user.Permission;
 import forum.server.updatedpersistentlayer.DatabaseRetrievalException;
 import forum.server.updatedpersistentlayer.DatabaseUpdateException;
-
-
-import forum.server.updatedpersistentlayer.pipe.message.exceptions.*;
-import forum.server.updatedpersistentlayer.pipe.user.exceptions.*;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.MessageNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectAlreadyExistsException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.SubjectNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.message.exceptions.ThreadNotFoundException;
+import forum.server.updatedpersistentlayer.pipe.user.exceptions.NotRegisteredException;
 
 public class MessagesController {
 
