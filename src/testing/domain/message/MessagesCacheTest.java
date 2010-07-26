@@ -31,7 +31,7 @@ public class MessagesCacheTest extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		Settings.switchToTestMode();
-		this.messagesCacheUnderTest = new MessagesCache();
+		this.messagesCacheUnderTest = new MessagesCache(true);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class MessagesCacheTest extends TestCase {
 		try {
 			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("name1", "description1", -1);
 			final ForumSubject tObtainedSubject = this.messagesCacheUnderTest.getSubjectByID(tNewSubject.getID());
-			assertSame(tNewSubject, tObtainedSubject);
+			assertEquals(tNewSubject, tObtainedSubject);
 		}
 		catch (SubjectNotFoundException e) {
 			fail(e.getMessage());
@@ -103,7 +103,7 @@ public class MessagesCacheTest extends TestCase {
 			final ForumSubject tNewSubject = this.messagesCacheUnderTest.createNewSubject("sub1", "desc1", -1);
 			assertEquals(tNewSubject.getName(), "sub1");
 			assertEquals(tNewSubject.getDescription(), "desc1");
-			assertSame(tNewSubject, this.messagesCacheUnderTest.getSubjectByID(tNewSubject.getID()));
+			assertEquals(tNewSubject, this.messagesCacheUnderTest.getSubjectByID(tNewSubject.getID()));
 		}
 		catch (SubjectNotFoundException e) {
 			fail(e.getMessage());
@@ -131,14 +131,18 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testGetThreadByID() {
 		try {
-			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 104, -1);
+			long tSubjectID = this.messagesCacheUnderTest.createNewSubject("a", "b", -1).getID();
+			long tMessageID = this.messagesCacheUnderTest.createNewMessage(-1, "a", "b", -1).getMessageID();
+			final ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tMessageID, tSubjectID);
 			final ForumThread tObtainedThread = this.messagesCacheUnderTest.getThreadByID(tNewThread.getID());
-			assertSame(tNewThread, tObtainedThread);
+			assertEquals(tNewThread, tObtainedThread);
 		}
 		catch (ThreadNotFoundException e) {
 			fail(e.getMessage());
 		}
 		catch (DatabaseUpdateException e) {
+			e.printStackTrace();
+			System.exit(-1);
 			fail(e.getMessage());
 		}
 		catch (DatabaseRetrievalException e) {
@@ -152,10 +156,15 @@ public class MessagesCacheTest extends TestCase {
 	@Test
 	public void testOpenNewThread() {
 		try {
-			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", 104, -1);
+			long tSubjectID = this.messagesCacheUnderTest.createNewSubject("a", "b", -1).getID();
+			long tMessageID = this.messagesCacheUnderTest.createNewMessage(-1, "a", "b", -1).getMessageID();
+			ForumThread tNewThread = this.messagesCacheUnderTest.openNewThread("topic1", tMessageID, tSubjectID);
 			assertEquals(tNewThread.getTopic(), "topic1");
-			assertEquals(tNewThread.getRootMessageID(), 104);
-			assertSame(tNewThread, this.messagesCacheUnderTest.getThreadByID(tNewThread.getID()));
+			assertEquals(tNewThread.getRootMessageID(), tMessageID);
+			ForumThread tThread = this.messagesCacheUnderTest.getThreadByID(tNewThread.getID());
+			assertEquals(tNewThread.getID(), tThread.getID());
+			assertEquals(tNewThread.getTopic(), tThread.getTopic());
+			assertEquals(tNewThread.getRootMessageID(), tThread.getRootMessageID());
 		}
 		catch (ThreadNotFoundException e) {
 			fail("the thread hasn't been added successfuly");
@@ -245,7 +254,7 @@ public class MessagesCacheTest extends TestCase {
 		try {
 			ForumMessage tNewMessage = this.messagesCacheUnderTest.createNewMessage(-1, "title1", "content1", -1);
 			ForumMessage tObtainedMessage = this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID());
-			assertSame(tNewMessage, tObtainedMessage);
+			assertEquals(tNewMessage, tObtainedMessage);
 		}
 		catch (MessageNotFoundException e) {
 			fail("the thread hasn't been added successfuly");
@@ -268,7 +277,7 @@ public class MessagesCacheTest extends TestCase {
 			assertEquals(tNewMessage.getAuthorID(), -1);
 			assertEquals(tNewMessage.getTitle(), "title1");
 			assertEquals(tNewMessage.getContent(), "content1");
-			assertSame(tNewMessage, this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID()));
+			assertEquals(tNewMessage, this.messagesCacheUnderTest.getMessageByID(tNewMessage.getMessageID()));
 		} 
 		catch (DatabaseUpdateException e) {
 			fail(e.getMessage());

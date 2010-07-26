@@ -75,7 +75,6 @@ public class Settings {
 			String url = "jdbc:mysql://localhost/" + databaseName;
 			connection = DriverManager.getConnection(url, "root", "1234");
 			statement = connection.createStatement();
-
 			statement.executeUpdate(query);
 
 		}
@@ -116,18 +115,17 @@ public class Settings {
 	public static void switchToTestMode() throws IOException {	
 		boolean toReturn = true;
 		try {
-			/* Load the hsqldb driver which implements the jdbc interface */
+			/* Load the jdbc driver which implements the jdbc interface */
 			Class.forName("com.mysql.jdbc.Driver" );
 		} 
 		catch (Exception e) {
-			SystemLogger.severe("failed to load MYSQLDB JDBC driver and therefore can't run tests.");
+			SystemLogger.severe("failed to load MySQLDb JDBC driver and therefore can't run tests.");
 			toReturn = false;
 		}
 
-
-		if (toReturn)
+		if (toReturn) {
 			toReturn = Settings.executeQuery("mysql", "CREATE DATABASE IF NOT EXISTS QuadCoreForumDBTest");
-
+		}
 		Queue<String> temp = new LinkedList<String>();
 		while (!mainScriptQuery.isEmpty()) {
 			String tCurrentQuery = mainScriptQuery.remove();

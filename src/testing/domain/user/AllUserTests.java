@@ -6,7 +6,7 @@ public class AllUserTests extends TestCase {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite(
-				"Test for forum.testing.domainlayer.user");
+				"Test for forum.server.domainlayer.user");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ForumUserTest.class);
 		suite.addTestSuite(ForumMemberTest.class);

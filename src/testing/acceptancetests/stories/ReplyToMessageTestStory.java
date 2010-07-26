@@ -28,8 +28,9 @@ public class ReplyToMessageTestStory extends GeneralMethodsTest {
 	@Test
 	public void testReplyToMessage() {
 		/* prepares for the test - adds subject, thread and user. */
-		// registers two new users and logins them to the forum 
-		assertTrue(super.register("user1", "pass1", "last1", "first1", "user1@gmail.com"));
+		// registers two new users and logins them to the forum
+		long tFirstUserID = super.register("user1", "pass1", "last1", "first1", "user1@gmail.com");
+		assertFalse(tFirstUserID == -1); // if it is - an exception was thrown
 		String[] tLoginInfo = super.login("user1", "pass1"); 
 		assertNotNull(tLoginInfo);
 		long tLoggedInID = Long.parseLong(tLoginInfo[4]);
@@ -39,31 +40,26 @@ public class ReplyToMessageTestStory extends GeneralMethodsTest {
 		// checks whether the subject was added - should always succeed
 		assertNotSame(tSubject1ID, -1);
 		// adds a new thread
-
 		long tThread1FirstMessageID =
-			super.openNewThread(3, tSubject1ID, "topic1", "title1", "content1");
+			super.openNewThread(tFirstUserID, tSubject1ID, "topic1", "title1", "content1");
 		// checks whether the thread and its first message were added - should always succeed
-		assertFalse(tThread1FirstMessageID == -1);	
-		System.exit(-1);
-
+		assertFalse(tThread1FirstMessageID == -1);	// if it is - an exception was thrown
 		// checks that there are no replies to the new message
 		assertEquals(super.getReplies(tThread1FirstMessageID).size(), 0);
-
 		/* end of prepare - here the test starts. */
 		// adds a reply by a non-existing author - should fail
-		assertFalse(super.addNewReply(tLoggedInID + 10, tThread1FirstMessageID, "title1", "content1"));
-		
+		assertEquals(super.addNewReply(tLoggedInID + 10, tThread1FirstMessageID, "title1", "content1"), -1);		
 		// adds a reply by a not permitted user - should fail
-		assertFalse(super.addNewReply(tLoggedInID  + 1253, tThread1FirstMessageID, "title1", "content1"));
-
-		assertTrue(super.register("user2", "pass2", "last2", "first2", "user2@gmail.com"));
+		assertEquals(super.addNewReply(tLoggedInID  + 1253, tThread1FirstMessageID, "title1", "content1"), -1);
+		long tSecondUserID = super.register("user2", "pass2", "last2", "first2", "user2@gmail.com");
+		assertFalse(tSecondUserID == -1); // if it is - an exception was thrown
 		tLoginInfo = super.login("user2", "pass2");
 		assertNotNull(tLoginInfo);
-		tLoggedInID = Long.parseLong(tLoginInfo[4]);
+		tLoggedInID = Long.parseLong(tLoginInfo[4]);		
 		// adds a reply by an existing and logged-in user
-		assertTrue(super.addNewReply(tLoggedInID, tThread1FirstMessageID, "title1", "content1"));
+		assertTrue(super.addNewReply(tLoggedInID, tThread1FirstMessageID, "title1", "content1") != -1);
 		// adds a reply to non-existing message - should fail
-		assertFalse(super.addNewReply(tLoggedInID, 20, "title1", "content1"));
+		assertFalse(super.addNewReply(tLoggedInID, 20, "title1", "content1") != -1);
 		// get a collection of string representations of thread1 first message replies
 		Collection<String> replies = super.getReplies(tThread1FirstMessageID);
 		assertNotNull(replies);
@@ -71,7 +67,7 @@ public class ReplyToMessageTestStory extends GeneralMethodsTest {
 		// this test method
 		assertEquals(replies.size(), 1);
 		// checks whether the details of the reply are same - as given
-		assertEquals(replies.iterator().next(), "2title1content1");
+		assertEquals(replies.iterator().next(), "3title1content1");
 	}
 
 
