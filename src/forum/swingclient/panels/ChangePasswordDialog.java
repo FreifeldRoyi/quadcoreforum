@@ -220,7 +220,6 @@ public class ChangePasswordDialog extends JDialog implements GUIHandler, KeyList
 				super.paint(g);
 			}
 		};
-		
 		GroupLayout tLayout = new GroupLayout(mainPanel);
 		mainPanel.setLayout(tLayout);
 		this.getContentPane().add(mainPanel);

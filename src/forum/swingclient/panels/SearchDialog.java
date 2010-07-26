@@ -375,16 +375,16 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 
 		this.radBtn_5 = new JRadioButton("5 results per page");
 		this.radBtn_5.setOpaque(false);
-		this.radBtn_5.setForeground(Color.white);
+		this.radBtn_5.setForeground(Color.black);
 		this.radBtn_10 = new JRadioButton("10 results per page");
 		this.radBtn_10.setOpaque(false);
-		this.radBtn_10.setForeground(Color.white);
+		this.radBtn_10.setForeground(Color.black);
 		this.radBtn_15 = new JRadioButton("15 results per page");
 		this.radBtn_15.setOpaque(false);
-		this.radBtn_15.setForeground(Color.white);
+		this.radBtn_15.setForeground(Color.black);
 		this.radBtn_20 = new JRadioButton("20 results per page");
 		this.radBtn_20.setOpaque(false);
-		this.radBtn_20.setForeground(Color.white);
+		this.radBtn_20.setForeground(Color.black);
 
 
 		this.radBtn_5.addActionListener(new ActionListener() {
@@ -454,10 +454,10 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 		this.btnGrp_searchOption = new ButtonGroup();
 		this.radBtn_author = new JRadioButton("Search By Author");
 		this.radBtn_author.setOpaque(false);
-		this.radBtn_author.setForeground(Color.white);
+		this.radBtn_author.setForeground(Color.black);
 		this.radBtn_content = new JRadioButton("Search By Content");
 		this.radBtn_content.setOpaque(false);
-		this.radBtn_content.setForeground(Color.white);
+		this.radBtn_content.setForeground(Color.black);
 		
 		this.radBtn_author.addKeyListener(this);
 		this.radBtn_content.addKeyListener(this);

@@ -781,7 +781,7 @@ public class MainPanel extends JFrame implements GUIHandler {
 			private static final long serialVersionUID = 4663000630699083767L;
 
 			public void paint(Graphics g) {
-				g.drawImage(new ImageIcon("./images/background1.jpg").getImage(), 
+				g.drawImage(new ImageIcon("./images/background5.jpg").getImage(), 
 						0, 0, 1920, 1200, null);
 				setOpaque(false);
 				super.paint(g);
