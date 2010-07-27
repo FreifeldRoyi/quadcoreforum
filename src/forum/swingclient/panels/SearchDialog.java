@@ -29,7 +29,6 @@ public class SearchDialog extends JDialog implements GUIHandler, KeyListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -4418635670089090353L;
-
 	private static final int TABLE_LINES_NUMBER = 3;
 	private static final int TABLE_ROW_HEIGHT = 17;
 

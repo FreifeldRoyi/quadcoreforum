@@ -87,6 +87,7 @@ public class MessagesController {
 			SystemLogger.info("A user with id " + userID + " requests to add a new subject named " + name + " to " + 
 					tLoggerMessageEnd + ".");
 			final ForumUser tApplicant = this.dataHandler.getUsersCache().getUserByID(userID);
+			System.out.println("permisions: "+ tApplicant.getPermissions());
 			if (tApplicant.isAllowed(tPermissionToCheck)) {
 				SystemLogger.info("permission granted for user " + userID + ".");
 				// checks that there doesn't exist a subject whose id is same as the given one, in the required level
