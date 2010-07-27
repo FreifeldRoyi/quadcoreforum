@@ -582,6 +582,10 @@ public class UsersController {
 		final Collection<Permission> toReturn = this.getDefaultMemberPermissions();
 		toReturn.add(Permission.DELETE_THREAD);
 		toReturn.add(Permission.DELETE_MESSAGE);
+		toReturn.add(Permission.ADD_SUBJECT);
+		toReturn.add(Permission.DELETE_SUBJECT);
+		toReturn.add(Permission.ADD_SUB_SUBJECT);
+		toReturn.add(Permission.EDIT_SUBJECT);
 		return toReturn;
 	}
 }
